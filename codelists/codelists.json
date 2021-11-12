@@ -407,6 +407,30 @@
       "url": "https://codelists.opensafely.org/codelist/nhsd-primary-care-domain-refsets/hyp_cod/20210127/",
       "downloaded_at": "2021-11-11 16:06:47.776169Z",
       "sha": "2c1fb493d94ce1610482d575ef14c35bd09e47c1"
+    },
+    "user-hjforbes-tia_snomed.csv": {
+      "id": "user/hjforbes/tia_snomed/04fdfd0d",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/tia_snomed/04fdfd0d/",
+      "downloaded_at": "2021-11-12 11:38:27.867090Z",
+      "sha": "f2f150a0e66dd879f981e08125b1228eb6dda218"
+    },
+    "user-hjforbes-tia_icd10.csv": {
+      "id": "user/hjforbes/tia_icd10/6bee89d7",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/tia_icd10/6bee89d7/",
+      "downloaded_at": "2021-11-12 11:38:28.182108Z",
+      "sha": "66297d49dce122a650bd71a45fa90e8f2150dfd1"
+    },
+    "user-hjforbes-angina_snomed.csv": {
+      "id": "user/hjforbes/angina_snomed/52df16a2",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/angina_snomed/52df16a2/",
+      "downloaded_at": "2021-11-12 11:38:28.456802Z",
+      "sha": "a3898f852193d02a74604d9d2d4a2535b8262a8c"
+    },
+    "user-hjforbes-angina_hf_icd10.csv": {
+      "id": "user/hjforbes/angina_hf_icd10/20c03038",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/angina_hf_icd10/20c03038/",
+      "downloaded_at": "2021-11-12 11:38:28.721363Z",
+      "sha": "e686d33f3c7927bb49d8503e51f4b91df1c793c7"
     }
   }
 }

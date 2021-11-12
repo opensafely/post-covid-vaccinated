@@ -434,3 +434,27 @@ hypertension_snomed_clinical = codelist_from_csv(
     system="snomed",
     column="code",
 )
+
+tia_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-tia_snomed.csv",
+    system="snomed",
+    column="code",
+)
+
+tia_icd10 = codelist_from_csv(
+    "codelists/user-hjforbes-tia_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+angina_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-angina_snomed.csv",
+    system="snomed",
+    column="code",
+)
+
+angina_icd10 = codelist_from_csv(
+    "codelists/user-hjforbes-angina_hf_icd10.csv",
+    system="icd10",
+    column="code",
+)

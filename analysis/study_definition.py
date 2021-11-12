@@ -388,6 +388,48 @@ study = StudyDefinition(
 ###Deep vein thrombosis
 
 ###Transient ischaemic attack
+   #primary care
+    tia_snomed=patients.with_these_clinical_events(
+        tia_snomed_clinical,
+        returning="date",
+        on_or_after="index_date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+     #HES APC
+    tia_icd10_hes=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=tia_icd10,
+        on_or_after="index_date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+    #ONS
+    tia_icd10_death=patients.with_these_codes_on_death_certificate(
+        tia_icd10,
+        returning="date_of_death",
+        on_or_after="index_date",
+        match_only_underlying_cause=True,
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.02
+        },
+    ),
+    out_tia=patients.minimum_of(
+        "tia_snomed", "tia_icd10_hes", "tia_icd10_death"
+    ),
 
 ###Subarachnoid haemorrhage and haemorrhagic stroke
     #primary care
@@ -478,6 +520,49 @@ study = StudyDefinition(
     ),
 
 ###Angina
+   #primary care
+    angina_snomed=patients.with_these_clinical_events(
+        angina_snomed_clinical,
+        returning="date",
+        on_or_after="index_date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+     #HES APC
+    angina_icd10_hes=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=angina_icd10,
+        on_or_after="index_date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+    #ONS
+    angina_icd10_death=patients.with_these_codes_on_death_certificate(
+        angina_icd10,
+        returning="date_of_death",
+        on_or_after="index_date",
+        match_only_underlying_cause=True,
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.02
+        },
+    ),
+    out_angina=patients.minimum_of(
+        "angina_snomed", "angina_icd10_hes", "angina_icd10_death"
+    ),
+
 
 ###Arterial thrombosis events
 

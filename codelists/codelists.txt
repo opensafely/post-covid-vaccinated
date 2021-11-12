@@ -66,3 +66,7 @@ user/elsie_horne/myocarditis_icd10/48ed9c53
 user/elsie_horne/hypertension_icd10/1a48296e
 user/elsie_horne/hypertension_drugs_dmd/0009f464
 nhsd-primary-care-domain-refsets/hyp_cod/20210127
+user/hjforbes/tia_snomed/04fdfd0d
+user/hjforbes/tia_icd10/6bee89d7
+user/hjforbes/angina_snomed/52df16a2
+user/hjforbes/angina_hf_icd10/20c03038
