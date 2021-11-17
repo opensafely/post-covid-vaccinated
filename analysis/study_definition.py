@@ -63,7 +63,6 @@ variables = {
     "cov_ever_hf": [hf_snomed_clinical, hf_icd10],
     "cov_ever_pericarditis": [pericarditis_icd10],
     "cov_ever_myocarditis": [myocarditis_icd10],
-
 }
 
 covariates = {k: get_codelist_variable(v) for k, v in variables.items()}
@@ -646,7 +645,7 @@ study = StudyDefinition(
         },
     ),
     out_ate=patients.minimum_of(
-        "out_ami", "out_stroke_isch", "oae_icd10_hes", "oae_icd10_death"
+        "ami_snomed", "ami_icd10_hes", "ami_icd10_death", "oae_icd10_hes", "oae_icd10_death", "stroke_isch_snomed", "stroke_isch_icd10_hes", "stroke_isch_icd10_death"
     ),
 
 ###Venous thromboembolism events (PE, DVT, ICVT, Portal vein thrombosism, other DVT)
@@ -692,7 +691,6 @@ study = StudyDefinition(
     out_vte=patients.minimum_of(
         "all_vte_codes_snomed", "all_vte_codes_icd10_hes", "all_vte_codes_icd10_death"
     ),
-
 
 
 #SECTION 5 --- DEFINE COVARIATES ---
