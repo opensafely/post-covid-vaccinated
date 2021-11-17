@@ -7,6 +7,9 @@
 
 # --- IMPORT STATEMENTS ---
 
+import numpy as np
+np.random.seed(123456)
+
 ## Import code building blocks from cohort extractor package
 from cohortextractor import (
   StudyDefinition,
@@ -292,7 +295,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_AMI=patients.minimum_of(
+    out_ami=patients.minimum_of(
         "ami_snomed", "ami_icd10_hes", "ami_icd10_death"
     ),
 
@@ -339,7 +342,60 @@ study = StudyDefinition(
     out_stroke_isch=patients.minimum_of(
         "stroke_isch_snomed", "stroke_isch_icd10_hes", "stroke_isch_icd10_death"
     ),
-
+###Deep vein thrombosis (no primary care codes)
+     #HES APC
+    dvt_icd10_hes=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=dvt_dvt_icd10,
+        on_or_after="index_date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+    dvt_pregnancy_icd10_hes=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=dvt_pregnancy_icd10,
+        on_or_after="index_date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+    #ONS
+    dvt_icd10_death=patients.with_these_codes_on_death_certificate(
+        dvt_dvt_icd10,
+        returning="date_of_death",
+        on_or_after="index_date",
+        match_only_underlying_cause=True,
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.02,
+        },
+    ),
+    dvt_pregnancy_icd10_death=patients.with_these_codes_on_death_certificate(
+        dvt_pregnancy_icd10,
+        returning="date_of_death",
+        on_or_after="index_date",
+        match_only_underlying_cause=True,
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.02,
+        },
+    ),
+    out_dvt=patients.minimum_of(
+        "dvt_icd10_hes", "dvt_icd10_death", "dvt_pregnancy_icd10_hes", "dvt_pregnancy_icd10_death"
+    ),
 
 ###Pulmonary embolism
     #primary care
@@ -384,8 +440,6 @@ study = StudyDefinition(
     out_pe=patients.minimum_of(
         "pe_snomed", "pe_icd10_hes", "pe_icd10_death"
     ),
-
-###Deep vein thrombosis
 
 ###Transient ischaemic attack
    #primary care
@@ -565,8 +619,79 @@ study = StudyDefinition(
 
 
 ###Arterial thrombosis events
+    #HES APC
+    oae_icd10_hes=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=other_arterial_embolism_icd10, 
+        on_or_after="index_date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+    #ONS
+    oae_icd10_death=patients.with_these_codes_on_death_certificate(
+        other_arterial_embolism_icd10,
+        returning="date_of_death",
+        on_or_after="index_date",
+        match_only_underlying_cause=True,
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.02
+        },
+    ),
+    out_ate=patients.minimum_of(
+        "out_ami", "out_stroke_isch", "oae_icd10_hes", "oae_icd10_death"
+    ),
 
-###Venous thromboembolism events
+###Venous thromboembolism events (PE, DVT, ICVT, Portal vein thrombosism, other DVT)
+    #primary care
+    all_vte_codes_snomed=patients.with_these_clinical_events(
+        all_vte_codes_snomed,
+        returning="date",
+        on_or_after="index_date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+     #HES APC
+    all_vte_codes_icd10_hes=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=all_vte_codes_icd10,
+        on_or_after="index_date",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+    #ONS
+    all_vte_codes_icd10_death=patients.with_these_codes_on_death_certificate(
+        all_vte_codes_icd10,
+        returning="date_of_death",
+        on_or_after="index_date",
+        match_only_underlying_cause=True,
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.02
+        },
+    ),
+    out_vte=patients.minimum_of(
+        "all_vte_codes_snomed", "all_vte_codes_icd10_hes", "all_vte_codes_icd10_death"
+    ),
 
 
 

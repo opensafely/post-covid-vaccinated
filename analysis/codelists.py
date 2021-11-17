@@ -1,4 +1,4 @@
-from cohortextractor import codelist_from_csv
+from cohortextractor import codelist_from_csv, combine_codelists
 
 covid_codes = codelist_from_csv(
     "codelists/opensafely-covid-identification.csv",
@@ -457,4 +457,19 @@ angina_icd10 = codelist_from_csv(
     "codelists/user-hjforbes-angina_hf_icd10.csv",
     system="icd10",
     column="code",
+)
+
+all_vte_codes_icd10 = combine_codelists(
+    portal_vein_thrombosis_icd10, 
+    dvt_dvt_icd10, 
+    dvt_icvt_icd10, 
+    dvt_pregnancy_icd10, 
+    other_dvt_icd10, 
+    icvt_pregnancy_icd10, 
+    pe_icd10
+)
+
+all_vte_codes_snomed = combine_codelists(
+    pe_snomed_clinical,
+    dvt_icvt_snomed_clinical
 )
