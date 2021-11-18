@@ -70,4 +70,6 @@ user/hjforbes/tia_snomed/04fdfd0d
 user/hjforbes/tia_icd10/6bee89d7
 user/hjforbes/angina_snomed/52df16a2
 user/hjforbes/angina_hf_icd10/20c03038
-user/RochelleKnight/prostate_cancer_snomed/4f65a31d
+user/RochelleKnight/prostate_cancer_snomed/0437497e
+user/RochelleKnight/prostate_cancer_icd10/6b27d648
+user/RochelleKnight/pregnancy_and_birth_snomed/1d46bcb3
