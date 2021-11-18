@@ -63,6 +63,8 @@ variables = {
     "cov_ever_hf": [hf_snomed_clinical, hf_icd10],
     "cov_ever_pericarditis": [pericarditis_icd10],
     "cov_ever_myocarditis": [myocarditis_icd10],
+    "cov_ever_prostate_cancer":[prostate_cancer_snomed_clinical, prostate_cancer_icd10,],
+    "cov_ever_pregnancy":[pregnancy_snomed_clinical],
 }
 
 covariates = {k: get_codelist_variable(v) for k, v in variables.items()}

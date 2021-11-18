@@ -473,3 +473,21 @@ all_vte_codes_snomed = combine_codelists(
     pe_snomed_clinical,
     dvt_icvt_snomed_clinical
 )
+
+prostate_cancer_icd10 = codelist_from_csv(
+    "codelists/user-RochelleKnight-prostate_cancer_snomed.csv",
+    system="icd10",
+    column="code",
+)
+
+prostate_cancer_snomed_clinical = codelist_from_csv(
+    "codelists/user-RochelleKnight-prostate_cancer_snomed.csv",
+    system="snomed",
+    column="code",
+)
+
+pregnancy_snomed_clinical = codelist_from_csv(
+    "codelists/user-RochelleKnight-pregnancy_and_birth_snomed.csv",
+    system="snomed",
+    column="code",
+)
