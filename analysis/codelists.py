@@ -469,7 +469,7 @@ all_vte_codes_icd10 = combine_codelists(
     pe_icd10
 )
 
-all_vte_codes_snomed = combine_codelists(
+all_vte_codes_snomed_clinical = combine_codelists(
     pe_snomed_clinical,
     dvt_icvt_snomed_clinical
 )

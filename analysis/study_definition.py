@@ -34,37 +34,26 @@ placeholder_dmd = codelist(["dmd_id"], system="snomed")
 
 
 variables = {
-    "cov_ever_ami": [ami_snomed_clinical, ami_icd10, ami_prior_icd10],
-    "cov_ever_pe_vt": [pe_icd10, pe_snomed_clinical, dvt_dvt_icd10, other_dvt_icd10, dvt_pregnancy_icd10, icvt_pregnancy_icd10, portal_vein_thrombosis_icd10, vt_icd10],
-    "cov_ever_icvt": [dvt_icvt_icd10, dvt_icvt_snomed_clinical],
-    "cov_ever_all_stroke": [stroke_isch_icd10, stroke_isch_snomed_clinical, stroke_sah_hs_icd10, stroke_sah_hs_snomed_clinical],
-    "cov_ever_thrombophilia": [thrombophilia_snomed_clinical, thrombophilia_icd10],
-    "cov_ever_tcp": [thrombocytopenia_icd10, ttp_icd10, tcp_snomed_clinical],
-    "cov_ever_dementia": [dementia_snomed_clinical, dementia_icd10, dementia_vascular_snomed_clinical, dementia_vascular_icd10],
-    "cov_ever_liver_disease": [liver_disease_snomed_clinical, liver_disease_icd10],
-    "cov_ever_ckd": [ckd_snomed_clinical, ckd_icd10],
-    "cov_ever_cancer": [cancer_snomed_clinical, cancer_icd10],
-    "cov_ever_hypertension": [hypertension_icd10, hypertension_drugs_dmd, hypertension_snomed_clinical],
-    "cov_ever_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
-    "cov_ever_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
-    "cov_ever_depression": [depression_snomed_clinical, depression_icd10],
-    "cov_ever_copd": [copd_snomed_clinical, copd_icd10],
-    "cov_antiplatelet_meds": [antiplatelet_dmd],
-    "cov_lipid_meds": [lipid_lowering_dmd],
-    "cov_anticoagulation_meds": [anticoagulant_dmd],
-    "cov_cocp_meds": [cocp_dmd],
-    "cov_hrt_meds": [hrt_dmd],
-    "cov_ever_other_arterial_embolism": [other_arterial_embolism_icd10],
-    "cov_ever_dic": [dic_icd10],
-    "cov_ever_mesenteric_thrombus": [mesenteric_thrombus_icd10],
-    "cov_ever_artery_dissect": [artery_dissect_icd10],
-    "cov_ever_life_arrhythmia": [life_arrhythmia_icd10],
-    "cov_ever_cardiomyopathy": [cardiomyopathy_snomed_clinical, cardiomyopathy_icd10],
-    "cov_ever_hf": [hf_snomed_clinical, hf_icd10],
-    "cov_ever_pericarditis": [pericarditis_icd10],
-    "cov_ever_myocarditis": [myocarditis_icd10],
-    "cov_ever_prostate_cancer":[prostate_cancer_snomed_clinical, prostate_cancer_icd10,],
-    "cov_ever_pregnancy":[pregnancy_snomed_clinical],
+    "cov_ami": [ami_snomed_clinical, ami_icd10, ami_prior_icd10],
+    "cov_all_stroke": [stroke_isch_icd10, stroke_isch_snomed_clinical, stroke_sah_hs_icd10, stroke_sah_hs_snomed_clinical],
+    "cov_other_arterial_embolism": [other_arterial_embolism_icd10],
+    "cov_venous_thrombolism_events": [all_vte_codes_snomed_clinical, all_vte_codes_icd10],
+    "cov_heart_failure": [hf_snomed_clinical, hf_icd10],
+    "cov_angina": [angina_snomed_clinical, angina_icd10],
+    "cov_dementia": [dementia_snomed_clinical, dementia_icd10, dementia_vascular_snomed_clinical, dementia_vascular_icd10],
+    "cov_liver_disease": [liver_disease_snomed_clinical, liver_disease_icd10],
+    "cov_chronic_kidney_disease": [ckd_snomed_clinical, ckd_icd10],
+    "cov_cancer": [cancer_snomed_clinical, cancer_icd10],
+    "cov_hypertension": [hypertension_icd10, hypertension_drugs_dmd, hypertension_snomed_clinical],
+    "cov_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
+    "cov_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
+    "cov_depression": [depression_snomed_clinical, depression_icd10],
+    "cov_chronic_obstructive_pulmonary_disease": [copd_snomed_clinical, copd_icd10],
+    "cov_lipid_medications": [lipid_lowering_dmd],
+    "cov_antiplatelet_medications": [antiplatelet_dmd],
+    "cov_anticoagulation_medications": [anticoagulant_dmd],
+    "cov_combined_oral_contraceptive_pill": [cocp_dmd],
+    "cov_hormone_replacement_therapy": [hrt_dmd],   
 }
 
 covariates = {k: get_codelist_variable(v) for k, v in variables.items()}
@@ -653,7 +642,7 @@ study = StudyDefinition(
 ###Venous thromboembolism events (PE, DVT, ICVT, Portal vein thrombosism, other DVT)
     #primary care
     all_vte_codes_snomed=patients.with_these_clinical_events(
-        all_vte_codes_snomed,
+        all_vte_codes_snomed_clinical,
         returning="date",
         on_or_after="index_date",
         date_format="YYYY-MM-DD",
@@ -694,8 +683,67 @@ study = StudyDefinition(
         "all_vte_codes_snomed", "all_vte_codes_icd10_hes", "all_vte_codes_icd10_death"
     ),
 
+#SECTION 5 --- DEFINE QUALITY ASSURANCE VARIABLES ---
 
-#SECTION 5 --- DEFINE COVARIATES ---
+ ###Prostate cancer
+    #primary care
+    prostate_cancer_snomed=patients.with_these_clinical_events(
+        prostate_cancer_snomed_clinical,
+        returning="date",
+        on_or_before="today", # i.e. is this code ever on their record
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+     #HES APC
+    prostate_cancer_hes=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=prostate_cancer_icd10,
+        on_or_before="today", # i.e. is this code ever on their record
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+     #ONS
+    prostate_cancer_death=patients.with_these_codes_on_death_certificate(
+        prostate_cancer_icd10,
+        returning="date_of_death",
+        on_or_before="today", # i.e. is this code ever on their record
+        match_only_underlying_cause=True,
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.02
+        },
+    ),
+    qa_prostate_cancer=patients.minimum_of(
+        "prostate_cancer_snomed", "prostate_cancer_hes", "prostate_cancer_death"
+    ),
+ ###Pregnancy
+    #primary care
+    qa_pregnancy=patients.with_these_clinical_events(
+        pregnancy_snomed_clinical,
+        returning="date",
+        on_or_before="today", # i.e. is this code ever on their record
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+         return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
+#SECTION 6 --- DEFINE COVARIATES ---
 
   ### Sex
   cov_sex = patients.sex(
@@ -791,8 +839,6 @@ study = StudyDefinition(
         },
     ),
 
-#Medications (definition TBC)
-
   ###Smoking status
     cov_smoking_status=patients.categorised_as(
         {
@@ -819,6 +865,8 @@ study = StudyDefinition(
             on_or_before="index_date",
         ),
     ),
+
+    ###Other covariates (see: variables)
     **covariates,
 
 )
