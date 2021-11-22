@@ -793,7 +793,7 @@ study = StudyDefinition(
             returning="category",
             find_last_match_in_period=True,
         ),
-        return_expectations=helpers.generate_universal_expectations(6),
+        return_expectations=helpers.generate_universal_expectations(5), ## 6 ethncity categories includes missing but generate_universal_expectations adds missing by default hence 5, not 6 here
     ),
 
   ###deprivation
