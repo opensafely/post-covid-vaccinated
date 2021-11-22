@@ -66,5 +66,5 @@ input$rule9=((input$cov_sex=="M" & input$cov_hormone_replacement_therapy==1)|(in
 
 
 #Remove rows that are TRUE for at least one rule
-input_QA=input[rule1==F & rule2==F & rule3==F & rule4==F & rule7==F & rule9==F,]
-input_QA=input_QA %>% select(-c(rule1,rule2,rule3,rule4,rule7,rule9))
+input_QA=input[rule1==F & rule2==F & rule3==F & rule4==F & rule6==F & rule7==F & rule9==F,]
+input_QA=input_QA %>% select(-c(rule1,rule2,rule3,rule4,rule6,rule7,rule9))
