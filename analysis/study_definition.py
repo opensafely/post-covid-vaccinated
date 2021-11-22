@@ -214,8 +214,8 @@ study = StudyDefinition(
         "primary_care_death_date", "ons_died_from_any_cause_date"
     ),
 
-    #Date of birth
-    birth_date=patients.date_of_birth(
+    #Year of birth
+    birth_year=patients.date_of_birth(
         date_format="YYYY",
         return_expectations={
             "date": {"earliest": "1900-01-01", "latest": "today"},
