@@ -765,12 +765,12 @@ study = StudyDefinition(
 
   ### Ethnicity 
         cov_ethnicity=patients.categorised_as(
-        helpers.generate_ethnicity_dictionary(16),
+        helpers.generate_ethnicity_dictionary(6),
         cov_ethnicity_sus=patients.with_ethnicity_from_sus(
-            returning="group_16", use_most_frequent_code=True
+            returning="group_6", use_most_frequent_code=True
         ),
         cov_ethnicity_gp_opensafely=patients.with_these_clinical_events(
-            opensafely_ethnicity_codes_16,
+            opensafely_ethnicity_codes_6,
             on_or_before="index_date",
             returning="category",
             find_last_match_in_period=True,
@@ -782,7 +782,7 @@ study = StudyDefinition(
             find_last_match_in_period=True,
         ),
         cov_ethnicity_gp_opensafely_date=patients.with_these_clinical_events(
-            opensafely_ethnicity_codes_16,
+            opensafely_ethnicity_codes_6,
             on_or_before="index_date",
             returning="category",
             find_last_match_in_period=True,
@@ -793,7 +793,7 @@ study = StudyDefinition(
             returning="category",
             find_last_match_in_period=True,
         ),
-        return_expectations=helpers.generate_universal_expectations(16),
+        return_expectations=helpers.generate_universal_expectations(6),
     ),
 
   ###deprivation

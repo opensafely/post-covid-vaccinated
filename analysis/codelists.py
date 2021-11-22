@@ -48,18 +48,18 @@ covid_primary_care_sequalae = codelist_from_csv(
     column="CTV3ID",
 )
 
-opensafely_ethnicity_codes_16 = codelist_from_csv(
+opensafely_ethnicity_codes_6 = codelist_from_csv(
     "codelists/opensafely-ethnicity.csv",
     system="ctv3",
     column="Code",
-    category_column="Grouping_16",
+    category_column="Grouping_6",
 )
 
 primis_covid19_vacc_update_ethnicity = codelist_from_csv(
     "codelists/primis-covid19-vacc-uptake-eth2001.csv",
     system="snomed",
     column="code",
-    category_column="grouping_16_id",
+    category_column="grouping_6_id",
 )
 
 smoking_clear = codelist_from_csv(
