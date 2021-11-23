@@ -32,5 +32,20 @@ data1$start_alive[is.na(data1$start_alive)] <- 1
 table(data1$start_alive, useNA = "ifany")# ~482 died before the start date
 
 #subset data based on alive status on day 1 of follow up.
-data2 <- subset(data1, data1$start_alive > 0) #~ 9518 samples retained
+data1 <- subset(data1, data1$start_alive > 0) #~ 9518 samples retained
 
+#INCLUSION CRITERIA 2.Known age between 18 and 110 inclusive on the first day of follow-up 
+table(data$cov_age >=18, useNA = "ifany" )# ISSUE submitted to include DOB in study definition
+
+#subset data based >=18 status on day 1 of follow up.
+data2 <- subset(data1, data1$cov_age >= 18) #~ 7479 samples retained
+
+#INCLUSION CRITERIA 3.Known sex
+table(data2$cov_sex, useNA = "ifany")# nO 'NAs' found
+
+#INCLUSION CRITERIA 4.Known deprivation 
+table(data2$cov_deprivation, useNA = "ifany")# ~65 '0' found
+data4 <- subset(data2, data2$cov_deprivation >= 1)#7414 samples retained
+
+#INCLUSION CRITERIA 5.Registered in an English GP with TPP software for at least 6 months prior to the study start date
+str(data)
