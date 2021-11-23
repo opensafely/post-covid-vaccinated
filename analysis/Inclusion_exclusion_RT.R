@@ -6,46 +6,50 @@
 #Reason "Individuals may not have the best protection until 7–14 days after their second dose of the vaccine"
 #Ref: https://www.health.gov.au/initiatives-and-programs/covid-19-vaccines/is-it-true/is-it-true-how-long-does-it-take-to-have-immunity-after-vaccination
 
-#PRESET change dates to date format
-data1$covid19_vaccination_date1 <- as.Date(data1$covid19_vaccination_date1,tryFormats = c("%Y-%m-%d"))
-data1$covid19_vaccination_date2 <- as.Date(data1$covid19_vaccination_date2,tryFormats = c("%Y-%m-%d"))
-data1$death_covid19_date <- as.Date(data1$death_covid19_date,tryFormats = c("%Y-%m-%d"))
-data1$primary_care_death_date <- as.Date(data1$primary_care_death_date,tryFormats = c("%Y-%m-%d"))
-data1$ons_died_from_any_cause_date <- as.Date(data1$ons_died_from_any_cause_date,tryFormats = c("%Y-%m-%d"))
-
 #COHORT START DATE
 #a.start date 2021-06-1 of the cohort if not vaccinated
-data1$delta_start <- as.Date("2021-06-01")
+data$delta_start <- as.Date("2021-06-01")
 #b.15 days after the second vaccination
-data1$immune_start <- as.Date(data1$covid19_vaccination_date2)+15
+data$immune_start <- as.Date(data$covid19_vaccination_date2)+15
 #c.latest of a,b as COHORT start date
-data1$vacc_coh_start_date <- pmax(data1$delta_start, data1$immune_start, na.rm = TRUE)
+data$vacc_coh_start_date <- pmax(data$delta_start, data$immune_start, na.rm = TRUE)
 
-#INCLUSION CRITERIA 1.Alive on the first day of follow up
+#INCLUSION CRITERIA 1.Alive on the first day of follow up---------------------------------------------------------------
 #a.Determine the death date
-data1$vacc_coh_death_date <- pmin(data1$death_covid19_date, data1$primary_care_death_date, data1$ons_died_from_any_cause_date, na.rm = TRUE)
+data$death_date <- as.Date(data$death_date)
 #Adopted the earliest available death date
 
 #b.determine the living status on start date
-data1$start_alive <- ifelse(data1$vacc_coh_death_date < data1$vacc_coh_start_date, 0, 1)# 1- alive; 0 - died
-data1$start_alive[is.na(data1$start_alive)] <- 1
-table(data1$start_alive, useNA = "ifany")# ~482 died before the start date
+data$start_alive <- ifelse(data$death_date < data$vacc_coh_start_date, 0, 1)# 1- alive; 0 - died
+data$start_alive[is.na(data$start_alive)] <- 1
+table(data$start_alive, useNA = "ifany")# ~ 466 died before the start date
 
 #subset data based on alive status on day 1 of follow up.
-data1 <- subset(data1, data1$start_alive > 0) #~ 9518 samples retained
+data1 <- subset(data, data$start_alive > 0) #~ 9534 samples retained
 
-#INCLUSION CRITERIA 2.Known age between 18 and 110 inclusive on the first day of follow-up 
-table(data$cov_age >=18, useNA = "ifany" )# ISSUE submitted to include DOB in study definition
+#INCLUSION CRITERIA 2.Known age between 18 and 110 inclusive on the first day of follow-up-------------------------------------- 
+table(data$cov_age >=18, useNA = "ifany" )# ~ 2156 under 18 age group
 
 #subset data based >=18 status on day 1 of follow up.
-data2 <- subset(data1, data1$cov_age >= 18) #~ 7479 samples retained
+data2 <- subset(data1, data1$cov_age >= 18) #~ 7492 samples retained
 
-#INCLUSION CRITERIA 3.Known sex
+#INCLUSION CRITERIA 3.Known sex-----------------------------------------------------------------------------------------
 table(data2$cov_sex, useNA = "ifany")# nO 'NAs' found
 
-#INCLUSION CRITERIA 4.Known deprivation 
+#INCLUSION CRITERIA 4.Known deprivation--------------------------------------------------------------------------- 
 table(data2$cov_deprivation, useNA = "ifany")# ~65 '0' found
-data4 <- subset(data2, data2$cov_deprivation >= 1)#7414 samples retained
+data4 <- subset(data2, data2$cov_deprivation >= 1)#7427 samples retained
 
-#INCLUSION CRITERIA 5.Registered in an English GP with TPP software for at least 6 months prior to the study start date
-str(data)
+#INCLUSION CRITERIA 5.Registered in an English GP with TPP software for at least 6 months prior to the study start date--------------------------
+
+#EXCLUSION CRITERIA 6.SARS-CoV-2 infection recorded prior to the start of follow-up---------------------------------------
+#a.Determine the SARS-CoV-2 infection date
+data4$exp_confirmed_covid19_date <- as.Date(data4$exp_confirmed_covid19_date)
+#the earliest date adopted in the definition
+
+#b.determine prior to start date infections
+data4$prior_infections <- ifelse(data4$exp_confirmed_covid19_date < data4$vacc_coh_start_date, 1,0)#1-prior infection; 0 - No prior infection
+data4$prior_infections[is.na(data4$prior_infections)] <- 0
+table(data4$prior_infections, useNA = "ifany") #~183 prior infections
+
+data6 <- subset(data4, data4$prior_infections < 1)#~7244 samples retain
