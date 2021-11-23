@@ -14,6 +14,14 @@ data$immune_start <- as.Date(data$covid19_vaccination_date2)+15
 #c.latest of a,b as COHORT start date
 data$vacc_coh_start_date <- pmax(data$delta_start, data$immune_start, na.rm = TRUE)
 
+#COHORT END DATE
+#a.End date 2021-12-31 of the cohort (temporary - but latter change to last date of data collection)
+data$delta_end <- as.Date("2021-12-31")
+#b.sample follow up ends on Death date, if any
+data11$delta_end <- data11$death_date
+data11$delta_end[is.na(data11$delta_end)] <- as.Date("2021-12-31")
+
+
 #INCLUSION CRITERIA 1.Alive on the first day of follow up---------------------------------------------------------------
 #a.Determine the death date
 data$death_date <- as.Date(data$death_date)
@@ -53,3 +61,15 @@ data4$prior_infections[is.na(data4$prior_infections)] <- 0
 table(data4$prior_infections, useNA = "ifany") #~183 prior infections
 
 data6 <- subset(data4, data4$prior_infections < 1)#~7244 samples retain
+#EXCLUSION CRITERIA 7.do not have a record of two vaccination doses prior to the study end date--------------------------------
+#a.Determine the vaccination dates
+data6$covid19_vaccination_date1 <- as.Date(data6$covid19_vaccination_date1)
+data6$covid19_vaccination_date2 <- as.Date(data6$covid19_vaccination_date2)
+
+#b.determine the vaccination gap in days
+data6$vacc_gap <- data6$covid19_vaccination_date2 - data6$covid19_vaccination_date1
+
+#b.Determine the 'fully' vaccinated status
+data6$fully_vacc <- ifelse(data6$vacc_gap > 0,0,1) # 0- not fully vaccinated, 1- fully vaccinated
+data6$fully_vacc <- ifelse()
+table(data6$fully_vacc, useNA = "ifany")# ~65 '0' found
