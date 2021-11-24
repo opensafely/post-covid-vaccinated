@@ -804,7 +804,7 @@ study = StudyDefinition(
             returning="index_of_multiple_deprivation",
             round_to_nearest=100,
         ),
-        return_expectations=helpers.generate_universal_expectations(10),
+        return_expectations=helpers.generate_universal_expectations(10,False),
     ),
 
   ###Region
