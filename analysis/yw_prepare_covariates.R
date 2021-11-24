@@ -23,8 +23,7 @@
 #    3. cov_smoking_status = E, M, N, S, needs more detailed descriptions in the text about these labels
 
 # YW Notes:
-#    1. No "NA" in covariates apart from smoking status, 50% missing in this covariate
-
+#    1. No "NA" in covariates apart from smoking status, 50% "NA" in this covariate
 
 # YW 24/Nov/2021 make deprivation as a categorical variable
 #                deprivation: 11 unique integers, from 0 to 10. 
