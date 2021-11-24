@@ -89,15 +89,18 @@ data7 <- data6[!is.na(data6$vacc_gap),] #2902 samples retain
 data8 <- subset(data7, data7$covid19_vaccination_date1 >= as.Date("2020-12-08"))
 data8 <- subset(data7, data7$covid19_vaccination_date2 >= as.Date("2020-12-08"))# none change
 
-#received a vaccination prior to 08-12-2020 (i.e., the start of the vaccination program) 
+#EXCLUSION CRITERIA 9.received a second dose vaccination before their first dose vaccination------------
+table(data8$vacc_gap < 0) # ~ 1475 -ve gaps
+data9 <- subset(data8, data8$vacc_gap >= 0) # 1427 samples retain
 
-#received a second dose vaccination but not a first dose vaccination 
 
-#received a second dose vaccination before their first dose vaccination 
 
-#received a second dose vaccination less than three weeks after their first dose 
+ 
 
-#recorded as having a situation (e.g., refused vaccination) 
 
-#received mixed vaccine products before 07-05-2021 
 
+#They received a second dose vaccination less than three weeks after their first dose 
+
+#They are recorded as having a situation (e.g., refused vaccination) 
+
+#They received mixed vaccine products before 07-05-2021 
