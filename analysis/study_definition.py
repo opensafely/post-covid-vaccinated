@@ -806,56 +806,35 @@ study = StudyDefinition(
     #primary care
     prostate_cancer_snomed=patients.with_these_clinical_events(
         prostate_cancer_snomed_clinical,
-        returning="date",
-        on_or_before="today", # i.e. is this code ever on their record
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
+        returning='binary_flag',
          return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
             "incidence": 0.03,
         },
     ),
      #HES APC
     prostate_cancer_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=prostate_cancer_icd10,
-        on_or_before="today", # i.e. is this code ever on their record
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
+        returning='binary_flag',
          return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
             "incidence": 0.03,
         },
     ),
      #ONS
     prostate_cancer_death=patients.with_these_codes_on_death_certificate(
         prostate_cancer_icd10,
-        returning="date_of_death",
-        on_or_before="today", # i.e. is this code ever on their record
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
+        returning='binary_flag',
         return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
             "incidence": 0.02
         },
     ),
-    qa_prostate_cancer=patients.minimum_of(
+    qa_prostate_cancer=patients.maximum_of(
         "prostate_cancer_snomed", "prostate_cancer_hes", "prostate_cancer_death"
     ),
  ###Pregnancy
     #primary care
     qa_pregnancy=patients.with_these_clinical_events(
         pregnancy_snomed_clinical,
-        returning="date",
-        on_or_before="today", # i.e. is this code ever on their record
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
+        returning='binary_flag',
          return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
             "incidence": 0.03,
         },
     ),
