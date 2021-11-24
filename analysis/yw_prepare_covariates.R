@@ -25,7 +25,6 @@
 # YW Notes:
 #    1. No "NA" in covariates apart from smoking status, 50% missing in this covariate
 
-
 # YW 24/Nov/2021 make deprivation as a categorical variable
 #                deprivation: 11 unique integers, from 0 to 10. 
 #                group 1-2 (most deprived) 3-4, 5-6, 7-8, 9-10 (least deprived), is 0 missing?
