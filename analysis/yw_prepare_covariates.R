@@ -12,7 +12,7 @@
 ##           2. Check that continuous variables are defined as numeric variables.
 ##           3. check the number and percentage of missing values for covariates
 ## =============================================================================
-
+#
 # Notes:
 # Assumption applied: age, deprivation and number of disorders are currently assumed to be continuous variables
 #
@@ -20,10 +20,12 @@
 #    1. table(data$cov_n_disorder) includes a negative value -1
 #    2. table(data$cov_ethnicity) returns 17 ethnic groups, should merge some.
 #       no names for ethnicity, all in numbers
-#    3. cov_smoking_status = E, M, N, S, needs more detailed description in the text about these labels
+#    3. cov_smoking_status = E, M, N, S, needs more detailed descriptions in the text about these labels
 
 # YW Notes:
-#    1. No missing values in covariates apart from smoking status, 50% missing in this covariates
+#    1. No missing values in covariates apart from smoking status, 50% missing in this covariate
+
+# YW updated 24/Nov/2021 make deprivation as a categorical variable
 
 library(readr); library(dplyr); library(stringr)
 
@@ -60,7 +62,7 @@ covars$cov_region <- gsub(" ", "_", covars$cov_region)
 print(unique(covars$cov_region))
 
 # names of variables which are factors: only two variables are continuous, all others or binary or categorical
-factor_names <- names(covars %>% dplyr::select(! c("cov_age", "cov_deprivation", "cov_n_disorder")))
+factor_names <- names(covars %>% dplyr::select(! c("cov_age", "cov_n_disorder")))
 
 # The variables that should be factor variables
 covars[,factor_names] <- lapply(covars[,factor_names] , factor)
@@ -83,7 +85,7 @@ for (colname in factor_names){
 }
 
 ##------Relevel to set the group which has the highest frequency as reference group -----------------------------------------
-# check the frequencies for each factor level
+# check the frequency for each factor level
 lapply(data[,factor_names], table)
 
 # Find mode in a factor variable
@@ -100,7 +102,7 @@ covars$cov_region = relevel(covars$cov_region, ref = as.character(calculate_mode
 
 # a simple check if factor reference level has changed
 lapply(covars[,c("cov_ethnicity", "cov_smoking_status", "cov_region")], table)
-lapply(covars[,names], table)
+lapply(covars[,factor_names], table)
 
 ##------------------------------- NUMERICAL Variables --------------------------------------
 # Checking if continuous covariates are set up as numeric variable correctly
