@@ -93,7 +93,9 @@ data8 <- subset(data7, data7$covid19_vaccination_date2 >= as.Date("2020-12-08"))
 table(data8$vacc_gap < 0) # ~ 1475 -ve gaps
 data9 <- subset(data8, data8$vacc_gap >= 0) # 1427 samples retain
 
-
+#EXCLUSION CRITERIA 10.received a second dose vaccination less than three weeks after their first dose ------------
+table(data9$vacc_gap < 21) # ~ 196
+data10 <- subset(data9, data9$vacc_gap >= 21) # 1231 samples retain - RECONFIRM '21'
 
  
 
