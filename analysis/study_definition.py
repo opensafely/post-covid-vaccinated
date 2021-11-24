@@ -235,7 +235,7 @@ study = StudyDefinition(
         returning="date",
         date_format="YYYY-MM-DD",
         return_expectations={
-            "date": {"earliest": "covid_vax_disease_1_date + 1 day", "latest" : "today"},
+            "date": {"earliest": "2021-01-08", "latest" : "today"}, # dates can only be 'index_date','today', or specified date
             "incidence": 0.6
         },
     ),
@@ -246,7 +246,7 @@ study = StudyDefinition(
         returning="date",
         date_format="YYYY-MM-DD",
          return_expectations={
-            "date": {"earliest": "covid_vax_disease_2_date + 1 day", "latest" : "today"},
+            "date": {"earliest": "2021-02-08", "latest" : "today"}, # dates can only be 'index_date','today', or specified date
             "incidence": 0.5
         },
     ),
@@ -272,7 +272,7 @@ study = StudyDefinition(
         returning="date",
         date_format="YYYY-MM-DD",
         return_expectations={
-            "date": {"earliest": "covid_vax_pfizer_1_date + 1 day", "latest" : "today"},
+            "date": {"earliest": "2021-01-08", "latest" : "today"},
             "incidence": 0.5
         },
     ),
@@ -283,7 +283,7 @@ study = StudyDefinition(
         returning="date",
         date_format="YYYY-MM-DD",
          return_expectations={
-            "date": {"earliest": "covid_vax_pfizer_2_date + 1 day", "latest" : "today"},
+            "date": {"earliest": "2021-02-08", "latest" : "today"},
             "incidence": 0.5
         },
     ),
@@ -308,7 +308,7 @@ study = StudyDefinition(
         returning="date",
         date_format="YYYY-MM-DD",
         return_expectations={
-            "date": {"earliest": "covid_vax_az_1_date + 1 day","latest" : "today"},
+            "date": {"earliest": "2021-01-08", "latest" : "today"},
             "incidence": 0.5
         },
     ),
@@ -319,7 +319,7 @@ study = StudyDefinition(
         returning="date",
         date_format="YYYY-MM-DD",
          return_expectations={
-            "date": {"earliest": "covid_vax_az_2_date + 1 day", "latest" : "today"},
+            "date": {"earliest": "2021-02-08", "latest" : "today"},
             "incidence": 0.5
         },
     ),
@@ -344,7 +344,7 @@ study = StudyDefinition(
         returning="date",
         date_format="YYYY-MM-DD",
          return_expectations={
-            "date": {"earliest": "covid_vax_moderna_1_date + 1 day", "latest" : "today"},
+            "date": {"earliest": "2021-01-08", "latest" : "today"},
             "incidence": 0.5
         },
     ),
@@ -355,7 +355,7 @@ study = StudyDefinition(
         returning="date",
         date_format="YYYY-MM-DD",
         return_expectations={
-            "date": {"earliest": "covid_vax_moderna_2_date + 1 day", "latest" : "today"},
+            "date": {"earliest": "2021-02-08", "latest" : "today"},
             "incidence": 0.5
         },
     ),
