@@ -214,12 +214,12 @@ study = StudyDefinition(
         "primary_care_death_date", "ons_died_from_any_cause_date"
     ),
   
-  ###  COVID vaccination
-    # First covid vaccination date (first vaccine given on 8/12/2020 in the UK)
-    covid19_vaccination_date1=patients.with_tpp_vaccination_record(
-        # code for TPP only, when using patients.with_tpp_vaccination_record() function
+    #COVID Vaccines
+
+    ## any covid vaccination, identified by target disease
+    covid_vax_disease_1_date=patients.with_tpp_vaccination_record(
         target_disease_matches="SARS-2 CORONAVIRUS",
-        on_or_after="2020-12-07",
+        on_or_after="2020-12-08",
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -228,20 +228,137 @@ study = StudyDefinition(
             "incidence": 0.7
         },
     ),
-    # Second covid vaccination date (first second dose reported on 29/12/2020 in the UK)
-    covid19_vaccination_date2=patients.with_tpp_vaccination_record(
-        # code for TPP only, when using patients.with_tpp_vaccination_record() function
+    covid_vax_disease_2_date=patients.with_tpp_vaccination_record(
         target_disease_matches="SARS-2 CORONAVIRUS",
-        on_or_after="covid19_vaccination_date1 + 14 days",  # Allowing for less days between 2 vaccination dates
+        on_or_after="covid_vax_disease_1_date + 1 day",
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
         return_expectations={
-            "date": {"earliest": "2020-12-29", "latest": "today"},
+            "date": {"earliest": "covid_vax_disease_1_date + 1 day", "latest" : "today"},
             "incidence": 0.6
         },
     ),
+    covid_vax_disease_3_date=patients.with_tpp_vaccination_record(
+        target_disease_matches="SARS-2 CORONAVIRUS",
+        on_or_after="covid_vax_disease_2_date + 1 day",
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+         return_expectations={
+            "date": {"earliest": "covid_vax_disease_2_date + 1 day", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
 
+    # Pfizer BioNTech - first record of a pfizer vaccine 
+    # NB *** may be patient's first COVID vaccine dose or their second if mixed types are given ***
+       
+    covid_vax_pfizer_1_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
+        on_or_after="2020-12-08",
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "2020-12-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ), 
+    covid_vax_pfizer_2_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
+        on_or_after="covid_vax_pfizer_1_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "covid_vax_pfizer_1_date + 1 day", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    covid_vax_pfizer_3_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
+         on_or_after="covid_vax_pfizer_2_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+         return_expectations={
+            "date": {"earliest": "covid_vax_pfizer_2_date + 1 day", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    
+    ## Oxford AZ - first record of an Oxford AZ vaccine 
+    # NB *** may be patient's first COVID vaccine dose or their second if mixed types are given ***
+    covid_vax_az_1_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 Vac AstraZeneca (ChAdOx1 S recomb) 5x10000000000 viral particles/0.5ml dose sol for inj MDV",
+        on_or_after="2020-12-08",
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "2020-12-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    covid_vax_az_2_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 Vac AstraZeneca (ChAdOx1 S recomb) 5x10000000000 viral particles/0.5ml dose sol for inj MDV",
+        on_or_after="covid_vax_az_1_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "covid_vax_az_1_date + 1 day","latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    covid_vax_az_3_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 Vac AstraZeneca (ChAdOx1 S recomb) 5x10000000000 viral particles/0.5ml dose sol for inj MDV",
+        on_or_after="covid_vax_az_2_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+         return_expectations={
+            "date": {"earliest": "covid_vax_az_2_date + 1 day", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    
+    ## Moderna - first record of moderna vaccine
+    ## NB *** may be patient's first COVID vaccine dose or their second if mixed types are given ***
+    covid_vax_moderna_1_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
+        on_or_after="2020-12-08",
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "2020-12-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),            
+    covid_vax_moderna_2_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
+        on_or_after="covid_vax_moderna_1_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+         return_expectations={
+            "date": {"earliest": "covid_vax_moderna_1_date + 1 day", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    covid_vax_moderna_3_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
+        on_or_after="covid_vax_moderna_2_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "covid_vax_moderna_2_date + 1 day", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
 
 #SECTION 4 --- OUTCOMES ---
 
