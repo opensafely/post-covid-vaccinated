@@ -85,9 +85,9 @@ data6$vacc_gap <- data6$covid19_vaccination_date2 - data6$covid19_vaccination_da
 table(data6$vacc_gap, useNA = "ifany") #~4342 Na
 data7 <- data6[!is.na(data6$vacc_gap),] #2902 samples retain
 
-#EXCLUSION CRITERIA 7.do not have a record of two vaccination doses prior to the study end date ---------
-
-
+#EXCLUSION CRITERIA 8.received a vaccination prior to 08-12-2020 (i.e., the start of the vaccination program)------------
+data8 <- subset(data7, data7$covid19_vaccination_date1 >= as.Date("2020-12-08"))
+data8 <- subset(data7, data7$covid19_vaccination_date2 >= as.Date("2020-12-08"))# none change
 
 #received a vaccination prior to 08-12-2020 (i.e., the start of the vaccination program) 
 
