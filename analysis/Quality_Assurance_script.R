@@ -23,19 +23,19 @@ for(date in date_columns){
 #Rule 1:
 #Year of birth is after year of death or patient only has year of death
 input$rule1=NA
-input$rule1=((input$birth_year > as.integer((format(input$death_date, format="%Y"))) & is.na(input$birth_year)== FALSE & is.na(input$death_date) == FALSE)|(is.na(input$birth_year)== TRUE & is.na(input$death_date) == FALSE))
+input$rule1=((input$qa_birth_year > as.integer((format(input$death_date, format="%Y"))) & is.na(input$qa_birth_year)== FALSE & is.na(input$death_date) == FALSE)|(is.na(input$qa_birth_year)== TRUE & is.na(input$death_date) == FALSE))
 
 
 #Rule 2: Patient does not have mandatory fields completed (patient id, sex, age, index of multiple deprivation, ethnicity, region, n_disorder, smoking status, year of birth)
 input$rule2=NA
-input$rule2=(is.na(input$patient_id)|is.na(input$cov_age)|is.na(input$cov_sex)|is.na(input$cov_deprivation)|is.na(input$cov_ethnicity)|is.na(input$cov_region)|is.na(input$cov_n_disorder)|is.na(input$cov_smoking_status)|is.na(input$birth_year))
+input$rule2=(is.na(input$patient_id)|is.na(input$cov_age)|is.na(input$cov_sex)|is.na(input$cov_deprivation)|is.na(input$cov_ethnicity)|is.na(input$cov_region)|is.na(input$cov_n_disorder)|is.na(input$cov_smoking_status)|is.na(input$qa_birth_year))
 #input$rule2=(is.na(input$patient_id)|is.na(input$cov_age)|is.na(input$cov_sex)|is.na(input$cov_deprivation)|is.null(input$patient_id)|is.null(input$cov_age)|is.null(input$cov_sex)|is.null(input$cov_deprivation)|is.nan(input$patient_id)|is.nan(input$cov_age)|is.nan(input$cov_sex)|is.nan(input$cov_deprivation))
 #I think is.na would probably be enough but not sure
 
 
 #Rule 3: Year of birth predates NHS established year or year of birth exceeds current date
 input$rule3=NA
-input$rule3=((input$birth_year <1793 & is.na(input$birth_year) == FALSE) |(input$birth_year >as.integer(format(Sys.Date(),"%Y")) & is.na(input$birth_year) == FALSE))
+input$rule3=((input$qa_birth_year <1793 & is.na(input$qa_birth_year) == FALSE) |(input$qa_birth_year >as.integer(format(Sys.Date(),"%Y")) & is.na(input$qa_birth_year) == FALSE))
 
 
 #Rule 4: Date of death is NULL or invalid (on or before 1/1/1900 or after current date)
