@@ -77,13 +77,13 @@ study = StudyDefinition(
     """
         NOT has_died
         AND
-        cov_age >= 18 
+        cov_num_age >= 18 
         AND
-        cov_age <=110
+        cov_num_age <=110
         AND
-        (cov_sex = "M" OR cov_sex = "F")
+        (cov_cat_sex = "M" OR cov_cat_sex = "F")
         AND
-        cov_deprivation != "0"
+        cov_cat_deprivation != "0"
         AND
         registered        
         AND
@@ -842,7 +842,7 @@ study = StudyDefinition(
 #SECTION 6 --- DEFINE COVARIATES ---
 
   ### Sex
-  cov_bin_sex = patients.sex(
+  cov_cat_sex = patients.sex(
     return_expectations = {
       "rate": "universal",
       "category": {"ratios": {"M": 0.49, "F": 0.51}},
