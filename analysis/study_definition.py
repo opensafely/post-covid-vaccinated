@@ -890,6 +890,7 @@ study = StudyDefinition(
             find_last_match_in_period=True,
         ),
         return_expectations=helpers.generate_universal_expectations(16),
+        return_expectations=helpers.generate_universal_expectations(16,False),
     ),
 
   ###deprivation
