@@ -742,6 +742,15 @@ study = StudyDefinition(
             "incidence": 0.03,
         },
     ),
+  
+  #Year of birth
+    qa_birth_year=patients.date_of_birth(
+        date_format="YYYY",
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest": "today"},
+            "rate": "uniform",
+        },
+    ),
 
 #SECTION 6 --- DEFINE COVARIATES ---
 
