@@ -21,8 +21,7 @@ input = input %>%
                      (cov_age>=60 & cov_age<=69) ~ "60-69",
                      (cov_age>=70 & cov_age<=79) ~ "70-79",
                      (cov_age>=80 & cov_age<=89) ~ "80-89",
-                     (cov_age>=90) ~ "90+",
-                     TRUE ~ "other"
+                     (cov_age>=90) ~ "90+"
                      ))
 
 input = input %>% 
@@ -31,8 +30,7 @@ input = input %>%
                      (cov_deprivation==3 | cov_deprivation==4) ~ "3-4",
                      (cov_deprivation==5 | cov_deprivation==6) ~ "5-6",
                      (cov_deprivation==7 | cov_deprivation==8) ~ "7-8",
-                     (cov_deprivation==9 | cov_deprivation==10) ~ "9-10 (least deprived)",
-                     TRUE ~ "other"
+                     (cov_deprivation==9 | cov_deprivation==10) ~ "9-10 (least deprived)"
            ))
 
 
