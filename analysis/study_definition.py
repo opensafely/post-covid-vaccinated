@@ -215,7 +215,7 @@ study = StudyDefinition(
     ),
 
     #Year of birth
-    birth_year=patients.date_of_birth(
+    qa_birth_year=patients.date_of_birth(
         date_format="YYYY",
         return_expectations={
             "date": {"earliest": "1900-01-01", "latest": "today"},
