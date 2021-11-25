@@ -213,15 +213,6 @@ study = StudyDefinition(
     death_date=patients.minimum_of(
         "primary_care_death_date", "ons_died_from_any_cause_date"
     ),
-
-    #Year of birth
-    qa_birth_year=patients.date_of_birth(
-        date_format="YYYY",
-        return_expectations={
-            "date": {"earliest": "1900-01-01", "latest": "today"},
-            "rate": "uniform",
-        },
-    ),
   
   ###  COVID vaccination
     # First covid vaccination date (first vaccine given on 8/12/2020 in the UK)
@@ -749,6 +740,15 @@ study = StudyDefinition(
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
             "incidence": 0.03,
+        },
+    ),
+  
+  #Year of birth
+    qa_birth_year=patients.date_of_birth(
+        date_format="YYYY",
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest": "today"},
+            "rate": "uniform",
         },
     ),
 
