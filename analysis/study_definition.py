@@ -34,26 +34,26 @@ placeholder_dmd = codelist(["dmd_id"], system="snomed")
 
 
 variables = {
-    "cov_ami": [ami_snomed_clinical, ami_icd10, ami_prior_icd10],
-    "cov_all_stroke": [stroke_isch_icd10, stroke_isch_snomed_clinical, stroke_sah_hs_icd10, stroke_sah_hs_snomed_clinical],
-    "cov_other_arterial_embolism": [other_arterial_embolism_icd10],
-    "cov_venous_thrombolism_events": [all_vte_codes_snomed_clinical, all_vte_codes_icd10],
-    "cov_heart_failure": [hf_snomed_clinical, hf_icd10],
-    "cov_angina": [angina_snomed_clinical, angina_icd10],
-    "cov_dementia": [dementia_snomed_clinical, dementia_icd10, dementia_vascular_snomed_clinical, dementia_vascular_icd10],
-    "cov_liver_disease": [liver_disease_snomed_clinical, liver_disease_icd10],
-    "cov_chronic_kidney_disease": [ckd_snomed_clinical, ckd_icd10],
-    "cov_cancer": [cancer_snomed_clinical, cancer_icd10],
-    "cov_hypertension": [hypertension_icd10, hypertension_drugs_dmd, hypertension_snomed_clinical],
-    "cov_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
-    "cov_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
-    "cov_depression": [depression_snomed_clinical, depression_icd10],
-    "cov_chronic_obstructive_pulmonary_disease": [copd_snomed_clinical, copd_icd10],
-    "cov_lipid_medications": [lipid_lowering_dmd],
-    "cov_antiplatelet_medications": [antiplatelet_dmd],
-    "cov_anticoagulation_medications": [anticoagulant_dmd],
-    "cov_combined_oral_contraceptive_pill": [cocp_dmd],
-    "cov_hormone_replacement_therapy": [hrt_dmd],   
+    "cov_bin_ami": [ami_snomed_clinical, ami_icd10, ami_prior_icd10],
+    "cov_bin_all_stroke": [stroke_isch_icd10, stroke_isch_snomed_clinical, stroke_sah_hs_icd10, stroke_sah_hs_snomed_clinical],
+    "cov_bin_other_arterial_embolism": [other_arterial_embolism_icd10],
+    "cov_bin_venous_thrombolism_events": [all_vte_codes_snomed_clinical, all_vte_codes_icd10],
+    "cov_bin_heart_failure": [hf_snomed_clinical, hf_icd10],
+    "cov_bin_angina": [angina_snomed_clinical, angina_icd10],
+    "cov_bin_dementia": [dementia_snomed_clinical, dementia_icd10, dementia_vascular_snomed_clinical, dementia_vascular_icd10],
+    "cov_bin_liver_disease": [liver_disease_snomed_clinical, liver_disease_icd10],
+    "cov_bin_chronic_kidney_disease": [ckd_snomed_clinical, ckd_icd10],
+    "cov_bin_cancer": [cancer_snomed_clinical, cancer_icd10],
+    "cov_bin_hypertension": [hypertension_icd10, hypertension_drugs_dmd, hypertension_snomed_clinical],
+    "cov_bin_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
+    "cov_bin_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
+    "cov_bin_depression": [depression_snomed_clinical, depression_icd10],
+    "cov_bin_chronic_obstructive_pulmonary_disease": [copd_snomed_clinical, copd_icd10],
+    "cov_bin_lipid_medications": [lipid_lowering_dmd],
+    "cov_bin_antiplatelet_medications": [antiplatelet_dmd],
+    "cov_bin_anticoagulation_medications": [anticoagulant_dmd],
+    "cov_bin_combined_oral_contraceptive_pill": [cocp_dmd],
+    "cov_bin_hormone_replacement_therapy": [hrt_dmd],   
 }
 
 covariates = {k: get_codelist_variable(v) for k, v in variables.items()}
@@ -842,7 +842,7 @@ study = StudyDefinition(
 #SECTION 6 --- DEFINE COVARIATES ---
 
   ### Sex
-  cov_sex = patients.sex(
+  cov_bin_sex = patients.sex(
     return_expectations = {
       "rate": "universal",
       "category": {"ratios": {"M": 0.49, "F": 0.51}},
@@ -850,7 +850,7 @@ study = StudyDefinition(
   ),
 
   ### Age
-  cov_age = patients.age_as_of(
+  cov_num_age = patients.age_as_of(
     "index_date",
     return_expectations = {
       "rate": "universal",
@@ -860,7 +860,7 @@ study = StudyDefinition(
   ),
 
   ### Ethnicity 
-        cov_ethnicity=patients.categorised_as(
+        cov_cat_ethnicity=patients.categorised_as(
         helpers.generate_ethnicity_dictionary(16),
         cov_ethnicity_sus=patients.with_ethnicity_from_sus(
             returning="group_16", use_most_frequent_code=True
@@ -889,12 +889,11 @@ study = StudyDefinition(
             returning="category",
             find_last_match_in_period=True,
         ),
-        return_expectations=helpers.generate_universal_expectations(16),
         return_expectations=helpers.generate_universal_expectations(16,False),
     ),
 
   ###deprivation
-  cov_deprivation=patients.categorised_as(
+  cov_cat_deprivation=patients.categorised_as(
         helpers.generate_deprivation_ntile_dictionary(10),
         index_of_multiple_deprivation=patients.address_as_of(
             "index_date",
@@ -905,7 +904,7 @@ study = StudyDefinition(
     ),
 
   ###Region
-  cov_region=patients.registered_practice_as_of(
+  cov_cat_region=patients.registered_practice_as_of(
             "index_date",
             returning="nuts1_region_name",
             return_expectations={
@@ -927,7 +926,7 @@ study = StudyDefinition(
         ),
 
   ###No. primary care consultation in year prior to index date
-    cov_consulation_rate=patients.with_gp_consultations(
+    cov_num_consulation_rate=patients.with_gp_consultations(
         between=["index_date - 12 months", "index_date"],
         returning="number_of_matches_in_period",
         return_expectations={
@@ -937,7 +936,7 @@ study = StudyDefinition(
     ),
 
   ###Smoking status
-    cov_smoking_status=patients.categorised_as(
+    cov_cat_smoking_status=patients.categorised_as(
         {
             "S": "most_recent_smoking_code = 'S'",
             "E": """
