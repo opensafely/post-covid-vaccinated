@@ -25,6 +25,13 @@ from codelists import *
 import study_def_helper_functions as helpers
 from variable_loop import get_codelist_variable
 
+# import the vairables for deriving JCVI groups
+from grouping_variables import (
+    jcvi_variables, 
+    start_date,
+    end_date,
+)
+
 # ------
 
 placeholder_ctv3 = codelist(["codes"], system="ctv3")
@@ -875,7 +882,17 @@ study = StudyDefinition(
         ),
     ),
 
+#Define variables for determining vaccine eligibility date
+    # Healthcare worker flag on vaccine record
+    hscworker=patients.with_healthcare_worker_flag_on_covid_vaccine_record(
+        returning="binary_flag",
+        return_expectations={"incidence": 0.01},
+        ),
+    
+
+
     ###Other covariates (see: variables)
     **covariates,
 
+    **jcvi_variables, 
 )
