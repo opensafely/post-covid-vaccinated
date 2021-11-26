@@ -882,14 +882,6 @@ study = StudyDefinition(
         ),
     ),
 
-#Define variables for determining vaccine eligibility date
-    # Healthcare worker flag on vaccine record
-    hscworker=patients.with_healthcare_worker_flag_on_covid_vaccine_record(
-        returning="binary_flag",
-        return_expectations={"incidence": 0.01},
-        ),
-    
-
 
     ###Other covariates (see: variables)
     **covariates,
