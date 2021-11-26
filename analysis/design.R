@@ -27,7 +27,7 @@ study_dates <-
     end_date = "2021-09-15" # last date of available vaccination data. NEED TO ALSO CHECK END DATES FOR OTHER DATA SOURCES
   )
 
-readr::write_rds(study_dates,"./output/lib/study_dates.rds")
+readr::write_rds(study_dates,"output/lib/study_dates.rds")
 #readr::write_rds(study_dates, here::here("output", "lib", "study_dates.rds"))
 jsonlite::write_json(study_dates, path = "./output/lib/study_dates.json", auto_unbox = TRUE, pretty=TRUE)
 #jsonlite::write_json(study_dates, path = here::here("output", "lib", "study_dates.json"), auto_unbox = TRUE, pretty=TRUE)
@@ -51,7 +51,7 @@ tribble(
     "99", "DEFAULT",
 )
 
-readr::write_csv(jcvi_groups, "./output/lib/jcvi_groups.csv")
+readr::write_csv(jcvi_groups, "output/lib/jcvi_groups.csv")
 #readr::write_csv(jcvi_groups, here::here("output", "lib", "jcvi_groups.csv"))
 
 # create elig_dates ----
@@ -89,5 +89,5 @@ tribble(
     "2100-12-31", "DEFAULT", "NA",
 )
 
-readr::write_csv(elig_dates, "./output/lib/elig_dates.csv")
+readr::write_csv(elig_dates, "output/lib/elig_dates.csv")
 #readr::write_csv(elig_dates, here::here("output", "lib", "elig_dates.csv"))
