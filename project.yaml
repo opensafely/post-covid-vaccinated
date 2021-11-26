@@ -4,9 +4,20 @@ expectations:
   population_size: 10000
 
 actions:
+  vaccine_eligibility_inputs:
+    run: r:latest analysis/design.R
+    outputs:
+      highly_sensitive:
+        study_dates_json: output/lib/study_dates.json
+        study_dates_rds: output/lib/study_dates.rds
+        jcvi_groups: output/lib/jcvi_groups.csv
+        elig_dates: output/lib/elig_dates.csv
+
 
   generate_study_population:
     run: cohortextractor:latest generate_cohort --study-definition study_definition
+    needs:
+    - vaccine_eligibility_inputs 
     outputs:
       highly_sensitive:
         cohort: output/input.csv
