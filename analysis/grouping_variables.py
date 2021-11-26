@@ -19,8 +19,8 @@ jcvi_groups = pd.read_csv(
     filepath_or_buffer='./output/lib/jcvi_groups.csv',
     dtype=str
 )
-dict_jcvi = { jcvi_groups['group'][i] : jcvi_groups['definition'][i] for i in jcvi_groups.index }
-ratio_jcvi = { jcvi_groups['group'][i] : 1/len(jcvi_groups.index) for i in jcvi_groups.index }
+dict_jcvi = {jcvi_groups['group'][i]: jcvi_groups['definition'][i] for i in jcvi_groups.index}
+ratio_jcvi = {jcvi_groups['group'][i]: 1/len(jcvi_groups.index) for i in jcvi_groups.index}
 
 # elig_dates
 elig_dates = pd.read_csv(
