@@ -28,7 +28,7 @@ library(readr)
 args = commandArgs(trailingOnly=TRUE)
 path_dataset  = args[[1]] # "../output/input.csv"
 
-input <- read_csv(path_dataset)
+input <- read_rds(path_dataset)
 
 
 #####################################################################
