@@ -4,25 +4,29 @@
 
 library(dplyr)
 library(data.table)
+library(arrow)
+#input=read_feather(file = "output/input.feather")
 input=readRDS("output/input.rds")
 input$qa_birth_year=as.Date(input$qa_birth_year) #needs to be added to preprocessing script
 
 #Rule 1:
 #Year of birth is after year of death or patient only has year of death
+#currently dummy data does not give birth year for all patients
 input$rule1=NA
-input$rule1=((input$qa_birth_year > as.integer((format(input$death_date, format="%Y"))) & is.na(input$qa_birth_year)== FALSE & is.na(input$death_date) == FALSE)|(is.na(input$qa_birth_year)== TRUE & is.na(input$death_date) == FALSE))
+input$rule1=((format(input$qa_birth_year, format="%Y") > (format(input$death_date, format="%Y")) & is.na(input$qa_birth_year)== FALSE & is.na(input$death_date) == FALSE)|(is.na(input$qa_birth_year)== TRUE & is.na(input$death_date) == FALSE))
 
 
 #Rule 2: Patient does not have mandatory fields completed (patient id, sex, age, index of multiple deprivation, ethnicity, region, n_disorder, smoking status, year of birth)
+#These are fields with NA as opposed to having been changed to missing which is fine
 input$rule2=NA
-input$rule2=(is.na(input$patient_id)|is.na(input$cov_age)|is.na(input$cov_sex)|is.na(input$cov_deprivation)|is.na(input$cov_ethnicity)|is.na(input$cov_region)|is.na(input$cov_n_disorder)|is.na(input$cov_smoking_status)|is.na(input$qa_birth_year))
+input$rule2=(is.na(input$patient_id)|is.na(input$cov_num_age)|is.na(input$cov_cat_sex)|is.na(input$cov_cat_deprivation)|is.na(input$cov_cat_ethnicity)|is.na(input$cov_cat_region)|is.na(input$cov_num_consulation_rate)|is.na(input$cov_cat_smoking_status)|is.na(input$qa_birth_year))
 #input$rule2=(is.na(input$patient_id)|is.na(input$cov_age)|is.na(input$cov_sex)|is.na(input$cov_deprivation)|is.null(input$patient_id)|is.null(input$cov_age)|is.null(input$cov_sex)|is.null(input$cov_deprivation)|is.nan(input$patient_id)|is.nan(input$cov_age)|is.nan(input$cov_sex)|is.nan(input$cov_deprivation))
 #I think is.na would probably be enough but not sure
 
 
 #Rule 3: Year of birth predates NHS established year or year of birth exceeds current date
 input$rule3=NA
-input$rule3=((input$qa_birth_year <1793 & is.na(input$qa_birth_year) == FALSE) |(input$qa_birth_year >as.integer(format(Sys.Date(),"%Y")) & is.na(input$qa_birth_year) == FALSE))
+input$rule3=((format(input$qa_birth_year, format="%Y") <1793 & is.na(input$qa_birth_year) == FALSE) |(format(input$qa_birth_year, format="%Y") >format(Sys.Date(),"%Y") & is.na(input$qa_birth_year) == FALSE))
 
 
 #Rule 4: Date of death is NULL or invalid (on or before 1/1/1900 or after current date)
@@ -37,12 +41,12 @@ input$rule4=((input$death_date <="1900-01-01"|input$death_date > format(Sys.Date
 
 #Rule 6: Pregnancy/birth codes for men
 input$rule6=NA
-input$rule6=(is.na(input$qa_pregnancy) == FALSE & input$cov_sex=="M")
+input$rule6=(is.na(input$qa_pregnancy) == FALSE & input$cov_cat_sex=="M")
 
 
 #Rule 7: Prostate cancer codes for women
 input$rule7=NA
-input$rule7=(is.na(input$qa_prostate_cancer) == FALSE & input$cov_sex=="F")
+input$rule7=(is.na(input$qa_prostate_cancer) == FALSE & input$cov_cat_sex=="F")
 
 #Rule 8: Patients have all missing record dates and dates
 #Not sure if this is possible? In NHS TRE this looks at gdppr data and removes people who have null values in the record_date or date column
@@ -50,13 +54,13 @@ input$rule7=(is.na(input$qa_prostate_cancer) == FALSE & input$cov_sex=="F")
 
 #Rule 9: HRT or COCP meds for men
 input$rule9=NA
-input$rule9=((input$cov_sex=="M" & input$cov_hormone_replacement_therapy==1)|(input$cov_sex=="M" & input$cov_combined_oral_contraceptive_pill==1))
+input$rule9=((input$cov_cat_sex=="M" & input$cov_bin_hormone_replacement_therapy==1)|(input$cov_cat_sex=="M" & input$cov_bin_combined_oral_contraceptive_pill==1))
 
 
 #Remove rows that are TRUE for at least one rule
-input_QA=input[rule1==F & rule2==F & rule3==F & rule4==F & rule6 & rule7==F & rule9==F,]
+#To Note, no records within the dummy data meet QA rules
+input_QA=input%>%filter(rule1==F & rule2==F & rule3==F & rule4==F & rule6==F & rule7==F & rule9==F)
 input_QA=input_QA %>% select(-c(rule1,rule2,rule3,rule4,rule6,rule7,rule9))
-
 
 #QA summary
 QA_summary <- data.frame(matrix(ncol = 2))
