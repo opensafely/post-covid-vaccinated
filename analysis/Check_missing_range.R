@@ -22,11 +22,11 @@ library(dplyr)
 library(readr)
 
 # 0. Reading data
-#input <- read_csv("../output/input.csv")
+#input <- read_rds("../output/input.rds")
 
 # Specify command arguments ----------------------------------------------------
 args = commandArgs(trailingOnly=TRUE)
-path_dataset  = args[[1]] # "../output/input.csv"
+path_dataset  = args[[1]] # "../output/input.rds"
 
 input <- read_rds(path_dataset)
 
