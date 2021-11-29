@@ -4,7 +4,7 @@
 
 library(dplyr)
 library(data.table)
-input <- fread("OpenSafely - unvaccinated analysis/input.csv" ,na.strings=c("","NA"))
+input=readRDS("output/input.rds")
 
 
 #I'm assuming this will all be done in the preparing covariates script instead
