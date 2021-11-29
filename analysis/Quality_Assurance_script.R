@@ -12,12 +12,12 @@ input=readRDS("output/input.rds")
 #qa_variables=colnames(input)[grepl("qa_",colnames(input))]
 #contain_date=colnames(input)[grepl("date",colnames(input))]
 #date_columns=c(outcome,qa_variables,contain_date)
-date_columns=colnames(input)[grepl("\\d\\d\\d\\d-\\d\\d-\\d\\d",input)]
+#date_columns=colnames(input)[grepl("\\d\\d\\d\\d-\\d\\d-\\d\\d",input)]
 
 
-for(date in date_columns){
-  input[[date]]=as.Date(input[[date]], format="%Y-%m-%d")
-}
+#for(date in date_columns){
+#  input[[date]]=as.Date(input[[date]], format="%Y-%m-%d")
+#}
 
 
 #Rule 1:
