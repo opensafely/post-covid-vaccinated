@@ -5,20 +5,7 @@
 library(dplyr)
 library(data.table)
 input=readRDS("output/input.rds")
-
-
-#I'm assuming this will all be done in the preparing covariates script instead
-#outcome=colnames(input)[grepl("out_",colnames(input))]
-#qa_variables=colnames(input)[grepl("qa_",colnames(input))]
-#contain_date=colnames(input)[grepl("date",colnames(input))]
-#date_columns=c(outcome,qa_variables,contain_date)
-#date_columns=colnames(input)[grepl("\\d\\d\\d\\d-\\d\\d-\\d\\d",input)]
-
-
-#for(date in date_columns){
-#  input[[date]]=as.Date(input[[date]], format="%Y-%m-%d")
-#}
-
+input$qa_birth_year=as.Date(input$qa_birth_year) #needs to be added to preprocessing script
 
 #Rule 1:
 #Year of birth is after year of death or patient only has year of death
