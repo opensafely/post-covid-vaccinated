@@ -57,7 +57,6 @@ input$rule9=((input$cov_cat_sex=="M" & input$cov_bin_hormone_replacement_therapy
 
 
 #Remove rows that are TRUE for at least one rule
-#To Note, no records within the dummy data meet QA rules
 input_QA=input%>%filter(rule1==F & rule2==F & rule3==F & rule4==F & rule6==F & rule7==F & rule9==F)
 input_QA=input_QA %>% select(-c(rule1,rule2,rule3,rule4,rule6,rule7,rule9))
 
