@@ -62,6 +62,9 @@ input$rule9=((input$cov_cat_sex=="M" & input$cov_bin_hormone_replacement_therapy
 input_QA=input%>%filter(rule1==F & rule2==F & rule3==F & rule4==F & rule6==F & rule7==F & rule9==F)
 input_QA=input_QA %>% select(-c(rule1,rule2,rule3,rule4,rule6,rule7,rule9))
 
+#Save QA'd input as .rds
+saveRDS(QA_summary,file = "output/QA_input.rds")
+
 #QA summary
 QA_summary <- data.frame(matrix(ncol = 2))
 colnames(QA_summary) <- c('Rule', '# where rule true')
@@ -82,7 +85,9 @@ QA_summary[7,2]=nrow(input%>%filter(rule9==T))
 QA_summary[8,1]="Total excluded from QA"
 QA_summary[8,2]=nrow(input)-nrow(input_QA)
 
-#write.csv(QA_summary, file = file.path("output", paste0("QA_summary", ".csv")) , row.names=F)
+
+#Save Qa summary as .csv
+write.csv(QA_summary, file = file.path("output", paste0("QA_summary", ".csv")) , row.names=F)
 
 
 
