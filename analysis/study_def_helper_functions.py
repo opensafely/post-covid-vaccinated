@@ -31,7 +31,7 @@ def generate_deprivation_ntile_dictionary(ntiles: int) -> dict:
     return dep_dict
 
 
-def generate_universal_expectations(n_categories: int) -> dict:
+def generate_universal_expectations(n_categories: int, zero_category=True) -> dict:
     """
     generate expectations statement for categorical variable of n classes
     each with the value n, universally distributed, with an additional "0"
@@ -39,7 +39,8 @@ def generate_universal_expectations(n_categories: int) -> dict:
     """
     equal_ratio = round(1 / n_categories, 2)
     ratios = {str(n): equal_ratio for n in range(1, n_categories)}
-    ratios["0"] = 0.01
+    if zero_category == True:
+        ratios["0"] = 0.01
     ratios[str(n_categories)] = 1 - sum(ratios.values())
 
     exp_dict = {"rate": "universal", "category": {"ratios": ratios}}

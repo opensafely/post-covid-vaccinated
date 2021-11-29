@@ -34,26 +34,26 @@ placeholder_dmd = codelist(["dmd_id"], system="snomed")
 
 
 variables = {
-    "cov_ami": [ami_snomed_clinical, ami_icd10, ami_prior_icd10],
-    "cov_all_stroke": [stroke_isch_icd10, stroke_isch_snomed_clinical, stroke_sah_hs_icd10, stroke_sah_hs_snomed_clinical],
-    "cov_other_arterial_embolism": [other_arterial_embolism_icd10],
-    "cov_venous_thrombolism_events": [all_vte_codes_snomed_clinical, all_vte_codes_icd10],
-    "cov_heart_failure": [hf_snomed_clinical, hf_icd10],
-    "cov_angina": [angina_snomed_clinical, angina_icd10],
-    "cov_dementia": [dementia_snomed_clinical, dementia_icd10, dementia_vascular_snomed_clinical, dementia_vascular_icd10],
-    "cov_liver_disease": [liver_disease_snomed_clinical, liver_disease_icd10],
-    "cov_chronic_kidney_disease": [ckd_snomed_clinical, ckd_icd10],
-    "cov_cancer": [cancer_snomed_clinical, cancer_icd10],
-    "cov_hypertension": [hypertension_icd10, hypertension_drugs_dmd, hypertension_snomed_clinical],
-    "cov_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
-    "cov_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
-    "cov_depression": [depression_snomed_clinical, depression_icd10],
-    "cov_chronic_obstructive_pulmonary_disease": [copd_snomed_clinical, copd_icd10],
-    "cov_lipid_medications": [lipid_lowering_dmd],
-    "cov_antiplatelet_medications": [antiplatelet_dmd],
-    "cov_anticoagulation_medications": [anticoagulant_dmd],
-    "cov_combined_oral_contraceptive_pill": [cocp_dmd],
-    "cov_hormone_replacement_therapy": [hrt_dmd],   
+    "cov_bin_ami": [ami_snomed_clinical, ami_icd10, ami_prior_icd10],
+    "cov_bin_all_stroke": [stroke_isch_icd10, stroke_isch_snomed_clinical, stroke_sah_hs_icd10, stroke_sah_hs_snomed_clinical],
+    "cov_bin_other_arterial_embolism": [other_arterial_embolism_icd10],
+    "cov_bin_venous_thrombolism_events": [all_vte_codes_snomed_clinical, all_vte_codes_icd10],
+    "cov_bin_heart_failure": [hf_snomed_clinical, hf_icd10],
+    "cov_bin_angina": [angina_snomed_clinical, angina_icd10],
+    "cov_bin_dementia": [dementia_snomed_clinical, dementia_icd10, dementia_vascular_snomed_clinical, dementia_vascular_icd10],
+    "cov_bin_liver_disease": [liver_disease_snomed_clinical, liver_disease_icd10],
+    "cov_bin_chronic_kidney_disease": [ckd_snomed_clinical, ckd_icd10],
+    "cov_bin_cancer": [cancer_snomed_clinical, cancer_icd10],
+    "cov_bin_hypertension": [hypertension_icd10, hypertension_drugs_dmd, hypertension_snomed_clinical],
+    "cov_bin_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
+    "cov_bin_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
+    "cov_bin_depression": [depression_snomed_clinical, depression_icd10],
+    "cov_bin_chronic_obstructive_pulmonary_disease": [copd_snomed_clinical, copd_icd10],
+    "cov_bin_lipid_medications": [lipid_lowering_dmd],
+    "cov_bin_antiplatelet_medications": [antiplatelet_dmd],
+    "cov_bin_anticoagulation_medications": [anticoagulant_dmd],
+    "cov_bin_combined_oral_contraceptive_pill": [cocp_dmd],
+    "cov_bin_hormone_replacement_therapy": [hrt_dmd],   
 }
 
 covariates = {k: get_codelist_variable(v) for k, v in variables.items()}
@@ -77,13 +77,13 @@ study = StudyDefinition(
     """
         NOT has_died
         AND
-        cov_age >= 18 
+        cov_num_age >= 18 
         AND
-        cov_age <=110
+        cov_num_age <=110
         AND
-        (cov_sex = "M" OR cov_sex = "F")
+        (cov_cat_sex = "M" OR cov_cat_sex = "F")
         AND
-        cov_deprivation != "0"
+        cov_cat_deprivation != "0"
         AND
         registered        
         AND
@@ -214,12 +214,12 @@ study = StudyDefinition(
         "primary_care_death_date", "ons_died_from_any_cause_date"
     ),
   
-  ###  COVID vaccination
-    # First covid vaccination date (first vaccine given on 8/12/2020 in the UK)
-    covid19_vaccination_date1=patients.with_tpp_vaccination_record(
-        # code for TPP only, when using patients.with_tpp_vaccination_record() function
+    #COVID Vaccines
+
+    ## any covid vaccination, identified by target disease
+    covid_vax_disease_1_date=patients.with_tpp_vaccination_record(
         target_disease_matches="SARS-2 CORONAVIRUS",
-        on_or_after="2020-12-07",
+        on_or_after="2020-12-08",
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -228,20 +228,137 @@ study = StudyDefinition(
             "incidence": 0.7
         },
     ),
-    # Second covid vaccination date (first second dose reported on 29/12/2020 in the UK)
-    covid19_vaccination_date2=patients.with_tpp_vaccination_record(
-        # code for TPP only, when using patients.with_tpp_vaccination_record() function
+    covid_vax_disease_2_date=patients.with_tpp_vaccination_record(
         target_disease_matches="SARS-2 CORONAVIRUS",
-        on_or_after="covid19_vaccination_date1 + 14 days",  # Allowing for less days between 2 vaccination dates
+        on_or_after="covid_vax_disease_1_date + 1 day",
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
         return_expectations={
-            "date": {"earliest": "2020-12-29", "latest": "today"},
+            "date": {"earliest": "2021-01-08", "latest" : "today"}, # dates can only be 'index_date','today', or specified date
             "incidence": 0.6
         },
     ),
+    covid_vax_disease_3_date=patients.with_tpp_vaccination_record(
+        target_disease_matches="SARS-2 CORONAVIRUS",
+        on_or_after="covid_vax_disease_2_date + 1 day",
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+         return_expectations={
+            "date": {"earliest": "2021-02-08", "latest" : "today"}, # dates can only be 'index_date','today', or specified date
+            "incidence": 0.5
+        },
+    ),
 
+    # Pfizer BioNTech - first record of a pfizer vaccine 
+    # NB *** may be patient's first COVID vaccine dose or their second if mixed types are given ***
+       
+    covid_vax_pfizer_1_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
+        on_or_after="2020-12-08",
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "2020-12-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ), 
+    covid_vax_pfizer_2_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
+        on_or_after="covid_vax_pfizer_1_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "2021-01-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    covid_vax_pfizer_3_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
+         on_or_after="covid_vax_pfizer_2_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+         return_expectations={
+            "date": {"earliest": "2021-02-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    
+    ## Oxford AZ - first record of an Oxford AZ vaccine 
+    # NB *** may be patient's first COVID vaccine dose or their second if mixed types are given ***
+    covid_vax_az_1_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 Vac AstraZeneca (ChAdOx1 S recomb) 5x10000000000 viral particles/0.5ml dose sol for inj MDV",
+        on_or_after="2020-12-08",
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "2020-12-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    covid_vax_az_2_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 Vac AstraZeneca (ChAdOx1 S recomb) 5x10000000000 viral particles/0.5ml dose sol for inj MDV",
+        on_or_after="covid_vax_az_1_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "2021-01-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    covid_vax_az_3_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 Vac AstraZeneca (ChAdOx1 S recomb) 5x10000000000 viral particles/0.5ml dose sol for inj MDV",
+        on_or_after="covid_vax_az_2_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+         return_expectations={
+            "date": {"earliest": "2021-02-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    
+    ## Moderna - first record of moderna vaccine
+    ## NB *** may be patient's first COVID vaccine dose or their second if mixed types are given ***
+    covid_vax_moderna_1_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
+        on_or_after="2020-12-08",
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "2020-12-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),            
+    covid_vax_moderna_2_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
+        on_or_after="covid_vax_moderna_1_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+         return_expectations={
+            "date": {"earliest": "2021-01-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
+    covid_vax_moderna_3_date=patients.with_tpp_vaccination_record(
+        product_name_matches="COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
+        on_or_after="covid_vax_moderna_2_date + 1 day",  
+        find_first_match_in_period=True,
+        returning="date",
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "2021-02-08", "latest" : "today"},
+            "incidence": 0.5
+        },
+    ),
 
 #SECTION 4 --- OUTCOMES ---
 
@@ -689,64 +806,52 @@ study = StudyDefinition(
     #primary care
     prostate_cancer_snomed=patients.with_these_clinical_events(
         prostate_cancer_snomed_clinical,
-        returning="date",
-        on_or_before="today", # i.e. is this code ever on their record
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
+        returning='binary_flag',
          return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
             "incidence": 0.03,
         },
     ),
      #HES APC
     prostate_cancer_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=prostate_cancer_icd10,
-        on_or_before="today", # i.e. is this code ever on their record
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
+        returning='binary_flag',
          return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
             "incidence": 0.03,
         },
     ),
      #ONS
     prostate_cancer_death=patients.with_these_codes_on_death_certificate(
         prostate_cancer_icd10,
-        returning="date_of_death",
-        on_or_before="today", # i.e. is this code ever on their record
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
+        returning='binary_flag',
         return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
             "incidence": 0.02
         },
     ),
-    qa_prostate_cancer=patients.minimum_of(
+    qa_prostate_cancer=patients.maximum_of(
         "prostate_cancer_snomed", "prostate_cancer_hes", "prostate_cancer_death"
     ),
  ###Pregnancy
     #primary care
     qa_pregnancy=patients.with_these_clinical_events(
         pregnancy_snomed_clinical,
-        returning="date",
-        on_or_before="today", # i.e. is this code ever on their record
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
+        returning='binary_flag',
          return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
             "incidence": 0.03,
+        },
+    ),
+  
+  #Year of birth
+    qa_birth_year=patients.date_of_birth(
+        date_format="YYYY",
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest": "today"},
+            "rate": "uniform",
         },
     ),
 
 #SECTION 6 --- DEFINE COVARIATES ---
 
   ### Sex
-  cov_sex = patients.sex(
+  cov_cat_sex = patients.sex(
     return_expectations = {
       "rate": "universal",
       "category": {"ratios": {"M": 0.49, "F": 0.51}},
@@ -754,7 +859,7 @@ study = StudyDefinition(
   ),
 
   ### Age
-  cov_age = patients.age_as_of(
+  cov_num_age = patients.age_as_of(
     "index_date",
     return_expectations = {
       "rate": "universal",
@@ -764,7 +869,7 @@ study = StudyDefinition(
   ),
 
   ### Ethnicity 
-        cov_ethnicity=patients.categorised_as(
+        cov_cat_ethnicity=patients.categorised_as(
         helpers.generate_ethnicity_dictionary(6),
         cov_ethnicity_sus=patients.with_ethnicity_from_sus(
             returning="group_6", use_most_frequent_code=True
@@ -793,22 +898,22 @@ study = StudyDefinition(
             returning="category",
             find_last_match_in_period=True,
         ),
-        return_expectations=helpers.generate_universal_expectations(5), ## 6 ethncity categories includes missing but generate_universal_expectations adds missing by default hence 5, not 6 here
+        return_expectations=helpers.generate_universal_expectations(5,False),
     ),
 
   ###deprivation
-  cov_deprivation=patients.categorised_as(
+  cov_cat_deprivation=patients.categorised_as(
         helpers.generate_deprivation_ntile_dictionary(10),
         index_of_multiple_deprivation=patients.address_as_of(
             "index_date",
             returning="index_of_multiple_deprivation",
             round_to_nearest=100,
         ),
-        return_expectations=helpers.generate_universal_expectations(10),
+        return_expectations=helpers.generate_universal_expectations(10,False),
     ),
 
   ###Region
-  cov_region=patients.registered_practice_as_of(
+  cov_cat_region=patients.registered_practice_as_of(
             "index_date",
             returning="nuts1_region_name",
             return_expectations={
@@ -830,17 +935,17 @@ study = StudyDefinition(
         ),
 
   ###No. primary care consultation in year prior to index date
-    cov_n_disorder=patients.with_gp_consultations(
+    cov_num_consulation_rate=patients.with_gp_consultations(
         between=["index_date - 12 months", "index_date"],
         returning="number_of_matches_in_period",
         return_expectations={
-            "int": {"distribution": "normal", "mean": 10, "stddev": 3},
+            "int": {"distribution": "poisson", "mean": 5},
             "incidence": 1,
         },
     ),
 
   ###Smoking status
-    cov_smoking_status=patients.categorised_as(
+    cov_cat_smoking_status=patients.categorised_as(
         {
             "S": "most_recent_smoking_code = 'S'",
             "E": """
