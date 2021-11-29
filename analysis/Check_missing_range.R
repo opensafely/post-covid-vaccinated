@@ -72,7 +72,7 @@ data.table::fwrite(check_both,"../output/Check_missing_range_covariates.csv")
 
 # 4. Create a table with min and max for date variables
 check_dates <- data.frame(variable = character(), Ealiest_date = character(), Latest_date = character())
-date_variables_names <- tidyselect::vars_select(names(input), ends_with(c('_date','_date1','_date2'), ignore.case = TRUE))
+date_variables_names <- tidyselect::vars_select(names(input), ends_with(c('_date'), ignore.case = TRUE))
 input_date <- input[,date_variables_names]
 
 for (i in date_variables_names){
