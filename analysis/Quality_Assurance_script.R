@@ -4,8 +4,7 @@
 
 library(dplyr)
 library(data.table)
-library(arrow)
-#input=read_feather(file = "output/input.feather")
+
 input=readRDS("output/input.rds")
 input$qa_birth_year=as.Date(input$qa_birth_year) #needs to be added to preprocessing script
 
@@ -41,12 +40,12 @@ input$rule4=((input$death_date <="1900-01-01"|input$death_date > format(Sys.Date
 
 #Rule 6: Pregnancy/birth codes for men
 input$rule6=NA
-input$rule6=(is.na(input$qa_pregnancy) == FALSE & input$cov_cat_sex=="M")
+input$rule6=(input$qa_pregnancy == TRUE & input$cov_cat_sex=="M")
 
 
 #Rule 7: Prostate cancer codes for women
 input$rule7=NA
-input$rule7=(is.na(input$qa_prostate_cancer) == FALSE & input$cov_cat_sex=="F")
+input$rule7=(input$qa_prostate_cancer == TRUE & input$cov_cat_sex=="F")
 
 #Rule 8: Patients have all missing record dates and dates
 #Not sure if this is possible? In NHS TRE this looks at gdppr data and removes people who have null values in the record_date or date column
