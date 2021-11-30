@@ -10,7 +10,7 @@
 #a.start date 2021-06-1 of the cohort if not vaccinated
 data$delta_start <- as.Date("2021-06-01")
 #b.15 days after the second vaccination
-data$immune_start <- as.Date(data$covid19_vaccination_date2)+15
+data$immune_start <- as.Date(data$covid_vax_disease_2_date)+15
 #c.latest of a,b as COHORT start date
 data$vacc_coh_start_date <- pmax(data$delta_start, data$immune_start, na.rm = TRUE)
 
@@ -46,23 +46,23 @@ table(data$start_alive, useNA = "ifany")# ~ 466 died before the start date
 #b.subset data based on alive status on day 1 of follow up.
 data1 <- subset(data, data$start_alive > 0) #~ 9534 samples retained
 
-#INCLUSION CRITERIA 2.Known age between 18 and 110 inclusive on the first day of follow-up-------------------------------------- 
-table(data$cov_age >=18, useNA = "ifany" )# ~ 2156 under 18 age group 
-data1 <- data1[!is.na(data1$cov_age),] # removes NAs, if any
+#INCLUSION CRITERIA 2.Known age between 18 and 110 on 01/06/2021-------------------------------------- 
+table(data$cov_num_age >=18, useNA = "ifany" )# ~ 2156 under 18 age group 
+data1 <- data1[!is.na(data1$cov_num_age),] # removes NAs, if any
 #subset data based >=18 status on day 1 of follow up.
-data2 <- subset(data1, data1$cov_age >= 18) #~ 7492 samples retained RECONFIRM
+data2 <- subset(data1, data1$cov_num_age >= 18) #~ 7492 samples retained RECONFIRM
 
 #INCLUSION CRITERIA 3.Known sex-----------------------------------------------------------------------------------------
-table(data2$cov_sex, useNA = "ifany")# nO 'NAs' found
-data3 <- data2[!is.na(data2$cov_sex),] # removes NAs, if any
+table(data2$cov_cat_sex, useNA = "ifany")# nO 'NAs' found
+data3 <- data2[!is.na(data2$cov_cat_sex),] # removes NAs, if any
 
 #INCLUSION CRITERIA 4.Known deprivation--------------------------------------------------------------------------- 
-table(data3$cov_deprivation, useNA = "ifany")# ~65 '0' found
-data4 <- data3[!is.na(data3$cov_deprivation),] # removes NAs, if any
-data4 <- subset(data3, data3$cov_deprivation >= 1)#7427 samples retained
+table(data3$cov_cat_deprivation, useNA = "ifany")
+data4 <- data3[!is.na(data3$cov_cat_deprivation),] # removes NAs, if any
+#7427 samples retained
 
 #INCLUSION CRITERIA 5.Registered in an English GP with TPP software for at least 6 months prior to the study start date--------------------------
-data5 <- data4 #RECONFIRM 
+data5 <- data4 # This criteria is met in study definition 
 
 #EXCLUSION CRITERIA 6.SARS-CoV-2 infection recorded prior to the start of follow-up---------------------------------------
 #a.Determine the SARS-CoV-2 infection date
@@ -76,12 +76,13 @@ data6 <- subset(data5, data5$prior_infections < 1)#~7244 samples retain
 
 #EXCLUSION CRITERIA 7.do not have a record of two vaccination doses prior to the study end date --------------------------------
 #a.Determine the vaccination dates
-data6$covid19_vaccination_date1 <- as.Date(data6$covid19_vaccination_date1)
-data6$covid19_vaccination_date2 <- as.Date(data6$covid19_vaccination_date2)
+data6$covid19_vaccination_date1 <- as.Date(data6$covid_vax_disease_1_date)
+data6$covid19_vaccination_date2 <- as.Date(data6$covid_vax_disease_2_date)
 #b.determine the vaccination gap in days
 data6$vacc_gap <- data6$covid19_vaccination_date2 - data6$covid19_vaccination_date1
+str(data6$vacc_gap)
 #b.Subset the fully vaccinated group
-# note vaccination gap will be an NA if both the vaccines are not received
+# note vaccination gap will be an NA if 2nd/both the vaccines are not received
 table(data6$vacc_gap, useNA = "ifany") #~4342 Na
 data7 <- data6[!is.na(data6$vacc_gap),] #2902 samples retain
 
@@ -97,6 +98,37 @@ data9 <- subset(data8, data8$vacc_gap >= 0) # 1427 samples retain
 table(data9$vacc_gap < 21) # ~ 196
 data10 <- subset(data9, data9$vacc_gap >= 21) # 1231 samples retain - RECONFIRM '21'
 
-#EXCLUSION CRITERIA 11.Recorded as having a situation (e.g., refused vaccination)-------------------------------
+#EXCLUSION CRITERIA 11.They received mixed vaccine products before 07-05-2021 ----------------------------------
+#This is a generalized code, which has to be modified latter based on the vaccine date & product variables which Yinghui(?) will derive
+data10$mixed_vacc <- ifelse((data10$vaccine_1_product == "az" & 
+                              data10$vaccine_2_product == "az") |
+                              (data10$vaccine_1_product == "pfizer" & 
+                              data10$vaccine_2_product == "pfizer") |
+                              (data10$vaccine_1_product == "moderna" & 
+                              data10$vaccine_2_product == "moderna"), 0, 1)#1- mixed
 
-#EXCLUSION CRITERIA 12.They received mixed vaccine products before 07-05-2021 ----------------------------------
+data10$mixed_vacc <- ifelse(data10$mixed_vacc == 1 & data10$covid_vax_disease_2_date < as.Date ("07/05/2021"),1,0) 
+data11 <- subset(data10, data10$mixed_vacc == 0)
+
+#Define the cohort flow--------
+cohort_flow <- data.frame(N = numeric(),
+                          Description = character(),
+                          stringsAsFactors = FALSE)
+
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data),"Study defined sample size")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data1),"Inclusion1:Alive on the first day of follow up")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data2),"Inclusion2:Known age between 18 and 110 on 01/06/2021")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data3),"Inclusion3:Known sex")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data4),"Inclusion4:Known deprivation")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data5),"Inclusion5:Registered in an English GP with TPP software for at least 6 months prior to the study start date")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data6),"Exclusion6: SARS-CoV-2 infection recorded prior to their index date")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data7),"Exclusion7:Do not have a record of two vaccination doses prior to the study end date")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data8),"Exclusion8: Received a vaccination prior to 08-12-2020")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data9),"Exclusion9:Received a second dose vaccination before their first dose vaccination")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data10),"Exclusion10:Received a second dose vaccination less than three weeks after their first dose")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(data11),"Exclusion11:They received mixed vaccine products before 07-05-2021")
+
+# Save data -------------------------------------------------------------------
+
+data.table::fwrite(data11,"data/Vaccinated_delta_cohort.csv")
+data.table::fwrite(cohort_flow,"output/delta-cohort_flow.csv")
