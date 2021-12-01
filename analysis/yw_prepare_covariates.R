@@ -34,7 +34,8 @@
 library(readr); library(dplyr); library(stringr)
 
 # read in data
-data <- read_csv("../output/input.csv")
+# data <- read_csv("../output/input.csv")
+data <-read_rds("../output/input.rds")
 
 # checking the data
 #View(data)
