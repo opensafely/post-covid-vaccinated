@@ -71,7 +71,7 @@ for (colname in factor_names){
 
 ##------Relevel to set the group which has the highest frequency as reference group -----------------------------------------
 # check the frequency for each factor level
-lapply(data[,factor_names], table)
+#lapply(data[,factor_names], table)
 
 # Find mode in a factor variable
 calculate_mode <- function(x) {
