@@ -92,13 +92,14 @@ levels(covars$cov_deprivation)[levels(covars$cov_deprivation)==7 | levels(covars
 levels(covars$cov_deprivation)[levels(covars$cov_deprivation)==9 | levels(covars$cov_deprivation)==10] <-"9-10 (least deprived)"
 
 # a simple check if factor reference level has changed
-lapply(covars[,c("cov_ethnicity", "cov_smoking_status", "cov_region")], table)
-lapply(covars[,factor_names], table)
+#lapply(covars[,c("cov_ethnicity", "cov_smoking_status", "cov_region")], table)
+#lapply(covars[,factor_names], table)
 
 ##------------------------------- NUMERICAL Variables --------------------------------------
 # Checking if continuous covariates are set up as numeric variable correctly
-is.numeric(data$cov_n_disorder); is.numeric(data$cov_age); 
-str(covars)
+#is.numeric(data$cov_n_disorder); 
+#is.numeric(data$cov_age); 
+#str(covars)
 
 data[,covariate_names] <- covars
-str(data)
+#str(data)
