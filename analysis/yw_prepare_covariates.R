@@ -34,14 +34,7 @@
 library(readr); library(dplyr); library(stringr)
 
 # read in data
-#data <- read_csv("output/input.csv")
 data <-read_rds("output/input.rds")
-
-# checking the data
-#View(data)
-dim(data)
-str(data)
-any(is.na(data))
 
 # extract names of covariates
 covariate_names <- tidyselect::vars_select(names(data), starts_with('cov_', ignore.case = TRUE))
