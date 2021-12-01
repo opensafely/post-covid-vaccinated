@@ -46,7 +46,6 @@ covars <- data[,covariate_names]
 covars$cov_cat_region <- gsub(" ", "_", covars$cov_cat_region)
 
 # names of variables which are factors
-
 factor_names_bin <- tidyselect::vars_select(names(data), starts_with('cov_bin', ignore.case = TRUE))
 factor_names_cat <- tidyselect::vars_select(names(data), starts_with('cov_cat', ignore.case = TRUE))
 factor_names <- c(factor_names_bin, factor_names_cat)
@@ -71,6 +70,10 @@ for (colname in factor_names){
 }
 
 ##------Relevel to set the group which has the highest frequency as reference group -----------------------------------------
+
+# check the frequency for each factor level
+#lapply(data[,factor_names], table)
+
 # Find mode in a factor variable
 calculate_mode <- function(x) {
   uniqx <- unique(na.omit(x))
@@ -100,6 +103,7 @@ sink()
 ##------------------------------- NUMERICAL Variables --------------------------------------
 # Checking if continuous covariates are set up as numeric variable correctly
 #is.numeric(data$cov_num_age); is.numeric(data$cov_num_consulation_rate); 
+
 #str(covars)
 
 data[,covariate_names] <- covars
