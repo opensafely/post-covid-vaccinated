@@ -17,10 +17,10 @@
 # Assumption applied: age, deprivation and number of disorders are currently assumed to be continuous variables
 #
 # YW identified data queries:
-#    1. table(data$cov_n_disorder) includes a negative value -1
+#    1. table(data$cov_n_disorder) includes a negative value -1 (resolved in study definition 2)
 #    2. table(data$cov_ethnicity) returns 17 ethnic groups, should merge some.
 #       no names for ethnicity, all in numbers
-#    3. cov_smoking_status = E, M, N, S, needs more detailed descriptions in the text about these labels
+#    3. cov_smoking_status = E, M, N, S, needs more detailed descriptions in the text about these labels (resolved)
 
 # YW Notes:
 #    1. No "NA" in covariates apart from smoking status, 50% "NA" in this covariate
@@ -38,36 +38,24 @@ data <-read_rds("output/input.rds")
 
 # extract names of covariates
 covariate_names <- tidyselect::vars_select(names(data), starts_with('cov_', ignore.case = TRUE))
-length(covariate_names)
+
 # create a data frame for covariates
 covars <- data[,covariate_names]
 
-# check number of missing values
-num_missing <-function(x){
-  sum(is.na(x))
-}
-
-# calculate the number of missing values for each covariates
-number_missing_by_covars <- lapply(covars[,covariate_names], num_missing)
-names(number_missing_by_covars) <- covariate_names
-#number of missing values, if any for the covariates
-number_missing_by_covars[which(number_missing_by_covars!=0)]
-# percentage of of missing values, if any for the covariates
-as.numeric(number_missing_by_covars[which(number_missing_by_covars!=0)])/dim(data)[1]
-
 #----------------------- REPLACE " " with "_" for glht's linfct-----------------
-covars$cov_region <- gsub(" ", "_", covars$cov_region)
-print(unique(covars$cov_region))
+covars$cov_cat_region <- gsub(" ", "_", covars$cov_cat_region)
 
-# names of variables which are factors: only two variables are continuous, all others or binary or categorical
-factor_names <- names(covars %>% dplyr::select(! c("cov_age", "cov_n_disorder")))
+# names of variables which are factors
+
+factor_names_bin <- tidyselect::vars_select(names(data), starts_with('cov_bin', ignore.case = TRUE))
+factor_names_cat <- tidyselect::vars_select(names(data), starts_with('cov_cat', ignore.case = TRUE))
+factor_names <- c(factor_names_bin, factor_names_cat)
 
 # The variables that should be factor variables
 covars[,factor_names] <- lapply(covars[,factor_names] , factor)
 
 # check the property of variables
-str(covars)
-
+#str(covars)
 
 # sort factor level alphabetically
 mk_factor_orderlevels <- function(covars, colname)
@@ -78,41 +66,42 @@ mk_factor_orderlevels <- function(covars, colname)
 }
 
 for (colname in factor_names){
-  print(colname)
+  #print(colname)
   covars <- mk_factor_orderlevels(covars, colname)
 }
 
 ##------Relevel to set the group which has the highest frequency as reference group -----------------------------------------
-# check the frequency for each factor level
-lapply(data[,factor_names], table)
-
 # Find mode in a factor variable
 calculate_mode <- function(x) {
   uniqx <- unique(na.omit(x))
   uniqx[which.max(tabulate(match(x, uniqx)))]
 }
 
-# For the following variables, the first level (reference level) is not the one with the highese frequency
+# For the following variables, the first level (reference level) is not the one with the highest frequency
 # set the most frequently occurred level as the reference reference for a factor variable
-covars$cov_ethnicity = relevel(covars$cov_ethnicity, ref = as.character(calculate_mode(covars$cov_ethnicity)))
-covars$cov_smoking_status = relevel(covars$cov_smoking_status, ref = as.character(calculate_mode(covars$cov_smoking_status)))
-covars$cov_region = relevel(covars$cov_region, ref = as.character(calculate_mode(covars$cov_region)))
+covars$cov_cat_ethnicity = relevel(covars$cov_cat_ethnicity, ref = as.character(calculate_mode(covars$cov_cat_ethnicity)))
+covars$cov_cat_smoking_status = relevel(covars$cov_cat_smoking_status, ref = as.character(calculate_mode(covars$cov_cat_smoking_status)))
+covars$cov_cat_region = relevel(covars$cov_cat_region, ref = as.character(calculate_mode(covars$cov_cat_region)))
 
 #combine groups in deprivation: First - most deprived; fifth -least deprived
-levels(covars$cov_deprivation)[levels(covars$cov_deprivation)==1 | levels(covars$cov_deprivation)==2] <-"1-2 (most deprived)"
-levels(covars$cov_deprivation)[levels(covars$cov_deprivation)==3 | levels(covars$cov_deprivation)==4] <-"3-4"
-levels(covars$cov_deprivation)[levels(covars$cov_deprivation)==5 | levels(covars$cov_deprivation)==6] <-"5-6"
-levels(covars$cov_deprivation)[levels(covars$cov_deprivation)==7 | levels(covars$cov_deprivation)==8] <-"7-8"
-levels(covars$cov_deprivation)[levels(covars$cov_deprivation)==9 | levels(covars$cov_deprivation)==10] <-"9-10 (least deprived)"
+levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==1 | levels(covars$cov_cat_deprivation)==2] <-"1-2 (most deprived)"
+levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==3 | levels(covars$cov_cat_deprivation)==4] <-"3-4"
+levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==5 | levels(covars$cov_cat_deprivation)==6] <-"5-6"
+levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==7 | levels(covars$cov_cat_deprivation)==8] <-"7-8"
+levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==9 | levels(covars$cov_cat_deprivation)==10] <-"9-10 (least deprived)"
 
 # a simple check if factor reference level has changed
-lapply(covars[,c("cov_ethnicity", "cov_smoking_status", "cov_region")], table)
-lapply(covars[,factor_names], table)
+#lapply(covars[,c("cov_ethnicity", "cov_smoking_status", "cov_region")], table)
+meta_data_factors <- lapply(covars[,factor_names], table)
 
+sink("output/meta_data_factors.csv")
+print(meta_data_factors)
+sink()
 ##------------------------------- NUMERICAL Variables --------------------------------------
 # Checking if continuous covariates are set up as numeric variable correctly
-is.numeric(data$cov_n_disorder); is.numeric(data$cov_age); 
-str(covars)
+#is.numeric(data$cov_num_age); is.numeric(data$cov_num_consulation_rate); 
+#str(covars)
 
 data[,covariate_names] <- covars
-str(data)
+#str(data)
+
