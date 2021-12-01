@@ -44,7 +44,6 @@ covars <- data[,covariate_names]
 
 #----------------------- REPLACE " " with "_" for glht's linfct-----------------
 covars$cov_region <- gsub(" ", "_", covars$cov_region)
-print(unique(covars$cov_region))
 
 # names of variables which are factors: only two variables are continuous, all others or binary or categorical
 factor_names <- names(covars %>% dplyr::select(! c("cov_age", "cov_n_disorder")))
