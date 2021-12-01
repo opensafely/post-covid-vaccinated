@@ -36,30 +36,11 @@ library(readr); library(dplyr); library(stringr)
 # read in data
 data <- read_csv("../output/input.csv")
 
-# checking the data
-#View(data)
-dim(data)
-str(data)
-any(is.na(data))
-
 # extract names of covariates
 covariate_names <- tidyselect::vars_select(names(data), starts_with('cov_', ignore.case = TRUE))
-length(covariate_names)
+
 # create a data frame for covariates
 covars <- data[,covariate_names]
-
-# check number of missing values
-num_missing <-function(x){
-  sum(is.na(x))
-}
-
-# calculate the number of missing values for each covariates
-number_missing_by_covars <- lapply(covars[,covariate_names], num_missing)
-names(number_missing_by_covars) <- covariate_names
-#number of missing values, if any for the covariates
-number_missing_by_covars[which(number_missing_by_covars!=0)]
-# percentage of of missing values, if any for the covariates
-as.numeric(number_missing_by_covars[which(number_missing_by_covars!=0)])/dim(data)[1]
 
 #----------------------- REPLACE " " with "_" for glht's linfct-----------------
 covars$cov_region <- gsub(" ", "_", covars$cov_region)
