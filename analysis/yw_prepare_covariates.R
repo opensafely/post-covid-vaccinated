@@ -65,7 +65,7 @@ mk_factor_orderlevels <- function(covars, colname)
 }
 
 for (colname in factor_names){
-  print(colname)
+  #print(colname)
   covars <- mk_factor_orderlevels(covars, colname)
 }
 
