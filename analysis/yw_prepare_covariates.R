@@ -52,7 +52,7 @@ factor_names <- names(covars %>% dplyr::select(! c("cov_age", "cov_n_disorder"))
 covars[,factor_names] <- lapply(covars[,factor_names] , factor)
 
 # check the property of variables
-str(covars)
+#str(covars)
 
 
 # sort factor level alphabetically
