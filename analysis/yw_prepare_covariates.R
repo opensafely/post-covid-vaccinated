@@ -48,6 +48,7 @@ covars$cov_cat_region <- gsub(" ", "_", covars$cov_cat_region)
 # names of variables which are factors
 factor_names_bin <- tidyselect::vars_select(names(input), starts_with('cov_bin', ignore.case = TRUE))
 factor_names_cat <- tidyselect::vars_select(names(input), starts_with('cov_cat', ignore.case = TRUE))
+
 factor_names <- c(factor_names_bin, factor_names_cat)
 
 # The variables that should be factor variables
@@ -102,8 +103,7 @@ print(meta_data_factors)
 sink()
 ##------------------------------- NUMERICAL Variables --------------------------------------
 # Checking if continuous covariates are set up as numeric variable correctly
-#is.numeric(input$cov_num_age); is.numeric(input$cov_num_consulation_rate); 
-
+#is.numeric(data$cov_num_age); is.numeric(data$cov_num_consulation_rate); 
 #str(covars)
 
 input[,covariate_names] <- covars
