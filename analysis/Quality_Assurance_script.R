@@ -4,8 +4,9 @@
 
 library(dplyr)
 library(data.table)
+library(readr)
 
-input=readRDS("output/input.rds")
+input=read_rds(file="output/input.rds")
 input$qa_birth_year=as.Date(input$qa_birth_year) #needs to be added to preprocessing script
 
 #Rule 1:
