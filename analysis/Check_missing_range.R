@@ -22,7 +22,7 @@ library(dplyr)
 library(readr)
 
 # 0. Reading data
-#input <- read_rds("../output/input.rds")
+#input <- read_rds("output/input.rds")
 
 # Specify command arguments ----------------------------------------------------
 args = commandArgs(trailingOnly=TRUE)
@@ -50,15 +50,13 @@ for (i in covariate_names){
 
 # 2. Create a table with min and max for numerical covariates
 check_range <- data.frame(variable = character(), Minimum_value = character(), Maximum_value = character())
-input_numeric <- select_if(input, is.numeric)
-numeric_var_names=colnames(input_numeric)
+numeric_var_names=colnames(select_if(input, is.numeric))
 numeric_var_names = numeric_var_names [!numeric_var_names == "patient_id"]
 
 for (i in numeric_var_names){
-  num_var = input_numeric %>% dplyr::select(i)
   check_range[nrow(check_range)+1,1] <- i
-  check_range[nrow(check_range),2] <- min(na.omit(num_var))
-  check_range[nrow(check_range),3] <- max(na.omit(num_var))
+  check_range[nrow(check_range),2] <- min(na.omit(input %>% dplyr::select(i)))
+  check_range[nrow(check_range),3] <- max(na.omit(input %>% dplyr::select(i)))
 }
 #check_range
 
@@ -67,12 +65,12 @@ for (i in numeric_var_names){
 check_both <- merge(x=check_missing, y=check_range, by = "variable",all.x=TRUE)
 #check_both
 
-data.table::fwrite(check_both,"../output/Check_missing_range_covariates.csv")
+write.csv(check_both, file = "output/check_both.csv", row.names=F)
 
 
 # 4. Create a table with min and max for date variables
 check_dates <- data.frame(variable = character(), Ealiest_date = character(), Latest_date = character())
-date_variables_names <- tidyselect::vars_select(names(input), ends_with(c('_date'), ignore.case = TRUE))
+date_variables_names <- tidyselect::vars_select(names(input), ends_with('_date', ignore.case = TRUE) | starts_with(c('out_','exp_'), ignore.case = TRUE))
 input_date <- input[,date_variables_names]
 
 for (i in date_variables_names){
@@ -82,5 +80,5 @@ for (i in date_variables_names){
   check_dates[nrow(check_dates),3] <- paste0("",max(na.omit(date_var)))
 }
 #check_dates
-data.table::fwrite(check_dates,"../output/Check_range_dates.csv")
+write.csv(check_dates, file = "output/check_dates.csv", row.names=F)
 
