@@ -85,7 +85,7 @@ QA_summary[8,2]=nrow(input)-nrow(input_QA)
 
 
 #Save Qa summary as .csv
-write.csv(QA_summary, file = file.path("output", paste0("QA_summary", ".csv")) , row.names=F)
+write.csv(QA_summary, file = "output/QA_summary.csv" , row.names=F)
 
 
 
