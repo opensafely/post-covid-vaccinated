@@ -25,8 +25,7 @@ input$rule2=(is.na(input$patient_id)|is.na(input$cov_num_age)|is.na(input$cov_ca
 
 #Rule 3: Year of birth predates NHS established year or year of birth exceeds current date
 input$rule3=NA
-input$rule3=((format(input$qa_birth_year, format="%Y") <1793 & is.na(input$qa_birth_year) == FALSE) |(format(input$qa_birth_year, format="%Y") >format(Sys.Date(),"%Y") & is.na(input$qa_birth_year) == FALSE))
-
+input$rule3=(((format(input$qa_birth_year, format="%Y") <1793 |(format(input$qa_birth_year, format="%Y") >format(Sys.Date(),"%Y"))) & is.na(input$qa_birth_year) == FALSE))
 
 #Rule 4: Date of death is NULL or invalid (on or before 1/1/1900 or after current date)
 input$rule4=NA
