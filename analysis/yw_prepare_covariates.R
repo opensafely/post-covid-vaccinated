@@ -29,7 +29,7 @@
 #                deprivation: 11 unique integers, from 0 to 10. 
 #                group 1-2 (most deprived) 3-4, 5-6, 7-8, 9-10 (least deprived), is 0 missing?
 # YW updated 24/Nov/2021 make deprivation as a categorical variable
-
+# YW updated 2/Dec/2021, data -> input; csv -> rds; sort out the type of variables used in quality assurance
 
 library(readr); library(dplyr); library(stringr)
 
@@ -98,9 +98,34 @@ levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==9 | level
 #lapply(covars[,c("cov_ethnicity", "cov_smoking_status", "cov_region")], table)
 meta_data_factors <- lapply(covars[,factor_names], table)
 
+# write.csv is not feasible to output list with uneven length
 sink("output/meta_data_factors.csv")
 print(meta_data_factors)
 sink()
+
+# Specific code: three additional variables in quality assurance
+#input%>% mutate(qa_pregnancy <- as.factor(qa_pregnancy))
+#input%>% mutate(qa_prostate_cancer <- as.factor(qa_prostate_cancer))
+#is.factor(input$qa_prostate_cancer); is.factor(input$qa_pregnancy)
+
+# general code: quality assurance variables
+qa_vars_names <- tidyselect::vars_select(names(input), starts_with('qa_', ignore.case = TRUE))
+# remove birth year
+qa_factor_names = qa_vars_names[- which(qa_vars_names=="qa_birth_year")]
+# create a data frame for factors used in quality assurance
+qa_factor <- input[,qa_factor_names]
+qa_factor_names
+qa_factor[,qa_factor_names] <- lapply(qa_factor[,qa_factor_names], factor)
+#lapply(qa_factor[,qa_factor_names], is.factor)
+
+# put qa factors back to input with the desirable variable types
+input[,qa_factor_names] <- qa_factor[,qa_factor_names]
+lapply(input[,qa_factor_names], is.factor)
+
+# extract year from qa_birth_year(date), and set it as a numeric
+input$qa_birth_year <- strtoi(format(input$qa_birth_year, "%Y"))
+#input$qa_birth_year[1:10]
+class(input$qa_birth_year)
 ##------------------------------- NUMERICAL Variables --------------------------------------
 # Checking if continuous covariates are set up as numeric variable correctly
 #is.numeric(data$cov_num_age); is.numeric(data$cov_num_consulation_rate); 
