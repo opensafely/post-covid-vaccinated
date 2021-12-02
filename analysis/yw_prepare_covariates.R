@@ -34,20 +34,20 @@
 library(readr); library(dplyr); library(stringr)
 
 # read in data
-data <-read_rds("output/input.rds")
+input <-read_rds("output/input.rds")
 
 # extract names of covariates
-covariate_names <- tidyselect::vars_select(names(data), starts_with('cov_', ignore.case = TRUE))
+covariate_names <- tidyselect::vars_select(names(input), starts_with('cov_', ignore.case = TRUE))
 
 # create a data frame for covariates
-covars <- data[,covariate_names]
+covars <- input[,covariate_names]
 
 #----------------------- REPLACE " " with "_" for glht's linfct-----------------
 covars$cov_cat_region <- gsub(" ", "_", covars$cov_cat_region)
 
 # names of variables which are factors
-factor_names_bin <- tidyselect::vars_select(names(data), starts_with('cov_bin', ignore.case = TRUE))
-factor_names_cat <- tidyselect::vars_select(names(data), starts_with('cov_cat', ignore.case = TRUE))
+factor_names_bin <- tidyselect::vars_select(names(input), starts_with('cov_bin', ignore.case = TRUE))
+factor_names_cat <- tidyselect::vars_select(names(input), starts_with('cov_cat', ignore.case = TRUE))
 factor_names <- c(factor_names_bin, factor_names_cat)
 
 # The variables that should be factor variables
@@ -72,7 +72,7 @@ for (colname in factor_names){
 ##------Relevel to set the group which has the highest frequency as reference group -----------------------------------------
 
 # check the frequency for each factor level
-#lapply(data[,factor_names], table)
+#lapply(input[,factor_names], table)
 
 # Find mode in a factor variable
 calculate_mode <- function(x) {
@@ -102,9 +102,9 @@ print(meta_data_factors)
 sink()
 ##------------------------------- NUMERICAL Variables --------------------------------------
 # Checking if continuous covariates are set up as numeric variable correctly
-#is.numeric(data$cov_num_age); is.numeric(data$cov_num_consulation_rate); 
+#is.numeric(input$cov_num_age); is.numeric(input$cov_num_consulation_rate); 
 
 #str(covars)
 
-data[,covariate_names] <- covars
-#str(data)
+input[,covariate_names] <- covars
+#str(input)
