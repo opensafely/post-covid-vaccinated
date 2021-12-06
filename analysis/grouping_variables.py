@@ -16,7 +16,7 @@ import pandas as pd
 ### import groups and dates
 # jcvi_groups
 jcvi_groups = pd.read_csv(
-    filepath_or_buffer='./output/lib/jcvi_groups.csv',
+    filepath_or_buffer='./output/vax_jcvi_groups.csv',
     dtype=str
 )
 dict_jcvi = {jcvi_groups['group'][i]: jcvi_groups['definition'][i] for i in jcvi_groups.index}
@@ -24,19 +24,19 @@ ratio_jcvi = {jcvi_groups['group'][i]: 1/len(jcvi_groups.index) for i in jcvi_gr
 
 # elig_dates
 elig_dates = pd.read_csv(
-    filepath_or_buffer='./output/lib/elig_dates.csv',
+    filepath_or_buffer='./output/vax_eligible_dates.csv',
     dtype=str
 )
 dict_elig = { elig_dates['date'][i] : elig_dates['description'][i] for i in elig_dates.index }
 ratio_elig = { elig_dates['date'][i] : 1/len(elig_dates.index) for i in elig_dates.index }
 
 #study_dates
-with open("./output/lib/study_dates.json") as f:
+with open("./output/vax_study_dates.json") as f:
   study_dates = json.load(f)
 
 # define variables explicitly
 ref_age_1=study_dates["ref_age_1"] # reference date for calculating age for phase 1 groups
-ref_age_2=study_dates["ref_age_1"] # reference date for calculating age for phase 2 groups
+ref_age_2=study_dates["ref_age_2"] # reference date for calculating age for phase 2 groups
 ref_cev=study_dates["ref_cev"] # reference date for calculating clinically extremely vulnerable group
 ref_ar=study_dates["ref_ar"] #reference date for caluclating at risk group
 start_date=study_dates["start_date"] # start of phase 1
@@ -60,7 +60,7 @@ def days(datestring, days):
 
 jcvi_variables = dict(
   # age on phase 1 reference date
-    age_1=patients.age_as_of(
+    vax_jcvi_age_1=patients.age_as_of(
         ref_age_1,
         return_expectations={
             "int": {"distribution": "population_ages"},
@@ -69,7 +69,7 @@ jcvi_variables = dict(
     ),
 
     # age on phase 2 reference date
-    age_2=patients.age_as_of(
+    vax_jcvi_age_2=patients.age_as_of(
         ref_age_2,
         return_expectations={
             "int": {"distribution": "population_ages"},
@@ -78,15 +78,15 @@ jcvi_variables = dict(
     ),
 
     # patient sex
-    sex=patients.sex(
-        return_expectations={
-        "rate": "universal",
-        "category": {"ratios": {"M": 0.49, "F": 0.51}},
-        "incidence": 0.99,
-        }
-    ),
+    # sex=patients.sex(
+    #     return_expectations={
+    #     "rate": "universal",
+    #     "category": {"ratios": {"M": 0.49, "F": 0.51}},
+    #     "incidence": 0.99,
+    #     }
+    # ),
 
-    jcvi_group=patients.categorised_as(
+    vax_cat_jcvi_group=patients.categorised_as(
         dict_jcvi,
         return_expectations={
             "rate": "universal",
@@ -102,7 +102,7 @@ jcvi_variables = dict(
     # # date of last pregnancy code in 36 weeks before ref_cev
     preg_group=patients.satisfying(
         """
-        (preg_36wks_date AND sex = 'F' AND age_1 < 50) AND
+        (preg_36wks_date AND cov_cat_sex = 'F' AND vax_jcvi_age_1 < 50) AND
         (pregdel_pre_date <= preg_36wks_date OR NOT pregdel_pre_date)
         """,
         preg_36wks_date=patients.with_these_clinical_events(
@@ -410,7 +410,7 @@ jcvi_variables = dict(
     ),
 
     # vaccine eligibility dates
-    elig_date=patients.categorised_as(
+    vax_date_eligible=patients.categorised_as(
        dict_elig,
         return_expectations={
             "category": {"ratios": 
