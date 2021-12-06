@@ -25,6 +25,13 @@ from codelists import *
 import study_def_helper_functions as helpers
 from variable_loop import get_codelist_variable
 
+# import the variables for deriving JCVI groups
+from grouping_variables import (
+    jcvi_variables, 
+    start_date,
+    end_date,
+)
+
 # ------
 
 placeholder_ctv3 = codelist(["codes"], system="ctv3")
@@ -171,7 +178,7 @@ study = StudyDefinition(
         },
     ),
     #Generate variable to identify first date of confirmed COVID
-    exp_confirmed_covid19_date=patients.minimum_of(
+    exp_date_covid19_confirmed=patients.minimum_of(
         "sgss_covid19_date","primary_care_covid19_date","hospital_covid19_date","death_covid19_date"
     ),
 
@@ -217,7 +224,7 @@ study = StudyDefinition(
     #COVID Vaccines
 
     ## any covid vaccination, identified by target disease
-    covid_vax_disease_1_date=patients.with_tpp_vaccination_record(
+    vax_date_covid_1=patients.with_tpp_vaccination_record(
         target_disease_matches="SARS-2 CORONAVIRUS",
         on_or_after="2020-12-08",
         find_first_match_in_period=True,
@@ -228,9 +235,9 @@ study = StudyDefinition(
             "incidence": 0.7
         },
     ),
-    covid_vax_disease_2_date=patients.with_tpp_vaccination_record(
+    vax_date_covid_2=patients.with_tpp_vaccination_record(
         target_disease_matches="SARS-2 CORONAVIRUS",
-        on_or_after="covid_vax_disease_1_date + 1 day",
+        on_or_after="vax_date_covid_1 + 1 day",
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -239,9 +246,9 @@ study = StudyDefinition(
             "incidence": 0.6
         },
     ),
-    covid_vax_disease_3_date=patients.with_tpp_vaccination_record(
+    vax_date_covid_3=patients.with_tpp_vaccination_record(
         target_disease_matches="SARS-2 CORONAVIRUS",
-        on_or_after="covid_vax_disease_2_date + 1 day",
+        on_or_after="vax_date_covid_2 + 1 day",
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -254,7 +261,7 @@ study = StudyDefinition(
     # Pfizer BioNTech - first record of a pfizer vaccine 
     # NB *** may be patient's first COVID vaccine dose or their second if mixed types are given ***
        
-    covid_vax_pfizer_1_date=patients.with_tpp_vaccination_record(
+    vax_date_Pfizer_1=patients.with_tpp_vaccination_record(
         product_name_matches="COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
         on_or_after="2020-12-08",
         find_first_match_in_period=True,
@@ -265,9 +272,9 @@ study = StudyDefinition(
             "incidence": 0.5
         },
     ), 
-    covid_vax_pfizer_2_date=patients.with_tpp_vaccination_record(
+    vax_date_Pfizer_2=patients.with_tpp_vaccination_record(
         product_name_matches="COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
-        on_or_after="covid_vax_pfizer_1_date + 1 day",  
+        on_or_after="vax_date_Pfizer_1 + 1 day",  
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -276,9 +283,9 @@ study = StudyDefinition(
             "incidence": 0.5
         },
     ),
-    covid_vax_pfizer_3_date=patients.with_tpp_vaccination_record(
+    vax_date_Pfizer_3=patients.with_tpp_vaccination_record(
         product_name_matches="COVID-19 mRNA Vaccine Comirnaty 30micrograms/0.3ml dose conc for susp for inj MDV (Pfizer)",
-         on_or_after="covid_vax_pfizer_2_date + 1 day",  
+         on_or_after="vax_date_Pfizer_2 + 1 day",  
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -290,7 +297,7 @@ study = StudyDefinition(
     
     ## Oxford AZ - first record of an Oxford AZ vaccine 
     # NB *** may be patient's first COVID vaccine dose or their second if mixed types are given ***
-    covid_vax_az_1_date=patients.with_tpp_vaccination_record(
+    vax_date_AstraZeneca_1=patients.with_tpp_vaccination_record(
         product_name_matches="COVID-19 Vac AstraZeneca (ChAdOx1 S recomb) 5x10000000000 viral particles/0.5ml dose sol for inj MDV",
         on_or_after="2020-12-08",
         find_first_match_in_period=True,
@@ -301,9 +308,9 @@ study = StudyDefinition(
             "incidence": 0.5
         },
     ),
-    covid_vax_az_2_date=patients.with_tpp_vaccination_record(
+    vax_date_AstraZeneca_2=patients.with_tpp_vaccination_record(
         product_name_matches="COVID-19 Vac AstraZeneca (ChAdOx1 S recomb) 5x10000000000 viral particles/0.5ml dose sol for inj MDV",
-        on_or_after="covid_vax_az_1_date + 1 day",  
+        on_or_after="vax_date_AstraZeneca_1 + 1 day",  
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -312,9 +319,9 @@ study = StudyDefinition(
             "incidence": 0.5
         },
     ),
-    covid_vax_az_3_date=patients.with_tpp_vaccination_record(
+    vax_date_AstraZeneca_3=patients.with_tpp_vaccination_record(
         product_name_matches="COVID-19 Vac AstraZeneca (ChAdOx1 S recomb) 5x10000000000 viral particles/0.5ml dose sol for inj MDV",
-        on_or_after="covid_vax_az_2_date + 1 day",  
+        on_or_after="vax_date_AstraZeneca_2 + 1 day",  
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -326,7 +333,7 @@ study = StudyDefinition(
     
     ## Moderna - first record of moderna vaccine
     ## NB *** may be patient's first COVID vaccine dose or their second if mixed types are given ***
-    covid_vax_moderna_1_date=patients.with_tpp_vaccination_record(
+    vax_date_Moderna_1=patients.with_tpp_vaccination_record(
         product_name_matches="COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
         on_or_after="2020-12-08",
         find_first_match_in_period=True,
@@ -337,9 +344,9 @@ study = StudyDefinition(
             "incidence": 0.5
         },
     ),            
-    covid_vax_moderna_2_date=patients.with_tpp_vaccination_record(
+    vax_date_Moderna_2=patients.with_tpp_vaccination_record(
         product_name_matches="COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
-        on_or_after="covid_vax_moderna_1_date + 1 day",  
+        on_or_after="vax_date_Moderna_1 + 1 day",  
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -348,9 +355,9 @@ study = StudyDefinition(
             "incidence": 0.5
         },
     ),
-    covid_vax_moderna_3_date=patients.with_tpp_vaccination_record(
+    vax_date_Moderna_3=patients.with_tpp_vaccination_record(
         product_name_matches="COVID-19 mRNA Vaccine Spikevax (nucleoside modified) 0.1mg/0.5mL dose disp for inj MDV (Moderna)",
-        on_or_after="covid_vax_moderna_2_date + 1 day",  
+        on_or_after="vax_date_Moderna_2 + 1 day",  
         find_first_match_in_period=True,
         returning="date",
         date_format="YYYY-MM-DD",
@@ -402,7 +409,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_ami=patients.minimum_of(
+    out_date_ami=patients.minimum_of(
         "ami_snomed", "ami_icd10_hes", "ami_icd10_death"
     ),
 
@@ -446,7 +453,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_stroke_isch=patients.minimum_of(
+    out_date_stroke_isch=patients.minimum_of(
         "stroke_isch_snomed", "stroke_isch_icd10_hes", "stroke_isch_icd10_death"
     ),
 ###Deep vein thrombosis (no primary care codes)
@@ -500,7 +507,7 @@ study = StudyDefinition(
             "incidence": 0.02,
         },
     ),
-    out_dvt=patients.minimum_of(
+    out_date_dvt=patients.minimum_of(
         "dvt_icd10_hes", "dvt_icd10_death", "dvt_pregnancy_icd10_hes", "dvt_pregnancy_icd10_death"
     ),
 
@@ -544,7 +551,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_pe=patients.minimum_of(
+    out_date_pe=patients.minimum_of(
         "pe_snomed", "pe_icd10_hes", "pe_icd10_death"
     ),
 
@@ -588,7 +595,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_tia=patients.minimum_of(
+    out_date_tia=patients.minimum_of(
         "tia_snomed", "tia_icd10_hes", "tia_icd10_death"
     ),
 
@@ -632,7 +639,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_stroke_sah_hs=patients.minimum_of(
+    out_date_stroke_sah_hs=patients.minimum_of(
         "stroke_sah_hs_snomed", "stroke_sah_hs_icd10_hes", "stroke_sah_hs_icd10_death"
     ),
 
@@ -676,7 +683,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_hf=patients.minimum_of(
+    out_date_hf=patients.minimum_of(
         "hf_snomed", "hf_icd10_hes", "hf_icd10_death"
     ),
 
@@ -720,7 +727,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_angina=patients.minimum_of(
+    out_date_angina=patients.minimum_of(
         "angina_snomed", "angina_icd10_hes", "angina_icd10_death"
     ),
 
@@ -752,7 +759,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_ate=patients.minimum_of(
+    out_date_ate=patients.minimum_of(
         "ami_snomed", "ami_icd10_hes", "ami_icd10_death", "oae_icd10_hes", "oae_icd10_death", "stroke_isch_snomed", "stroke_isch_icd10_hes", "stroke_isch_icd10_death"
     ),
 
@@ -796,7 +803,7 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    out_vte=patients.minimum_of(
+    out_date_vte=patients.minimum_of(
         "all_vte_codes_snomed", "all_vte_codes_icd10_hes", "all_vte_codes_icd10_death"
     ),
 
@@ -826,12 +833,12 @@ study = StudyDefinition(
             "incidence": 0.02
         },
     ),
-    qa_prostate_cancer=patients.maximum_of(
+    qa_bin_prostate_cancer=patients.maximum_of(
         "prostate_cancer_snomed", "prostate_cancer_hes", "prostate_cancer_death"
     ),
  ###Pregnancy
     #primary care
-    qa_pregnancy=patients.with_these_clinical_events(
+    qa_bin_pregnancy=patients.with_these_clinical_events(
         pregnancy_snomed_clinical,
         returning='binary_flag',
          return_expectations={
@@ -840,7 +847,7 @@ study = StudyDefinition(
     ),
   
   #Year of birth
-    qa_birth_year=patients.date_of_birth(
+    qa_num_birth_year=patients.date_of_birth(
         date_format="YYYY",
         return_expectations={
             "date": {"earliest": "1900-01-01", "latest": "today"},
@@ -971,7 +978,9 @@ study = StudyDefinition(
         ),
     ),
 
+
     ###Other covariates (see: variables)
     **covariates,
 
+    **jcvi_variables, 
 )
