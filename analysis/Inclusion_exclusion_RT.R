@@ -145,7 +145,11 @@ input <- subset(input, input$vacc_prior_mixed==0)
 
 #Define the cohort flow
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Exclusion11: Received mixed vaccine products before 07-05-2021")
-# Save input -------------------------------------------------------------------
 
-data.table::fwrite(input,"output/IE_applied_vaccinated_input.rds")
-data.table::fwrite(cohort_flow,"output/delta-vaccinated_cohort_flow.csv")
+# Save input -------------------------------------------------------------------
+saveRDS(input, file = "output/IE_applied_vaccinated_input.rds")
+write.csv(cohort_flow,"output/delta-vaccinated_cohort_flow.csv.csv", row.names = FALSE)
+
+#Alternatives-if requred - un comment the below
+#data.table::fwrite(input,"output/IE_applied_vaccinated_input.rds")
+#data.table::fwrite(cohort_flow,"output/delta-vaccinated_cohort_flow.csv")
