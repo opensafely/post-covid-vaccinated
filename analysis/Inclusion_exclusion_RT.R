@@ -148,7 +148,7 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Exclusion11: Received mixed 
 
 # Save input -------------------------------------------------------------------
 saveRDS(input, file = "output/IE_applied_vaccinated_input.rds")
-write.csv(cohort_flow,"output/delta-vaccinated_cohort_flow.csv.csv", row.names = FALSE)
+write.csv(cohort_flow,"output/delta-vaccinated_cohort_flow.csv", row.names = FALSE)
 
 #Alternatives-if requred - un comment the below
 #data.table::fwrite(input,"output/IE_applied_vaccinated_input.rds")
