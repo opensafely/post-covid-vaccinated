@@ -134,46 +134,18 @@ input$vacc_product_2 <- ifelse(input$vacc_product_2==0 & (input$covid_vax_modern
 input$vacc_product_2[is.na(input$vacc_product_2)] <- 0 #  0 - no product info
 table(input$vacc_product_2)
 
-#Exclude samples with no vaccine product info
-input <- subset(input, input$vacc_product_1 > 0)
-input <- subset(input, input$vacc_product_2 > 0)
-#Define the cohort flow
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Exclusion 11a: Vaccine product info not available")
-
 #Exclude samples with mixed vaccine product before 7/5/2021
+#define mixed vaccination 
+input$vacc_mixed <- ifelse(input$vacc_product_1==input$vacc_product_2,0,1)#1- mixed, 0 not mixed
+input$vacc_mixed <- ifelse((input$vacc_product_1==0|input$vacc_product_2==0), NA,input$vacc_mixed)
+input$vacc_prior_mixed <- ifelse(input$vacc_mixed==1 & input$covid_vax_disease_2_date < as.Date ("2021-07-05"), 1,0)
+input$vacc_prior_mixed  <- ifelse((input$vacc_product_1==0|input$vacc_product_2==0), NA,input$vacc_prior_mixed)
+#exclude mixed vaccine
+input <- subset(input, input$vacc_prior_mixed==0)
 
-
-
-#This is a generalized code, which has to be modified latter based on the vaccine date & product variables which Yinghui(?) will derive
-input10$mixed_vacc <- ifelse((input10$vaccine_1_product == "az" & 
-                              input10$vaccine_2_product == "az") |
-                              (input10$vaccine_1_product == "pfizer" & 
-                              input10$vaccine_2_product == "pfizer") |
-                              (input10$vaccine_1_product == "moderna" & 
-                              input10$vaccine_2_product == "moderna"), 0, 1)#1- mixed
-
-input10$mixed_vacc <- ifelse(input10$mixed_vacc == 1 & input10$covid_vax_disease_2_date < as.Date ("07/05/2021"),1,0) 
-input11 <- subset(input10, input10$mixed_vacc == 0)
-
-#Define the cohort flow--------
-cohort_flow <- input.frame(N = numeric(),
-                          Description = character(),
-                          stringsAsFactors = FALSE)
-
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input1),"Inclusion1:Alive on the first day of follow up")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input2),"Inclusion2:Known age between 18 and 110 on 01/06/2021")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input3),"Inclusion3:Known sex")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input4),"Inclusion4:Known deprivation")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input5),"Inclusion5:Registered in an English GP with TPP software for at least 6 months prior to the study start date")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input6),"Exclusion6: SARS-CoV-2 infection recorded prior to their index date")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input7),"Exclusion7:Do not have a record of two vaccination doses prior to the study end date")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input8),"Exclusion8: Received a vaccination prior to 08-12-2020")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input9),"Exclusion9:Received a second dose vaccination before their first dose vaccination")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input10),"Exclusion10:Received a second dose vaccination less than three weeks after their first dose")
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input11),"Exclusion11:They received mixed vaccine products before 07-05-2021")
-
+#Define the cohort flow
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Exclusion11: Received mixed vaccine products before 07-05-2021")
 # Save input -------------------------------------------------------------------
 
-input.table::fwrite(input11,"input/Vaccinated_delta_cohort.csv")
-input.table::fwrite(cohort_flow,"output/delta-cohort_flow.csv")
+data.table::fwrite(input,"output/IE_applied_vaccinated_input.rds")
+data.table::fwrite(cohort_flow,"output/delta-vaccinated_cohort_flow.csv")
