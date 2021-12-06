@@ -112,5 +112,8 @@ input <- subset(input, input$prior_vacc < 1)
 #Define the cohort flow--------
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Exclusion7: Have a record of one or more vaccination doses on the study start date")
 # Save input ----------------------------------------------------------------------------------------------
-input.table::fwrite(input11,"output/IE_applied_input.rds")
-input.table::fwrite(cohort_flow,"output/IE_delta-cohort_flow.csv")
+saveRDS(input, file = "output/IE_applied_unvaccinated_input.rds")
+write.csv(cohort_flow,"output/delta-unvaccinated_cohort_flow.csv", row.names = FALSE)
+
+#input.table::fwrite(input,"output/IE_applied_input.rds")
+#input.table::fwrite(cohort_flow,"output/IE_delta-cohort_flow.csv")
