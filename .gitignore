@@ -10,3 +10,5 @@ venv/
 .Rhistory
 *.Rproj
 .Rproj.user
+.RData
+.Rhistory

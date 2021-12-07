@@ -81,6 +81,24 @@ for (i in 1:3) {
   
 }
 
+# Define severity --------------------------------------------------------------
+
+df$exp_cat_covid19_hospital <- "no_infection"
+
+df$exp_cat_covid19_hospital <- ifelse(!is.na(df$exp_date_covid19_confirmed),
+                                      "non_hospitalised",df$exp_cat_covid19_hospital)
+
+df$exp_cat_covid19_hospital <- ifelse(!is.na(df$exp_date_covid19_confirmed) & 
+                                        !is.na(df$exp_date_covid19_hospital) &
+                                        (df$exp_date_covid19_hospital-df$exp_date_covid19_confirmed>=0 &
+                                           df$exp_date_covid19_hospital-df$exp_date_covid19_confirmed<29),
+                                      "hospitalised_within28days",df$exp_cat_covid19_hospital)
+
+df$exp_cat_covid19_hospital <- ifelse(!is.na(df$exp_date_covid19_confirmed) & 
+                                        !is.na(df$exp_date_covid19_hospital) &
+                                        (df$exp_date_covid19_hospital-df$exp_date_covid19_confirmed>=29),
+                                      "hospitalised_after28days",df$exp_cat_covid19_hospital)
+
 # Specify columns to keep ------------------------------------------------------
 
 df <- df[,c("patient_id","death_date",
