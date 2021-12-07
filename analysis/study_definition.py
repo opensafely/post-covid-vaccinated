@@ -183,14 +183,16 @@ study = StudyDefinition(
     ),
 
     #Hospital admission where COVID-19 in primary position (for SARS-COV-2 infection severity)
-    covid_admission_primary_diagnosis=patients.admitted_to_hospital(
-        returning="primary_diagnosis",
-        with_these_diagnoses=covid_codes,  # optional
-        on_or_after="index_date",
-        find_first_match_in_period=True,  
-        date_format="YYYY-MM-DD", 
-        return_expectations={"date": {"earliest": "2020-11-20"},"incidence" : 0.5,
-            "category": {"ratios": {"U071":0.5, "U072":0.5}},
+    exp_date_covid19_hospital=patients.admitted_to_hospital(
+        with_these_primary_diagnoses=covid_codes,
+        returning="date_admitted",
+        on_or_after="exp_date_covid19_confirmed",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.05,
         },
     ),
 
