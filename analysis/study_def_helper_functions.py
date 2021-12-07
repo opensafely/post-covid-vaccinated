@@ -1,6 +1,6 @@
 def generate_ethnicity_dictionary(n_groups: int) -> dict:
     """
-    project-specific function to generate dictionary of 16-group ethnicity
+    project-specific function to generate dictionary of 6-group ethnicity
     values and logical definitions combining three source ethnicity variables
     to be used within a patients.categorised_as() statement
     """
