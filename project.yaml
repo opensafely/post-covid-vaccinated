@@ -26,3 +26,11 @@ actions:
     outputs:
       highly_sensitive:
         cohort: output/input.rds
+  
+  generate_table_1:
+    run: r:latest analysis/table_1_script.R
+    needs: [preprocess_data] 
+    outputs:
+      moderately_sensitive:
+        table_1: output/Table_1.csv
+
