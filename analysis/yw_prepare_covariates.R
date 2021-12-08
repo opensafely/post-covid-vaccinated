@@ -115,6 +115,7 @@ qa_factor_names = qa_vars_names[- which(qa_vars_names=="qa_birth_year")]
 # create a data frame for factors used in quality assurance
 qa_factor <- input[,qa_factor_names]
 #qa_factor_names
+
 qa_factor[,qa_factor_names] <- lapply(qa_factor[,qa_factor_names], factor)
 #lapply(qa_factor[,qa_factor_names], is.factor)
 
@@ -126,6 +127,7 @@ lapply(input[,qa_factor_names], is.factor)
 input$qa_birth_year <- strtoi(format(input$qa_birth_year, "%Y"))
 #input$qa_birth_year[1:10]
 #class(input$qa_birth_year)
+
 ##------------------------------- NUMERICAL Variables --------------------------------------
 # Checking if continuous covariates are set up as numeric variable correctly
 #is.numeric(data$cov_num_age); is.numeric(data$cov_num_consulation_rate); 
