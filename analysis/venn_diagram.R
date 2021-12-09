@@ -44,6 +44,7 @@ input <- arrow::read_feather(file = file.path("output", "input.feather"))
 # -- write a function to create a venn diagram ------------------------------
 
 # Rules: three data sources in the order of "SNOMED", "Hospital Episode", "Deaths"
+# Once the study definition is updated, n_src = 4 can be removed
 venn_digram <- function(outcome_names, figure_name, figure_title)
 {
   print(outcome_names)
@@ -97,7 +98,6 @@ ami_names <- c("ami_snomed", "ami_icd10_hes", "ami_icd10_death")
 venn_digram(ami_names, "1 venn_ami.png", "Acute Myocardial Infarction")
 
 # outcome 2: stroke
-
 stroke_names <- c("stroke_isch_snomed", "stroke_isch_icd10_hes", "stroke_isch_icd10_death")
 venn_digram(stroke_names,"2_venn_stroke.png", "Ischaemic Stroke")
 
@@ -106,7 +106,7 @@ pe_names <- c("pe_snomed", "pe_icd10_hes", "pe_icd10_death")
 venn_digram(pe_names,"3_venn_pe.png", "Pulmonary Embolism")
 
 # outcome 4: dvt
-
+# comment: code for dvt will be updated once the study definition is updated
 dvt_names<-  c("dvt_icd10_hes", "dvt_pregnancy_icd10_hes", 
                "dvt_icd10_death", "dvt_pregnancy_icd10_death")
 venn_digram(dvt_names,"4_venn_dvt.png", "Deep Vein Thrombosis")
@@ -127,14 +127,14 @@ venn_digram(hf_names, "7_venn_hf.png", "Heart Failure")
 angina_names <- c("angina_snomed", "angina_icd10_hes", "angina_icd10_death")
 venn_digram(angina_names, "8_venn_angina.png", "Angina")
 
+
 # outcome 9: oae (what is this? Arterial thrombosis events? 
 #only two sources: deaths and hes, but no SONMED?
 # there is a variable named "out_ate" - what is this?)
-
+# comment: code for outcome 9 will be updated once there are data from SNOMED
 oae_names <- c("oae_icd10_hes", "oae_icd10_death")
 venn_digram(oae_names, "9_venn_oae.png", "Arterial Thrombosis Events")
 
 # outcome 10: all_vte
 vte_names <- c("all_vte_codes_snomed", "all_vte_codes_icd10_hes", "all_vte_codes_icd10_death")
 venn_digram(vte_names, "10_venn_vte.png", "Venous Thromboembolism Events")
-
