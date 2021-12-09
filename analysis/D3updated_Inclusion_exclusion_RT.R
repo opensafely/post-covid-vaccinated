@@ -107,51 +107,30 @@ input <- subset(input, input$vacc_gap >= 0)
 #Define the cohort flow
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Exclusion9: Second dose vaccination recoreded  before their first dose vaccination")
 
-#EXCLUSION CRITERIA 10.received a second dose vaccination less than three weeks after their first dose ------------
+#EXCLUSION CRITERIA 10.received a second dose vaccination less than three weeks after their first dose -------------------------------
 input <- subset(input, input$vacc_gap >= 21) 
 #Define the cohort flow
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Exclusion10: Second dose vaccination recorded less than three weeks after their first dose")
 
-#EXCLUSION CRITERIA 11.They received mixed vaccine products before 07-05-2021 ----------------------------------
-
-
-
-
-#1.Determine the vaccine1 date and product for each dose
-input$vacc_date_1 <- pmin(input$covid_vax_az_1_date,input$covid_vax_pfizer_1_date,input$covid_vax_moderna_1_date, na.rm = TRUE)#RT
-input$vacc_product_1 <- ifelse(input$covid_vax_disease_1_date > 0 & input$covid_vax_az_1_date == input$vacc_date_1, 1,0)#1- Astro zeneca
-input$vacc_product_1[is.na(input$vacc_product_1)] <- 0
-input$vacc_product_1 <- ifelse(input$vacc_product_1==0 & (input$covid_vax_pfizer_1_date == input$vacc_date_1), 2,input$vacc_product_1)#2- pfizer
-input$vacc_product_1[is.na(input$vacc_product_1)] <- 0
-input$vacc_product_1 <- ifelse(input$vacc_product_1==0 & (input$covid_vax_moderna_1_date == input$vacc_date_1), 3,input$vacc_product_1)# 3- moderna
-input$vacc_product_1[is.na(input$vacc_product_1)] <- 0 #  0 - no product info
-
-#2.Determine the vaccine2 date and product for each dose
-input$vacc_date_2 <- pmin(input$covid_vax_az_2_date,input$covid_vax_pfizer_2_date,input$covid_vax_moderna_2_date, na.rm = TRUE)#RT
-input$vacc_product_2 <- ifelse(input$covid_vax_disease_2_date > 0 & input$covid_vax_az_2_date == input$vacc_date_2, 1,0)#1- Astro zeneca
-input$vacc_product_2[is.na(input$vacc_product_2)] <- 0
-input$vacc_product_2 <- ifelse(input$vacc_product_2==0 & (input$covid_vax_pfizer_2_date == input$vacc_date_2), 2,input$vacc_product_2)#2- pfizer
-input$vacc_product_2[is.na(input$vacc_product_2)] <- 0
-input$vacc_product_2 <- ifelse(input$vacc_product_2==0 & (input$covid_vax_moderna_2_date == input$vacc_date_2), 3,input$vacc_product_2)# 3- moderna
-input$vacc_product_2[is.na(input$vacc_product_2)] <- 0 #  0 - no product info
-table(input$vacc_product_2)
-
-#Exclude samples with mixed vaccine product before 7/5/2021
-#define mixed vaccination 
-input$vacc_mixed <- ifelse(input$vacc_product_1==input$vacc_product_2,0,1)#1- mixed, 0 not mixed
-input$vacc_mixed <- ifelse((input$vacc_product_1==0|input$vacc_product_2==0), NA,input$vacc_mixed)
-input$vacc_prior_mixed <- ifelse(input$vacc_mixed==1 & input$covid_vax_disease_2_date < as.Date ("2021-07-05"), 1,0)
-input$vacc_prior_mixed  <- ifelse((input$vacc_product_1==0|input$vacc_product_2==0), NA,input$vacc_prior_mixed)
-#exclude mixed vaccine
-input <- subset(input, input$vacc_prior_mixed==0)
-
+#EXCLUSION CRITERIA 11.They received mixed vaccine products before 07-05-2021 ---------------------------------------------------------------
+#Determines mixed vaccination
+input$vax_mixed <- ifelse((input$vax_cat_product_1!=input$vax_cat_product_2),1,0)
+#Remove if vaccination products are mixed prior to "2021-05-07"
+input$vax_prior_mixed <- ifelse(input$vax_mixed==1 & input$vax_date_covid_1 < as.Date ("2021-05-07"), 1,0)
+input$vax_prior_mixed <- ifelse(input$vax_mixed==1 & input$vax_date_covid_2 < as.Date ("2021-05-07"), 1,0)
+input$vax_prior_mixed[is.na(input$vax_prior_mixed)] <- 0
+input <- subset(input, input$vax_prior_mixed==0)
+#Removes if vaccination date is less than "2021-05-07" and the vaccine product name is not known!
+input$vax_prior_unknown <- ifelse((input$vax_date_covid_1 < as.Date ("2021-05-07")) & is.na(input$vax_cat_product_1),1,0)
+input$vax_prior_unknown <- ifelse((input$vax_date_covid_2 < as.Date ("2021-05-07")) & is.na(input$vax_cat_product_1),1,0)
+input <- subset(input, input$vax_prior_unknown==0)
 #Define the cohort flow
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Exclusion11: Received mixed vaccine products before 07-05-2021")
 
-# Save input -------------------------------------------------------------------
+# Save input ---------------------------------------------------------------------------------------------------------------------
 saveRDS(input, file = "output/IE_applied_vaccinated_input.rds")
 write.csv(cohort_flow,"output/delta-vaccinated_cohort_flow.csv", row.names = FALSE)
 
-#Alternatives-if requred - un comment the below
+#Alternatives-when required - un comment the below
 #data.table::fwrite(input,"output/IE_applied_vaccinated_input.rds")
 #data.table::fwrite(cohort_flow,"output/delta-vaccinated_cohort_flow.csv")
