@@ -48,20 +48,20 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
 {
   print(outcome_names)
   n_src = length(outcome_names)
-  if(n_src ==3){
-  index1 <- which(!is.na(input[,outcome_names[1]]))
-  index2 <- which(!is.na(input[,outcome_names[2]]))
-  index3 <- which(!is.na(input[,outcome_names[3]]))
-  index = list(index1, index2, index3)
-  names(index) <- c("SNOMED", "Hospital Episode", "Deaths")
-  mycol=c("thistle", "lightcyan", "lemonchiffon")
-  }
   if(n_src ==2){
     index1 <- which(!is.na(input[,outcome_names[1]]))
     index2 <- which(!is.na(input[,outcome_names[2]]))
     index = list(index1, index2)
     names(index) <- c("Hospital Episode", "Deaths")
     mycol=c("thistle", "lightcyan")
+  }
+  if(n_src ==3){
+    index1 <- which(!is.na(input[,outcome_names[1]]))
+    index2 <- which(!is.na(input[,outcome_names[2]]))
+    index3 <- which(!is.na(input[,outcome_names[3]]))
+    index = list(index1, index2, index3)
+    names(index) <- c("SNOMED", "Hospital Episode", "Deaths")
+    mycol=c("thistle", "lightcyan", "lemonchiffon")
   }
   if(n_src ==4){
     index1 <- which(!is.na(input[,outcome_names[1]]))
@@ -94,7 +94,7 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
 
 # outcome 1: ami
 ami_names <- c("ami_snomed", "ami_icd10_hes", "ami_icd10_death")
-venn_digram(ami_names, "1_venn_ami.png", "Acute Myocardial Infarction")
+venn_digram(ami_names, "1 venn_ami.png", "Acute Myocardial Infarction")
 
 # outcome 2: stroke
 
@@ -106,14 +106,6 @@ pe_names <- c("pe_snomed", "pe_icd10_hes", "pe_icd10_death")
 venn_digram(pe_names,"3_venn_pe.png", "Pulmonary Embolism")
 
 # outcome 4: dvt
-# index1 <- which(!is.na(input$dvt_icd10_hes))
-# index2 <- which(!is.na(input$dvt_pregnancy_icd10_hes))
-# index3 <- which(!is.na(input$dvt_icd10_death))
-# index4 <- which(!is.na(input$dvt_pregnancy_icd10_death))
-# 
-# index <- list(index1, index2, index3, index4)
-# names(index) <-  c("HE", "Preg HE", "Deaths", "Preg D")
-# venn_digram4(index,"4_venn_dvt.png", "Deep Vein Thrombosis")
 
 dvt_names<-  c("dvt_icd10_hes", "dvt_pregnancy_icd10_hes", 
                "dvt_icd10_death", "dvt_pregnancy_icd10_death")
