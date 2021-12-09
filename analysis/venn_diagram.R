@@ -11,6 +11,9 @@
 ##           reporting from different data sources
 ## =============================================================================
 
+# YW Alert 9/Dec/2021: Code for outcome 4 (dvt) and outcome 9 (oae) will need to 
+#                      be updated once the study definition is updated
+
 library(arrow); library("ggvenn")
 
 # read in data------------------------------------------------------------
