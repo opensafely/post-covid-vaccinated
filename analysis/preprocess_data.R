@@ -1,15 +1,53 @@
-# Load study definition output -------------------------------------------------
+cohort = "vaccinated"
+study_start = "2021-06-01"
 
-df <- arrow::read_feather(file = "output/input.feather") 
+library(magrittr)
 
-# Specify columns to keep ------------------------------------------------------
+# Create spine dataset ---------------------------------------------------------
 
-df <- df[,c("patient_id","death_date",
-            colnames(df)[grepl("exp_",colnames(df))], # Exposures
-            colnames(df)[grepl("out_",colnames(df))], # Outcomes
-            colnames(df)[grepl("cov_",colnames(df))], # Covariates
-            colnames(df)[grepl("qa_",colnames(df))], # Quality assurance
-            colnames(df)[grepl("vax_",colnames(df))])] # Vaccinations
+df <- arrow::read_feather(file = "output/input_index.feather",
+                          col_select = c("patient_id","death_date"))
+
+# Tidy input file and merge to dataset -----------------------------------------
+
+for (i in c("index","other")) {
+
+  ## Load study definition output
+  
+  tmp <- arrow::read_feather(file = paste0("output/input_",ifelse(i=="other",cohort,i),".feather"))
+  
+  ## Merge dynamic variables to main dataset
+  
+  keep <- c("patient_id",
+            colnames(tmp)[grepl("exp_",colnames(tmp))], # Exposures
+            colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
+            colnames(tmp)[grepl("cov_",colnames(tmp))]) # Covariates
+
+  keep <- intersect(keep,colnames(tmp))
+  
+  tmp_dynamic <- tmp[,keep]
+  
+  colnames(tmp_dynamic) <- paste0(colnames(tmp_dynamic),"_",i)
+
+  tmp_dynamic <- dplyr::rename(tmp_dynamic, patient_id = paste0("patient_id_",i))
+  
+  df <- merge(df,tmp_dynamic, by = "patient_id")
+
+  ## Merge other specific variables if applicable
+  
+  keep <- c("patient_id",
+            colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
+            colnames(tmp)[grepl("vax_",colnames(tmp))]) # Vaccinations
+  
+  keep <- intersect(keep,colnames(tmp))
+  
+  tmp_static <- tmp[,keep]
+  
+  if (ncol(tmp_static)>1) {
+    df <- merge(df,tmp_static, by = "patient_id") 
+  }
+  
+}
 
 # Remove JCVI age variables ----------------------------------------------------
 
@@ -41,6 +79,28 @@ for (i in colnames(df)[grepl("_bin",colnames(df))]) {
   df[,i] <- as.logical(df[,i])
 }
 
+# Determine index date ---------------------------------------------------------
+
+df$study_start_date <- as.Date(study_start)
+
+df$vax_date_full <- as.Date(df$vax_date_covid_2)+14
+
+df$use_date <- ifelse(df$study_start_date>df$vax_date_full & !is.na(),"index","other")
+
+# Create sub cohorts -----------------------------------------------------------
+
+index <- df[df$use_date=="index" & !is.na(df$use_date),]
+index <- index[,!grepl("_other",colnames(index))]
+colnames(index) <- gsub("_index","",colnames(index))
+index$index_date <- index$study_start_date
+index[,c("use_date")] <- NULL
+
+other <- df[df$use_date=="other",]
+other <- other[,!grepl("_index",colnames(other))]
+colnames(other) <- gsub("_other","",colnames(other))
+other$index_date <- other$vax_date_full
+other[,c("use_date")] <- NULL
+         
 # Generate vaccine variables ---------------------------------------------------
 
 for (i in 1:3) {
