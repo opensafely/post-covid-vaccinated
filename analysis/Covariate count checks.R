@@ -1,14 +1,18 @@
-#This script will create 
-#Checking of covariates for critical numbers for separate vaccinated and unvaccinated population
+#This script will create a table for the population of interest eg vaccinated/unvaccinated containing the pre-exposure and post-exposure
+#event counts split by covariate and sub group eg male/female
+
 library(dplyr)
 library(data.table)
 library(purrr)
 library(readr)
 library(tidyverse)
 
+args = commandArgs(trailingOnly=TRUE)
+project  = args[[1]] #vaccinated_delta,unvaccinated_delta, unvaccinated
+
 input <- read_rds("output/input.rds")
-project="vaccinated_delta"
-#unvaccinated_delta, unvaccinated
+
+project="vaccinated_delta" #this will need to be removed merged and added as an action
 
 #done in previous script so can be deleted once merged
 input$cov_cat_region=gsub(" ","_",input$cov_cat_region)
@@ -79,9 +83,9 @@ covar_levels$Covariate=gsub("\\s","",covar_levels$Covariate)
 covar_levels=covar_levels %>% drop_na(Covariate_level)
 covar_levels=covar_levels%>%select(-Var1)
 
+#This will be the format of the final table
 summary_final <- data.frame(matrix(ncol = 7, nrow = 0))
-colnames(summary_final) <- c('Covariate', 'Covariate_level', 'Pre_expo_freq', 'Post_expo_freq', 'Event','Strata','Project')
-
+colnames(summary_final) <- c('Covariate', 'Covariate_level', 'Pre_expo_covid19_freq', 'Post_expo_covid19_freq', 'Event','Strata','Project')
 
 
 
@@ -102,58 +106,56 @@ for (j in 1:nrow(pop)) {
       df=df %>% rowwise() %>% mutate(follow_up_end=min(outcome_event, vax_date_covid_1, death_date,cohort_end_date,na.rm = TRUE))
     }
     
+    
+    #Pre exposure events
     df_pre_expo= df %>% filter((follow_up_end == outcome_event & follow_up_end >= follow_up_start) & (follow_up_end < exp_date_covid19_confirmed | is.na(exp_date_covid19_confirmed)=="TRUE"))
     df_pre_expo <- df_pre_expo %>% dplyr::select(c(all_of(covar_names)))
-    #df_pre_expo <- df_pre_expo %>%  dplyr::select(!c( df_pre_expo %>%  dplyr::select_if(~n_distinct(.)>2) %>% names()))
-    #df_pre_expo= df_pre_expo %>% mutate_if(is.numeric,as.factor)
-    #df_pre_expo= df_pre_expo %>% mutate_if(is.character,as.factor)
-    
+
     summary_pre_expo <- as.data.frame(summary(df_pre_expo,maxsum=50))
-    summary_pre_expo$Pre_expo_freq=summary_pre_expo$Freq
+    summary_pre_expo$Pre_expo_covid19_freq=summary_pre_expo$Freq
     summary_pre_expo = rename(summary_pre_expo, Covariate_level = Freq, Covariate = Var2)
-    #summary_pre_expo$Pre_expo_freq <- gsub("0:","",summary_pre_expo$Pre_expo_freq)
-    #summary_pre_expo$Pre_expo_freq <- gsub("1:","",summary_pre_expo$Pre_expo_freq)
-    summary_pre_expo$Pre_expo_freq=gsub(".*:", "",summary_pre_expo$Pre_expo_freq) #remove everything before :
     
+    #Tidy summary table
+    summary_pre_expo$Pre_expo_covid19_freq=gsub(".*:", "",summary_pre_expo$Pre_expo_covid19_freq) #remove everything before :
     summary_pre_expo$Covariate_level= sub('\\:.*', '', summary_pre_expo$Covariate_level)#remove everything after :
-    summary_pre_expo$Covariate_level=gsub("\\s","",summary_pre_expo$Covariate_level)#remove any space
-    summary_pre_expo$Covariate=gsub("\\s","",summary_pre_expo$Covariate)
-    summary_pre_expo$Pre_expo_freq <- as.numeric(summary_pre_expo$Pre_expo_freq)
+    summary_pre_expo$Covariate_level=gsub("\\s","",summary_pre_expo$Covariate_level)#remove any spaces
+    summary_pre_expo$Covariate=gsub("\\s","",summary_pre_expo$Covariate)#remove any spaces
+    summary_pre_expo$Pre_expo_covid19_freq <- as.numeric(summary_pre_expo$Pre_expo_covid19_freq)
     summary_pre_expo=summary_pre_expo %>% drop_na(Covariate_level)
     summary_pre_expo=summary_pre_expo%>%select(-Var1)
     summary_pre_expo=left_join(covar_levels, summary_pre_expo, by = c('Covariate', 'Covariate_level')) 
     
     
+    #Post exposure events
     df_post_expo = df %>% filter(follow_up_end == outcome_event & follow_up_end >= exp_date_covid19_confirmed & follow_up_end >= follow_up_start)
     df_post_expo <- df_post_expo %>% dplyr::select(c(covar_names))
-    #df_post_expo <- df_post_expo %>%  dplyr::select(!c( df_post_expo %>%  dplyr::select_if(~n_distinct(.)>2) %>% names()))
-    #df_post_expo= df_post_expo %>% mutate_if(is.numeric,as.factor)
-    #df_post_expo= df_post_expo %>% mutate_if(is.character,as.factor)
     
     summary_post_expo <- as.data.frame(summary(df_post_expo, maxsum=50))
-    summary_post_expo$Post_expo_freq=summary_post_expo$Freq
+    summary_post_expo$Post_expo_covid19_freq=summary_post_expo$Freq
     summary_post_expo = rename(summary_post_expo, Covariate_level = Freq, Covariate = Var2)
-    summary_post_expo$Post_expo_freq=gsub(".*:", "",summary_post_expo$Post_expo_freq)
     
-    summary_post_expo$Covariate_level= sub('\\:.*', '', summary_post_expo$Covariate_level)
-    summary_post_expo$Covariate_level=gsub("\\s","",summary_post_expo$Covariate_level)
-    summary_post_expo$Covariate=gsub("\\s","",summary_post_expo$Covariate)
-    summary_post_expo$Post_expo_freq <- as.numeric(summary_post_expo$Post_expo_freq)
+    #Tidy summary table
+    summary_post_expo$Post_expo_covid19_freq=gsub(".*:", "",summary_post_expo$Post_expo_covid19_freq) #remove everything before :
+    
+    summary_post_expo$Covariate_level= sub('\\:.*', '', summary_post_expo$Covariate_level) #remove everything after :
+    summary_post_expo$Covariate_level=gsub("\\s","",summary_post_expo$Covariate_level) #remove spaces
+    summary_post_expo$Covariate=gsub("\\s","",summary_post_expo$Covariate) #remove spaces
+    summary_post_expo$Post_expo_covid19_freq <- as.numeric(summary_post_expo$Post_expo_covid19_freq)
     summary_post_expo=summary_post_expo %>% drop_na(Covariate_level)
     summary_post_expo=summary_post_expo%>%select(-Var1)
     summary_post_expo=left_join(covar_levels, summary_post_expo, by = c('Covariate', 'Covariate_level')) 
     
+    #Join pre-expo and post expo counts together
     summary=left_join(summary_pre_expo, summary_post_expo, by = c('Covariate', 'Covariate_level'))  
     summary$Event=outcome_name
     summary$Strata=population
     summary$Project=project
     
-    summary["Post_expo_freq"][is.na(summary["Post_expo_freq"])] <- 0
+    summary["Post_expo_covid19_freq"][is.na(summary["Post_expo_covid19_freq"])] <- 0
     summary_final=rbind(summary_final,summary)
   }
 }
 
 
-#write.csv(summary_final, file = file.path("output", paste0("covariates_counts_check", "_", vaccine_status, ".csv")) , row.names=F)
-#write.csv(event_counts, file = file.path("output", paste0("event_counts", "_", vaccine_status, ".csv")) , row.names=F)
+write.csv(summary_final, file = file.path("output", paste0("covariates_counts_check", "_", project, ".csv")) , row.names=F)
 
