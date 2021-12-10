@@ -12,7 +12,7 @@ project  = args[[1]] #vaccinated_delta,unvaccinated_delta, unvaccinated
 
 input <- read_rds("output/input.rds")
 
-project="vaccinated_delta" #this will need to be removed merged and added as an action
+#project="vaccinated_delta" #this will need to be removed merged and added as an action
 
 #done in previous script so can be deleted once merged
 input$cov_cat_region=gsub(" ","_",input$cov_cat_region)

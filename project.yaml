@@ -26,3 +26,18 @@ actions:
     outputs:
       highly_sensitive:
         cohort: output/input.rds
+
+  covariate_critical_numbers_within_subpopulations_vaccinated_delta:
+    run: r:latest analysis/Covariate_count_checks.R vaccinated_delta
+    needs: [preprocess_data]
+    outputs:
+      moderately_sensitive:
+        covar_counts: output/covariates_counts_check_vaccinated_delta.csv
+
+  covariate_critical_numbers_within_subpopulations_unvaccinated_delta:
+    run: r:latest analysis/Covariate_count_checks.R unvaccinated_delta
+    needs: [preprocess_data]
+    outputs:
+      moderately_sensitive:
+        covar_counts: output/covariates_counts_check_unvaccinated_delta.csv
+        
