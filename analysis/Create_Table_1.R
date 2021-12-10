@@ -9,6 +9,11 @@ library(tidyverse)
 library(readr)
 
 #Read in data-------------------------------------------------------------------
+args = commandArgs(trailingOnly=TRUE)
+project  = args[[1]] #vaccinated_delta,unvaccinated_delta, unvaccinated
+project="vaccinated_delta"
+
+
 input=read_rds(file = "output/input.rds")
 input$cov_cat_region=gsub(" ","_",input$cov_cat_region)#This has been done in an earlier script so can be deleted once merged
 
@@ -144,4 +149,4 @@ table1$Covariate=gsub("cov_\\D\\D\\D_", "",table1$Covariate)
 table1$Covariate=gsub("_", " ",table1$Covariate)
 table1=table1%>%filter(!Covariate_level %in% c("Min.","1st Qu.","Median"))
 
-write.csv(table1, file = file.path("output", paste0("Table_1", ".csv")) , row.names=F)
+write.csv(table1, file = file.path("output", paste0("Table_1_",project, ".csv")) , row.names=F)
