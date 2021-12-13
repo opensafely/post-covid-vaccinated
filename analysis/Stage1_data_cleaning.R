@@ -158,38 +158,43 @@ input[,covariate_names] <- covars
 # 2. Apply QA rules #
 #####################
 
-#Rule 1:
-#Year of birth is after year of death or patient only has year of death
+#Rule 1: Year of birth is after year of death or patient only has year of death
 input$rule1=NA
 input$rule1=(input$qa_num_birth_year > (format(input$death_date, format="%Y")) & is.na(input$qa_num_birth_year)== FALSE & is.na(input$death_date) == FALSE)|(is.na(input$qa_num_birth_year)== TRUE & is.na(input$death_date) == FALSE)
 
-#Rule 3: Year of birth predates NHS established year or year of birth exceeds current date
+#Rule 2: Year of birth predates NHS established year or year of birth exceeds current date
+input$rule2=NA
+input$rule2=((input$qa_num_birth_year <1793 |(input$qa_num_birth_year >format(Sys.Date(),"%Y"))) & is.na(input$qa_num_birth_year) == FALSE)
+
+#Rule 3: Date of death is NULL or invalid (on or before 1/1/1900 or after current date)
 input$rule3=NA
-input$rule3=((input$qa_num_birth_year <1793 |(input$qa_num_birth_year >format(Sys.Date(),"%Y"))) & is.na(input$qa_num_birth_year) == FALSE)
+input$rule3=((input$death_date <="1900-01-01"|input$death_date > format(Sys.Date(),"%Y-%m-%d")) & is.na(input$death_date) == FALSE)
 
-#Rule 4: Date of death is NULL or invalid (on or before 1/1/1900 or after current date)
+#Rule 4: Confirms that infection date is before or at the same time as hospitalisation
 input$rule4=NA
-input$rule4=((input$death_date <="1900-01-01"|input$death_date > format(Sys.Date(),"%Y-%m-%d")) & is.na(input$death_date) == FALSE)
+input$rule4=(input$exp_date_covid19_confirmed <= input$exp_date_covid19_hospital & is.na(input$exp_date_covid19_confirmed) == FALSE)
 
-#Rule 6: Pregnancy/birth codes for men
+#Rule 5: Pregnancy/birth codes for men
+input$rule5=NA
+input$rule5=(input$qa_bin_pregnancy == TRUE & input$cov_cat_sex=="M")
+
+#Rule 6: HRT or COCP meds for men
 input$rule6=NA
-input$rule6=(input$qa_bin_pregnancy == TRUE & input$cov_cat_sex=="M")
+input$rule6=((input$cov_cat_sex=="M" & input$cov_bin_hormone_replacement_therapy==1)|(input$cov_cat_sex=="M" & input$cov_bin_combined_oral_contraceptive_pill==1))
 
 #Rule 7: Prostate cancer codes for women
 input$rule7=NA
 input$rule7=(input$qa_bin_prostate_cancer == TRUE & input$cov_cat_sex=="F")
 
-#Rule 9: HRT or COCP meds for men
-input$rule9=NA
-input$rule9=((input$cov_cat_sex=="M" & input$cov_bin_hormone_replacement_therapy==1)|(input$cov_cat_sex=="M" & input$cov_bin_combined_oral_contraceptive_pill==1))
 
 
 #Remove rows that are TRUE for at least one rule
-input_QA=input%>%filter(rule1==F & rule2==F & rule3==F & rule4==F & rule6==F & rule7==F & rule9==F)
-input_QA=input_QA %>% select(-c(rule1,rule2,rule3,rule4,rule6,rule7,rule9))
+input_QA=input%>%filter(rule1==F & rule2==F & rule3==F & rule4==F & rule5==F & rule6==F & rule7==F)
+input_QA=input_QA %>% select(-c(rule1,rule2,rule3,rule4,rule5,rule6,rule7))
+# View(input_QA)
 
 #Save QA'd input as .rds
-saveRDS(QA_summary,file = "output/QA_input.rds")
+#saveRDS(QA_summary,file = "output/QA_input.rds")
 
 #QA summary
 QA_summary <- data.frame(matrix(ncol = 2))
@@ -202,12 +207,12 @@ QA_summary[3,1]="Rule 3"
 QA_summary[3,2]=nrow(input%>%filter(rule3==T))
 QA_summary[4,1]="Rule 4"
 QA_summary[4,2]=nrow(input%>%filter(rule4==T))
-QA_summary[5,1]="Rule 6"
-QA_summary[5,2]=nrow(input%>%filter(rule6==T))
-QA_summary[6,1]="Rule 7"
-QA_summary[6,2]=nrow(input%>%filter(rule7==T))
-QA_summary[7,1]="Rule 9"
-QA_summary[7,2]=nrow(input%>%filter(rule9==T))
+QA_summary[5,1]="Rule 5"
+QA_summary[5,2]=nrow(input%>%filter(rule5==T))
+QA_summary[6,1]="Rule 6"
+QA_summary[6,2]=nrow(input%>%filter(rule6==T))
+QA_summary[7,1]="Rule 7"
+QA_summary[7,2]=nrow(input%>%filter(rule7==T))
 QA_summary[8,1]="Total excluded from QA"
 QA_summary[8,2]=nrow(input)-nrow(input_QA)
 
