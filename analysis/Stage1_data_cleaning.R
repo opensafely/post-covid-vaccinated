@@ -30,3 +30,13 @@
 ##    Differentiate criteria for the two sub-cohorts
 ##
 ## =============================================================================
+
+###############################################
+# 0. Load relevant libraries and read in data #
+###############################################
+library(readr)
+library(dplyr)
+library(stringr)
+
+# Read a R dataset
+input <-read_rds("output/input.rds") #View(input)
