@@ -250,47 +250,35 @@ input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_cov
 #----------------------------------------------------------------#
 # 3.b. Apply the 6 common criteria applicable to both sub-cohort #
 #----------------------------------------------------------------#
-
-#INCLUSION CRITERIA 1.Alive on the first day of follow up---------------------------------------------------------------
-#a.determine the living status on start date
-input$start_alive <- ifelse(input$death_date < input$index_start_date, 0, 1)# 1- alive; 0 - died
+#Inclusion criteria 1: Alive on the first day of follow up
+input$start_alive <- ifelse(input$death_date < input$index_start_date, 0, 1) # Determine the living status on start date: 1- alive; 0 - died
 input$start_alive[is.na(input$start_alive)] <- 1
-#b.subset input based on alive status on day 1 of follow up.
-input <- subset(input, input$start_alive > 0)
-#Define the cohort flow
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Inclusion1:Alive on the first day of follow up")
+input <- subset(input, input$start_alive > 0) # Subset input based on alive status on day 1 of follow up.
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 1 (Inclusion): Alive on the first day of follow up") # Feed into the cohort flow
 
-#INCLUSION CRITERIA 2.Known age between 18 and 110 on 01/06/2021-------------------------------------- 
-input <- input[!is.na(input$cov_num_age),] # removes NAs, if any
-#subset input based >=18 status on day 1 of follow up.
-input <- subset(input, input$cov_num_age >= 18 & input$cov_num_age <= 110) 
-#Define the cohort flow
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Inclusion2:Known age between 18 and 110 on 01/06/2021")
+#Inclusion criteria 2: Known age between 18 and 110 on 01/06/2021 
+#input <- input[!is.na(input$cov_num_age),] # Commented out this code line since it should be dealt with in the next code line
+input <- subset(input, input$cov_num_age >= 18 & input$cov_num_age <= 110) # Subset input based >=18 status on day 1 of follow up.
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 2 (Inclusion): Known age between 18 and 110 on 01/06/2021") # Feed into the cohort flow
 
-#INCLUSION CRITERIA 3.Known sex-----------------------------------------------------------------------------------------
+#Inclusion criteria  3: Known sex
 input <- input[!is.na(input$cov_cat_sex),] # removes NAs, if any
-#Define the cohort flow
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Inclusion3:Known sex")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 3 (Inclusion): Known sex")
 
-#INCLUSION CRITERIA 4.Known deprivation--------------------------------------------------------------------------- 
+#Inclusion criteria 4: Known deprivation 
 input <- input[!is.na(input$cov_cat_deprivation),] # removes NAs, if any
-#Define the cohort flow
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Inclusion4:Known deprivation")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 4 (Inclusion): Known deprivation")
 
-#INCLUSION CRITERIA 5.Registered in an English GP with TPP software for at least 6 months prior to the study start date--------------------------
-input <- input # This criteria is met in study definition 
-#Define the cohort flow
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Inclusion5:Registered in an English GP with TPP software for at least 6 months prior to the study start date")
+#Inclusion criteria 5: Registered in an English GP with TPP software for at least 6 months prior to the study start date
+# NOTE: Dealt with in Study definition
+#input <- input # This criteria is met in study definition 
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 5 (Inclusion): Registered in an English GP with TPP software for at least 6 months prior to the study start date")
 
-#EXCLUSION CRITERIA 6.SARS-CoV-2 infection recorded prior to the start of follow-up------------------------------------------------------
-#a.Determine the SARS-CoV-2 infection date
-input$exp_date_covid19_confirmed <- as.Date(input$exp_date_covid19_confirmed)
-#b.determine prior to start date infections
-input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_start_date, 1,0)#1-prior infection; 0 - No prior infection
+#Exclusion criteria 6: SARS-CoV-2 infection recorded prior to the start of follow-up
+input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_start_date, 1,0)# Determine infections prior to start date : 1-prior infection; 0 - No prior infection
 input$prior_infections[is.na(input$prior_infections)] <- 0
 input <- subset(input, input$prior_infections < 1)
-#Define the cohort flow
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Exclusion6: SARS-CoV-2 infection recorded prior to their index date")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS-CoV-2 infection recorded prior to their index date")
 
 
 #-------------------------------------------------#
