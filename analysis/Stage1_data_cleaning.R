@@ -140,3 +140,15 @@ sink()
 #is.numeric(data$cov_num_consulation_rate)
 #is.numeric(data$qa_num_birth_year)
 #str(covars)
+
+#-------------------------------------------------------#
+# 1.d. Check and specify date format for date variables #
+#-------------------------------------------------------#
+
+
+
+#-----------------------------------------#
+# 1.e. Apply changes in the input dataset #
+#-----------------------------------------#
+input[,covariate_names] <- covars
+#str(input)
