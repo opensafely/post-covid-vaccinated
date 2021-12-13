@@ -238,26 +238,22 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
 #---------------------------------------------------#
 # 3.a. Define index start date and general end date #
 #---------------------------------------------------#
-#INDEX START DATE
-#a.start date 2021-06-1 of the cohort 
-input$delta_start <- as.Date("2021-06-01")
-#b.15 days after the second vaccination
-input$immune_start <- as.Date(input$vax_date_covid_2)+15
-#c.latest of a,b as start date index
-input$vacc_coh_start_date <- pmax(input$delta_start, input$immune_start, na.rm = TRUE)
+# Index Start date : the latest of either 
+# the start date of the follow-up (2021-06-01) or 15 days after the second vaccination
+input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_covid_2)+15, na.rm = TRUE)
 
-#COHORT END DATE
-#a.End date 2021-12-31 of the cohort (TEMPORARY - but change to last date of input collection)
-input$delta_end <- as.Date("2021-12-31")
+# End date: 2021-12-31 of the cohort (no censoring for death/event at this stage) 
+# The end date doesn't seem to be used in criteria, so no need to be created at this stage
+# input$end_date <- as.Date("2021-12-31")
+
 
 #----------------------------------------------------------------#
 # 3.b. Apply the 6 common criteria applicable to both sub-cohort #
 #----------------------------------------------------------------#
 
-
 #INCLUSION CRITERIA 1.Alive on the first day of follow up---------------------------------------------------------------
 #a.determine the living status on start date
-input$start_alive <- ifelse(input$death_date < input$vacc_coh_start_date, 0, 1)# 1- alive; 0 - died
+input$start_alive <- ifelse(input$death_date < input$index_start_date, 0, 1)# 1- alive; 0 - died
 input$start_alive[is.na(input$start_alive)] <- 1
 #b.subset input based on alive status on day 1 of follow up.
 input <- subset(input, input$start_alive > 0)
@@ -290,7 +286,7 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Inclusion5:Registered in an 
 #a.Determine the SARS-CoV-2 infection date
 input$exp_date_covid19_confirmed <- as.Date(input$exp_date_covid19_confirmed)
 #b.determine prior to start date infections
-input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$vacc_coh_start_date, 1,0)#1-prior infection; 0 - No prior infection
+input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_start_date, 1,0)#1-prior infection; 0 - No prior infection
 input$prior_infections[is.na(input$prior_infections)] <- 0
 input <- subset(input, input$prior_infections < 1)
 #Define the cohort flow
