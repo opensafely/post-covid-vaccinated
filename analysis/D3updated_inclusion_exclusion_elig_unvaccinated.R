@@ -81,7 +81,7 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Inclusion5:Registered in an 
 
 #EXCLUSION CRITERIA 6.SARS-CoV-2 infection recorded prior to the start of follow-up---------------------------------------
 #a.Determine the SARS-CoV-2 infection date
-input$exp_date_covid19_confirmed <- as.Date(input$exp_confirmed_covid19_date)
+input$exp_date_covid19_confirmed <- as.Date(input$exp_date_covid19_confirmed)
 #the earliest date already adopted in the definition
 #b.determine prior to start date infections
 input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$unvacc_coh_start_date, 1,0)#1-prior infection; 0 - No prior infection
