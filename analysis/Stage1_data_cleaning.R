@@ -7,7 +7,7 @@
 ##  - Apply QA rules
 ##  - Apply inclusion exclusion criteria
 ##  - Create cleaned datasets for the following sub-cohorts:
-##    a. Vaccinated cohort
+##    a. Vaccinated
 ##    b. Electively unvaccinated
 ## 
 ## Authors: Yinghui Wei, Renin Toms, Rochelle Knight, Genevieve Cezard
@@ -18,7 +18,7 @@
 ##
 ##
 ## Content: 
-## 0. Load relevant libraries and read data
+## 0. Load relevant libraries and read data/arguments
 ## 1. Prepare all variables (re-factoring, re-typing)
 ##    1.a. Set factor variables as factor
 ##    1.b. Set the group with the highest frequency as the reference group
@@ -31,6 +31,10 @@
 ##    3.a. Define index start date and general end date
 ##    3.b. Apply the 6 common criteria applicable to both sub-cohort
 ##    3.c. Apply criteria specific to each sub-cohort
+##    3.d. Create csv file 
+## 4. Create the final stage 1 dataset 
+## (with a specific name to reflect either the Vaccinated 
+##  or Electively unvaccinated cohort)
 ##
 ## =============================================================================
 
@@ -50,10 +54,15 @@ library(stringr)
 args = commandArgs(trailingOnly=TRUE)
 input = args[[1]]
 choice = args[[2]] # either "vax" or "e_unvax"
+path_data_out = args[[3]] # e.g. "output/dataset_stage1_vaccinated.rds"
 
 # For testing:
+# input = input_vaccinated.rds
+# input = input_electively_unvaccinated.rds
 # choice = "vax"
 # choice = "e_unvax"
+# path_data_out = "output/dataset_stage1_vaccinated.rds"
+# path_data_out = "output/dataset_stage1_electively_unvaccinated.rds"
 
 ######################################################
 # 1. Prepare all variables (re-factoring, re-typing) # 
@@ -346,3 +355,14 @@ if (choice == "vax") {
   input <- subset(input, input$prior_vacc < 1) #Exclude people with prior vaccination
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): Have a record of one or more vaccination doses on the study start date")
 }
+
+#----------------------#
+# 3.d. Create csv file #
+#----------------------#
+write.csv(cohort_flow,"output/cohort_flow.csv", row.names = FALSE)
+
+#-------------------------------------#
+# 4. Create the final stage 1 dataset #
+#-------------------------------------#
+# Taking the path/dataset name as specified in the 3rd argument of the corresponding action in project.yaml
+saveRDS(input, file = path_data_out)
