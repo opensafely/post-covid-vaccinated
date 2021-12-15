@@ -77,7 +77,7 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
     names(index) <-  c("HE", "Preg HE", "Deaths", "Preg D")
     mycol=c("thistle", "lightcyan", "lemonchiffon", "orange")
   }
-  print(index)
+  #print(index)
   png(file=file.path("output", figure_name))
   print(ggvenn(
     index, 
