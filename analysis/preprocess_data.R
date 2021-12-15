@@ -4,7 +4,11 @@ library(magrittr)
 
 # Define parameters ------------------------------------------------------------
 
+## Study start date
 study_start <- "2021-06-01"
+
+## Study end date
+study_end <- NA
 
 # Create spine dataset ---------------------------------------------------------
 
@@ -26,7 +30,11 @@ for (i in c("index","vaccinated","electively_unvaccinated")) {
             colnames(tmp)[grepl("exp_",colnames(tmp))], # Exposures
             colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
             colnames(tmp)[grepl("cov_",colnames(tmp))]) # Covariates
-
+  
+  keep <- keep[!grepl("tmp_exp_",keep)]
+  keep <- keep[!grepl("tmp_sub_",keep)]
+  keep <- keep[!grepl("tmp_cov_",keep)]
+  
   keep <- intersect(keep,colnames(tmp))
   
   tmp_dynamic <- tmp[,keep]
@@ -115,9 +123,9 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   tmp$sub_cat_covid19_hospital <- as.factor(tmp$sub_cat_covid19_hospital)
   tmp[,c("sub_date_covid19_hospital")] <- NULL
 
-  # Specify columns to keep ------------------------------------------------------
+  # Save analysis dataset ---------------------------------------------------
   
-  tmp <- tmp[,c("patient_id","death_date","index_date",
+  tmp1 <- tmp[,c("patient_id","death_date","index_date",
               colnames(tmp)[grepl("sub_",colnames(tmp))], # Subgroups
               colnames(tmp)[grepl("exp_",colnames(tmp))], # Exposures
               colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
@@ -125,8 +133,14 @@ for (j in c("vaccinated","electively_unvaccinated")) {
               colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
               colnames(tmp)[grepl("vax_",colnames(tmp))])] # Vaccination
   
-  # Save file --------------------------------------------------------------------
+  tmp1[,colnames(tmp)[grepl("tmp_out_",colnames(tmp))]] <- NULL
   
-  saveRDS(tmp, file = paste0("output/input_",j,".rds"))
+  saveRDS(tmp1, file = paste0("output/input_",j,".rds"))
+  
+  # Save Venn diagram input dataset --------------------------------------------
+  
+  tmp2 <- tmp[,c("patient_id",colnames(tmp)[grepl("out_",colnames(tmp))])]
+  
+  saveRDS(tmp2, file = paste0("output/venn_",j,".rds"))
   
 }

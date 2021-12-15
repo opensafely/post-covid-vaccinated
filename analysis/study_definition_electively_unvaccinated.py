@@ -24,7 +24,7 @@ import study_def_helper_functions as helpers
 from common_variables import generate_common_variables
 (
     dynamic_variables
-) = generate_common_variables(index_date_variable="vax_date_eligible + 84 days")
+) = generate_common_variables(index_date_variable="vax_date_eligible + 84 day")
 
 
 ## Variables for deriving JCVI groups
@@ -33,13 +33,6 @@ from grouping_variables import (
     start_date,
     end_date,
 )
-
-# Define placeholders
-
-placeholder_ctv3 = codelist(["codes"], system="ctv3")
-placeholder_snomed_clinical = codelist(["codes"], system="snomed")
-placeholder_icd10 = codelist(["codes"], system="icd10")
-placeholder_dmd = codelist(["dmd_id"], system="snomed")
 
 study = StudyDefinition(
 

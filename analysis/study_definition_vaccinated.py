@@ -26,13 +26,6 @@ from common_variables import generate_common_variables
     dynamic_variables
 ) = generate_common_variables(index_date_variable="vax_date_covid_2 + 14 days")
 
-# Define placeholders
-
-placeholder_ctv3 = codelist(["codes"], system="ctv3")
-placeholder_snomed_clinical = codelist(["codes"], system="snomed")
-placeholder_icd10 = codelist(["codes"], system="icd10")
-placeholder_dmd = codelist(["dmd_id"], system="snomed")
-
 study = StudyDefinition(
 
     # Specify index date
