@@ -26,3 +26,25 @@ actions:
     outputs:
       highly_sensitive:
         cohort: output/input.rds
+
+  stage1_data_cleaning_vaccinated:
+    run: r: Stage1_data_cleaning.R input.rds vaccinated
+    needs: [preprocess_data]
+    outputs:
+      moderately_sensitive:
+        refactoring: meta_data_factors_vaccinated.csv
+        QA_rules: QA_summary_vaccinated.csv
+        IE_criteria: Cohort_flow_vaccinated.csv
+      highly_sensitive:
+        cohort: output/dataset_stage1_vaccinated.rds
+
+  stage1_data_cleaning_electively_unvaccinated:
+    run: r: Stage1_data_cleaning.R input.rds electively_unvaccinated
+    needs: [preprocess_data]
+    outputs:
+      moderately_sensitive:
+        refactoring: meta_data_factors_electively_unvaccinated.csv
+        QA_rules: QA_summary_electively_unvaccinated.csv
+        IE_criteria: Cohort_flow_electively_unvaccinated.csv
+      highly_sensitive:
+        cohort: output/dataset_stage1_velectively_unaccinated.rds
