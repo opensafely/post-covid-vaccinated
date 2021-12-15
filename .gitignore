@@ -10,4 +10,3 @@ venv/
 .vscode/settings.json
 .DS_Store
 .Rhistory
-.Rproj.user*
