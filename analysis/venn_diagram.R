@@ -22,14 +22,14 @@ input <- arrow::read_feather(file = file.path("output", "input.feather"))
 
 # #------Testing Example with a Function ---------------------------------------
 # - outcome: ami
-
-index1 <- which(!is.na(input$ami_snomed))
-index2 <- which(!is.na(input$ami_icd10_hes))
-index3 <- which(!is.na(input$ami_icd10_death))
-
-# - Figure: has count and percentage---------------------------------------
-y <- list(index1,index2, index3)
-names(y) <- c("SNOMED", "Hospital Episodes", "Deaths")
+# 
+# index1 <- which(!is.na(input$ami_snomed))
+# index2 <- which(!is.na(input$ami_icd10_hes))
+# index3 <- which(!is.na(input$ami_icd10_death))
+# 
+# # - Figure: has count and percentage---------------------------------------
+# y <- list(index1,index2, index3)
+# names(y) <- c("SNOMED", "Hospital Episodes", "Deaths")
 
 # png(file="output/venn_ami2.png")
 # ggvenn(
