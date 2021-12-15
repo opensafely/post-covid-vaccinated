@@ -99,37 +99,37 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
 
 # outcome 1: ami
 ami_names <- c("ami_snomed", "ami_icd10_hes", "ami_icd10_death")
-venn_digram(ami_names, "1_venn_ami.png", "Acute Myocardial Infarction")
+venn_digram(ami_names, "f1_venn_ami.png", "Acute Myocardial Infarction")
 
 # outcome 2: stroke
 stroke_names <- c("stroke_isch_snomed", "stroke_isch_icd10_hes", "stroke_isch_icd10_death")
-venn_digram(stroke_names,"2_venn_stroke.png", "Ischaemic Stroke")
+venn_digram(stroke_names,"f2_venn_stroke.png", "Ischaemic Stroke")
 
 # outcome 3: pe
 pe_names <- c("pe_snomed", "pe_icd10_hes", "pe_icd10_death")
-venn_digram(pe_names,"3_venn_pe.png", "Pulmonary Embolism")
+venn_digram(pe_names,"f3_venn_pe.png", "Pulmonary Embolism")
 
 # outcome 4: dvt
 # comment: code for dvt will be updated once the study definition is updated
 dvt_names<-  c("dvt_icd10_hes", "dvt_pregnancy_icd10_hes", 
                "dvt_icd10_death", "dvt_pregnancy_icd10_death")
-venn_digram(dvt_names,"4_venn_dvt.png", "Deep Vein Thrombosis")
+venn_digram(dvt_names,"f4_venn_dvt.png", "Deep Vein Thrombosis")
 
 # outcome 5: tia
 tia_names <- c("tia_snomed", "tia_icd10_hes", "tia_icd10_death")
-venn_digram(tia_names, "5_venn_tia.png", "Transient Ischaemic Attack")
+venn_digram(tia_names, "f5_venn_tia.png", "Transient Ischaemic Attack")
 
 # outcome 6: stroke_sah_hs
 stroke_sah_hs_names <- c("stroke_sah_hs_snomed", "stroke_sah_hs_icd10_hes", "stroke_sah_hs_icd10_death")
-venn_digram(stroke_sah_hs_names, "6_stroke_sah_hs.png", "Subarachnoid haemorrhage and haemorrhagic stroke")
+venn_digram(stroke_sah_hs_names, "f6_stroke_sah_hs.png", "Subarachnoid haemorrhage and haemorrhagic stroke")
 
 # outcome 7: hf
 hf_names <- c("hf_snomed", "hf_icd10_hes", "hf_icd10_death")
-venn_digram(hf_names, "7_venn_hf.png", "Heart Failure")
+venn_digram(hf_names, "f7_venn_hf.png", "Heart Failure")
 
 # outcome 8: angina
 angina_names <- c("angina_snomed", "angina_icd10_hes", "angina_icd10_death")
-venn_digram(angina_names, "8_venn_angina.png", "Angina")
+venn_digram(angina_names, "f8_venn_angina.png", "Angina Pectoris")
 
 # outcome 9: oae (Other Arterial Embolism, 
 #                 doesn't match with the name in the protocol: Arterial thrombosis events)
@@ -137,8 +137,8 @@ venn_digram(angina_names, "8_venn_angina.png", "Angina")
 # there is a variable named "out_ate" - what is this?)
 # comment: code for outcome 9 will be updated once there are data from SNOMED
 oae_names <- c("oae_icd10_hes", "oae_icd10_death")
-venn_digram(oae_names, "9_venn_oae.png", "All Arterial Thrombotic and Embolization Events")
+venn_digram(oae_names, "f9_venn_oae.png", "All Arterial Thrombotic and Embolization Events")
 
 # outcome 10: all_vte
 vte_names <- c("all_vte_codes_snomed", "all_vte_codes_icd10_hes", "all_vte_codes_icd10_death")
-venn_digram(vte_names, "10_venn_vte.png", "All Venous Thromboembolism Events")
+venn_digram(vte_names, "f10_venn_vte.png", "All Venous Thromboembolism Events")
