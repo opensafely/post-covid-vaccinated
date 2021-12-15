@@ -21,23 +21,23 @@ library(arrow); library("ggvenn")
 input <- arrow::read_feather(file = file.path("output", "input.feather"))
 
 # #------Testing Example with a Function ---------------------------------------
-# # - outcome: ami
-# 
-# index1 <- which(!is.na(input$ami_snomed))
-# index2 <- which(!is.na(input$ami_icd10_hes))
-# index3 <- which(!is.na(input$ami_icd10_death))
-# 
-# # - Figure: has count and percentage---------------------------------------
-# y <- list(index1,index2, index3)
-# names(y) <- c("SNOMED", "Hospital Episode", "Deaths")
-# 
+# - outcome: ami
+
+index1 <- which(!is.na(input$ami_snomed))
+index2 <- which(!is.na(input$ami_icd10_hes))
+index3 <- which(!is.na(input$ami_icd10_death))
+
+# - Figure: has count and percentage---------------------------------------
+y <- list(index1,index2, index3)
+names(y) <- c("SNOMED", "Hospital Episodes", "Deaths")
+
 # png(file="output/venn_ami2.png")
 # ggvenn(
-#   y, 
+#   y,
 #   fill_color = c("thistle", "lightcyan", "lemonchiffon"),
 #   stroke_color = "white",
 #   text_size = 5,
-#   set_name_size = 5, 
+#   set_name_size = 5,
 #   fill_alpha = 0.9
 # ) +  ggtitle("Acute Myocardial Infarction") +
 #   theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold"))
@@ -57,7 +57,7 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
     index1 <- which(!is.na(input[,outcome_names[1]]))
     index2 <- which(!is.na(input[,outcome_names[2]]))
     index = list(index1, index2)
-    names(index) <- c("Hospital Episode", "Deaths")
+    names(index) <- c("Hospital Episodes", "Deaths")
     mycol=c("thistle", "lightcyan")
   }
   if(n_src ==3){
@@ -65,7 +65,7 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
     index2 <- which(!is.na(input[,outcome_names[2]]))
     index3 <- which(!is.na(input[,outcome_names[3]]))
     index = list(index1, index2, index3)
-    names(index) <- c("SNOMED", "Hospital Episode", "Deaths")
+    names(index) <- c("SNOMED", "Hospital Episodes", "Deaths")
     mycol=c("thistle", "lightcyan", "lemonchiffon")
   }
   if(n_src ==4){
@@ -99,7 +99,7 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
 
 # outcome 1: ami
 ami_names <- c("ami_snomed", "ami_icd10_hes", "ami_icd10_death")
-venn_digram(ami_names, "1 venn_ami.png", "Acute Myocardial Infarction")
+venn_digram(ami_names, "1_venn_ami.png", "Acute Myocardial Infarction")
 
 # outcome 2: stroke
 stroke_names <- c("stroke_isch_snomed", "stroke_isch_icd10_hes", "stroke_isch_icd10_death")
@@ -131,14 +131,14 @@ venn_digram(hf_names, "7_venn_hf.png", "Heart Failure")
 angina_names <- c("angina_snomed", "angina_icd10_hes", "angina_icd10_death")
 venn_digram(angina_names, "8_venn_angina.png", "Angina")
 
-
-# outcome 9: oae (what is this? Arterial thrombosis events? 
+# outcome 9: oae (Other Arterial Embolism, 
+#                 doesn't match with the name in the protocol: Arterial thrombosis events)
 #only two sources: deaths and hes, but no SONMED?
 # there is a variable named "out_ate" - what is this?)
 # comment: code for outcome 9 will be updated once there are data from SNOMED
 oae_names <- c("oae_icd10_hes", "oae_icd10_death")
-venn_digram(oae_names, "9_venn_oae.png", "Arterial Thrombosis Events")
+venn_digram(oae_names, "9_venn_oae.png", "All Arterial Thrombotic and Embolization Events")
 
 # outcome 10: all_vte
 vte_names <- c("all_vte_codes_snomed", "all_vte_codes_icd10_hes", "all_vte_codes_icd10_death")
-venn_digram(vte_names, "10_venn_vte.png", "Venous Thromboembolism Events")
+venn_digram(vte_names, "10_venn_vte.png", "All Venous Thromboembolism Events")
