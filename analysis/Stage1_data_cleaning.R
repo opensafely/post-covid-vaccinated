@@ -48,30 +48,25 @@ library(readr)
 library(dplyr)
 library(stringr)
 
-# Read a R dataset
-#input <-read_rds("output/input.rds") #View(input)
+
 
 # Get dataset for either the vaccinated or electively unvaccinated subcohort
 # Specify command arguments ----------------------------------------------------
 args = commandArgs(trailingOnly=TRUE)
-input = args[[1]]
+input_filename = args[[1]] # tested with output/input.rds
 cohort_name = args[[2]] # either "vaccinated" or "electively_unvaccinated"
 
-# For testing:
-# input = input_vaccinated.rds
-# input = input_electively_unvaccinated.rds
-# cohort_name = "vaccinated"
-# cohort_name = "electively_unvaccinated"
+input <-read_rds(input_filename)
 
+# NOTE: Once study definition is updated, input_filename will be either 
+# output/input_vaccinated.rds or output/input_electively_unvaccinated.rds
 
 ######################################################
 # 1. Prepare all variables (re-factoring, re-typing) # 
 ######################################################
 
 # Extract names of variables
-#variable_names <- tidyselect::vars_select(names(input), starts_with(c('cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE)) # Doesn't work for OpenSafely
-#variable_names <- names( input %>% select(starts_with(c('cov_','qa_','vax_cat','exp_cat')))) # Alternative version - doesn't work for OpenSafely
-variable_names <- colnames(input)[grep("cov_|qa_|vax_cat|exp_cat", colnames(input))] # Using basic R
+variable_names <- tidyselect::vars_select(names(input), starts_with(c('cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE))
 
 # Create a data frame for all relevant variables
 covars <- input[,variable_names] #View(covars)
@@ -83,9 +78,7 @@ covars$cov_cat_region <- gsub(" ", "_", covars$cov_cat_region)
 # 1.a. Set factor variables as factor #
 #-------------------------------------#
 # Get the names of variables which are factors
-#factor_names <- tidyselect::vars_select(names(input), starts_with(c('cov_bin','cov_cat','qa_bin','vax_cat','exp_cat'), ignore.case = TRUE)) # Doesn't work for OpenSafely
-#factor_names <- names( input %>% select(starts_with(c('cov_bin','cov_cat','qa_bin','vax_cat','exp_cat')))) # Alternative version - doesn't work for OpenSafely
-factor_names <- colnames(input)[grep("cov_bin|cov_cat|qa_bin|vax_cat|exp_cat", colnames(input))] # Using basic R
+factor_names <- tidyselect::vars_select(names(input), starts_with(c('cov_bin','cov_cat','qa_bin','vax_cat','exp_cat'), ignore.case = TRUE))
 
 # Set the variables that should be factor variables as factor
 covars[,factor_names] <- lapply(covars[,factor_names] , factor)
@@ -167,9 +160,7 @@ sink()
 # 1.d. Check and specify date format for date variables #
 #-------------------------------------------------------#
 # Get the names of variables which are dates
-#date_names <- tidyselect::vars_select(names(input), starts_with(c('exp_date','out_date','vax_date'), ignore.case = TRUE)) # Doesn't work for OpenSafely
-#date_names <- names( input %>% select(starts_with(c('exp_date','out_date','vax_date')))) # Alternative version for OpenSafely - doesn't work
-date_names <- colnames(input)[grep("exp_date|out_date|vax_date", colnames(input))] # Using basic R
+date_names <- tidyselect::vars_select(names(input), starts_with(c('exp_date','out_date','vax_date'), ignore.case = TRUE))
 
 # Set the variables that should be date variables as dates
 for (colname in date_names){
@@ -268,10 +259,10 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
 #---------------------------------------------------#
 # Index Start date : the latest of either 
 
-if (cohort_name = "vaccinated") {
+if (cohort_name == "vaccinated") {
   # the start date of the follow-up (2021-06-01) or 15 days after the second vaccination
   input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_covid_2)+15, na.rm = TRUE)
-} else if (cohort_name = "electively_unvaccinated"){
+} else if (cohort_name == "electively_unvaccinated"){
   # the start date of the follow-up (2021-06-01) or 12 weeks (84 days) after they become eligible for vaccination
   input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_eligible)+85, na.rm = TRUE)
 }
@@ -320,7 +311,7 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS
 # 3.c. Apply criteria specific to each sub-cohort #
 #-------------------------------------------------#
 
-if (cohort_name = "vaccinated") {
+if (cohort_name == "vaccinated") {
 
   #Exclusion criteria 7: Do not have a record of two vaccination doses prior to the study end date
   input$vacc_gap <- input$vax_date_covid_2 - input$vax_date_covid_1 #Determine the vaccination gap in days : gap is NA if any vaccine date is missing
@@ -349,7 +340,7 @@ if (cohort_name = "vaccinated") {
   input <- subset(input, input$vax_prior_mixed==0 | input$vax_prior_unknown==0)
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 11 (Exclusion): Received mixed vaccine products before 07-05-2021")
   
-} else if (cohort_name = "electively_unvaccinated"){
+} else if (cohort_name == "electively_unvaccinated"){
   
   #Exclusion criteria 7: Have a record of one or more vaccination doses on the study start date
   #a.Determine the vaccination status on index start date
