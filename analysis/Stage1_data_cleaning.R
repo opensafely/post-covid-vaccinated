@@ -33,8 +33,10 @@
 ##    3.c. Apply criteria specific to each sub-cohort
 ##    3.d. Create csv file 
 ## 4. Create the final stage 1 dataset 
-## (with a specific name to reflect either the Vaccinated 
-##  or Electively unvaccinated cohort)
+## 
+## NOTE: This code output are 3 .csv files and 1 R dataset
+##       Output files have a specific name to reflect either the Vaccinated 
+##       or Electively unvaccinated cohort
 ##
 ## =============================================================================
 
@@ -53,16 +55,14 @@ library(stringr)
 # Specify command arguments ----------------------------------------------------
 args = commandArgs(trailingOnly=TRUE)
 input = args[[1]]
-choice = args[[2]] # either "vax" or "e_unvax"
-path_data_out = args[[3]] # e.g. "output/dataset_stage1_vaccinated.rds"
+cohort_name = args[[2]] # either "vaccinated" or "electively_unvaccinated"
 
 # For testing:
 # input = input_vaccinated.rds
 # input = input_electively_unvaccinated.rds
-# choice = "vax"
-# choice = "e_unvax"
-# path_data_out = "output/dataset_stage1_vaccinated.rds"
-# path_data_out = "output/dataset_stage1_electively_unvaccinated.rds"
+# cohort_name = "vaccinated"
+# cohort_name = "electively_unvaccinated"
+
 
 ######################################################
 # 1. Prepare all variables (re-factoring, re-typing) # 
@@ -143,7 +143,7 @@ covars$cov_cat_deprivation = relevel(covars$cov_cat_deprivation, ref = as.charac
 meta_data_factors <- lapply(covars[,factor_names], table)
 
 # write.csv is not feasible to output list with uneven length
-sink("output/meta_data_factors.csv")
+sink(file = file.path("output", paste0("meta_data_factors_",cohort_name, ".csv")))
 print(meta_data_factors)
 sink()
 
@@ -241,7 +241,8 @@ QA_summary[8,2]=nrow(input)-nrow(input_QA)
 
 
 #Save Qa summary as .csv
-write.csv(QA_summary, file = "output/QA_summary.csv" , row.names=F)
+write.csv(QA_summary, file = file.path("output", paste0("QA_summary_",cohort_name, ".csv")) , row.names=F)
+
 
 
 #########################################
@@ -260,10 +261,10 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
 #---------------------------------------------------#
 # Index Start date : the latest of either 
 
-if (choice == "vax") {
+if (cohort_name = "vaccinated") {
   # the start date of the follow-up (2021-06-01) or 15 days after the second vaccination
   input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_covid_2)+15, na.rm = TRUE)
-} else if (choice == "e_unvax"){
+} else if (cohort_name = "electively_unvaccinated"){
   # the start date of the follow-up (2021-06-01) or 12 weeks (84 days) after they become eligible for vaccination
   input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_eligible)+85, na.rm = TRUE)
 }
@@ -312,7 +313,7 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS
 # 3.c. Apply criteria specific to each sub-cohort #
 #-------------------------------------------------#
 
-if (choice == "vax") {
+if (cohort_name = "vaccinated") {
 
   #Exclusion criteria 7: Do not have a record of two vaccination doses prior to the study end date
   input$vacc_gap <- input$vax_date_covid_2 - input$vax_date_covid_1 #Determine the vaccination gap in days : gap is NA if any vaccine date is missing
@@ -341,7 +342,7 @@ if (choice == "vax") {
   input <- subset(input, input$vax_prior_mixed==0 | input$vax_prior_unknown==0)
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 11 (Exclusion): Received mixed vaccine products before 07-05-2021")
   
-} else if (choice == "e_unvax"){
+} else if (cohort_name = "electively_unvaccinated"){
   
   #Exclusion criteria 7: Have a record of one or more vaccination doses on the study start date
   #a.Determine the vaccination status on index start date
@@ -361,10 +362,9 @@ if (choice == "vax") {
 #----------------------#
 # 3.d. Create csv file #
 #----------------------#
-write.csv(cohort_flow,"output/cohort_flow.csv", row.names = FALSE)
+write.csv(cohort_flow, file = file.path("output", paste0("Cohort_flow_",cohort_name, ".csv")) , row.names=F)
 
 #-------------------------------------#
 # 4. Create the final stage 1 dataset #
 #-------------------------------------#
-# Taking the path/dataset name as specified in the 3rd argument of the corresponding action in project.yaml
-saveRDS(input, file = path_data_out)
+saveRDS(input, file = file.path("output", paste0("dataset_stage1_",cohort_name, ".rds")))
