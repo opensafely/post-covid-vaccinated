@@ -69,7 +69,7 @@ path_data_out = args[[3]] # e.g. "output/dataset_stage1_vaccinated.rds"
 ######################################################
 
 # Extract names of variables
-variable_names <- tidyselect::vars_select(names(input), starts_with('cov_','qa_','vax_cat','exp_cat', ignore.case = TRUE))
+variable_names <- tidyselect::vars_select(names(input), starts_with(c('cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE))
 # Create a data frame for all relevant variables
 covars <- input[,variable_names] #View(covars)
 
@@ -80,12 +80,7 @@ covars$cov_cat_region <- gsub(" ", "_", covars$cov_cat_region)
 # 1.a. Set factor variables as factor #
 #-------------------------------------#
 # Get the names of variables which are factors
-factor_names_bin <- tidyselect::vars_select(names(input), starts_with('cov_bin', ignore.case = TRUE))
-factor_names_cat <- tidyselect::vars_select(names(input), starts_with('cov_cat', ignore.case = TRUE))
-factor_names_qa_bin <- tidyselect::vars_select(names(input), starts_with('qa_bin', ignore.case = TRUE))
-factor_names_vax_cat <- tidyselect::vars_select(names(input), starts_with('vax_cat', ignore.case = TRUE))
-factor_names_exp_cat <- tidyselect::vars_select(names(input), starts_with('exp_cat', ignore.case = TRUE))
-factor_names <- c(factor_names_bin, factor_names_cat, factor_names_qa_bin, factor_names_vax_cat, factor_names_exp_cat)
+factor_names <- tidyselect::vars_select(names(input), starts_with(c('cov_bin','cov_cat','qa_bin','vax_cat','exp_cat'), ignore.case = TRUE))
 
 # Set the variables that should be factor variables as factor
 covars[,factor_names] <- lapply(covars[,factor_names] , factor)
@@ -143,7 +138,8 @@ levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==9 | level
 covars$cov_cat_deprivation = relevel(covars$cov_cat_deprivation, ref = as.character(calculate_mode(covars$cov_cat_deprivation))) # added
 
 # A simple check if factor reference level has changed
-#lapply(covars[,c("cov_ethnicity", "cov_smoking_status", "cov_region")], table)
+#lapply(covars[,c("cov_cat_ethnicity", "cov_cat_smoking_status", "cov_cat_region","cov_cat_deprivation","exp_cat_covid19_hospital","vax_cat_jcvi_group","vax_cat_product_1","vax_cat_product_2","vax_cat_product_3")], table)
+
 meta_data_factors <- lapply(covars[,factor_names], table)
 
 # write.csv is not feasible to output list with uneven length
@@ -157,21 +153,27 @@ sink()
 # Notes: Age, number of GP consultations and year of birth are continuous variables
 
 # Checking if continuous variables are set up as numeric variable correctly
-#is.numeric(data$cov_num_age)
-#is.numeric(data$cov_num_consulation_rate)
-#is.numeric(data$qa_num_birth_year)
+#is.numeric(input$cov_num_age)
+#is.numeric(input$cov_num_consulation_rate)
+#is.numeric(input$qa_num_birth_year)
 #str(covars)
 
 #-------------------------------------------------------#
 # 1.d. Check and specify date format for date variables #
 #-------------------------------------------------------#
+# Get the names of variables which are dates
+date_names <- tidyselect::vars_select(names(input), starts_with(c('exp_date','out_date','vax_date'), ignore.case = TRUE))
 
+# Set the variables that should be date variables as dates
+for (colname in date_names){
+  input[[colname]] <- as.Date(input[[colname]])
+}
 
 
 #-----------------------------------------#
 # 1.e. Apply changes in the input dataset #
 #-----------------------------------------#
-input[,covariate_names] <- covars
+input[,variable_names] <- covars
 #str(input)
 
 
