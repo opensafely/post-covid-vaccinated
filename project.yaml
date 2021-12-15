@@ -47,4 +47,4 @@ actions:
         QA_rules: QA_summary_electively_unvaccinated.csv
         IE_criteria: Cohort_flow_electively_unvaccinated.csv
       highly_sensitive:
-        cohort: output/dataset_stage1_velectively_unaccinated.rds
+        cohort: output/dataset_stage1_electively_unvaccinated.rds
