@@ -26,3 +26,19 @@ actions:
     outputs:
       highly_sensitive:
         cohort: output/input.rds
+
+  venn_diagram:
+    run: r:latest analysis/venn_diagram.R
+    needs: [generate_study_population]
+    outputs:
+      highly_sensitive:
+        acute_myocardial_infarction: output/f1_venn_ami.png
+        ischaemic_stroke: output/f2_venn_stroke.png
+        pulmonary_embolism: output/f3_venn_pe.png
+        deep_vein_thrombosis: output/f4_venn_dvt.png
+        transient_ischaemic_attack: output/f5_venn_tia.png
+        subarachnoid_haemorrhage_and_haemorrhagic_stroke: output/f6_stroke_sah_hs.png
+        heart_failure: output/f7_venn_hf.png
+        angina_pectoris: output/f8_venn_angina.png
+        all_arterial_thrombotic_and_embolization_events: output/f9_venn_oae.png
+        all_venous_thromboembolism_events: output/f10_venn_vte.png
