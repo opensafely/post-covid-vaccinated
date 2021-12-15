@@ -28,7 +28,7 @@ actions:
         cohort: output/input.rds
 
   stage1_data_cleaning_vaccinated:
-    run: r: analysis/Stage1_data_cleaning.R input.rds vaccinated
+    run: r:latest analysis/Stage1_data_cleaning.R input.rds "vaccinated"
     needs: [preprocess_data]
     outputs:
       moderately_sensitive:
@@ -39,7 +39,7 @@ actions:
         cohort: output/dataset_stage1_vaccinated.rds
 
   stage1_data_cleaning_electively_unvaccinated:
-    run: r: analysis/Stage1_data_cleaning.R input.rds electively_unvaccinated
+    run: r:latest analysis/Stage1_data_cleaning.R input.rds "electively_unvaccinated"
     needs: [preprocess_data]
     outputs:
       moderately_sensitive:
