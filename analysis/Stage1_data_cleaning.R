@@ -69,8 +69,9 @@ cohort_name = args[[2]] # either "vaccinated" or "electively_unvaccinated"
 ######################################################
 
 # Extract names of variables
-#variable_names <- tidyselect::vars_select(names(input), starts_with(c('cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE))
-variable_names <- names( input %>% select(starts_with(c('cov_','qa_','vax_cat','exp_cat')))) # Alternative version for OpenSafely
+#variable_names <- tidyselect::vars_select(names(input), starts_with(c('cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE)) # Doesn't work for OpenSafely
+#variable_names <- names( input %>% select(starts_with(c('cov_','qa_','vax_cat','exp_cat')))) # Alternative version - doesn't work for OpenSafely
+variable_names <- colnames(input)[grep("cov_|qa_|vax_cat|exp_cat", colnames(input))] # Using basic R
 
 # Create a data frame for all relevant variables
 covars <- input[,variable_names] #View(covars)
@@ -82,8 +83,9 @@ covars$cov_cat_region <- gsub(" ", "_", covars$cov_cat_region)
 # 1.a. Set factor variables as factor #
 #-------------------------------------#
 # Get the names of variables which are factors
-#factor_names <- tidyselect::vars_select(names(input), starts_with(c('cov_bin','cov_cat','qa_bin','vax_cat','exp_cat'), ignore.case = TRUE))
-factor_names <- names( input %>% select(starts_with(c('cov_bin','cov_cat','qa_bin','vax_cat','exp_cat')))) # Alternative version for OpenSafely
+#factor_names <- tidyselect::vars_select(names(input), starts_with(c('cov_bin','cov_cat','qa_bin','vax_cat','exp_cat'), ignore.case = TRUE)) # Doesn't work for OpenSafely
+#factor_names <- names( input %>% select(starts_with(c('cov_bin','cov_cat','qa_bin','vax_cat','exp_cat')))) # Alternative version - doesn't work for OpenSafely
+factor_names <- colnames(input)[grep("cov_bin|cov_cat|qa_bin|vax_cat|exp_cat", colnames(input))] # Using basic R
 
 # Set the variables that should be factor variables as factor
 covars[,factor_names] <- lapply(covars[,factor_names] , factor)
@@ -165,8 +167,9 @@ sink()
 # 1.d. Check and specify date format for date variables #
 #-------------------------------------------------------#
 # Get the names of variables which are dates
-#date_names <- tidyselect::vars_select(names(input), starts_with(c('exp_date','out_date','vax_date'), ignore.case = TRUE))
-date_names <- names( input %>% select(starts_with(c('exp_date','out_date','vax_date')))) # Alternative version for OpenSafely
+#date_names <- tidyselect::vars_select(names(input), starts_with(c('exp_date','out_date','vax_date'), ignore.case = TRUE)) # Doesn't work for OpenSafely
+#date_names <- names( input %>% select(starts_with(c('exp_date','out_date','vax_date')))) # Alternative version for OpenSafely - doesn't work
+date_names <- colnames(input)[grep("exp_date|out_date|vax_date", colnames(input))] # Using basic R
 
 # Set the variables that should be date variables as dates
 for (colname in date_names){
