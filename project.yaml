@@ -32,9 +32,9 @@ actions:
     needs: [preprocess_data]
     outputs:
       moderately_sensitive:
-        refactoring: meta_data_factors_vaccinated.csv
-        QA_rules: QA_summary_vaccinated.csv
-        IE_criteria: Cohort_flow_vaccinated.csv
+        refactoring: output/meta_data_factors_vaccinated.csv
+        QA_rules: output/QA_summary_vaccinated.csv
+        IE_criteria: output/Cohort_flow_vaccinated.csv
       highly_sensitive:
         cohort: output/dataset_stage1_vaccinated.rds
 
@@ -43,8 +43,8 @@ actions:
     needs: [preprocess_data]
     outputs:
       moderately_sensitive:
-        refactoring: meta_data_factors_electively_unvaccinated.csv
-        QA_rules: QA_summary_electively_unvaccinated.csv
-        IE_criteria: Cohort_flow_electively_unvaccinated.csv
+        refactoring: output/meta_data_factors_electively_unvaccinated.csv
+        QA_rules: output/QA_summary_electively_unvaccinated.csv
+        IE_criteria: output/Cohort_flow_electively_unvaccinated.csv
       highly_sensitive:
         cohort: output/dataset_stage1_electively_unvaccinated.rds
