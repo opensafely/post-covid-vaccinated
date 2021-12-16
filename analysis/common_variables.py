@@ -809,9 +809,98 @@ def generate_common_variables(index_date_variable):
     ),
 
     # "cov_bin_dementia": [dementia_snomed_clinical, dementia_icd10, dementia_vascular_snomed_clinical, dementia_vascular_icd10],
+    ### Primary care
+    tmp_cov_bin_dementia_snomed=patients.with_these_clinical_events(
+        dementia_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC
+    tmp_cov_bin_dementia_hes=patients.admitted_to_hospital(
+        returning='binary_flag',
+        with_these_diagnoses=dementia_icd10,
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Primary care vascular
+    tmp_cov_bin_dementia_vascular_snomed=patients.with_these_clinical_events(
+        dementia_vascular_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC vascular
+    tmp_cov_bin_dementia_vascular_hes=patients.admitted_to_hospital(
+        returning='binary_flag',
+        with_these_diagnoses=dementia_vascular_icd10,
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_dementia=patients.maximum_of(
+        "tmp_cov_bin_dementia_snomed", "tmp_cov_bin_dementia_hes", "tmp_cov_bin_dementia_vascular_snomed", "tmp_cov_bin_dementia_vascular_hes",
+    ),
+
     # "cov_bin_liver_disease": [liver_disease_snomed_clinical, liver_disease_icd10],
+     ### Primary care
+    tmp_cov_bin_liver_disease_snomed=patients.with_these_clinical_events(
+        liver_disease_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC
+    tmp_cov_bin_liver_disease_hes=patients.admitted_to_hospital(
+        returning='binary_flag',
+        with_these_diagnoses=liver_disease_icd10,
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_liver_disease=patients.maximum_of(
+        "tmp_cov_bin_liver_disease_snomed", "tmp_cov_bin_liver_disease_hes",
+    ),
+
     # "cov_bin_chronic_kidney_disease": [ckd_snomed_clinical, ckd_icd10],
+    ### Primary care
+    tmp_cov_bin_chronic_kidney_disease_snomed=patients.with_these_clinical_events(
+        ckd_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC
+    tmp_cov_bin_chronic_kidney_disease_hes=patients.admitted_to_hospital(
+        returning='binary_flag',
+        with_these_diagnoses=ckd_icd10,
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_chronic_kidney_disease=patients.maximum_of(
+        "tmp_cov_bin_chronic_kidney_disease_snomed", "tmp_cov_bin_chronic_kidney_disease_hes",
+    ),
+
     # "cov_bin_cancer": [cancer_snomed_clinical, cancer_icd10],
+    ### Primary care
+    tmp_cov_bin_cancer_snomed=patients.with_these_clinical_events(
+        cancer_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC
+    tmp_cov_bin_cancer_hes=patients.admitted_to_hospital(
+        returning='binary_flag',
+        with_these_diagnoses=cancer_icd10,
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_cancer=patients.maximum_of(
+        "tmp_cov_bin_cancer_snomed", "tmp_cov_bin_cancer_hes",
+    ),
     # "cov_bin_hypertension": [hypertension_icd10, hypertension_drugs_dmd, hypertension_snomed_clinical],
     # "cov_bin_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
     # "cov_bin_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
