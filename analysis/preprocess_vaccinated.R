@@ -17,7 +17,7 @@ tmp$use_date <- ifelse(tmp$study_start_date>tmp$pat_start_date ,"index","noninde
 # Identify variables for those using study start as index ----------------------
 
 index <- tmp[tmp$use_date=="index",]
-index[,grepl("_electively_unvaccinated",colnames(index))] <- NULL
+index[,grepl("_vaccinated",colnames(index))] <- NULL
 colnames(index) <- gsub("_index","",colnames(index))
 index$index_date <- index$study_start_date
 index[,c("use_date")] <- NULL
@@ -26,7 +26,7 @@ index[,c("use_date")] <- NULL
 
 nonindex <- tmp[tmp$use_date=="nonindex",]
 nonindex[,grepl("_index",colnames(nonindex))] <- NULL
-colnames(nonindex) <- gsub("_electively_unvaccinated","",colnames(nonindex))
+colnames(nonindex) <- gsub("_vaccinated","",colnames(nonindex))
 nonindex$index_date <- nonindex$pat_start_date 
 nonindex[,c("use_date")] <- NULL
 
