@@ -901,12 +901,134 @@ def generate_common_variables(index_date_variable):
     cov_bin_cancer=patients.maximum_of(
         "tmp_cov_bin_cancer_snomed", "tmp_cov_bin_cancer_hes",
     ),
+
     # "cov_bin_hypertension": [hypertension_icd10, hypertension_drugs_dmd, hypertension_snomed_clinical],
+    ### Primary care
+    tmp_cov_bin_hypertension_snomed=patients.with_these_clinical_events(
+        hypertension_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC: error message, can't include
+    #tmp_cov_bin_hypertension_hes=patients.admitted_to_hospital(
+    #    returning='binary_flag',
+    #    with_these_diagnoses=hypertension_icd10,
+    #    on_or_before=f"{index_date_variable}",
+    #    return_expectations={"incidence": 0.01},
+    #),
+    ### Drugs dmd: error message, can't include
+    #tmp_cov_bin_hypertension_drugs_dmd=patients.admitted_to_hospital(
+    #    returning='binary_flag',
+    #    with_these_diagnoses=hypertension_drugs_dmd,
+    #    on_or_before=f"{index_date_variable}",
+    #    return_expectations={"incidence": 0.01},
+    #),
+    ### Combined: for now
+    cov_bin_hypertension=patients.maximum_of(
+        "tmp_cov_bin_hypertension_snomed", 
+    ),
+
     # "cov_bin_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
+    ### Primary care
+    tmp_cov_bin_diabetes_snomed=patients.with_these_clinical_events(
+        diabetes_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC
+    #tmp_cov_bin_diabetes_hes=patients.admitted_to_hospital(
+    #    returning='binary_flag',
+    #    with_these_diagnoses=diabetes_icd10,
+    #    on_or_before=f"{index_date_variable}",
+    #    return_expectations={"incidence": 0.01},
+    #),
+    ### Drugs DMD
+    #tmp_cov_bin_diabetes_drugs_dmd=patients.admitted_to_hospital(
+    #    returning='binary_flag',
+    #    with_these_diagnoses=diabetes_drugs_dmd,
+    #    on_or_before=f"{index_date_variable}",
+    #    return_expectations={"incidence": 0.01},
+    #),
+    ### Combined
+    cov_bin_diabetes = patients.maximum_of(
+        "tmp_cov_bin_diabetes_snomed", 
+    ),
+
     # "cov_bin_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
+       ### Primary care
+    tmp_cov_bin_obesity_snomed=patients.with_these_clinical_events(
+        bmi_obesity_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC
+    tmp_cov_bin_obesity_hes=patients.admitted_to_hospital(
+        returning='binary_flag',
+        with_these_diagnoses=bmi_obesity_icd10,
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_obesity=patients.maximum_of(
+        "tmp_cov_bin_obesity_snomed", "tmp_cov_bin_obesity_hes",
+    ),
+
     # "cov_bin_depression": [depression_snomed_clinical, depression_icd10],
+    ### Primar care
+    tmp_cov_bin_depression_snomed=patients.with_these_clinical_events(
+        depression_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC
+    tmp_cov_bin_depression_hes=patients.admitted_to_hospital(
+        returning='binary_flag',
+        with_these_diagnoses=depression_icd10,
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_depression=patients.maximum_of(
+        "tmp_cov_bin_depression_snomed", "tmp_cov_bin_depression_hes",
+    ),
+
     # "cov_bin_chronic_obstructive_pulmonary_disease": [copd_snomed_clinical, copd_icd10],
+    ### Primar care
+    tmp_cov_bin_chronic_obstructive_pulmonary_disease_snomed=patients.with_these_clinical_events(
+        copd_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC
+    tmp_cov_bin_chronic_obstructive_pulmonary_disease_hes=patients.admitted_to_hospital(
+        returning='binary_flag',
+        with_these_diagnoses= copd_icd10,
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_chronic_obstructive_pulmonary_disease=patients.maximum_of(
+        "tmp_cov_bin_chronic_obstructive_pulmonary_disease_snomed", "tmp_cov_bin_chronic_obstructive_pulmonary_disease_hes",
+    ),
+
     # "cov_bin_lipid_medications": [lipid_lowering_dmd],
+    ### dmd: dictionary of medicines and devices
+    tmp_cov_bin_lipid_medications_dmd=patients.with_these_clinical_events(
+        lipid_lowering_dmd,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_lipid_medications_dmd=patients.maximum_of(
+        "tmp_cov_bin_lipid_medications_dmd", 
+    ),
+
     # "cov_bin_antiplatelet_medications": [antiplatelet_dmd],
     # "cov_bin_anticoagulation_medications": [anticoagulant_dmd],
     # "cov_bin_combined_oral_contraceptive_pill": [cocp_dmd],
