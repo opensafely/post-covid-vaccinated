@@ -1030,8 +1030,33 @@ def generate_common_variables(index_date_variable):
     ),
 
     # "cov_bin_antiplatelet_medications": [antiplatelet_dmd],
+    ### dmd: dictionary of medicines and devices
+    tmp_cov_bin_antiplatelet_medications=patients.with_these_clinical_events(
+        antiplatelet_dmd,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_antiplatelet_medications=patients.maximum_of(
+        "tmp_cov_bin_antiplatelet_medications", 
+    ),
+
     # "cov_bin_anticoagulation_medications": [anticoagulant_dmd],
+    ### dmd: dictionary of medicines and devices
+    tmp_cov_bin_anticoagulation_medications=patients.with_these_clinical_events(
+        anticoagulant_dmd, 
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_anticoagulation_medications= patients.maximum_of(
+        "tmp_cov_bin_anticoagulation_medications",
+    ),
+
     # "cov_bin_combined_oral_contraceptive_pill": [cocp_dmd],
+
     # "cov_bin_hormone_replacement_therapy": [hrt_dmd],
     # "sub_bin_ate": [ami_snomed_clinical, ami_icd10, ami_prior_icd10, other_arterial_embolism_icd10, stroke_isch_icd10, stroke_isch_snomed_clinical],  
 
