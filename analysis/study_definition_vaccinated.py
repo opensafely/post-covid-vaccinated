@@ -28,7 +28,7 @@ from common_variables import generate_common_variables
 
 study = StudyDefinition(
 
-    # Specify index date
+    # Specify index date for study
     index_date = "2021-06-01",
 
     # Configure the expectations framework
@@ -39,8 +39,7 @@ study = StudyDefinition(
     },
 
     # Define the study population 
-    # NB: cov_age and cov_sex defined in covariates section
-    # NB: exclusions not written into study definition
+    # NB: not all inclusions and exclusions are written into study definition
     population = patients.satisfying(
         """
             NOT has_died
@@ -213,7 +212,7 @@ study = StudyDefinition(
             },
         ),
     
-    # Common variables (e.g., exposures, outcomes, covariates) that require dynamic dates
+    # Define common variables (e.g., exposures, outcomes, covariates) that require dynamic dates
 
         **dynamic_variables
 )

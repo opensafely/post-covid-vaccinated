@@ -7,23 +7,20 @@ library(magrittr)
 ## Study start date
 study_start <- "2021-06-01"
 
-## Study end date
-study_end <- NA
-
 # Create spine dataset ---------------------------------------------------------
 
 df <- arrow::read_feather(file = "output/input_index.feather",
                           col_select = c("patient_id","death_date"))
 
-# Tidy input file and merge to dataset -----------------------------------------
+# Merge each dataset to the spine dataset --------------------------------------
 
 for (i in c("index","vaccinated","electively_unvaccinated")) {
 
-  ## Load study definition output
+  ## Load dataset
   
   tmp <- arrow::read_feather(file = paste0("output/input_",i,".feather"))
   
-  ## Merge dynamic variables to main dataset
+  ## Identify dynamic variables in dataset
   
   keep <- c("patient_id",
             colnames(tmp)[grepl("sub_",colnames(tmp))], # Subgroups
@@ -39,13 +36,17 @@ for (i in c("index","vaccinated","electively_unvaccinated")) {
   
   tmp_dynamic <- tmp[,keep]
   
+  ## Rename dynamic variables to indicate source data
+  
   colnames(tmp_dynamic) <- paste0(colnames(tmp_dynamic),"_",i)
-
+  
   tmp_dynamic <- dplyr::rename(tmp_dynamic, patient_id = paste0("patient_id_",i))
+  
+  ## Merge dynamic variables to spine
   
   df <- merge(df,tmp_dynamic, by = "patient_id")
 
-  ## Merge other specific variables if applicable
+  ## Identify static variables
   
   keep <- c("patient_id",
             colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
@@ -55,17 +56,28 @@ for (i in c("index","vaccinated","electively_unvaccinated")) {
   
   tmp_static <- tmp[,keep]
   
+  ## Merge static variables to spine if applicable
+  
   if (ncol(tmp_static)>1) {
     df <- merge(df,tmp_static, by = "patient_id") 
   }
   
 }
 
-# Rename cov_cat_sex as it is universally defined in electively unvaccinated ---
+# Remove temporary datasets ----------------------------------------------------
 
-df <- dplyr::rename(df, "cov_cat_sex" = "cov_cat_sex_electively_unvaccinated")
+rm(tmp, tmp_dynamic, tmp_static)
+
+# Rename universally defined variables -----------------------------------------
+# NB: These appear in only one dataset so do not need dataset specific names
+
+df <- dplyr::rename(df, 
+                    "cov_cat_sex" = "cov_cat_sex_electively_unvaccinated",
+                    "cov_num_consulation_rate" = "cov_num_consulation_rate_index",
+                    "cov_bin_healthcare_worker" = "cov_bin_healthcare_worker_index")
 
 # Remove JCVI age variables ----------------------------------------------------
+# NB: These are used to determine JCVI category only
 
 df[,c("vax_jcvi_age_1","vax_jcvi_age_2")] <- NULL
 
@@ -95,7 +107,7 @@ for (i in colnames(df)[grepl("_bin",colnames(df))]) {
   df[,i] <- as.logical(df[,i])
 }
 
-# Split into cohorts -----------------------------------------------------------
+# Split into "vaccinated" and "electively_unvaccinated" cohorts ----------------
 
 for (j in c("vaccinated","electively_unvaccinated")) {
   
@@ -103,11 +115,11 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   
   tmp <- df 
   
-  # Perform cohort specific preprocessing --------------------------------------
+  # Perform cohort specific preprocessing steps --------------------------------
   
   source(paste0("analysis/preprocess_",j,".R"))
   
-  # Define severity --------------------------------------------------------------
+  # Define COVID-19 severity --------------------------------------------------------------
   
   tmp$sub_cat_covid19_hospital <- "no_infection"
   
@@ -123,7 +135,7 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   tmp$sub_cat_covid19_hospital <- as.factor(tmp$sub_cat_covid19_hospital)
   tmp[,c("sub_date_covid19_hospital")] <- NULL
 
-  # Save analysis dataset ---------------------------------------------------
+  # Restrict columns and save analysis dataset ---------------------------------
   
   tmp1 <- tmp[,c("patient_id","death_date","index_date",
               colnames(tmp)[grepl("sub_",colnames(tmp))], # Subgroups
@@ -137,7 +149,7 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   
   saveRDS(tmp1, file = paste0("output/input_",j,".rds"))
   
-  # Save Venn diagram input dataset --------------------------------------------
+  # Restrict columns and save Venn diagram input dataset -----------------------
   
   tmp2 <- tmp[,c("patient_id",colnames(tmp)[grepl("out_",colnames(tmp))])]
   

@@ -28,7 +28,7 @@ from common_variables import generate_common_variables
 
 study = StudyDefinition(
 
-    # Specify index date
+    # Specify index date for study
     index_date = "2021-06-01",
 
     # Configure the expectations framework
@@ -39,8 +39,7 @@ study = StudyDefinition(
     },
 
     # Define the study population 
-    # NB: cov_age and cov_sex defined in covariates section
-    # NB: exclusions not written into study definition
+    # NB: not all inclusions and exclusions are written into study definition
     population = patients.satisfying(
         """
             NOT has_died
@@ -143,7 +142,25 @@ study = StudyDefinition(
             "primary_care_death_date", "ons_died_from_any_cause_date"
         ),
 
-    # Common variables (e.g., exposures, outcomes, covariates) that require dynamic dates
+    # Define fixed covariates other than sex
+    # NB: sex is required to determine vaccine eligibility covariates so is defined in study_definition_electively_unvaccinated.py
+
+        ## 2019 consultation rate
+            cov_num_consulation_rate=patients.with_gp_consultations(
+                between=["2019-01-01", "2019-12-31"],
+                returning="number_of_matches_in_period",
+                return_expectations={
+                    "int": {"distribution": "poisson", "mean": 5},
+                },
+            ),
+    
+        ## Healthcare worker    
+        cov_bin_healthcare_worker=patients.with_healthcare_worker_flag_on_covid_vaccine_record(
+            returning='binary_flag', 
+            return_expectations={"incidence": 0.01},
+        ),
+    
+    # Define common variables (e.g., exposures, outcomes, covariates) that require dynamic dates
 
         **dynamic_variables
 )

@@ -632,16 +632,6 @@ def generate_common_variables(index_date_variable):
         },
     ),
 
-    # ## Consultations
-    # cov_num_consulation_rate=patients.with_gp_consultations(
-    #     between=[f"{index_date_variable} - 365 day", f"{index_date_variable}"],
-    #     returning="number_of_matches_in_period",
-    #     return_expectations={
-    #         "int": {"distribution": "poisson", "mean": 5},
-    #         "incidence": 1,
-    #     },
-    # ),
-
     ## Smoking status
     cov_cat_smoking_status=patients.categorised_as(
         {
@@ -669,100 +659,81 @@ def generate_common_variables(index_date_variable):
         ),
     ),
 
-    ## Prior AMI
+    ## Care home status
+    cov_bin_carehome_status=patients.care_home_status_as_of(
+        f"{index_date_variable}", 
+        categorised_as={
+            "Yes": """
+              IsPotentialCareHome
+              AND LocationDoesNotRequireNursing='Y'
+              AND LocationRequiresNursing='N'
+            """,
+            "Yes": """
+              IsPotentialCareHome
+              AND LocationDoesNotRequireNursing='N'
+              AND LocationRequiresNursing='Y'
+            """,
+            "Yes": "IsPotentialCareHome",
+            "No": "DEFAULT",
+        },
+        return_expectations={
+            "rate": "universal",
+            "category": {"ratios": {"Yes": 0.30, "No": 0.70},},
+        },
+    ),
+
+    ## History of AMI
     ### Primary care
     tmp_cov_bin_ami_snomed=patients.with_these_clinical_events(
         ami_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### HES APC
     tmp_cov_bin_ami_prior_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ami_prior_icd10,
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     tmp_cov_bin_ami_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ami_icd10,
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### Combined
     cov_bin_ami=patients.maximum_of(
         "tmp_cov_bin_ami_snomed", "tmp_cov_bin_ami_prior_hes", "tmp_cov_bin_ami_hes",
     ),
 
-    ## Prior all stroke
+    ## History of stroke
     ### Primary care
     tmp_cov_bin_stroke_isch_snomed=patients.with_these_clinical_events(
         stroke_isch_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     tmp_cov_bin_stroke_sah_hs_snomed=patients.with_these_clinical_events(
         stroke_sah_hs_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### HES APC
     tmp_cov_bin_stroke_isch_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=stroke_isch_icd10,
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     tmp_cov_bin_stroke_sah_hs_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=stroke_sah_hs_icd10,
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### Combined
     cov_bin_all_stroke=patients.maximum_of(
@@ -774,105 +745,63 @@ def generate_common_variables(index_date_variable):
         returning='binary_flag',
         with_these_diagnoses=other_arterial_embolism_icd10,
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     
-    ## Prior venous thrombolism events
+    ## History of venous thrombolism events
     ### Primary care
     tmp_cov_bin_vte_snomed=patients.with_these_clinical_events(
         all_vte_codes_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### HES APC
     tmp_cov_bin_vte_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=all_vte_codes_icd10,
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### Combined
     cov_bin_vte=patients.maximum_of(
         "tmp_cov_bin_vte_snomed", "tmp_cov_bin_vte_hes",
     ),
 
-    ## Prior heart failure
+    ## History of heart failure
     ### Primary care
     tmp_cov_bin_hf_snomed=patients.with_these_clinical_events(
         hf_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### HES APC
     tmp_cov_bin_hf_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=hf_icd10,
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### Combined
     cov_bin_hf=patients.maximum_of(
         "tmp_cov_bin_hf_snomed", "tmp_cov_bin_hf_hes",
     ),
 
-    ## Prior angina
+    ## History of angina
     ### Primary care
     tmp_cov_bin_angina_snomed=patients.with_these_clinical_events(
         angina_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### HES APC
     tmp_cov_bin_angina_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=angina_icd10,
         on_or_before=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        return_expectations={"incidence": 0.01},
     ),
     ### Combined
     cov_bin_angina=patients.maximum_of(

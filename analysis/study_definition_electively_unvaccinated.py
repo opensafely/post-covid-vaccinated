@@ -36,7 +36,7 @@ from grouping_variables import (
 
 study = StudyDefinition(
 
-    # Specify index date
+    # Specify index date for study
     index_date = "2021-06-01",
 
     # Configure the expectations framework
@@ -47,8 +47,7 @@ study = StudyDefinition(
     },
 
     # Define the study population 
-    # NB: cov_age and cov_sex defined in covariates section
-    # NB: exclusions not written into study definition
+    # NB: not all inclusions and exclusions are written into study definition
     population = patients.satisfying(
         """
             NOT has_died
@@ -75,7 +74,8 @@ study = StudyDefinition(
         ),
     ),
 
-    # Define sex
+    # Define sex 
+    # NB: this is required for JCVI variables hence is defined here
         cov_cat_sex = patients.sex(
             return_expectations = {
             "rate": "universal",
@@ -83,11 +83,11 @@ study = StudyDefinition(
             }
         ),
 
-    # JCVI variables
+    # Define vaccine eligibility variables
 
         **jcvi_variables, 
 
-    # Common variables (e.g., exposures, outcomes, covariates) that require dynamic dates
+    # Define common variables (e.g., exposures, outcomes, covariates) that require dynamic dates
 
         **dynamic_variables
 )

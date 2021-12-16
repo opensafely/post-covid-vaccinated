@@ -1,12 +1,12 @@
-# Filter to individuals with known vaccinations 1 and 2 ------------------------
+# Filter to individuals with dates for first and second vaccination ------------
 
 tmp <- tmp[!is.na(tmp$vax_date_covid_1) & !is.na(tmp$vax_date_covid_2),]
 
-# Remove variables for electively unvaccinated ---------------------------------
+# Remove dynammic variables from electively unvaccinated dataset ---------------
 
 tmp[,colnames(tmp)[grepl("_electively_unvaccinated",colnames(tmp))]] <- NULL
 
-# Determine index date ---------------------------------------------------------
+# Determine patient index date -------------------------------------------------
 
 tmp$study_start_date <- as.Date(study_start)
 
@@ -14,19 +14,23 @@ tmp$pat_start_date  <- as.Date(tmp$vax_date_covid_2)+14
 
 tmp$use_date <- ifelse(tmp$study_start_date>tmp$pat_start_date ,"index","nonindex")
 
-# Create sub cohorts -----------------------------------------------------------
+# Identify variables for those using study start as index ----------------------
 
 index <- tmp[tmp$use_date=="index",]
-index[,grepl("_vaccinated",colnames(index))] <- NULL
+index[,grepl("_electively_unvaccinated",colnames(index))] <- NULL
 colnames(index) <- gsub("_index","",colnames(index))
 index$index_date <- index$study_start_date
 index[,c("use_date")] <- NULL
 
+# Identify variables for those not using study start as index ------------------
+
 nonindex <- tmp[tmp$use_date=="nonindex",]
-nonindex <- nonindex[,!grepl("_index",colnames(nonindex))]
-colnames(nonindex) <- gsub("_vaccinated","",colnames(nonindex))
+nonindex[,grepl("_index",colnames(nonindex))] <- NULL
+colnames(nonindex) <- gsub("_electively_unvaccinated","",colnames(nonindex))
 nonindex$index_date <- nonindex$pat_start_date 
 nonindex[,c("use_date")] <- NULL
+
+# Combine index and nonindex back into a single dataset ------------------------
 
 tmp <- rbind(index,nonindex)
 
