@@ -956,52 +956,6 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_diabetes_snomed", "tmp_cov_bin_diabetes_dmd", "tmp_cov_bin_diabetes_snomed",
     ),
 
-    # ### HES APC
-    # tmp_cov_bin_hypertension_hes=patients.admitted_to_hospital(
-    #    returning='binary_flag',
-    #    with_these_diagnoses=hypertension_icd10,
-    #    on_or_before=f"{index_date_variable}",
-    #    return_expectations={"incidence": 0.01},
-    # ),
-    # ### DMD
-    # tmp_cov_bin_hypertension_drugs_dmd=patients.with_these_clinical_events(
-    #     hypertension_drugs_dmd,
-    #     returning='binary_flag',
-    #     on_or_before=f"{index_date_variable}",
-    #     return_expectations={"incidence": 0.01},
-    # ),
-    # ### Combined
-    # cov_bin_hypertension=patients.maximum_of(
-    #     "tmp_cov_bin_hypertension_snomed", "tmp_cov_bin_hypertension_hes", "tmp_cov_bin_hypertension_drugs_dmd",
-    # ),
-
-    # "cov_bin_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
-    # ### Primary care
-    # tmp_cov_bin_diabetes_snomed=patients.with_these_clinical_events(
-    #     diabetes_snomed_clinical,
-    #     returning='binary_flag',
-    #     on_or_before=f"{index_date_variable}",
-    #     return_expectations={"incidence": 0.01},
-    # ),
-    # ### HES APC
-    # tmp_cov_bin_diabetes_hes=patients.admitted_to_hospital(
-    #    returning='binary_flag',
-    #    with_these_diagnoses=diabetes_icd10,
-    #    on_or_before=f"{index_date_variable}",
-    #    return_expectations={"incidence": 0.01},
-    # ),
-    # ### DMD
-    # tmp_cov_bin_diabetes_dmd=patients.with_these_clinical_events(
-    #     diabetes_drugs_dmd,
-    #     returning='binary_flag',
-    #     on_or_before=f"{index_date_variable}",
-    #     return_expectations={"incidence": 0.01},
-    # ),
-    # ### Combined
-    # cov_bin_diabetes = patients.maximum_of(
-    #     "tmp_cov_bin_diabetes_snomed", "tmp_cov_bin_diabetes_dmd", "tmp_cov_bin_diabetes_snomed",
-    # ),
-
     # "cov_bin_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
     ### Primary care
     tmp_cov_bin_obesity_snomed=patients.with_these_clinical_events(
