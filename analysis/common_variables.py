@@ -87,21 +87,6 @@ def generate_common_variables(index_date_variable):
         "tmp_exp_date_covid19_confirmed_sgss","tmp_exp_date_covid19_confirmed_snomed","tmp_exp_date_covid19_confirmed_hes","tmp_exp_date_covid19_confirmed_death"
     ),
 
-    # Define COVID-19 severity
-
-    sub_date_covid19_hospital=patients.admitted_to_hospital(
-        with_these_primary_diagnoses=covid_codes,
-        returning="date_admitted",
-        on_or_after="exp_date_covid19_confirmed",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.05,
-        },
-    ),
-
     # Define outomes 
 
     ## Acute myocardial infarction
@@ -682,7 +667,7 @@ def generate_common_variables(index_date_variable):
         },
     ),
 
-    ## History of AMI
+    ## Acute myocardial infarction
     ### Primary care
     tmp_cov_bin_ami_snomed=patients.with_these_clinical_events(
         ami_snomed_clinical,
@@ -708,7 +693,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_ami_snomed", "tmp_cov_bin_ami_prior_hes", "tmp_cov_bin_ami_hes",
     ),
 
-    ## History of stroke
+    ## All stroke
     ### Primary care
     tmp_cov_bin_stroke_isch_snomed=patients.with_these_clinical_events(
         stroke_isch_snomed_clinical,
@@ -740,7 +725,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_stroke_isch_hes", "tmp_cov_bin_stroke_isch_snomed", "tmp_cov_bin_stroke_sah_hs_hes", "tmp_cov_bin_stroke_sah_hs_snomed",
     ),
 
-    ## Prior other arterial embolism  
+    ## Other arterial embolism  
     cov_bin_other_arterial_embolism=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=other_arterial_embolism_icd10,
@@ -748,7 +733,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={"incidence": 0.01},
     ),
     
-    ## History of venous thrombolism events
+    ## Venous thrombolism events
     ### Primary care
     tmp_cov_bin_vte_snomed=patients.with_these_clinical_events(
         all_vte_codes_snomed_clinical,
@@ -768,7 +753,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_vte_snomed", "tmp_cov_bin_vte_hes",
     ),
 
-    ## History of heart failure
+    ## Heart failure
     ### Primary care
     tmp_cov_bin_hf_snomed=patients.with_these_clinical_events(
         hf_snomed_clinical,
@@ -788,7 +773,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_hf_snomed", "tmp_cov_bin_hf_hes",
     ),
 
-    ## History of angina
+    ## Angina
     ### Primary care
     tmp_cov_bin_angina_snomed=patients.with_these_clinical_events(
         angina_snomed_clinical,
@@ -808,7 +793,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_angina_snomed", "tmp_cov_bin_angina_hes",
     ),
 
-    # "cov_bin_dementia": [dementia_snomed_clinical, dementia_icd10, dementia_vascular_snomed_clinical, dementia_vascular_icd10],
+    ## Dementia
     ### Primary care
     tmp_cov_bin_dementia_snomed=patients.with_these_clinical_events(
         dementia_snomed_clinical,
@@ -823,14 +808,14 @@ def generate_common_variables(index_date_variable):
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
-    ### Primary care vascular
+    ### Primary care - vascular
     tmp_cov_bin_dementia_vascular_snomed=patients.with_these_clinical_events(
         dementia_vascular_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
-    ### HES APC vascular
+    ### HES APC - vascular
     tmp_cov_bin_dementia_vascular_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=dementia_vascular_icd10,
@@ -842,7 +827,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_dementia_snomed", "tmp_cov_bin_dementia_hes", "tmp_cov_bin_dementia_vascular_snomed", "tmp_cov_bin_dementia_vascular_hes",
     ),
 
-    # "cov_bin_liver_disease": [liver_disease_snomed_clinical, liver_disease_icd10],
+    ## Liver disease
      ### Primary care
     tmp_cov_bin_liver_disease_snomed=patients.with_these_clinical_events(
         liver_disease_snomed_clinical,
@@ -862,7 +847,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_liver_disease_snomed", "tmp_cov_bin_liver_disease_hes",
     ),
 
-    # "cov_bin_chronic_kidney_disease": [ckd_snomed_clinical, ckd_icd10],
+    ## Chronic kidney disease
     ### Primary care
     tmp_cov_bin_chronic_kidney_disease_snomed=patients.with_these_clinical_events(
         ckd_snomed_clinical,
@@ -882,7 +867,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_chronic_kidney_disease_snomed", "tmp_cov_bin_chronic_kidney_disease_hes",
     ),
 
-    # "cov_bin_cancer": [cancer_snomed_clinical, cancer_icd10],
+    ## Cancer
     ### Primary care
     tmp_cov_bin_cancer_snomed=patients.with_these_clinical_events(
         cancer_snomed_clinical,
@@ -902,7 +887,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_cancer_snomed", "tmp_cov_bin_cancer_hes",
     ),
 
-    # "cov_bin_hypertension": [hypertension_icd10, hypertension_drugs_dmd, hypertension_snomed_clinical],
+    ## Hypertension
     ### Primary care
     tmp_cov_bin_hypertension_snomed=patients.with_these_clinical_events(
         hypertension_snomed_clinical,
@@ -929,7 +914,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_hypertension_snomed", "tmp_cov_bin_hypertension_hes", "tmp_cov_bin_hypertension_drugs_dmd",
     ),
 
-    #"cov_bin_diabetes": [diabetes_snomed_clinical, diabetes_icd10, diabetes_drugs_dmd],
+    ## Diabetes
     ### Primary care
     tmp_cov_bin_diabetes_snomed=patients.with_these_clinical_events(
         diabetes_snomed_clinical,
@@ -956,7 +941,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_diabetes_snomed", "tmp_cov_bin_diabetes_dmd", "tmp_cov_bin_diabetes_snomed",
     ),
 
-    # "cov_bin_obesity": [bmi_obesity_snomed_clinical, bmi_obesity_icd10],
+    ## Obesity
     ### Primary care
     tmp_cov_bin_obesity_snomed=patients.with_these_clinical_events(
         bmi_obesity_snomed_clinical,
@@ -976,7 +961,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_obesity_snomed", "tmp_cov_bin_obesity_hes",
     ),
 
-    # "cov_bin_depression": [depression_snomed_clinical, depression_icd10],
+    ## Depresssion
     ### Primary care
     tmp_cov_bin_depression_snomed=patients.with_these_clinical_events(
         depression_snomed_clinical,
@@ -996,7 +981,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_depression_snomed", "tmp_cov_bin_depression_hes",
     ),
 
-    # "cov_bin_chronic_obstructive_pulmonary_disease": [copd_snomed_clinical, copd_icd10],
+    ## Chronic obstructive pulmonary disease
     ### Primary care
     tmp_cov_bin_chronic_obstructive_pulmonary_disease_snomed=patients.with_these_clinical_events(
         copd_snomed_clinical,
@@ -1016,114 +1001,66 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_chronic_obstructive_pulmonary_disease_snomed", "tmp_cov_bin_chronic_obstructive_pulmonary_disease_hes",
     ),
 
-    # "cov_bin_lipid_medications": [lipid_lowering_dmd],
-    ### dmd: dictionary of medicines and devices
+    ## Lipid medications
     cov_bin_lipid_medications_dmd=patients.with_these_clinical_events(
         lipid_lowering_dmd,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
-    ### Combined
-    # cov_bin_lipid_medications_dmd=patients.maximum_of(
-    #     "tmp_cov_bin_lipid_medications_dmd", 
-    # ),
 
-    # "cov_bin_antiplatelet_medications": [antiplatelet_dmd],
-    ### dmd: dictionary of medicines and devices
+    ## Antiplatelet_medications
     cov_bin_antiplatelet_medications=patients.with_these_clinical_events(
         antiplatelet_dmd,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
-    ### Combined
-    # cov_bin_antiplatelet_medications=patients.maximum_of(
-    #     "tmp_cov_bin_antiplatelet_medications", 
-    # ),
 
-    # "cov_bin_anticoagulation_medications": [anticoagulant_dmd],
-    ### dmd: dictionary of medicines and devices
+    ## Anticoagulation_medications
     cov_bin_anticoagulation_medications=patients.with_these_clinical_events(
         anticoagulant_dmd, 
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
-    # ### Combined
-    # cov_bin_anticoagulation_medications= patients.maximum_of(
-    #     "tmp_cov_bin_anticoagulation_medications",
-    # ),
-
-    # "cov_bin_combined_oral_contraceptive_pill": [cocp_dmd],
+   
+    ## Combined oral contraceptive pill
     ### dmd: dictionary of medicines and devices
-    cov_bin_combined_oral_contraceptive_pill_dmd=patients.with_these_clinical_events(
+    cov_bin_combined_oral_contraceptive_pill=patients.with_these_clinical_events(
         cocp_dmd, 
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
-    # ### Combined
-    # cov_bin_combined_oral_contraceptive_pill= patients.maximum_of(
-    #     "tmp_cov_bin_combined_oral_contraceptive_pill_dmd",
-    # ),
 
-    # "cov_bin_hormone_replacement_therapy": [hrt_dmd],
-    cov_bin_hormone_replacement_therapy_dmd=patients.with_these_clinical_events(
+    ## Hormone replacement therapy
+    cov_bin_hormone_replacement_therapy=patients.with_these_clinical_events(
         hrt_dmd, 
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
-    # ### Combined
-    # cov_bin_hormone_replacement_therapy= patients.maximum_of(
-    #     "tmp_cov_bin_hormone_replacement_therapy_dmd",
-    # ),
-    # "sub_bin_ate": [ami_snomed_clinical, ami_icd10, ami_prior_icd10, other_arterial_embolism_icd10, stroke_isch_icd10, stroke_isch_snomed_clinical],  
-    ### Primary care
-    tmp_sub_bin_ate_snomed=patients.with_these_clinical_events(
-        ami_snomed_clinical,
-        returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+
+    # Define subgroups (for variables that don't have a corresponding covariate only)
+
+    ## Arterial thrombosis events (i.e., any arterial event - this combines: AMI, ischaemic stroke, other arterial embolism)
+    sub_bin_ate=patients.minimum_of(
+        "cov_bin_ami", "cov_bin_other_arterial_embolism", "tmp_cov_bin_stroke_isch_snomed", "tmp_cov_bin_stroke_isch_hes",
     ),
-    ### HES APC
-    tmp_sub_bin_ate_hes=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses= ami_icd10,
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+    ## COVID-19 severity
+    sub_date_covid19_hospital=patients.admitted_to_hospital(
+        with_these_primary_diagnoses=covid_codes,
+        returning="date_admitted",
+        on_or_after="exp_date_covid19_confirmed",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.05,
+        },
     ),
-    ### Prior HES APC
-    tmp_sub_bin_ate_prior_hes=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses= ami_prior_icd10,
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
-    ),
-    ### HES
-    tmp_sub_bin_other_arterial_embolism_hes=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses= other_arterial_embolism_icd10,
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
-    ),
-    ### HES
-    tmp_sub_bin_stroke_isch_hes=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses= stroke_isch_icd10,
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
-    ),
-    tmp_sub_bin_stroke_isch_snomed=patients.with_these_clinical_events(
-        stroke_isch_snomed_clinical,
-        returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
-    ),
-    ### Combined
-    sub_bin_ate= patients.maximum_of(
-        "tmp_sub_bin_ate_snomed", "tmp_sub_bin_ate_hes", "tmp_sub_bin_ate_prior_hes", "tmp_sub_bin_other_arterial_embolism_hes","tmp_sub_bin_stroke_isch_hes","tmp_sub_bin_stroke_isch_snomed",
-    ),
+
     )
     return dynamic_variables
