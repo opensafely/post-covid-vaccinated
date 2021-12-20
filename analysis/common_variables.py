@@ -1045,7 +1045,7 @@ def generate_common_variables(index_date_variable):
     # Define subgroups (for variables that don't have a corresponding covariate only)
 
     ## Arterial thrombosis events (i.e., any arterial event - this combines: AMI, ischaemic stroke, other arterial embolism)
-    sub_bin_ate=patients.minimum_of(
+    sub_bin_ate=patients.maximum_of(
         "cov_bin_ami", "cov_bin_other_arterial_embolism", "tmp_cov_bin_stroke_isch_snomed", "tmp_cov_bin_stroke_isch_hes",
     ),
     ## COVID-19 severity
