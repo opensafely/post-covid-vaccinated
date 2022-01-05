@@ -43,7 +43,7 @@ for (colname in factor_covars){
 #Set cohort start and end dates
 if(endsWith(project,"_delta")==T){
   cohort_start_date=as.Date("2021-06-01")
-  cohort_end_date=as.Date(Sys.Date(), format="%y-%m-%d")
+  cohort_end_date=as.Date("2021-12-14")
 }else{
   cohort_start_date=as.Date("2020-01-01")
   cohort_end_date=as.Date("2021-10-27")
@@ -94,12 +94,22 @@ for (j in 1:nrow(pop)) {
     population <- pop[j,]$name
     df <- subset(input, eval(parse(text = pop[j,]$condition)))
     df=rename(df, outcome_event = outcome_name)
+    
+    #Follow up start and end date dependent on project
+    #Vaccinated in era of delta: Start - latest of study start (start of delta wave) or two weeks after second vaccination
+    #End - Earliest of death, outcome event or study end date (end of delta wave)
+    #
+    #Electively unvaccinated: Start - latest of study start date (start of delta wave) or 12 weeks after become eligible for vaccination
+    #End - Earliest of death, outcome event, study end date end of delta wave) or vaccination
+    #
+    #Unvaccinated: Start - Study start date (start of COVID pandemic)
+    #End - Earliest of death, outcome event, study end date or vaccination
 
     if(project=="vaccinated_delta"){
       df=df %>% rowwise() %>% mutate(follow_up_start=max((vax_date_covid_2+14),cohort_start_date,na.rm = TRUE))
       df=df %>% rowwise() %>% mutate(follow_up_end=min(outcome_event, death_date,cohort_end_date,na.rm = TRUE))
     }else if (project=="unvaccinated_delta"){
-      df=df %>% rowwise() %>% mutate(follow_up_start=max((vax_date_eligible+72),cohort_start_date,na.rm = TRUE))
+      df=df %>% rowwise() %>% mutate(follow_up_start=max((vax_date_eligible+84),cohort_start_date,na.rm = TRUE))
       df=df %>% rowwise() %>% mutate(follow_up_end=min(vax_date_covid_1,outcome_event, death_date,cohort_end_date,na.rm = TRUE))
     }else if (project == "unvaccinated"){
       df$follow_up_start=cohort_start_date
