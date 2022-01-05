@@ -13,7 +13,7 @@ project  = args[[1]] #vaccinated_delta,unvaccinated_delta, unvaccinated
 
 input <- read_rds("output/input.rds")
 
-project="vaccinated_delta" #this will need to be removed merged and added as an action
+#project="vaccinated_delta" #this will need to be removed merged and added as an action
 
 #done in previous script so can be deleted once merged
 input$cov_cat_region=gsub(" ","_",input$cov_cat_region)
@@ -21,10 +21,10 @@ input$exp_cat_covid19_hospital[input$exp_cat_covid19_hospital=="hospitalised_aft
 input$exp_cat_covid19_hospital[input$exp_cat_covid19_hospital=="hospitalised_within28days"]="hospitalised"
 
 #Outcomes and covariates
+#Create vectors of the outcome and covariate variables
 outcome <- input %>% dplyr::select(c(names(input)[grepl("out_", names(input))])) %>% names()
 covar_names=(c(colnames(input)[grepl("cov_", colnames(input))]))
 covar_names <- covar_names[!covar_names %in% c("cov_num_age","cov_num_consulation_rate")]
-
 
 
 #need to check whether all covariates are changed to factors in earlier script
@@ -51,9 +51,8 @@ if(endsWith(project,"_delta")==T){
 }
 
 #Populations of interest
-pop <- data.frame(rbind(c("Whole_population","!is.na(input$patient_id)")),stringsAsFactors = FALSE)
+#Create data frame containing the popuations of interest and how to filter the dataset to get them
 
-colnames(pop) <- c("name","condition")
 pop <- data.frame(rbind(c("Whole_population","!is.na(input$patient_id)"),
                        c("COVID_hospitalised","input$exp_cat_covid19_hospital=='hospitalised'"),
                        c("COVID_non_hospitalised","input$exp_cat_covid19_hospital=='non_hospitalised'"),
@@ -72,20 +71,19 @@ pop <- data.frame(rbind(c("Whole_population","!is.na(input$patient_id)"),
                        
 ),
 stringsAsFactors = FALSE)
-
 colnames(pop) <- c("name","condition")
 
 #Create base table of covariate levels to join counts onto 
 covar_levels=input %>% dplyr::select(c(covar_names))
-covar_levels= covar_levels %>% mutate_if(is.numeric,as.factor)
+covar_levels= covar_levels %>% mutate_if(is.numeric,as.factor)#convert numeric variables to factor so that counts of each level are given
 covar_levels= covar_levels %>% mutate_if(is.character,as.factor)
 covar_levels=as.data.frame(summary(covar_levels,maxsum=20))
 covar_levels = rename(covar_levels, Covariate_level = Freq, Covariate = Var2)
-covar_levels$Covariate_level= sub('\\:.*', '', covar_levels$Covariate_level)
-covar_levels$Covariate_level=gsub("\\s","",covar_levels$Covariate_level)
-covar_levels$Covariate=gsub("\\s","",covar_levels$Covariate)
-covar_levels=covar_levels %>% drop_na(Covariate_level)
-covar_levels=covar_levels%>%select(-Var1)
+covar_levels$Covariate_level= sub('\\:.*', '', covar_levels$Covariate_level)#Remove every thing after :
+covar_levels$Covariate_level=gsub("\\s","",covar_levels$Covariate_level)#Remove any spaces in covariate level names
+covar_levels$Covariate=gsub("\\s","",covar_levels$Covariate) #Remove any spaces in covariate column
+covar_levels=covar_levels %>% drop_na(Covariate_level)#DRop any rows containing NA
+covar_levels=covar_levels%>%select(-Var1)#Remove empty column 'Var1'
 
 #This will be the format of the final table
 summary_final <- data.frame(matrix(ncol = 7, nrow = 0))
@@ -93,7 +91,8 @@ colnames(summary_final) <- c('Covariate', 'Covariate_level', 'Pre_expo_covid19_f
 
 
 foreach (j = 1:nrow(pop), .combine=c) %do%{
-  for(outcome_name in outcome){
+  foreach(outcome_name = outcome, .combine = c) %do%{
+  #for(outcome_name in outcome){
     population <- pop[j,]$name
     df <- subset(input, eval(parse(text = pop[j,]$condition)))
     df=rename(df, outcome_event = outcome_name)
@@ -168,7 +167,6 @@ foreach (j = 1:nrow(pop), .combine=c) %do%{
     summary_final=rbind(summary_final,summary)
   }
 }
-
 
 write.csv(summary_final, file = file.path("output", paste0("covariates_counts_check", "_", project, ".csv")) , row.names=F)
 
