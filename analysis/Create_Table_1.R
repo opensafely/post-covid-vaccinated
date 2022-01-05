@@ -89,6 +89,10 @@ table1$Covariate=gsub("\\s","",table1$Covariate)#Remove spaces
 table1$Covariate_level= sub('\\:.*', '', table1$Covariate_level)#Remove everything after :
 table1=table1%>%filter(!(Covariate == "cov_num_consulation_rate" & !Covariate_level=="Mean   "))
 
+table1_count_all= as.data.frame(matrix(nrow = 1, ncol = 2))
+colnames(table1_count_all)=c("Covariate","Covariate_level")
+table1_count_all[1,]=c("All","All")
+table1=rbind(table1_count_all,table1)
 
 for (j in 1:nrow(pop)) {
   
