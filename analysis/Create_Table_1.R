@@ -151,6 +151,5 @@ for (j in 1:nrow(pop)) {
 table1$Covariate=gsub("cov_bin_", "History of ",table1$Covariate)
 table1$Covariate=gsub("cov_\\D\\D\\D_", "",table1$Covariate)
 table1$Covariate=gsub("_", " ",table1$Covariate)
-table1=table1%>%filter(!Covariate_level %in% c("Min.","1st Qu.","Median"))
 
 write.csv(table1, file = file.path("output", paste0("Table_1_",project, ".csv")) , row.names=F)
