@@ -124,7 +124,7 @@ for (j in 1:nrow(pop)) {
   
   #Binary covariates
   bin_pop=df %>% dplyr::select(binary_cov)
-  bin_pop= bin_pop %>% mutate_if(is.logical,as.factor)
+  #bin_pop= bin_pop %>% mutate_if(is.logical,as.factor)
   bin_summary=as.data.frame(summary(bin_pop,maxsum=50))
   bin_summary[,population]=bin_summary$Freq
   bin_summary=rename(bin_summary, Covariate_level = Freq, Covariate = Var2)
