@@ -6,13 +6,14 @@ library(data.table)
 library(purrr)
 library(readr)
 library(tidyverse)
+library(doParallel)
 
 args = commandArgs(trailingOnly=TRUE)
 project  = args[[1]] #vaccinated_delta,unvaccinated_delta, unvaccinated
 
 input <- read_rds("output/input.rds")
 
-#project="vaccinated_delta" #this will need to be removed merged and added as an action
+project="vaccinated_delta" #this will need to be removed merged and added as an action
 
 #done in previous script so can be deleted once merged
 input$cov_cat_region=gsub(" ","_",input$cov_cat_region)
@@ -50,6 +51,9 @@ if(endsWith(project,"_delta")==T){
 }
 
 #Populations of interest
+pop <- data.frame(rbind(c("Whole_population","!is.na(input$patient_id)")),stringsAsFactors = FALSE)
+
+colnames(pop) <- c("name","condition")
 pop <- data.frame(rbind(c("Whole_population","!is.na(input$patient_id)"),
                        c("COVID_hospitalised","input$exp_cat_covid19_hospital=='hospitalised'"),
                        c("COVID_non_hospitalised","input$exp_cat_covid19_hospital=='non_hospitalised'"),
@@ -88,8 +92,7 @@ summary_final <- data.frame(matrix(ncol = 7, nrow = 0))
 colnames(summary_final) <- c('Covariate', 'Covariate_level', 'Pre_expo_covid19_freq', 'Post_expo_covid19_freq', 'Event','Strata','Project')
 
 
-
-for (j in 1:nrow(pop)) {
+foreach (j = 1:nrow(pop), .combine=c) %do%{
   for(outcome_name in outcome){
     population <- pop[j,]$name
     df <- subset(input, eval(parse(text = pop[j,]$condition)))
