@@ -107,7 +107,7 @@ for (j in 1:nrow(pop)) {
   
   #Categorical covariates
   cat_pop=df %>% dplyr::select(categorical_cov)
-  cat_pop= cat_pop %>% mutate_if(is.character,as.factor)
+  #cat_pop= cat_pop %>% mutate_if(is.character,as.factor)
   cat_summary=as.data.frame(summary(cat_pop,maxsum=50))
   cat_summary[,population]=cat_summary$Freq
   cat_summary=rename(cat_summary, Covariate_level = Freq, Covariate = Var2)
