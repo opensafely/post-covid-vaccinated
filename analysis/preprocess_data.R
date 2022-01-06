@@ -1,17 +1,83 @@
-# Load study definition output -------------------------------------------------
+# Load libraries ---------------------------------------------------------------
 
-df <- arrow::read_feather(file = "output/input.feather") 
+library(magrittr)
 
-# Specify columns to keep ------------------------------------------------------
+# Define parameters ------------------------------------------------------------
 
-df <- df[,c("patient_id","death_date",
-            colnames(df)[grepl("exp_",colnames(df))], # Exposures
-            colnames(df)[grepl("out_",colnames(df))], # Outcomes
-            colnames(df)[grepl("cov_",colnames(df))], # Covariates
-            colnames(df)[grepl("qa_",colnames(df))], # Quality assurance
-            colnames(df)[grepl("vax_",colnames(df))])] # Vaccinations
+## Study start date
+study_start <- "2021-06-01"
+
+# Create spine dataset ---------------------------------------------------------
+
+df <- arrow::read_feather(file = "output/input_index.feather",
+                          col_select = c("patient_id","death_date"))
+
+# Merge each dataset to the spine dataset --------------------------------------
+
+for (i in c("index","vaccinated","electively_unvaccinated")) {
+
+  ## Load dataset
+  
+  tmp <- arrow::read_feather(file = paste0("output/input_",i,".feather"))
+  
+  ## Identify dynamic variables in dataset
+  
+  keep <- c("patient_id",
+            colnames(tmp)[grepl("sub_",colnames(tmp))], # Subgroups
+            colnames(tmp)[grepl("exp_",colnames(tmp))], # Exposures
+            colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
+            colnames(tmp)[grepl("cov_",colnames(tmp))]) # Covariates
+  
+  keep <- keep[!grepl("tmp_exp_",keep)]
+  keep <- keep[!grepl("tmp_sub_",keep)]
+  keep <- keep[!grepl("tmp_cov_",keep)]
+  
+  keep <- intersect(keep,colnames(tmp))
+  
+  tmp_dynamic <- tmp[,keep]
+  
+  ## Rename dynamic variables to indicate source data
+  
+  colnames(tmp_dynamic) <- paste0(colnames(tmp_dynamic),"_",i)
+  
+  tmp_dynamic <- dplyr::rename(tmp_dynamic, patient_id = paste0("patient_id_",i))
+  
+  ## Merge dynamic variables to spine
+  
+  df <- merge(df,tmp_dynamic, by = "patient_id")
+
+  ## Identify static variables
+  
+  keep <- c("patient_id",
+            colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
+            colnames(tmp)[grepl("vax_",colnames(tmp))]) # Vaccinations
+  
+  keep <- intersect(keep,colnames(tmp))
+  
+  tmp_static <- tmp[,keep]
+  
+  ## Merge static variables to spine if applicable
+  
+  if (ncol(tmp_static)>1) {
+    df <- merge(df,tmp_static, by = "patient_id") 
+  }
+  
+}
+
+# Remove temporary datasets ----------------------------------------------------
+
+rm(tmp, tmp_dynamic, tmp_static)
+
+# Rename universally defined variables -----------------------------------------
+# NB: These appear in only one dataset so do not need dataset specific names
+
+df <- dplyr::rename(df, 
+                    "cov_cat_sex" = "cov_cat_sex_electively_unvaccinated",
+                    "cov_num_consulation_rate" = "cov_num_consulation_rate_index",
+                    "cov_bin_healthcare_worker" = "cov_bin_healthcare_worker_index")
 
 # Remove JCVI age variables ----------------------------------------------------
+# NB: These are used to determine JCVI category only
 
 df[,c("vax_jcvi_age_1","vax_jcvi_age_2")] <- NULL
 
@@ -41,73 +107,52 @@ for (i in colnames(df)[grepl("_bin",colnames(df))]) {
   df[,i] <- as.logical(df[,i])
 }
 
-# Generate vaccine variables ---------------------------------------------------
+# Split into "vaccinated" and "electively_unvaccinated" cohorts ----------------
 
-for (i in 1:3) {
+for (j in c("vaccinated","electively_unvaccinated")) {
   
-  # Restrict to relevant columns and rename
+  # Make temporary data frame --------------------------------------------------
+  
+  tmp <- df 
+  
+  # Perform cohort specific preprocessing steps --------------------------------
+  
+  source(paste0("analysis/preprocess_",j,".R"))
+  
+  # Define COVID-19 severity --------------------------------------------------------------
+  
+  tmp$sub_cat_covid19_hospital <- "no_infection"
+  
+  tmp$sub_cat_covid19_hospital <- ifelse(!is.na(tmp$exp_date_covid19_confirmed),
+                                        "non_hospitalised",tmp$sub_cat_covid19_hospital)
+  
+  tmp$sub_cat_covid19_hospital <- ifelse(!is.na(tmp$exp_date_covid19_confirmed) & 
+                                          !is.na(tmp$sub_date_covid19_hospital) &
+                                          (tmp$sub_date_covid19_hospital-tmp$exp_date_covid19_confirmed>=0 &
+                                             tmp$sub_date_covid19_hospital-tmp$exp_date_covid19_confirmed<29),
+                                        "hospitalised",tmp$sub_cat_covid19_hospital)
+  
+  tmp$sub_cat_covid19_hospital <- as.factor(tmp$sub_cat_covid19_hospital)
+  tmp[,c("sub_date_covid19_hospital")] <- NULL
 
-  tmp <- df[,c("patient_id",paste0(c("vax_date_covid_","vax_date_AstraZeneca_","vax_date_Pfizer_","vax_date_Moderna_"),i))]
-  colnames(tmp) <- c("patient_id","vax_date_covid","vax_date_AstraZeneca","vax_date_Pfizer","vax_date_Moderna")
+  # Restrict columns and save analysis dataset ---------------------------------
   
-  # Determine vaccination product
-
-  tmp$vax_cat_product <- NA
+  tmp1 <- tmp[,c("patient_id","death_date","index_date",
+              colnames(tmp)[grepl("sub_",colnames(tmp))], # Subgroups
+              colnames(tmp)[grepl("exp_",colnames(tmp))], # Exposures
+              colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
+              colnames(tmp)[grepl("cov_",colnames(tmp))], # Covariates
+              colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
+              colnames(tmp)[grepl("vax_",colnames(tmp))])] # Vaccination
   
-  tmp$vax_cat_product <- ifelse(!is.na(tmp$vax_date_covid) & 
-                                   tmp$vax_date_covid==tmp$vax_date_AstraZeneca &
-                                   tmp$vax_date_covid!=tmp$vax_date_Pfizer &
-                                   tmp$vax_date_covid!=tmp$vax_date_Moderna,"AstraZeneca",tmp$vax_cat_product)
+  tmp1[,colnames(tmp)[grepl("tmp_out_",colnames(tmp))]] <- NULL
   
-  tmp$vax_cat_product <- ifelse(!is.na(tmp$vax_date_covid) & 
-                                   tmp$vax_date_covid!=tmp$vax_date_AstraZeneca &
-                                   tmp$vax_date_covid==tmp$vax_date_Pfizer &
-                                   tmp$vax_date_covid!=tmp$vax_date_Moderna,"Pfizer",tmp$vax_cat_product)
+  saveRDS(tmp1, file = paste0("output/input_",j,".rds"))
   
-  tmp$vax_cat_product <- ifelse(!is.na(tmp$vax_date_covid) & 
-                                   tmp$vax_date_covid!=tmp$vax_date_AstraZeneca &
-                                   tmp$vax_date_covid!=tmp$vax_date_Pfizer &
-                                   tmp$vax_date_covid==tmp$vax_date_Moderna,"Moderna",tmp$vax_cat_product)
+  # Restrict columns and save Venn diagram input dataset -----------------------
   
-  # Add information to main data
-
-  tmp <- tmp[,c("patient_id","vax_cat_product")]
-  colnames(tmp) <- c("patient_id",paste0("vax_cat_product_",i))
-  df <- merge(df, tmp, by = "patient_id")
+  tmp2 <- tmp[,c("patient_id",colnames(tmp)[grepl("out_",colnames(tmp))])]
   
-  # Remove unnecessary vaccination product information
-
-  df[,paste0(c("vax_date_AstraZeneca_","vax_date_Pfizer_","vax_date_Moderna_"),i)] <- NULL
+  saveRDS(tmp2, file = paste0("output/venn_",j,".rds"))
   
 }
-
-# Define severity --------------------------------------------------------------
-
-df$exp_cat_covid19_hospital <- "no_infection"
-
-df$exp_cat_covid19_hospital <- ifelse(!is.na(df$exp_date_covid19_confirmed),
-                                      "non_hospitalised",df$exp_cat_covid19_hospital)
-
-df$exp_cat_covid19_hospital <- ifelse(!is.na(df$exp_date_covid19_confirmed) & 
-                                        !is.na(df$exp_date_covid19_hospital) &
-                                        (df$exp_date_covid19_hospital-df$exp_date_covid19_confirmed>=0 &
-                                           df$exp_date_covid19_hospital-df$exp_date_covid19_confirmed<29),
-                                      "hospitalised_within28days",df$exp_cat_covid19_hospital)
-
-df$exp_cat_covid19_hospital <- ifelse(!is.na(df$exp_date_covid19_confirmed) & 
-                                        !is.na(df$exp_date_covid19_hospital) &
-                                        (df$exp_date_covid19_hospital-df$exp_date_covid19_confirmed>=29),
-                                      "hospitalised_after28days",df$exp_cat_covid19_hospital)
-
-# Specify columns to keep ------------------------------------------------------
-
-df <- df[,c("patient_id","death_date",
-            colnames(df)[grepl("exp_",colnames(df))], # Exposures
-            colnames(df)[grepl("out_",colnames(df))], # Outcomes
-            colnames(df)[grepl("cov_",colnames(df))], # Covariates
-            colnames(df)[grepl("qa_",colnames(df))], # Quality assurance
-            colnames(df)[grepl("vax_",colnames(df))])] # Vaccination
-
-# Save file --------------------------------------------------------------------
-
-saveRDS(df, file = "output/input.rds")
