@@ -90,9 +90,9 @@ summary_final <- data.frame(matrix(ncol = 7, nrow = 0))
 colnames(summary_final) <- c('Covariate', 'Covariate_level', 'Pre_expo_covid19_freq', 'Post_expo_covid19_freq', 'Event','Strata','Project')
 
 
-foreach (j = 1:nrow(pop), .combine=c) %do%{
+#Will count both pre and post exposure event counts for each outcome within each population
+foreach (j = 1:nrow(pop), .combine=c) %do%{#use doParallel package to make loop quicker
   foreach(outcome_name = outcome, .combine = c) %do%{
-  #for(outcome_name in outcome){
     population <- pop[j,]$name
     df <- subset(input, eval(parse(text = pop[j,]$condition)))
     df=rename(df, outcome_event = outcome_name)
@@ -120,25 +120,34 @@ foreach (j = 1:nrow(pop), .combine=c) %do%{
     
     
     #Pre exposure events
+    #select pre-exposure/no exposure population where follow up ends at outcome event and is prior to exposure
     df_pre_expo= df %>% filter((follow_up_end == outcome_event & follow_up_end >= follow_up_start) & (follow_up_end < exp_date_covid19_confirmed | is.na(exp_date_covid19_confirmed)=="TRUE"))
-    df_pre_expo <- df_pre_expo %>% dplyr::select(c(all_of(covar_names)))
+    df_pre_expo <- df_pre_expo %>% dplyr::select(c(all_of(covar_names)))#only select covariate variables
 
-    summary_pre_expo <- as.data.frame(summary(df_pre_expo,maxsum=50))
-    summary_pre_expo$Pre_expo_covid19_freq=summary_pre_expo$Freq
+    summary_pre_expo <- as.data.frame(summary(df_pre_expo,maxsum=50))#creates a table with counts for each covariate level e.g number of males/females within pre-expo population
+    summary_pre_expo$Pre_expo_covid19_freq=summary_pre_expo$Freq#duplicate column so that can split into counts and covariate level name
     summary_pre_expo = rename(summary_pre_expo, Covariate_level = Freq, Covariate = Var2)
     
     #Tidy summary table
-    summary_pre_expo$Pre_expo_covid19_freq=gsub(".*:", "",summary_pre_expo$Pre_expo_covid19_freq) #remove everything before :
-    summary_pre_expo$Covariate_level= sub('\\:.*', '', summary_pre_expo$Covariate_level)#remove everything after :
-    summary_pre_expo$Covariate_level=gsub("\\s","",summary_pre_expo$Covariate_level)#remove any spaces
-    summary_pre_expo$Covariate=gsub("\\s","",summary_pre_expo$Covariate)#remove any spaces
+    #remove everything before :
+    summary_pre_expo$Pre_expo_covid19_freq=gsub(".*:", "",summary_pre_expo$Pre_expo_covid19_freq) 
+    #remove everything after :
+    summary_pre_expo$Covariate_level= sub('\\:.*', '', summary_pre_expo$Covariate_level)
+    #Remove any spaces in covariate level name
+    summary_pre_expo$Covariate_level=gsub("\\s","",summary_pre_expo$Covariate_level)
+    #Remove any spaces in covariate name
+    summary_pre_expo$Covariate=gsub("\\s","",summary_pre_expo$Covariate)
     summary_pre_expo$Pre_expo_covid19_freq <- as.numeric(summary_pre_expo$Pre_expo_covid19_freq)
+    #Remove any rows containing NA
     summary_pre_expo=summary_pre_expo %>% drop_na(Covariate_level)
+    #Remove empty column 'Var1'
     summary_pre_expo=summary_pre_expo%>%select(-Var1)
+    #Left join the covariate counts for the pre-expo group onto empty covar_levels table to ensure only relevant covariates are kept 
     summary_pre_expo=left_join(covar_levels, summary_pre_expo, by = c('Covariate', 'Covariate_level')) 
     
     
     #Post exposure events
+    #Select post exposure events where follow-up ends at outcome and is after exposure
     df_post_expo = df %>% filter(follow_up_end == outcome_event & follow_up_end >= exp_date_covid19_confirmed & follow_up_end >= follow_up_start)
     df_post_expo <- df_post_expo %>% dplyr::select(c(covar_names))
     
@@ -147,23 +156,34 @@ foreach (j = 1:nrow(pop), .combine=c) %do%{
     summary_post_expo = rename(summary_post_expo, Covariate_level = Freq, Covariate = Var2)
     
     #Tidy summary table
-    summary_post_expo$Post_expo_covid19_freq=gsub(".*:", "",summary_post_expo$Post_expo_covid19_freq) #remove everything before :
-    
-    summary_post_expo$Covariate_level= sub('\\:.*', '', summary_post_expo$Covariate_level) #remove everything after :
-    summary_post_expo$Covariate_level=gsub("\\s","",summary_post_expo$Covariate_level) #remove spaces
-    summary_post_expo$Covariate=gsub("\\s","",summary_post_expo$Covariate) #remove spaces
+    #remove everything before :
+    summary_post_expo$Post_expo_covid19_freq=gsub(".*:", "",summary_post_expo$Post_expo_covid19_freq) 
+    #remove everything after :
+    summary_post_expo$Covariate_level= sub('\\:.*', '', summary_post_expo$Covariate_level) 
+    #remove spaces in covariate level name
+    summary_post_expo$Covariate_level=gsub("\\s","",summary_post_expo$Covariate_level)
+    #remove spaces in covariate name
+    summary_post_expo$Covariate=gsub("\\s","",summary_post_expo$Covariate) 
     summary_post_expo$Post_expo_covid19_freq <- as.numeric(summary_post_expo$Post_expo_covid19_freq)
+    #Remove rows with NA
     summary_post_expo=summary_post_expo %>% drop_na(Covariate_level)
+    #Remove empty column 'Var1'
     summary_post_expo=summary_post_expo%>%select(-Var1)
+    #Left join the covariate counts for the post-expo group onto empty covar_levels table to ensure only relevant covariates are kept 
     summary_post_expo=left_join(covar_levels, summary_post_expo, by = c('Covariate', 'Covariate_level')) 
     
     #Join pre-expo and post expo counts together
     summary=left_join(summary_pre_expo, summary_post_expo, by = c('Covariate', 'Covariate_level'))  
+    #Create new column called 'Event' where the rows are the outcome name e.g AMI
     summary$Event=outcome_name
+    #Create new column called 'Strata' where the rows are the current population of interest e.g males
     summary$Strata=population
+    #Create new column called 'Project' where the rows are the current project of interest e.g vaccinated_delta
     summary$Project=project
     
+    #Set any rows with NA to zero
     summary["Post_expo_covid19_freq"][is.na(summary["Post_expo_covid19_freq"])] <- 0
+    #rbind onto the empty summary table template
     summary_final=rbind(summary_final,summary)
   }
 }
