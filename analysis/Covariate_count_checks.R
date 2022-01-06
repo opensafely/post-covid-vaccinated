@@ -89,7 +89,8 @@ covar_levels=covar_levels%>%select(-Var1)#Remove empty column 'Var1'
 summary_final <- data.frame(matrix(ncol = 7, nrow = 0))
 colnames(summary_final) <- c('Covariate', 'Covariate_level', 'Pre_expo_covid19_freq', 'Post_expo_covid19_freq', 'Event','Strata','Project')
 
-
+j=2
+outcome_name="out_date_ami"
 #Will count both pre and post exposure event counts for each outcome within each population
 foreach (j = 1:nrow(pop), .combine=c) %do%{#use doParallel package to make loop quicker
   foreach(outcome_name = outcome, .combine = c) %do%{
@@ -182,11 +183,16 @@ foreach (j = 1:nrow(pop), .combine=c) %do%{#use doParallel package to make loop 
     summary$Project=project
     
     #Set any rows with NA to zero
-    summary["Post_expo_covid19_freq"][is.na(summary["Post_expo_covid19_freq"])] <- 0
+    summary$Pre_expo_covid19_freq=replace(summary$Pre_expo_covid19_freq, is.na(summary$Pre_expo_covid19_freq),0)
+    summary$Post_expo_covid19_freq=replace(summary$Post_expo_covid19_freq, is.na(summary$Pre_expo_covid19_freq),0)
     #rbind onto the empty summary table template
     summary_final=rbind(summary_final,summary)
   }
 }
+
+#Replace any values that are less than 5 with 'less than 5'
+summary_final$Pre_expo_covid19_freq=replace(summary_final$Pre_expo_covid19_freq,summary_final$Pre_expo_covid19_freq<=5,"<=5" )
+summary_final$Post_expo_covid19_freq=replace(summary_final$Post_expo_covid19_freq,summary_final$Post_expo_covid19_freq<=5,"<=5" )
 
 write.csv(summary_final, file = file.path("output", paste0("covariates_counts_check", "_", project, ".csv")) , row.names=F)
 
