@@ -539,6 +539,62 @@ def generate_common_variables(index_date_variable):
         "tmp_out_date_vte_snomed", "tmp_out_date_vte_hes", "tmp_out_date_vte_death"
     ),
 
+    ## Type 1 diabetes
+    out_date_diabetes_type1=patients.with_these_clinical_events(
+        diabetes_type1_snomed_clinical,
+        returning="date",
+        on_or_after=f"{index_date_variable}",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
+    ## Type 2 diabetes
+    out_date_diabetes_type2=patients.with_these_clinical_events(
+        diabetes_type2_snomed_clinical,
+        returning="date",
+        on_or_after=f"{index_date_variable}",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
+    ## Other or non-specific diabetes
+    out_date_diabetes_other=patients.with_these_clinical_events(
+        diabetes_other_snomed_clinical,
+        returning="date",
+        on_or_after=f"{index_date_variable}",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
+    ## Gestational diabetes
+    out_date_diabetes_gestational=patients.with_these_clinical_events(
+        diabetes_gestational_snomed_clinical,
+        returning="date",
+        on_or_after=f"{index_date_variable}",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
     # Define covariates (other than sex, which is considered constant and needed for JCVI groupings)
 
     ## Age
@@ -1037,6 +1093,38 @@ def generate_common_variables(index_date_variable):
     ## Hormone replacement therapy
     cov_bin_hormone_replacement_therapy=patients.with_these_clinical_events(
         hrt_dmd, 
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+    ## Type 1 diabetes
+    cov_bin_diabetes_type1=patients.with_these_clinical_events(
+        diabetes_type1_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+    ## Type 2 diabetes
+    cov_bin_diabetes_type2=patients.with_these_clinical_events(
+        diabetes_type2_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+    ## Other or non-specific diabetes
+    cov_bin_diabetes_other=patients.with_these_clinical_events(
+        diabetes_other_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+    ## Gestational diabetes
+    cov_bin_diabetes_gestational=patients.with_these_clinical_events(
+        diabetes_gestational_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},

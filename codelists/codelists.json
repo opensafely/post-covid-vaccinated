@@ -641,6 +641,30 @@
       "url": "https://codelists.opensafely.org/codelist/primis-covid19-vacc-uptake/preg/v1/",
       "downloaded_at": "2021-11-26 11:46:47.969451Z",
       "sha": "16b9bdf6c37c9f5e802912a98542c5dd5d21183d"
+    },
+    "user-hjforbes-type-1-diabetes.csv": {
+      "id": "user/hjforbes/type-1-diabetes/674fbd7a",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/type-1-diabetes/674fbd7a/",
+      "downloaded_at": "2022-01-06 12:50:37.762391Z",
+      "sha": "54a7772024e03c2129cb0c0c7ba77944eacd054a"
+    },
+    "user-hjforbes-type-2-diabetes.csv": {
+      "id": "user/hjforbes/type-2-diabetes/3530d710",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/type-2-diabetes/3530d710/",
+      "downloaded_at": "2022-01-06 12:50:37.927221Z",
+      "sha": "08421a5b1e92d07e47cbab2e12ecd71856cee98a"
+    },
+    "user-hjforbes-other-or-nonspecific-diabetes.csv": {
+      "id": "user/hjforbes/other-or-nonspecific-diabetes/0311f0a6",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/other-or-nonspecific-diabetes/0311f0a6/",
+      "downloaded_at": "2022-01-06 12:50:38.080448Z",
+      "sha": "1461877af2c069504535089d669e830616629f67"
+    },
+    "user-hjforbes-gestational-diabetes.csv": {
+      "id": "user/hjforbes/gestational-diabetes/1ed423d1",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/gestational-diabetes/1ed423d1/",
+      "downloaded_at": "2022-01-06 12:50:38.239635Z",
+      "sha": "4298a4affa79a1f04130cf5c630892a25819292c"
     }
   }
 }

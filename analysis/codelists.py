@@ -744,3 +744,31 @@ pregdel_primis = codelist_from_csv(
     system="snomed",
     column="code",
 )
+
+# Type 1 diabetes
+diabetes_type1_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-type-1-diabetes.csv",
+    system="snomed",
+    column="code",
+)
+
+# Type 2 diabetes
+diabetes_type2_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-type-2-diabetes.csv",
+    system="snomed",
+    column="code",
+)
+
+# Other or non-specific diabetes
+diabetes_other_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-other-or-nonspecific-diabetes.csv",
+    system="snomed",
+    column="code",
+)
+
+#  Gestational diabetes
+diabetes_gestational_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-gestational-diabetes.csv",
+    system="snomed",
+    column="code",
+)

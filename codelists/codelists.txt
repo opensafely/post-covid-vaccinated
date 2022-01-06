@@ -73,7 +73,6 @@ user/hjforbes/angina_hf_icd10/20c03038
 user/RochelleKnight/prostate_cancer_snomed/0437497e
 user/RochelleKnight/prostate_cancer_icd10/6b27d648
 user/RochelleKnight/pregnancy_and_birth_snomed/1d46bcb3
-
 primis-covid19-vacc-uptake/ast/v1
 primis-covid19-vacc-uptake/astadm/v1
 primis-covid19-vacc-uptake/astrx/v1
@@ -107,3 +106,7 @@ primis-covid19-vacc-uptake/longres/v1
 primis-covid19-vacc-uptake/eth2001/v1
 primis-covid19-vacc-uptake/pregdel/v1.2.1
 primis-covid19-vacc-uptake/preg/v1
+user/hjforbes/type-1-diabetes/674fbd7a
+user/hjforbes/type-2-diabetes/3530d710
+user/hjforbes/other-or-nonspecific-diabetes/0311f0a6
+user/hjforbes/gestational-diabetes/1ed423d1
