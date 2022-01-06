@@ -641,6 +641,60 @@
       "url": "https://codelists.opensafely.org/codelist/primis-covid19-vacc-uptake/preg/v1/",
       "downloaded_at": "2021-11-26 11:46:47.969451Z",
       "sha": "16b9bdf6c37c9f5e802912a98542c5dd5d21183d"
+    },
+    "user-hjforbes-depression-symptoms-and-diagnoses.csv": {
+      "id": "user/hjforbes/depression-symptoms-and-diagnoses/499814eb",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/depression-symptoms-and-diagnoses/499814eb/",
+      "downloaded_at": "2022-01-06 13:51:24.419140Z",
+      "sha": "fb7d78483687797b51f106137a809c0e469ca6c0"
+    },
+    "user-hjforbes-anxiety-symptoms-and-diagnoses.csv": {
+      "id": "user/hjforbes/anxiety-symptoms-and-diagnoses/3088a1b6",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/anxiety-symptoms-and-diagnoses/3088a1b6/",
+      "downloaded_at": "2022-01-06 13:51:24.595954Z",
+      "sha": "d5cfd421be9c680373365f60395a6a7b2d0ed82e"
+    },
+    "user-hjforbes-obsessive-compulsive-disorder-ocd.csv": {
+      "id": "user/hjforbes/obsessive-compulsive-disorder-ocd/17792e81",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/obsessive-compulsive-disorder-ocd/17792e81/",
+      "downloaded_at": "2022-01-06 13:51:24.855633Z",
+      "sha": "03a163b6afa744cf5ac8853eed58b2d798805e80"
+    },
+    "user-hjforbes-post-traumatic-stress-disorder.csv": {
+      "id": "user/hjforbes/post-traumatic-stress-disorder/7e69bb4b",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/post-traumatic-stress-disorder/7e69bb4b/",
+      "downloaded_at": "2022-01-06 13:51:25.047204Z",
+      "sha": "d40c357ef9d0f171c9b7322911c6399b700e042f"
+    },
+    "user-hjforbes-diagnoses-eating-disorder.csv": {
+      "id": "user/hjforbes/diagnoses-eating-disorder/62a78820",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/diagnoses-eating-disorder/62a78820/",
+      "downloaded_at": "2022-01-06 13:51:25.225326Z",
+      "sha": "7e6ed67c391b24de8f85adcca66813026596f67d"
+    },
+    "user-hjforbes-severe-mental-illness.csv": {
+      "id": "user/hjforbes/severe-mental-illness/2dd5e1c0",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/severe-mental-illness/2dd5e1c0/",
+      "downloaded_at": "2022-01-06 13:51:25.451546Z",
+      "sha": "34556a280d7c7e90ce823c84930a5209f011ad0e"
+    },
+    "user-hjforbes-self-harm.csv": {
+      "id": "user/hjforbes/self-harm/546314c3",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/self-harm/546314c3/",
+      "downloaded_at": "2022-01-06 13:51:25.803333Z",
+      "sha": "94397e3fe05f9bcc757306d3034b7f4df01c01d4"
+    },
+    "user-hjforbes-suicide-icd-10.csv": {
+      "id": "user/hjforbes/suicide-icd-10/3b53a18e",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/suicide-icd-10/3b53a18e/",
+      "downloaded_at": "2022-01-06 13:51:25.991930Z",
+      "sha": "806be08bebc267e8abb26b8ceeefd713dacb1eb8"
+    },
+    "user-hjforbes-opioid-dependency-clinical-diagnosis.csv": {
+      "id": "user/hjforbes/opioid-dependency-clinical-diagnosis/46e554f5",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/opioid-dependency-clinical-diagnosis/46e554f5/",
+      "downloaded_at": "2022-01-06 13:51:26.157775Z",
+      "sha": "67304f24e3cbffa04852eb4d86c456df75987590"
     }
   }
 }

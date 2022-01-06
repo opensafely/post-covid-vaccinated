@@ -73,7 +73,6 @@ user/hjforbes/angina_hf_icd10/20c03038
 user/RochelleKnight/prostate_cancer_snomed/0437497e
 user/RochelleKnight/prostate_cancer_icd10/6b27d648
 user/RochelleKnight/pregnancy_and_birth_snomed/1d46bcb3
-
 primis-covid19-vacc-uptake/ast/v1
 primis-covid19-vacc-uptake/astadm/v1
 primis-covid19-vacc-uptake/astrx/v1
@@ -107,3 +106,12 @@ primis-covid19-vacc-uptake/longres/v1
 primis-covid19-vacc-uptake/eth2001/v1
 primis-covid19-vacc-uptake/pregdel/v1.2.1
 primis-covid19-vacc-uptake/preg/v1
+user/hjforbes/depression-symptoms-and-diagnoses/499814eb
+user/hjforbes/anxiety-symptoms-and-diagnoses/3088a1b6
+user/hjforbes/obsessive-compulsive-disorder-ocd/17792e81
+user/hjforbes/post-traumatic-stress-disorder/7e69bb4b
+user/hjforbes/diagnoses-eating-disorder/62a78820
+user/hjforbes/severe-mental-illness/2dd5e1c0
+user/hjforbes/self-harm/546314c3
+user/hjforbes/suicide-icd-10/3b53a18e
+user/hjforbes/opioid-dependency-clinical-diagnosis/46e554f5
