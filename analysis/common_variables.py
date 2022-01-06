@@ -1061,6 +1061,37 @@ def generate_common_variables(index_date_variable):
             "incidence": 0.05,
         },
     ),
+    ## History of COVID-19 
+    ### Positive SARS-COV-2 PCR antigen test
+    tmp_sub_bin_covid19_confirmed_history_sgss=patients.with_test_result_in_sgss(
+        pathogen="SARS-CoV-2",
+        test_result="positive",
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.05},
+    ),
+    ### COVID-19 code (diagnosis, positive test or sequalae) in primary care
+    tmp_sub_bin_covid19_confirmed_history_snomed=patients.with_these_clinical_events(
+        combine_codelists(
+            covid_primary_care_code,
+            covid_primary_care_positive_test,
+            covid_primary_care_sequalae,
+        ),
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.05},
+    ),
+    ### Hospital episode with confirmed diagnosis in any position
+    tmp_sub_bin_covid19_confirmed_history_hes=patients.admitted_to_hospital(
+        with_these_diagnoses=covid_codes,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.05},
+    ),
+    ## Generate variable to identify first date of confirmed COVID
+    sub_bin_covid19_confirmed_history=patients.maximum_of(
+        "tmp_sub_bin_covid19_confirmed_history_sgss","tmp_sub_bin_covid19_confirmed_history_snomed","tmp_sub_bin_covid19_confirmed_history_hes"
+    ),
 
     )
     return dynamic_variables
