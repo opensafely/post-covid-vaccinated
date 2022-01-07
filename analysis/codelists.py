@@ -327,23 +327,23 @@ liver_disease_icd10 = codelist_from_csv(
     column="code",
 )
 
-diabetes_snomed_clinical = codelist_from_csv(
-    "codelists/user-elsie_horne-diabetes_snomed.csv",
-    system="snomed",
-    column="code",
-)
+# diabetes_snomed_clinical = codelist_from_csv(
+#     "codelists/user-elsie_horne-diabetes_snomed.csv",
+#     system="snomed",
+#     column="code",
+# )
 
-diabetes_icd10 = codelist_from_csv(
-    "codelists/user-elsie_horne-diabetes_icd10.csv",
-    system="icd10",
-    column="code",
-)
+# diabetes_icd10 = codelist_from_csv(
+#     "codelists/user-elsie_horne-diabetes_icd10.csv",
+#     system="icd10",
+#     column="code",
+# )
 
-diabetes_drugs_dmd = codelist_from_csv(
-    "codelists/user-elsie_horne-diabetes_drugs_dmd.csv",
-    system="snomed",
-    column="dmd_id",
-)
+# diabetes_drugs_dmd = codelist_from_csv(
+#     "codelists/user-elsie_horne-diabetes_drugs_dmd.csv",
+#     system="snomed",
+#     column="dmd_id",
+# )
 
 depression_icd10 = codelist_from_csv(
     "codelists/user-elsie_horne-depression_icd10.csv",
