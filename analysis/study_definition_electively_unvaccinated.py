@@ -17,6 +17,9 @@ from cohortextractor import (
 ## Codelists from codelist.py (which pulls them from the codelist folder)
 from codelists import *
 
+## Datetime functions
+from datetime import date
+
 ## Study definition helper
 import study_def_helper_functions as helpers
 
@@ -25,7 +28,6 @@ from common_variables import generate_common_variables
 (
     dynamic_variables
 ) = generate_common_variables(index_date_variable="vax_date_eligible + 84 day")
-
 
 ## Variables for deriving JCVI groups
 from grouping_variables import (
