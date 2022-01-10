@@ -181,7 +181,7 @@ input[,variable_names] <- covars
 
 #Rule 1: Year of birth is after year of death or patient only has year of death
 input$rule1=NA
-input$rule1=(input$qa_num_birth_year > (format(input$death_date, format="%Y")) & is.na(input$qa_num_birth_year)== FALSE & is.na(input$death_date) == FALSE)|(is.na(input$qa_num_birth_year)== TRUE & is.na(input$death_date) == FALSE)
+input$rule1=((input$qa_num_birth_year > (format(input$death_date, format="%Y")) & is.na(input$qa_num_birth_year)== FALSE & is.na(input$death_date) == FALSE)|(is.na(input$qa_num_birth_year)== TRUE & is.na(input$death_date) == FALSE))
 
 #Rule 2: Year of birth predates NHS established year or year of birth exceeds current date
 input$rule2=NA
