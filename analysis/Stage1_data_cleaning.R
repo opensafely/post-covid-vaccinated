@@ -303,7 +303,7 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 5 (Inclusion): Regi
 #Exclusion criteria 6: SARS-CoV-2 infection recorded prior to the start of follow-up
 input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_start_date, 1,0)# Determine infections prior to start date : 1-prior infection; 0 - No prior infection
 input$prior_infections[is.na(input$prior_infections)] <- 0
-input <- subset(input, input$prior_infections < 1)
+input <- subset(input, input$prior_infections ==0)
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS-CoV-2 infection recorded prior to their index date")
 
 
