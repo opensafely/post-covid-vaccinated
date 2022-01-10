@@ -327,23 +327,23 @@ liver_disease_icd10 = codelist_from_csv(
     column="code",
 )
 
-diabetes_snomed_clinical = codelist_from_csv(
-    "codelists/user-elsie_horne-diabetes_snomed.csv",
-    system="snomed",
-    column="code",
-)
+# diabetes_snomed_clinical = codelist_from_csv(
+#     "codelists/user-elsie_horne-diabetes_snomed.csv",
+#     system="snomed",
+#     column="code",
+# )
 
-diabetes_icd10 = codelist_from_csv(
-    "codelists/user-elsie_horne-diabetes_icd10.csv",
-    system="icd10",
-    column="code",
-)
+# diabetes_icd10 = codelist_from_csv(
+#     "codelists/user-elsie_horne-diabetes_icd10.csv",
+#     system="icd10",
+#     column="code",
+# )
 
-diabetes_drugs_dmd = codelist_from_csv(
-    "codelists/user-elsie_horne-diabetes_drugs_dmd.csv",
-    system="snomed",
-    column="dmd_id",
-)
+# diabetes_drugs_dmd = codelist_from_csv(
+#     "codelists/user-elsie_horne-diabetes_drugs_dmd.csv",
+#     system="snomed",
+#     column="dmd_id",
+# )
 
 depression_icd10 = codelist_from_csv(
     "codelists/user-elsie_horne-depression_icd10.csv",
@@ -741,6 +741,34 @@ preg_primis = codelist_from_csv(
 # Pregnancy or Delivery codes
 pregdel_primis = codelist_from_csv(
     "codelists/primis-covid19-vacc-uptake-pregdel.csv",
+    system="snomed",
+    column="code",
+)
+
+# Type 1 diabetes
+diabetes_type1_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-type-1-diabetes.csv",
+    system="snomed",
+    column="code",
+)
+
+# Type 2 diabetes
+diabetes_type2_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-type-2-diabetes.csv",
+    system="snomed",
+    column="code",
+)
+
+# Other or non-specific diabetes
+diabetes_other_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-other-or-nonspecific-diabetes.csv",
+    system="snomed",
+    column="code",
+)
+
+#  Gestational diabetes
+diabetes_gestational_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-gestational-diabetes.csv",
     system="snomed",
     column="code",
 )
