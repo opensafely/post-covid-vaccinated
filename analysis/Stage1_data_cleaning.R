@@ -201,7 +201,7 @@ input$rule5=(input$qa_bin_pregnancy == TRUE & input$cov_cat_sex=="M")
 
 #Rule 6: HRT or COCP meds for men
 input$rule6=NA
-input$rule6=((input$cov_cat_sex=="M" & input$cov_bin_hormone_replacement_therapy==1)|(input$cov_cat_sex=="M" & input$cov_bin_combined_oral_contraceptive_pill==1))
+input$rule6=((input$cov_cat_sex=="M" & input$cov_bin_hormone_replacement_therapy==TRUE)|(input$cov_cat_sex=="M" & input$cov_bin_combined_oral_contraceptive_pill==TRUE))
 
 #Rule 7: Prostate cancer codes for women
 input$rule7=NA
