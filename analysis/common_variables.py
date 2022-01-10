@@ -14,6 +14,9 @@ from cohortextractor import (
 ## Codelists from codelist.py (which pulls them from the codelist folder)
 from codelists import *
 
+## Datetime functions
+from datetime import date
+
 ## Study definition helper
 import study_def_helper_functions as helpers
 
