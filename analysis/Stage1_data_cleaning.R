@@ -261,7 +261,7 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
 
 if (cohort_name == "vaccinated") {
   # the start date of the follow-up (2021-06-01) or 15 days after the second vaccination
-  input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_covid_2)+15, na.rm = TRUE)
+  input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_covid_2)+14, na.rm = TRUE)
 } else if (cohort_name == "electively_unvaccinated"){
   # the start date of the follow-up (2021-06-01) or 12 weeks (84 days) after they become eligible for vaccination
   input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_eligible)+85, na.rm = TRUE)
