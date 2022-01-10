@@ -353,7 +353,7 @@ if (cohort_name == "vaccinated") {
   input$prior_vacc <- ifelse((input$prior_vacc1==1 | input$prior_vacc2==1 |input$prior_vacc3==1), 1,0)
   #Note NAs don't have any vaccination date, hence move to '0' or unvaccinated category
   input$prior_vacc[is.na(input$prior_vacc)] <- 0
-  input <- subset(input, input$prior_vacc < 1) #Exclude people with prior vaccination
+  input <- subset(input, input$prior_vacc == 0) #Exclude people with prior vaccination
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): Have a record of one or more vaccination doses on the study start date")
 }
 
