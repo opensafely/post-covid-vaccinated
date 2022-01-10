@@ -28,10 +28,9 @@
 ## 2. Apply QA rules
 ## 3. Apply exclusion/inclusion criteria
 ##    (Differentiate criteria for the two sub-cohorts)
-##    3.a. Define index start date and general end date
-##    3.b. Apply the 6 common criteria applicable to both sub-cohort
-##    3.c. Apply criteria specific to each sub-cohort
-##    3.d. Create csv file 
+##    3.a. Apply the 6 common criteria applicable to both sub-cohort
+##    3.b. Apply criteria specific to each sub-cohort
+##    3.c. Create csv file 
 ## 4. Create the final stage 1 dataset 
 ## 
 ## NOTE: This code output are 3 .csv files and 1 R dataset
@@ -61,12 +60,19 @@ input <-read_rds(input_filename)
 # NOTE: Once study definition is updated, input_filename will be either 
 # output/input_vaccinated.rds or output/input_electively_unvaccinated.rds
 
+# Define general start date and end date
+start_date = as.Date("2021-06-01")
+end_date = as.Date("2021-12-14") # General End date: 2021-12-14 (Decision on Dec 20th 2021)
+
+# NOTE: no censoring of end date for death/event at this stage
+
+
 ######################################################
 # 1. Prepare all variables (re-factoring, re-typing) # 
 ######################################################
 
 # Extract names of variables
-variable_names <- tidyselect::vars_select(names(input), starts_with(c('cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE))
+variable_names <- tidyselect::vars_select(names(input), starts_with(c('sub_','cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE))
 
 # Create a data frame for all relevant variables
 covars <- input[,variable_names] #View(covars)
@@ -78,7 +84,7 @@ covars$cov_cat_region <- gsub(" ", "_", covars$cov_cat_region)
 # 1.a. Set factor variables as factor #
 #-------------------------------------#
 # Get the names of variables which are factors
-factor_names <- tidyselect::vars_select(names(input), starts_with(c('cov_bin','cov_cat','qa_bin','vax_cat','exp_cat'), ignore.case = TRUE))
+factor_names <- tidyselect::vars_select(names(input), starts_with(c('sub_bin','sub_cat','cov_bin','cov_cat','qa_bin','vax_cat','exp_cat'), ignore.case = TRUE))
 
 # Set the variables that should be factor variables as factor
 covars[,factor_names] <- lapply(covars[,factor_names] , factor)
@@ -116,15 +122,15 @@ calculate_mode <- function(x) {
 
 # For the following variables, the first level (reference level) is not the one with the highest frequency
 # Set the most frequently occurred level as the reference for a factor variable
+covars$sub_cat_covid19_hospital = relevel(covars$sub_cat_covid19_hospital, ref = as.character(calculate_mode(covars$sub_cat_covid19_hospital)))
+
 covars$cov_cat_ethnicity = relevel(covars$cov_cat_ethnicity, ref = as.character(calculate_mode(covars$cov_cat_ethnicity)))
 covars$cov_cat_smoking_status = relevel(covars$cov_cat_smoking_status, ref = as.character(calculate_mode(covars$cov_cat_smoking_status)))
 covars$cov_cat_region = relevel(covars$cov_cat_region, ref = as.character(calculate_mode(covars$cov_cat_region)))
 
-covars$exp_cat_covid19_hospital = relevel(covars$exp_cat_covid19_hospital, ref = as.character(calculate_mode(covars$exp_cat_covid19_hospital)))
-
 covars$vax_cat_jcvi_group = relevel(covars$vax_cat_jcvi_group, ref = as.character(calculate_mode(covars$vax_cat_jcvi_group)))
 covars$vax_cat_product_1 = relevel(covars$vax_cat_product_1, ref = as.character(calculate_mode(covars$vax_cat_product_1)))
-covars$vax_cat_product_2 = relevel(covars$vax_cat_product_2, ref = as.character(calculate_mode(covars$vax_cat_product_2)))
+#covars$vax_cat_product_2 = relevel(covars$vax_cat_product_2, ref = as.character(calculate_mode(covars$vax_cat_product_2)))
 covars$vax_cat_product_3 = relevel(covars$vax_cat_product_3, ref = as.character(calculate_mode(covars$vax_cat_product_3)))
 
 #combine groups in deprivation: First - most deprived; fifth -least deprived
@@ -136,7 +142,7 @@ levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==9 | level
 covars$cov_cat_deprivation = relevel(covars$cov_cat_deprivation, ref = as.character(calculate_mode(covars$cov_cat_deprivation))) # added
 
 # A simple check if factor reference level has changed
-#lapply(covars[,c("cov_cat_ethnicity", "cov_cat_smoking_status", "cov_cat_region","cov_cat_deprivation","exp_cat_covid19_hospital","vax_cat_jcvi_group","vax_cat_product_1","vax_cat_product_2","vax_cat_product_3")], table)
+#lapply(covars[,c("sub_cat_covid19_hospital", "cov_cat_ethnicity", "cov_cat_smoking_status", "cov_cat_region","cov_cat_deprivation","vax_cat_jcvi_group","vax_cat_product_1","vax_cat_product_2","vax_cat_product_3")], table)
 
 meta_data_factors <- lapply(covars[,factor_names], table)
 
@@ -160,7 +166,7 @@ sink()
 # 1.d. Check and specify date format for date variables #
 #-------------------------------------------------------#
 # Get the names of variables which are dates
-date_names <- tidyselect::vars_select(names(input), starts_with(c('exp_date','out_date','vax_date'), ignore.case = TRUE))
+date_names <- tidyselect::vars_select(names(input), starts_with(c('index_date','death_date','exp_date','out_date','vax_date'), ignore.case = TRUE))
 
 # Set the variables that should be date variables as dates
 for (colname in date_names){
@@ -207,7 +213,14 @@ input$rule6=((input$cov_cat_sex=="M" & input$cov_bin_hormone_replacement_therapy
 input$rule7=NA
 input$rule7=(input$qa_bin_prostate_cancer == TRUE & input$cov_cat_sex=="F")
 
-
+# Add QA rule on index_date
+if (cohort_name == "vaccinated") {
+  # the start date of the follow-up (2021-06-01) or 14 days after the second vaccination
+  input$index_start_date <- pmax(start_date, as.Date(input$vax_date_covid_2)+14, na.rm = TRUE)
+} else if (cohort_name == "electively_unvaccinated"){
+  # the start date of the follow-up (2021-06-01) or 12 weeks (84 days) after they become eligible for vaccination
+  input$index_start_date <- pmax(start_date, as.Date(input$vax_date_eligible)+85, na.rm = TRUE)
+}
 
 #Remove rows that are TRUE for at least one rule
 input_QA=input%>%filter(rule1==F & rule2==F & rule3==F & rule4==F & rule5==F & rule6==F & rule7==F)
@@ -254,30 +267,12 @@ cohort_flow <- data.frame(N = numeric(),
                           stringsAsFactors = FALSE)
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
 
-#---------------------------------------------------#
-# 3.a. Define index start date and general end date #
-#---------------------------------------------------#
-# Index Start date : the latest of either 
-
-if (cohort_name == "vaccinated") {
-  # the start date of the follow-up (2021-06-01) or 15 days after the second vaccination
-  input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_covid_2)+14, na.rm = TRUE)
-} else if (cohort_name == "electively_unvaccinated"){
-  # the start date of the follow-up (2021-06-01) or 12 weeks (84 days) after they become eligible for vaccination
-  input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_eligible)+85, na.rm = TRUE)
-}
-
-# End date: 2021-12-31 of the cohort (no censoring for death/event at this stage) 
-# The end date doesn't seem to be used in criteria, so no need to be created at this stage
-# input$end_date <- as.Date("2021-12-31")
-
-
 #----------------------------------------------------------------#
-# 3.b. Apply the 6 common criteria applicable to both sub-cohort #
+# 3.a. Apply the 6 common criteria applicable to both sub-cohort #
 #----------------------------------------------------------------#
 
 #Inclusion criteria 1: Alive on the first day of follow up
-input$start_alive <- ifelse(input$death_date < input$index_start_date, 0, 1) # Determine the living status on start date: 1- alive; 0 - died
+input$start_alive <- ifelse(input$death_date < input$index_date, 0, 1) # Determine the living status on start date: 1- alive; 0 - died
 input$start_alive[is.na(input$start_alive)] <- 1
 input <- subset(input, input$start_alive > 0) # Subset input based on alive status on day 1 of follow up.
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 1 (Inclusion): Alive on the first day of follow up") # Feed into the cohort flow
@@ -301,14 +296,14 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 4 (Inclusion): Know
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 5 (Inclusion): Registered in an English GP with TPP software for at least 6 months prior to the study start date")
 
 #Exclusion criteria 6: SARS-CoV-2 infection recorded prior to the start of follow-up
-input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_start_date, 1,0)# Determine infections prior to start date : 1-prior infection; 0 - No prior infection
+input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_date, 1,0)# Determine infections prior to start date : 1-prior infection; 0 - No prior infection
 input$prior_infections[is.na(input$prior_infections)] <- 0
 input <- subset(input, input$prior_infections ==0)
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS-CoV-2 infection recorded prior to their index date")
 
 
 #-------------------------------------------------#
-# 3.c. Apply criteria specific to each sub-cohort #
+# 3.b. Apply criteria specific to each sub-cohort #
 #-------------------------------------------------#
 
 if (cohort_name == "vaccinated") {
@@ -331,34 +326,34 @@ if (cohort_name == "vaccinated") {
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 10 (Exclusion): Second dose vaccination recorded less than three weeks after the first dose")
   
   #Exclusion criteria 11: Mixed vaccine products received before 07-05-2021
-  input$vax_mixed <- ifelse((input$vax_cat_product_1!=input$vax_cat_product_2),1,0) #Determines mixed vaccination
+  #input$vax_mixed <- ifelse((input$vax_cat_product_1!=input$vax_cat_product_2),1,0) #Determines mixed vaccination
   #Remove if vaccination products are mixed prior to "2021-05-07"
-  input$vax_prior_mixed <- ifelse(input$vax_mixed==1 & (input$vax_date_covid_1 < as.Date ("2021-05-07") | input$vax_date_covid_2 < as.Date ("2021-05-07")),1,0) 
-  input$vax_prior_mixed[is.na(input$vax_prior_mixed)] <- 0
+  #input$vax_prior_mixed <- ifelse(input$vax_mixed==1 & (input$vax_date_covid_1 < as.Date ("2021-05-07") | input$vax_date_covid_2 < as.Date ("2021-05-07")),1,0) 
+  #input$vax_prior_mixed[is.na(input$vax_prior_mixed)] <- 0
   #Removes if vaccination date is less than "2021-05-07" and the vaccine product name is not known!
-  input$vax_prior_unknown <- ifelse(is.na(input$vax_cat_product_1) & (input$vax_date_covid_1 < as.Date ("2021-05-07") | is.na(input$vax_cat_product_2) & input$vax_date_covid_2 < as.Date ("2021-05-07")),1,0)
-  input <- subset(input, input$vax_prior_mixed==0 | input$vax_prior_unknown==0)
+  #input$vax_prior_unknown <- ifelse(is.na(input$vax_cat_product_1) & (input$vax_date_covid_1 < as.Date ("2021-05-07") | is.na(input$vax_cat_product_2) & input$vax_date_covid_2 < as.Date ("2021-05-07")),1,0)
+  #input <- subset(input, input$vax_prior_mixed==0 | input$vax_prior_unknown==0)
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 11 (Exclusion): Received mixed vaccine products before 07-05-2021")
   
 } else if (cohort_name == "electively_unvaccinated"){
   
   #Exclusion criteria 7: Have a record of one or more vaccination doses on the study start date
   #a.Determine the vaccination status on index start date
-  input$prior_vacc1 <- ifelse(input$vax_date_covid_1 <= input$index_start_date, 1,0)
-  input$prior_vacc1[is.na(input$prior_vacc1)] <- 0
-  input$prior_vacc2 <- ifelse(input$vax_date_covid_2 <= input$index_start_date, 1,0)
-  input$prior_vacc2[is.na(input$prior_vacc2)] <- 0
-  input$prior_vacc3 <- ifelse(input$vax_date_covid_3 <= input$index_start_date, 1,0)
-  input$prior_vacc3[is.na(input$prior_vacc3)] <- 0
-  input$prior_vacc <- ifelse((input$prior_vacc1==1 | input$prior_vacc2==1 |input$prior_vacc3==1), 1,0)
+  #input$prior_vacc1 <- ifelse(input$vax_date_covid_1 <= input$index_date, 1,0)
+  #input$prior_vacc1[is.na(input$prior_vacc1)] <- 0
+  #input$prior_vacc2 <- ifelse(input$vax_date_covid_2 <= input$index_date, 1,0)
+  #input$prior_vacc2[is.na(input$prior_vacc2)] <- 0
+  #input$prior_vacc3 <- ifelse(input$vax_date_covid_3 <= input$index_date, 1,0)
+  #input$prior_vacc3[is.na(input$prior_vacc3)] <- 0
+  #input$prior_vacc <- ifelse((input$prior_vacc1==1 | input$prior_vacc2==1 |input$prior_vacc3==1), 1,0)
   #Note NAs don't have any vaccination date, hence move to '0' or unvaccinated category
-  input$prior_vacc[is.na(input$prior_vacc)] <- 0
-  input <- subset(input, input$prior_vacc == 0) #Exclude people with prior vaccination
+  #input$prior_vacc[is.na(input$prior_vacc)] <- 0
+  #input <- subset(input, input$prior_vacc == 0) #Exclude people with prior vaccination
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): Have a record of one or more vaccination doses on the study start date")
 }
 
 #----------------------#
-# 3.d. Create csv file #
+# 3.c. Create csv file #
 #----------------------#
 write.csv(cohort_flow, file = file.path("output", paste0("Cohort_flow_",cohort_name, ".csv")) , row.names=F)
 
