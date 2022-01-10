@@ -336,7 +336,7 @@ if (cohort_name == "vaccinated") {
   input$vax_prior_mixed <- ifelse(input$vax_mixed==1 & (input$vax_date_covid_1 < as.Date ("2021-05-07") | input$vax_date_covid_2 < as.Date ("2021-05-07")),1,0) 
   input$vax_prior_mixed[is.na(input$vax_prior_mixed)] <- 0
   #Removes if vaccination date is less than "2021-05-07" and the vaccine product name is not known!
-  input$vax_prior_unknown <- ifelse(is.na(input$vax_cat_product_1) & (input$vax_date_covid_1 < as.Date ("2021-05-07") | input$vax_date_covid_2 < as.Date ("2021-05-07")),1,0)
+  input$vax_prior_unknown <- ifelse(is.na(input$vax_cat_product_1) & (input$vax_date_covid_1 < as.Date ("2021-05-07") | is.na(input$vax_cat_product_2) & input$vax_date_covid_2 < as.Date ("2021-05-07")),1,0)
   input <- subset(input, input$vax_prior_mixed==0 | input$vax_prior_unknown==0)
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 11 (Exclusion): Received mixed vaccine products before 07-05-2021")
   
