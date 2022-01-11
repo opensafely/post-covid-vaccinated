@@ -1098,7 +1098,7 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Lipid medications
-    cov_bin_lipid_medications_dmd=patients.with_these_clinical_events(
+    cov_bin_lipid_medications=patients.with_these_clinical_events(
         lipid_lowering_dmd,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
