@@ -345,17 +345,17 @@ liver_disease_icd10 = codelist_from_csv(
 #     column="dmd_id",
 # )
 
-depression_icd10 = codelist_from_csv(
-    "codelists/user-elsie_horne-depression_icd10.csv",
-    system="icd10",
-    column="code",
-)
+# depression_icd10 = codelist_from_csv(
+#     "codelists/user-elsie_horne-depression_icd10.csv",
+#     system="icd10",
+#     column="code",
+# )
 
-depression_snomed_clinical = codelist_from_csv(
-    "codelists/user-elsie_horne-depression_snomed.csv",
-    system="snomed",
-    column="code",
-)
+# depression_snomed_clinical = codelist_from_csv(
+#     "codelists/user-elsie_horne-depression_snomed.csv",
+#     system="snomed",
+#     column="code",
+# )
 
 antiplatelet_dmd = codelist_from_csv(
     "codelists/user-elsie_horne-antiplatelet_dmd.csv",
@@ -769,6 +769,69 @@ diabetes_other_snomed_clinical = codelist_from_csv(
 #  Gestational diabetes
 diabetes_gestational_snomed_clinical = codelist_from_csv(
     "codelists/user-hjforbes-gestational-diabetes.csv",
+    system="snomed",
+    column="code",
+)
+
+# Depression 
+depression_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-depression-symptoms-and-diagnoses.csv",
+    system="snomed",
+    column="code",
+)
+
+# Anxiety - general
+anxiety_general_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-anxiety-symptoms-and-diagnoses.csv",
+    system="snomed",
+    column="code",
+)
+
+# Anxiety - obsessive compulsive disorder
+anxiety_ocd_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-obsessive-compulsive-disorder-ocd.csv",
+    system="snomed",
+    column="code",
+)
+
+# Anxiety - post traumatic stress disorder
+anxiety_ptsd_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-post-traumatic-stress-disorder.csv",
+    system="snomed",
+    column="code",
+)
+
+# Eating disorders
+eating_disorders_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-diagnoses-eating-disorder.csv",
+    system="snomed",
+    column="code",
+)
+
+# Serious mental illness
+serious_mental_illness_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-severe-mental-illness.csv",
+    system="snomed",
+    column="code",
+)
+
+# Self harm
+self_harm_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-self-harm.csv",
+    system="snomed",
+    column="code",
+)
+
+# Suicide
+suicide_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-suicide-icd-10.csv",
+    system="snomed",
+    column="code",
+)
+
+# Addiction
+addiction_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-opioid-dependency-clinical-diagnosis.csv",
     system="snomed",
     column="code",
 )
