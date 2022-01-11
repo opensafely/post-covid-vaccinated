@@ -61,6 +61,12 @@ input <-read_rds(input_filename)
 # NOTE: Once study definition is updated, input_filename will be either 
 # output/input_vaccinated.rds or output/input_electively_unvaccinated.rds
 
+# Define general start date and end date
+start_date = as.Date("2021-06-01")
+end_date = as.Date("2021-12-14") # General End date: 2021-12-14 (Decision on Dec 20th 2021)
+
+# NOTE: no censoring of end date for death/event at this stage
+
 ######################################################
 # 1. Prepare all variables (re-factoring, re-typing) # 
 ######################################################
@@ -191,9 +197,9 @@ input$rule2=((input$qa_num_birth_year <1793 |(input$qa_num_birth_year >format(Sy
 input$rule3=NA
 input$rule3=((input$death_date <="1900-01-01"|input$death_date > format(Sys.Date(),"%Y-%m-%d")) & is.na(input$death_date) == FALSE)
 
-#Rule 4: Covid infection date is before or at the same time as hospitalisation
+#Rule 4: Check index_date (from new 2022 datasets)
 input$rule4=NA
-input$rule4=(input$exp_date_covid19_confirmed <= input$exp_date_covid19_hospital & is.na(input$exp_date_covid19_confirmed) == FALSE)
+input$rule4= (is.na(start_date)==TRUE)
 
 #Rule 5: Pregnancy/birth codes for men
 input$rule5=NA
@@ -210,7 +216,7 @@ input$rule7=(input$qa_bin_prostate_cancer == TRUE & input$cov_cat_sex=="F")
 
 
 #Remove rows that are TRUE for at least one rule
-input_QA=input%>%filter(rule1==F & rule2==F & rule3==F & rule4==F & rule5==F & rule6==F & rule7==F)
+input_QA=input%>%filter(rule1==FALSE & rule2==FALSE & rule3==FALSE & rule4==FALSE & rule5==FALSE & rule6==FALSE & rule7==FALSE)
 input_QA=input_QA %>% select(-c(rule1,rule2,rule3,rule4,rule5,rule6,rule7))
 # View(input_QA)
 
@@ -252,7 +258,8 @@ write.csv(QA_summary, file = file.path("output", paste0("QA_summary_",cohort_nam
 cohort_flow <- data.frame(N = numeric(),
                           Description = character(),
                           stringsAsFactors = FALSE)
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input_QA),"Study defined sample size")
+input<-input_QA
 
 #---------------------------------------------------#
 # 3.a. Define index start date and general end date #
@@ -261,10 +268,10 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
 
 if (cohort_name == "vaccinated") {
   # the start date of the follow-up (2021-06-01) or 15 days after the second vaccination
-  input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_covid_2)+14, na.rm = TRUE)
+  input$index_start_date <- pmax(start_date, as.Date(input$vax_date_covid_2)+14, na.rm = TRUE)
 } else if (cohort_name == "electively_unvaccinated"){
   # the start date of the follow-up (2021-06-01) or 12 weeks (84 days) after they become eligible for vaccination
-  input$index_start_date <- pmax(as.Date("2021-06-01"), as.Date(input$vax_date_eligible)+85, na.rm = TRUE)
+  input$index_start_date <- pmax(start_date, as.Date(input$vax_date_eligible)+85, na.rm = TRUE)
 }
 
 # End date: 2021-12-31 of the cohort (no censoring for death/event at this stage) 
@@ -331,15 +338,16 @@ if (cohort_name == "vaccinated") {
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 10 (Exclusion): Second dose vaccination recorded less than three weeks after the first dose")
   
   #Exclusion criteria 11: Mixed vaccine products received before 07-05-2021
-  input$vax_mixed <- ifelse((input$vax_cat_product_1!=input$vax_cat_product_2),1,0) #Determines mixed vaccination
-  #Remove if vaccination products are mixed prior to "2021-05-07"
-  input$vax_prior_mixed <- ifelse(input$vax_mixed==1 & (input$vax_date_covid_1 < as.Date ("2021-05-07") | input$vax_date_covid_2 < as.Date ("2021-05-07")),1,0) 
-  input$vax_prior_mixed[is.na(input$vax_prior_mixed)] <- 0
-  #Removes if vaccination date is less than "2021-05-07" and the vaccine product name is not known!
-  input$vax_prior_unknown <- ifelse(is.na(input$vax_cat_product_1) & (input$vax_date_covid_1 < as.Date ("2021-05-07") | is.na(input$vax_cat_product_2) & input$vax_date_covid_2 < as.Date ("2021-05-07")),1,0)
-  input <- subset(input, input$vax_prior_mixed==0 | input$vax_prior_unknown==0)
+  #Determines mixed vaccination before 7/5/2021
+  input$vax_mixed <- ifelse((input$vax_cat_product_1!=input$vax_cat_product_2 & (is.na(input$vax_date_covid_2)==FALSE & input$vax_date_covid_2 < as.Date ("2021-05-07")) ),1,0)
+  #Determines unknown vaccine product before 7/5/2021
+  input$vax_prior_unknown <- ifelse(is.na(input$vax_cat_product_1) | is.na(input$vax_cat_product_2), 1,0)# unknown products
+  input$vax_prior_unknown <- ifelse(is.na(input$vax_date_covid_2), 1,input$vax_prior_unknown) #unknown vaccination 2 date
+  input$vax_prior_unknown <- ifelse(input$vax_prior_unknown==1 & input$vax_date_covid_2 < as.Date ("2021-05-07"),1,0)#Remove if vaccination products are mixed or not known, prior to "2021-05-07"
+  input <- subset(input, input$vax_mixed==0 | input$vax_prior_unknown==0)
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 11 (Exclusion): Received mixed vaccine products before 07-05-2021")
-  
+
+    
 } else if (cohort_name == "electively_unvaccinated"){
   
   #Exclusion criteria 7: Have a record of one or more vaccination doses on the study start date
@@ -355,6 +363,10 @@ if (cohort_name == "vaccinated") {
   input$prior_vacc[is.na(input$prior_vacc)] <- 0
   input <- subset(input, input$prior_vacc == 0) #Exclude people with prior vaccination
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): Have a record of one or more vaccination doses on the study start date")
+  
+  #Exclusion criteria 8: Missing JCVI group
+  input <- subset(input, is.na(input$vax_cat_jcvi_group)== FALSE)
+  cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 8 (Exclusion): Exclude missing JCVI group")
 }
 
 #----------------------#
