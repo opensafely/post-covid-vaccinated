@@ -17,12 +17,12 @@
 
 library(readr); library("ggvenn")
 
-args = commandArgs(trailingOnly=TRUE)
-population  = args[[1]] # vaccinated population or electively unvaccinated population
+# args = commandArgs(trailingOnly=TRUE)
+# population  = args[[1]] # vaccinated population or electively unvaccinated population
 
 # If working on local PC with dummy data, uncomment the following two lines
-#population="vaccinated" #this will need to be removed when using project yaml
-#population="electively_unvaccinated" #this will need to be removed when using project yaml
+population="vaccinated" #this will need to be removed when using project yaml
+population="electively_unvaccinated" #this will need to be removed when using project yaml
 
 
 # read in data------------------------------------------------------------
@@ -139,7 +139,7 @@ input$tmp_out_date_dvt_hes[index]= input$tmp_out_date_dvt_pregnancy_hes[index]
 index = which(is.na(input$tmp_out_date_dvt_death)==T)
 input$tmp_out_date_dvt_death[index]= input$tmp_out_date_dvt_pregnancy_death[index]
 
-dvt_names<-  c("tmp_out_date_dvt_hes", "tmp_out_date_dvt_death")
+dvt_names<-  c("tmp_out_date_dvt_snomed", "tmp_out_date_dvt_hes", "tmp_out_date_dvt_death")
 figure_name <- paste0(population, "_", "f4_venn_dvt", ".png")
 venn_digram(dvt_names, figure_name, "Deep Vein Thrombosis")
 
@@ -163,14 +163,10 @@ angina_names <- c("tmp_out_date_angina_snomed", "tmp_out_date_angina_hes", "tmp_
 figure_name <- paste0(population, "_", "f8_venn_angina", ".png")
 venn_digram(angina_names, figure_name, "Angina Pectoris")
 
-# outcome 9: oae (Other Arterial Embolism, 
-#                 doesn't match with the name in the protocol: Arterial thrombosis events)
-#only two sources: deaths and hes, but no SONMED?
-# there is a variable named "out_ate" - what is this?)
-# comment: code for outcome 9 will be updated once there are data from SNOMED
-oae_names <- c("tmp_out_date_oae_hes", "tmp_out_date_oae_death")
-figure_name <- paste0(population, "_", "f9_venn_oae", ".png")
-venn_digram(oae_names, figure_name, "All Arterial Thrombotic and Embolization Events")
+# outcome 9: ATE (Arterial thrombosis events)
+ate_names <- c("tmp_out_date_ate_snomed", "tmp_out_date_ate_hes", "tmp_out_date_ate_death")
+figure_name <- paste0(population, "_", "f9_venn_ate", ".png")
+venn_digram(ate_names, figure_name, "All Arterial Thrombotic and Embolization Events")
 
 # outcome 10: all_vte
 vte_names <- c("tmp_out_date_vte_snomed", "tmp_out_date_vte_hes", "tmp_out_date_vte_death")
