@@ -702,11 +702,17 @@
       "downloaded_at": "2022-01-11 10:56:58.973982Z",
       "sha": "34556a280d7c7e90ce823c84930a5209f011ad0e"
     },
-    "user-hjforbes-self-harm.csv": {
-      "id": "user/hjforbes/self-harm/546314c3",
-      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/self-harm/546314c3/",
-      "downloaded_at": "2022-01-11 10:56:59.317831Z",
-      "sha": "94397e3fe05f9bcc757306d3034b7f4df01c01d4"
+    "user-hjforbes-intentional-self-harm-aged10-years.csv": {
+      "id": "user/hjforbes/intentional-self-harm-aged10-years/6be520da",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/intentional-self-harm-aged10-years/6be520da/",
+      "downloaded_at": "2022-01-11 11:09:38.112879Z",
+      "sha": "9c7c14f8676720b35abac3033e0cac4d581c4316"
+    },
+    "user-hjforbes-undetermined-intent-self-harm-aged15-years.csv": {
+      "id": "user/hjforbes/undetermined-intent-self-harm-aged15-years/39c63a70",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/undetermined-intent-self-harm-aged15-years/39c63a70/",
+      "downloaded_at": "2022-01-11 11:09:38.386717Z",
+      "sha": "30bade44689a0a00357f15bc69a0361bff42633c"
     },
     "user-hjforbes-suicide-icd-10.csv": {
       "id": "user/hjforbes/suicide-icd-10/3b53a18e",

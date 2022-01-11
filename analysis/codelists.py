@@ -815,9 +815,16 @@ serious_mental_illness_snomed_clinical = codelist_from_csv(
     column="code",
 )
 
-# Self harm
-self_harm_snomed_clinical = codelist_from_csv(
-    "codelists/user-hjforbes-self-harm.csv",
+# Self harm - aged >= 10 years
+self_harm_10plus_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-intentional-self-harm-aged10-years.csv",
+    system="snomed",
+    column="code",
+)
+
+# Self harm - aged >= 15 years
+self_harm_15plus_snomed_clinical = codelist_from_csv(
+    "codelists/user-hjforbes-undetermined-intent-self-harm-aged15-years.csv",
     system="snomed",
     column="code",
 )

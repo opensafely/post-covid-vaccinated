@@ -682,9 +682,26 @@ def generate_common_variables(index_date_variable):
         },
     ),
 
-    ## Self harm
-    out_date_self_harm=patients.with_these_clinical_events(
-        self_harm_snomed_clinical,
+    ## Self harm - aged >= 10 years
+    out_date_self_harm_10plus=patients.with_these_clinical_events(
+        self_harm_10plus_snomed_clinical,
+        returning="date",
+        on_or_after=f"{index_date_variable}",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
+    ## Self harm - aged >= 15 years
+    out_date_self_harm_15plus=patients.with_these_clinical_events(
+        combine_codelists(
+            self_harm_10plus_snomed_clinical,
+            self_harm_15plus_snomed_clinical,
+        ),
         returning="date",
         on_or_after=f"{index_date_variable}",
         date_format="YYYY-MM-DD",
@@ -1318,9 +1335,26 @@ def generate_common_variables(index_date_variable):
         },
     ),
 
-    ## Self harm
-    cov_bin_self_harm=patients.with_these_clinical_events(
-        self_harm_snomed_clinical,
+    ## Self harm - aged >= 10 years
+    cov_bin_self_harm_10plus=patients.with_these_clinical_events(
+        self_harm_10plus_snomed_clinical,
+        returning="date",
+        on_or_after=f"{index_date_variable}",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
+     ## Self harm - aged >= 15 years
+    cov_bin_self_harm_15plus=patients.with_these_clinical_events(
+        combine_codelists(
+            self_harm_10plus_snomed_clinical,
+            self_harm_15plus_snomed_clinical,
+        ),
         returning="date",
         on_or_after=f"{index_date_variable}",
         date_format="YYYY-MM-DD",
