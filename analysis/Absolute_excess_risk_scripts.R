@@ -17,7 +17,7 @@ library(zoo)
 input$delta_start <- as.Date("2021-06-01", format="%Y-%m-%d")
 #b.if vaccinated, 14 days after the second vaccination
 input$immune_start <- as.Date(input$vax_date_covid_2)+14
-#c.At risk start time - latest of a,b as RISK - COHORT start date
+#c.At risk start time - latest of a,b as RISK - start date
 input$risk_start_date <- pmax(input$delta_start, input$immune_start, na.rm = TRUE)
 
 #2.RISK END DATE
@@ -46,19 +46,26 @@ input$risk_end_date <- pmin(input$delta_end,
 
 table(input$risk_end_date)
 
-
-#Step2. Calculate the daily CVD incidence----------------------------------------------
+#----------------------------------------
+#Step2. Calculate the daily CVD incidence
+#----------------------------------------
 #Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
              # for that day to derive the incidence on each day after COVID-19. 
 
-#Step3. Make life table to calculate cumulative risk over time---------------------------------------------
+#-------------------------------------------------------------
+#Step3. Make life table to calculate cumulative risk over time
+#-------------------------------------------------------------
 #Description:Use a life table approach to calculate age- and sex specific cumulative risks over time, -
              # with and without COVID-19. 
 
-#Step4. Calculate the Absolute excess risk-------------------------------------------------------------------
+#-----------------------------------------
+#Step4. Calculate the Absolute excess risk
+#-----------------------------------------
 #Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
              #compared with no COVID-19 diagnosis. 
 
-#Step5. Calculate the Overall Absolute excess risk------------------------------------------------------------
+#------------------------------------------------
+#Step5. Calculate the Overall Absolute excess risk
+#-------------------------------------------------
 #Description:Overall absolute excess risk is estimated from a weighted sum of the age and sex-specific excess risks, -
              #weighted by the proportions of people in age and sex strata within the COVID-19 infected population during the follow-up period.
