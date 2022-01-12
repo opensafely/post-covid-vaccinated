@@ -1338,15 +1338,9 @@ def generate_common_variables(index_date_variable):
     ## Self harm - aged >= 10 years
     cov_bin_self_harm_10plus=patients.with_these_clinical_events(
         self_harm_10plus_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.03},
     ),
 
      ## Self harm - aged >= 15 years
@@ -1355,43 +1349,25 @@ def generate_common_variables(index_date_variable):
             self_harm_10plus_snomed_clinical,
             self_harm_15plus_snomed_clinical,
         ),
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+         returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.03},
     ),
 
     ## Suicide
     cov_bin_suicide=patients.with_these_clinical_events(
         suicide_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.03},
     ),
 
     ## Addiction
     cov_bin_addiction=patients.with_these_clinical_events(
         addiction_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.03},
     ),
     
     # Define subgroups (for variables that don't have a corresponding covariate only)
