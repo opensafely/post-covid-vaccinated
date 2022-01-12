@@ -40,3 +40,4 @@ actions:
         cohort_electively_unvaccinated: output/input_electively_unvaccinated.rds
         venn_vaccinated: output/venn_vaccinated.rds
         venn_electively_unvaccinated: output/venn_electively_unvaccinated.rds
+
