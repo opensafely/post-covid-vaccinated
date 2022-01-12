@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## =============================================================================
 ## Purpose:  Create Table 2
 ## 
@@ -215,3 +216,7 @@ table_2
 # 
 
 
+=======
+# Table 2: Number of outcome events, 
+#          person years of follow up and rates of events, for each outcome
+>>>>>>> 3c0fced (to create table 2)
