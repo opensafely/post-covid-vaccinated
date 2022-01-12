@@ -20,8 +20,8 @@ library(readr); library("ggvenn")
 args = commandArgs(trailingOnly=TRUE)
 population  = args[[1]] # vaccinated population or electively unvaccinated population
 
-#population="vaccinated" #this will need to be removed merged and added as an action
-#population="electively_unvaccinateda" #this will need to be removed merged and added as an action
+#population="vaccinated" #this will need to be removed when using project yaml
+#population="electively_unvaccinated" #this will need to be removed when using project yaml
 
 
 # read in data------------------------------------------------------------
