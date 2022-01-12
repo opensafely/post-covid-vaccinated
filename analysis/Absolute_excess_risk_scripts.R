@@ -3,8 +3,7 @@
 #Scripts: Renin Toms
 
 library(tidyverse)
-library(lubridate)
-library(zoo)
+
 #-----------------------------------------------
 #Step1.Calculate the average daily CVD incidence
 #-----------------------------------------------
@@ -51,6 +50,8 @@ str(input$out_date_ami)#Date
 table(input$out_date_ami>0)#7805 AMI events 
 table(input$out_date_ami)
 
+table(input$cov_num_age)
+table(input$cov_cat_sex)
 #----------------------------------------
 #Step2. Calculate the daily CVD incidence
 #----------------------------------------
