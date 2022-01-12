@@ -46,6 +46,11 @@ input$risk_end_date <- pmin(input$delta_end,
 
 table(input$risk_end_date)
 
+#3.Derive the event counts on days
+str(input$out_date_ami)#Date
+table(input$out_date_ami>0)#7805 AMI events 
+table(input$out_date_ami)
+
 #----------------------------------------
 #Step2. Calculate the daily CVD incidence
 #----------------------------------------
