@@ -15,14 +15,14 @@
 #                      be updated once the study definition is updated with data from 
 #                      SNOMED for these two outcomes
 
+#library(arrow); library("ggvenn")
 library(readr); library("ggvenn")
 
-# args = commandArgs(trailingOnly=TRUE)
-# population  = args[[1]] # vaccinated population or electively unvaccinated population
+args = commandArgs(trailingOnly=TRUE)
+population  = args[[1]] # vaccinated population or electively unvaccinated population
 
-# If working on local PC with dummy data, uncomment the following two lines
-population="vaccinated" #this will need to be removed when using project yaml
-population="electively_unvaccinated" #this will need to be removed when using project yaml
+population="vaccinated" #this will need to be removed merged and added as an action
+#population="electively_unvaccinateda" #this will need to be removed merged and added as an action
 
 
 # read in data------------------------------------------------------------
