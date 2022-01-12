@@ -12,14 +12,15 @@
 ## =============================================================================
 
 # YW Alert 9/Dec/2021: Code for outcome 4 (dvt) and outcome 9 (oae) will need to 
-#                      be updated once the study definition is updated
+#                      be updated once the study definition is updated with data from 
+#                      SNOMED for these two outcomes
 
-#library(arrow); library("ggvenn")
 library(readr); library("ggvenn")
 
 args = commandArgs(trailingOnly=TRUE)
 population  = args[[1]] # vaccinated population or electively unvaccinated population
 
+# If working on local PC with dummy data, uncomment the following two lines
 #population="vaccinated" #this will need to be removed when using project yaml
 #population="electively_unvaccinated" #this will need to be removed when using project yaml
 
@@ -33,7 +34,6 @@ if(population == "vaccinated"){
 if(population == "electively_unvaccinated"){
   input <- read_rds("output/venn_electively_unvaccinated.rds")
 }
-
 
 # #------Testing Example with a Function ---------------------------------------
 # - outcome: ami
