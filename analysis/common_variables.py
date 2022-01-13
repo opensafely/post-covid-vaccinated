@@ -622,7 +622,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.01,
         },
     ),
 
@@ -636,7 +636,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.01,
         },
     ),
 
@@ -650,7 +650,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.01,
         },
     ),
 
@@ -664,7 +664,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.01,
         },
     ),
 
@@ -678,7 +678,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.01,
         },
     ),
 
@@ -692,7 +692,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.01,
         },
     ),
 
@@ -709,7 +709,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.01,
         },
     ),
 
@@ -723,7 +723,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.01,
         },
     ),
 
@@ -737,7 +737,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.01,
         },
     ),
 
@@ -1340,7 +1340,7 @@ def generate_common_variables(index_date_variable):
         self_harm_10plus_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
+        return_expectations={"incidence": 0.01},
     ),
 
      ## Self harm - aged >= 15 years
@@ -1349,9 +1349,9 @@ def generate_common_variables(index_date_variable):
             self_harm_10plus_snomed_clinical,
             self_harm_15plus_snomed_clinical,
         ),
-         returning='binary_flag',
+        returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
+        return_expectations={"incidence": 0.01},
     ),
 
     ## Suicide
@@ -1359,7 +1359,7 @@ def generate_common_variables(index_date_variable):
         suicide_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
+        return_expectations={"incidence": 0.01},
     ),
 
     ## Addiction
@@ -1367,7 +1367,7 @@ def generate_common_variables(index_date_variable):
         addiction_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
+        return_expectations={"incidence": 0.01},
     ),
     
     # Define subgroups (for variables that don't have a corresponding covariate only)
