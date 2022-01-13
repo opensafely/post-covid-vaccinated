@@ -35,8 +35,7 @@ cuts_days_since_expo_reduced <- c(28,196)
 
 # ---------------------- READ IN DATA ------------------------------------------
 # read in core analysis information
-input=read_rds("output/input_vaccinated.rds")
-
+input=read_rds(master_df_fpath)
 master_names=colnames(input)
 
 
@@ -59,9 +58,9 @@ setnames(input,
 #Reduce dataset to those who do NOT have a prior hsitory of COVID unless running the sensitivity
 #analysis for this with a prior history
 
-if(covid_history =="FALSE"){
+if(covid_history =="covid_history_false"){
   input=input%>%filter(sub_bin_covid19_confirmed_history == FALSE)
-}else if (covid_history =="TRUE"){
+}else if (covid_history =="covid_history_true"){
   input=input%>%filter(sub_bin_covid19_confirmed_history == TRUE)
 }
 

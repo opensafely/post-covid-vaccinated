@@ -241,9 +241,9 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
   
 
   if (identical(cuts_days_since_expo, c(28, 365))){
-    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_red_" , save_name, "_",stratify_by,"_",event,"_",project,"_",mdl, ".csv"), row.names = T)
+    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_red_" , save_name, "_",stratify_by,"_",event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
   } else (
-    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl, ".csv"), row.names = T)
+    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
   )
    
   

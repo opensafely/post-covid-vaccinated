@@ -163,8 +163,9 @@ fit_model_reducedcovariates <- function(event, stratify_by_subgroup, stratify_by
   fit_model$event <- event
   fit_model$project <- project
   fit_model$model <- mdl
+  fit_model$covid_history <- covid_history
   
-  write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , save_name,"_",stratify_by, "_", event, "_",project,"_",mdl, ".csv"), row.names = T)
+  write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , save_name,"_",stratify_by, "_", event, "_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
   
 }
 

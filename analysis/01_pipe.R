@@ -26,24 +26,24 @@ library(rms)
 library(readr)
 
 
-#args = commandArgs(trailingOnly=TRUE)
-#mdl  = args[[1]] # "mdl_agesex", "mdl_max_adj"
-#event_name  = args[[2]] # "all" or individual outcome
-#strata  = args[[3]] 
+args = commandArgs(trailingOnly=TRUE)
+mdl  = args[[1]] # "mdl_agesex", "mdl_max_adj"
+event_name  = args[[2]] # "all" or individual outcome
+strata  = args[[3]] 
 #strata: main, covid_pheno_all, covid_pheno_hospitalised, covid_pheno_non_hospitalised, agegp_all, agegp_18_39, agegp_40_59, agegp_60_79, agegp_80_110
 #sex_all,sex_M, sex_F, ethnicity_all,ethnicity_1, ethnicity_2, ethnicity_3, ethnicity_4, ethnicity_5, ethnicity_6
 #prior_history_all
-#project = args[[4]] #vaccinated_delta, electively_unvaccinated_delta, unvaccinated
-#covid_history = args[[5]] #TRUE, FALSE
+project = args[[4]] #vaccinated_delta, electively_unvaccinated_delta, unvaccinated
+covid_history = args[[5]] #covid_history_false, covid_history_true
 ########
 #To Test
 ########
 
-mdl="mdl_agesex"
-event_name="ami"
-strata="main"
+mdl="mdl_max_adj"
+event_name="pe"
+strata="agegp_all"
 project="vaccinated_delta"
-covid_history="FALSE"
+covid_history="covid_history_false"
 # event="ami"
 # stratify_by_subgroup="main"
 # stratify_by="main"

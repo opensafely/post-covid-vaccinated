@@ -95,9 +95,9 @@ get_vacc_res <- function(event,stratify_by_subgroup,stratify_by,input,cuts_days_
   survival_data=survival_data%>%filter(follow_up_end>=follow_up_start)#can remove once studydef is updated
   
   #uncomment later
-  # if(nrow(survival_data%>%filter(is.na(event_date)==F))>=400){
-  #   res_vacc <- fit_model_reducedcovariates(event, stratify_by_subgroup, stratify_by, survival_data,covar_names,input)
-  #   return(res_vacc)
+  # if(nrow(survival_data%>%filter(is.na(event_date)==F))>=20){
+   #  res_vacc <- fit_model_reducedcovariates(event, stratify_by_subgroup, stratify_by, survival_data,covar_names,input)
+    # return(res_vacc)
   # }
   
   res_vacc <- fit_model_reducedcovariates(event, stratify_by_subgroup, stratify_by, survival_data,covar_names,input)
