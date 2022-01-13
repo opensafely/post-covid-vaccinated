@@ -64,3 +64,9 @@ actions:
         IE_criteria: output/Cohort_flow_vaccinated.csv
       highly_sensitive:
         cohort: output/input_vaccinated_stage1.rds
+  main_analysis_age_sex_adjusted_all_outcomes_vaccinated:
+    run: r:latest analysis/01_pipe.R mdl_agesex ami main vaccinated_delta
+    outputs:
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_main_vaccinated_delta_mdl_agesex.csv
+        compiled_event_counts: output/compiled_event_counts_main_vaccinated_delta_mdl_agesex.csv
