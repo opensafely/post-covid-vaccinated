@@ -1324,15 +1324,9 @@ def generate_common_variables(index_date_variable):
     ## Serious mental illness
     cov_bin_serious_mental_illness=patients.with_these_clinical_events(
         serious_mental_illness_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
     ),
 
     ## Self harm - aged >= 10 years
