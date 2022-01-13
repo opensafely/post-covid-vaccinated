@@ -62,14 +62,13 @@ result_file_paths <- pmap(list(results_done),
                })
 
 
-
-df_hr <- rbindlist(result_file_paths, fill=TRUE)
-df_hr <- df_hr %>% mutate_if(is.numeric, round, digits=5)%>%select(-V1)
-
-write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv"), row.names = F)
-
-
-
+if(length(results_done)>0){
+  df_hr <- rbindlist(result_file_paths, fill=TRUE)
+  df_hr <- df_hr %>% mutate_if(is.numeric, round, digits=5)%>%select(-V1)
+  
+  write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv"), row.names = F)
+  
+}
 
 
 # =============================  R events count =====================================
@@ -107,25 +106,28 @@ for (i in 1:nrow(results_needed)) {
   }
 }
 
-#  fread completed ones
-event_counts_completed <- pmap(list(event_count_done, results_needed$event, results_needed$save_name, results_needed$which_strata,results_needed$project, results_needed$mdl,results_needed$covid_history), 
-               function(fpath, event, save_name, which_strata, project, mdl,covid_history){ 
-                 df <- fread(fpath) 
-                 df$event <- event
-                 df$subgroup <- save_name
-                 df$strata <- which_strata
-                 df$project <- project
-                 df$mdl <- mdl
-                 df$covid_history <- covid_history
-                 return(df)
-                 })
 
-
-
-df_hr <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
-
-write.csv(df_hr, paste0(output_dir,"/compiled_event_counts_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
-
+if(length(event_count_done)>0){
+  #  fread completed ones
+  event_counts_completed <- pmap(list(event_count_done, results_needed$event, results_needed$save_name, results_needed$which_strata,results_needed$project, results_needed$mdl,results_needed$covid_history), 
+                                 function(fpath, event, save_name, which_strata, project, mdl,covid_history){ 
+                                   df <- fread(fpath) 
+                                   df$event <- event
+                                   df$subgroup <- save_name
+                                   df$strata <- which_strata
+                                   df$project <- project
+                                   df$mdl <- mdl
+                                   df$covid_history <- covid_history
+                                   return(df)
+                                 })
+  
+  
+  
+  df_hr <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
+  
+  write.csv(df_hr, paste0(output_dir,"/compiled_event_counts_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
+  
+}
 
 
 
