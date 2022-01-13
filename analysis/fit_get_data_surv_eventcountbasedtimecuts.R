@@ -245,12 +245,13 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
   } else (
     write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
   )
-   
+  
   
   #===============================================================================
   # FINALIZE age, region, data_surv
   #-------------------------------------------------------------------------------
+  more_than_400_events = any((as.numeric(tbl_event_count$events_total) >=3) & (tbl_event_count$expo_week=="all post expo"))
   data_surv <- data_surv %>% left_join(df_age_region)
-
-  return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_weight))
+  return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_weight, more_than_400_events))
+ 
 }

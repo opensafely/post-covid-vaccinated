@@ -40,13 +40,13 @@ covid_history = args[[5]] #covid_history_false, covid_history_true
 ########
 
 mdl="mdl_max_adj"
-event_name="pe"
-strata="agegp_all"
+event_name="all"
+strata="main"
 project="vaccinated_delta"
 covid_history="covid_history_false"
-# event="ami"
-# stratify_by_subgroup="main"
-# stratify_by="main"
+ event="tia"
+ stratify_by_subgroup="main"
+ stratify_by="main"
 
 # Specify directories ----------------------------------------------------------
 output_dir <- "output"
