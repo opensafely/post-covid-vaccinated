@@ -128,9 +128,11 @@ covars$cov_cat_region = relevel(covars$cov_cat_region, ref = as.character(calcul
 covars$sub_cat_covid19_hospital = relevel(covars$sub_cat_covid19_hospital, ref = as.character(calculate_mode(covars$sub_cat_covid19_hospital)))
 
 covars$vax_cat_jcvi_group = relevel(covars$vax_cat_jcvi_group, ref = as.character(calculate_mode(covars$vax_cat_jcvi_group)))
-covars$vax_cat_product_1 = relevel(covars$vax_cat_product_1, ref = as.character(calculate_mode(covars$vax_cat_product_1)))
-covars$vax_cat_product_2 = relevel(covars$vax_cat_product_2, ref = as.character(calculate_mode(covars$vax_cat_product_2)))
-covars$vax_cat_product_3 = relevel(covars$vax_cat_product_3, ref = as.character(calculate_mode(covars$vax_cat_product_3)))
+if (cohort_name == "vaccinated") {
+  covars$vax_cat_product_1 = relevel(covars$vax_cat_product_1, ref = as.character(calculate_mode(covars$vax_cat_product_1)))
+  covars$vax_cat_product_2 = relevel(covars$vax_cat_product_2, ref = as.character(calculate_mode(covars$vax_cat_product_2)))
+  covars$vax_cat_product_3 = relevel(covars$vax_cat_product_3, ref = as.character(calculate_mode(covars$vax_cat_product_3)))
+}
 
 #combine groups in deprivation: First - most deprived; fifth -least deprived
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==1 | levels(covars$cov_cat_deprivation)==2] <-"1-2 (most deprived)"
@@ -292,7 +294,7 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 5 (Inclusion): Regi
 input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_date, 1,0)# Determine infections prior to start date : 1-prior infection; 0 - No prior infection
 input$prior_infections[is.na(input$prior_infections)] <- 0
 input <- subset(input, input$prior_infections ==0)
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS-CoV-2 infection recorded prior to their index date")
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS-CoV-2 infection recorded prior index date")
 
 
 #-------------------------------------------------#
@@ -319,6 +321,10 @@ if (cohort_name == "vaccinated") {
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 10 (Exclusion): Second dose vaccination recorded less than three weeks after the first dose")
   
   #Exclusion criteria 11: Mixed vaccine products received before 07-05-2021
+  # Trick to run the mixed vaccine code on dummy data with limited levels -> To ensure that the levels are the same in vax_cat_product variables
+  levels(input$vax_cat_product_1) <- union(levels(input$vax_cat_product_1), levels(input$vax_cat_product_2))
+  levels(input$vax_cat_product_2) <- levels(input$vax_cat_product_1)
+  
   #Determines mixed vaccination before 7/5/2021
   input$vax_mixed <- ifelse((input$vax_cat_product_1!=input$vax_cat_product_2 & (is.na(input$vax_date_covid_2)==FALSE & input$vax_date_covid_2 < as.Date ("2021-05-07")) ),1,0)
   #Determines unknown vaccine product before 7/5/2021
@@ -331,23 +337,24 @@ if (cohort_name == "vaccinated") {
     
 } else if (cohort_name == "electively_unvaccinated"){
   
-  #Exclusion criteria 7: Have a record of one or more vaccination doses prior index date
+  #Exclusion criteria 7: Have a record of one or more vaccination prior index date
+  # i.e. Have a record of a first vaccination prior index date (no more vax 2 and 3 variables available in this dataset)
   #a.Determine the vaccination status on index start date
   input$prior_vacc1 <- ifelse(input$vax_date_covid_1 <= input$index_date, 1,0)
   input$prior_vacc1[is.na(input$prior_vacc1)] <- 0
-  input$prior_vacc2 <- ifelse(input$vax_date_covid_2 <= input$index_date, 1,0)
-  input$prior_vacc2[is.na(input$prior_vacc2)] <- 0
-  input$prior_vacc3 <- ifelse(input$vax_date_covid_3 <= input$index_date, 1,0)
-  input$prior_vacc3[is.na(input$prior_vacc3)] <- 0
-  input$prior_vacc <- ifelse((input$prior_vacc1==1 | input$prior_vacc2==1 |input$prior_vacc3==1), 1,0)
+  #input$prior_vacc2 <- ifelse(input$vax_date_covid_2 <= input$index_date, 1,0)
+  #input$prior_vacc2[is.na(input$prior_vacc2)] <- 0
+  #input$prior_vacc3 <- ifelse(input$vax_date_covid_3 <= input$index_date, 1,0)
+  #input$prior_vacc3[is.na(input$prior_vacc3)] <- 0
+  #input$prior_vacc <- ifelse((input$prior_vacc1==1 | input$prior_vacc2==1 |input$prior_vacc3==1), 1,0)
   #Note NAs don't have any vaccination date, hence move to '0' or unvaccinated category
-  input$prior_vacc[is.na(input$prior_vacc)] <- 0
-  input <- subset(input, input$prior_vacc == 0) #Exclude people with prior vaccination
-  cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): Have a record of one or more vaccination doses prior index date")
+  #input$prior_vacc[is.na(input$prior_vacc)] <- 0
+  input <- subset(input, input$prior_vacc1 == 0) #Exclude people with prior vaccination
+  cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): Have a record of a first vaccination prior index date")
   
   #Exclusion criteria 8: Missing JCVI group
   input <- subset(input, is.na(input$vax_cat_jcvi_group)== FALSE)
-  cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 8 (Exclusion): Exclude missing JCVI group")
+  cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 8 (Exclusion): Missing JCVI group")
   
 }
 
