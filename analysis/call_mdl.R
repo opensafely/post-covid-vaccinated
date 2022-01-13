@@ -98,4 +98,4 @@ get_vacc_res <- function(event,stratify_by_subgroup,stratify_by,input,cuts_days_
   return(res_vacc)
 }
   
-  
+    
