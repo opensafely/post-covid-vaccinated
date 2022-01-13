@@ -41,7 +41,7 @@ covid_history = args[[5]] #covid_history_false, covid_history_true
 
 #mdl="mdl_max_adj"
 #event_name="all"
-#strata="main"
+#strata="agegp_all"
 #project="vaccinated_delta"
 #covid_history="covid_history_false"
 # event="tia"
