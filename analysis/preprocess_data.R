@@ -156,3 +156,9 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   saveRDS(tmp2, file = paste0("output/venn_",j,".rds"))
   
 }
+
+# Update vaccine products for dummy data only ----------------------------------
+
+if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
+  source("analysis/modify_dummy_data.R")
+}
