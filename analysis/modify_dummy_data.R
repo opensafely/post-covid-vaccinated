@@ -6,10 +6,6 @@ set.seed(1)
 
 df <- readr::read_rds(file.path("output", "input_vaccinated.rds"))
 
-# Specify possible vaccine products
-
-vax_products <- c("AstraZeneca","Pfizer","Moderna")
-
 # Assign a vaccine product for dose 1
 
 df$vax_cat_product_1 <- ifelse(rbinom(nrow(df),1,0.5)==1,"AstraZeneca","Pfizer")
