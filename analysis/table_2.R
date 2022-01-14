@@ -17,7 +17,6 @@ library(readr)
 population = "vaccinated" #commented out when using project yaml
 population = "electively_unvaccinated" #commented out when using project yaml
 
-
 # read in data------------------------------------------------------------
 
 if(population == "vaccinated"){
@@ -35,7 +34,6 @@ number_events <- function(outcome)
   count <- length(which(!is.na(outcome)))
   return(count)
 }
-
 
 outcome_names <- c("out_date_ami",  "out_date_stroke_isch", 
                    "out_date_pe",   "out_date_dvt",
