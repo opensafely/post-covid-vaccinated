@@ -4,6 +4,7 @@ code,term
 219336007,Injury of unknown intent by shotgun
 219337003,Injury of unknown intent by hunting rifle
 219338008,Injury of unknown intent by military firearm
+219340003,Injury of unknown intent by explosive
 219342006,Injury of unknown intent by sharp instrument
 219343001,Injury of unknown intent by cutting instrument
 219344007,Injury of unknown intent by stabbing instrument
@@ -12,7 +13,6 @@ code,term
 222759003,"[X]Hanging, strangulation and suffocation undetermined intent"
 222793004,"[X]Rifle, shotgun and larger firearm discharge, undetermined intent"
 222804005,"[X]Other and unspecified firearm discharge, undetermined intent"
-269688005,"Accidental poisoning caused by drugs, medicines and biologicals"
 269735005,Injury undetermined whether accidentally or purposely inflicted
 275385007,Poisoning caused by biological substance
 290805006,Lithium poisoning of undetermined intent

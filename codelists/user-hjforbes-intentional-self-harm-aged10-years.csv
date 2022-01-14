@@ -19,8 +19,6 @@ code,term
 219155000,Suicide or self injury by jumping from a height
 219168008,Suicide or self injury by electric current
 219174008,Late effect of self inflicted injury
-219187002,Assault by poisoning by drugs or medicines
-219340003,Injury of unknown intent by explosive
 222196002,"[X]Intentional self harm by rifle, shotgun and larger firearm discharge, occurrence at school, other institution and public administrative area"
 222200007,"[X]Intentional self harm by rifle, shotgun and larger firearm discharge, occurrence at industrial and construction area"
 224945002,Self-incineration
@@ -1003,8 +1001,6 @@ code,term
 297101001,Intentional urokinase overdose
 297201008,Intentional overdose of tricyclic antidepressant
 314550003,History of deliberate self harm
-32835006,Poisoning caused by autonomous nervous system drug
-35942003,Homicidal deliberate poisoning
 385231000000108,"[X]Intentional self harm by drowning and submersion, occurrence at sports and athletics area"
 385441000000100,"[X]Intentional self harm by sharp object, occurrence at sports and athletics area"
 385451000000102,"[X]Intentional self harm by sharp object, occurrence on street and highway"
@@ -1051,7 +1047,6 @@ code,term
 421581000000105,"[X]Intentional self poisoning by and exposure to narcotic drugs, occurrence at school, other institution and public administrative area"
 422691000000103,"[X]Intentional self harm by handgun discharge, occurrence at other specified place"
 422721000000107,"[X]Intentional self poisoning by and exposure to nonopioid analgesics, occurrence at school, other institution and public administrative area"
-42377002,Poisoning caused by anticonvulsant
 426299001,Intentional X-ray contrast media poisoning
 426450003,Intentional chlorprothixene overdose
 431307001,Intentional poisoning caused by drug
@@ -1103,11 +1098,9 @@ code,term
 473731000000102,"[X]Intentional self harm by drowning and submersion, occurrence in residential institution"
 473791000000101,"[X]Intentional self harm by hanging, strangulation and suffocation, occurrence in residential institution"
 474461000000102,"[X]Intentional self poisoning by and exposure to nonopioid analgesics, occurrence in residential institution"
-4836003,Poisoning caused by anti-parkinsonism drug
 48981002,Parasuicide
 518431000000101,Intentional overdose of prescription only medication
 59274003,Intentional drug overdose
-61438005,Poisoning caused by psychotropic agent
 681111000000102,Suicide and self inflicted poisoning by drug or medicine NOS
 684281000000100,Suicide and self inflicted injury NOS
 711538001,Intentional drug overdose by tablet
@@ -1117,6 +1110,4 @@ code,term
 82313006,Suicide attempt
 838521001,Intentional overdose of methylenedioxymethamphetamine
 838526006,Intentional poisoning caused by methylenedioxymethamphetamine
-85337000,Poisoning caused by sedative AND/OR hypnotic
-85975005,Poisoning caused by psychodysleptic
 981111000000101,Health of the Nation Outcome Scales for Children and Adolescents rating scale 3 - non-accidental self injury
