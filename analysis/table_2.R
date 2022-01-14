@@ -36,11 +36,11 @@ number_events <- function(outcome)
   return(count)
 }
 
-outcome_names <- c("out_date_ami", "out_date_stroke_isch", 
-                   "out_date_pe", "out_date_dvt",
-                    "out_date_tia", "out_date_stroke_sah_hs", 
-                   "out_date_hf", "out_date_angina",
-                   "out_date_ate", "out_date_vte"
+outcome_names <- c("out_date_ami",  "out_date_stroke_isch", 
+                   "out_date_pe",   "out_date_dvt",
+                   "out_date_tia",  "out_date_stroke_sah_hs", 
+                   "out_date_hf",   "out_date_angina",
+                   "out_date_ate",  "out_date_vte"
                    )
 
 n_events <- c(lapply(input[,outcome_names], number_events))
