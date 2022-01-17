@@ -707,22 +707,22 @@ def generate_common_variables(index_date_variable):
     cov_bin_carehome_status=patients.care_home_status_as_of(
         f"{index_date_variable}", 
         categorised_as={
-            "Yes": """
+            "TRUE": """
               IsPotentialCareHome
               AND LocationDoesNotRequireNursing='Y'
               AND LocationRequiresNursing='N'
             """,
-            "Yes": """
+            "TRUE": """
               IsPotentialCareHome
               AND LocationDoesNotRequireNursing='N'
               AND LocationRequiresNursing='Y'
             """,
-            "Yes": "IsPotentialCareHome",
-            "No": "DEFAULT",
+            "TRUE": "IsPotentialCareHome",
+            "FALSE": "DEFAULT",
         },
         return_expectations={
             "rate": "universal",
-            "category": {"ratios": {"Yes": 0.30, "No": 0.70},},
+            "category": {"ratios": {"TRUE": 0.30, "FALSE": 0.70},},
         },
     ),
 
