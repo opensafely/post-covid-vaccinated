@@ -84,9 +84,6 @@ population= "vaccinated_delta"
 
 # take ami as an example, 17 Jan 2022
 # can't use index_date as the start date of follow up as some index dates were after the end of the cohort
-
-
-
 survival_data <- survival_data %>% mutate(delta_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
                                           cohort_end_date = as.Date("2021-12-04", format = "%Y-%m-%d"))
 View(survival_data)
