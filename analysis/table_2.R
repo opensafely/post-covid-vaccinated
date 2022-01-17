@@ -11,15 +11,15 @@
 ##           person years of follow up and rates of events, for each outcome
 ## =============================================================================
 
-library(readr)
+library(readr); library(dplyr); library(data.table); library(lubridate)
 
 # If working on local PC with dummy data, uncomment the following two lines
-population = "vaccinated" #commented out when using project yaml
-population = "electively_unvaccinated" #commented out when using project yaml
+population = "vaccinated_delta" #commented out when using project yaml
+#population = "electively_unvaccinated_delta" #commented out when using project yaml
 
 # read in data------------------------------------------------------------
 
-if(population == "vaccinated"){
+if(population == "vaccinated_delta"){
   input <- read_rds("output/input_vaccinated.rds")
 }
 
@@ -45,6 +45,87 @@ outcome_names <- c("out_date_ami",  "out_date_stroke_isch",
 n_events <- c(lapply(input[,outcome_names], number_events))
 
 n_events
+
+
+
+# record variable names for covariate, qa which are not used in calculating incidence rate
+variable_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
+
+
+# Create a data frame for survival data 
+survival_data <- input[,variable_names] #View(covars)
+
+
+# # read in event dates for outcome-of-interest
+# event_names <- c("ami",  "stroke_isch", 
+#                  "pe",   "dvt",
+#                  "tia",  "stroke_sah_hs", 
+#                  "hf",   "angina",
+#                  "ate",  "vte"
+# )
+# # create a new data frame with columns: patient_id, out_date for each outcome
+# event <- event_names[1]
+# outcomes <-input%>%dplyr::select(c("patient_id", 
+#                                    paste0("out_date_", event)))
+# 
+# # wrangle columns for naming convention 
+# setnames(outcomes, 
+#          old = c(paste0("out_date_", event)), 
+#          new = c("event_date"))
+# 
+# outcomes$name <- event
+# 
+# head(outcomes)
+
+# follow-up start date: input$index_date
+population= "vaccinated_delta"
+#project = "electively_unvaccinated_delta"
+#project = "unvaccinated"
+
+# take ami as an example, 17 Jan 2022
+
+survival_data <- survival_data %>% mutate(cohort_end_date = as.Date("2021-12-04"))
+is.Date(survival_data$cohort_end_date)
+if(population == "vaccinated_delta"){
+  survival_data = survial_data %>% rowwise() %>% mutate(follow_up_end= min(out_date_ami, death_date, cohort_end_date,na.rm = TRUE))
+}else if(population=="electively_unvaccinated_delta"){
+  survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
+  survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(vax_date_covid_1,out_date_ami, death_date,cohort_end_date,na.rm = TRUE))
+  survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
+}
+
+
+# follow-up years
+# some of the index_date were wrong? January 2022 after the end of the cohort?
+survival_data = survival_data %>% mutate(follow_up_period = (as.Date(follow_up_end) - as.Date(index_date))/365.2)
+
+data<-survival_data %>% dplyr::select(c("out_date_ami", "death_date", "cohort_end_date","index_date" , "follow_up_end", "follow_up_period"))
+View(data)
+names(survival_data)
+
+index_date <- survival_data$index_date
+follow_up_end <- survival_data$follow_up_end
+
+follow_up_period <- survival_data$follow_up_period
+data <- data.frame(index_date, follow_up_end, follow_up_period)
+View(data)
+
+head(survival_data$follow_up_period)
+
+number_person_years_follow_up  = sum(survival_data$follow_up_period, na.rm = TRUE)
+number_person_years_follow_up
+n_events[1]/number_person_years_follow_up 
+
+# what is "date_expo_censor"?
+# else if (project == "unvaccinated"){
+#   survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
+#   survival_data$follow_up_start=cohort_start_date
+#   survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(out_date_ami, vax_date_covid_1, death_date,cohort_end_date,date_expo_censor,na.rm = TRUE))
+#   survival_data <- survival_data %>% dplyr::select(!vax_date_covid_1)
+# }
+
+
+
 
 # # outcome 1: ami
 # n_events[1] <- number_events(input$out_date_ami)
