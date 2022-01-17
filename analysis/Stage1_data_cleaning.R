@@ -328,7 +328,8 @@ if (cohort_name == "vaccinated") {
   
   #Determines mixed vaccination before 7/5/2021
   input$vax_mixed <- ifelse((input$vax_cat_product_1!=input$vax_cat_product_2 & (is.na(input$vax_date_covid_2)==FALSE & input$vax_date_covid_2 < as.Date ("2021-05-07")) ),1,0)
-  # Ensure vax_mixed is not NA but 0
+  #Some testing on dummy data returns NA for vax_mixed when vax_date_covid_2 < 2021-05-07 and both vaccine products are NA
+  #Ensure vax_mixed is not NA but 0
   input$vax_mixed <- replace(input$vax_mixed, is.na(input$vax_mixed),0)
   #Determines unknown vaccine product before 7/5/2021
   input$vax_prior_unknown <- ifelse(is.na(input$vax_cat_product_1) | is.na(input$vax_cat_product_2), 1,0)# unknown products
