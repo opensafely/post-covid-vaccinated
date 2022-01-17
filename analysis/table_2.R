@@ -46,49 +46,21 @@ n_events <- c(lapply(input[,outcome_names], number_events))
 
 n_events
 
-
-
 # record variable names for covariate, qa which are not used in calculating incidence rate
 variable_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
 
-
-# Create a data frame for survival data 
-survival_data <- input[,variable_names] #View(covars)
-
-
-# # read in event dates for outcome-of-interest
-# event_names <- c("ami",  "stroke_isch", 
-#                  "pe",   "dvt",
-#                  "tia",  "stroke_sah_hs", 
-#                  "hf",   "angina",
-#                  "ate",  "vte"
-# )
-# # create a new data frame with columns: patient_id, out_date for each outcome
-# event <- event_names[1]
-# outcomes <-input%>%dplyr::select(c("patient_id", 
-#                                    paste0("out_date_", event)))
-# 
-# # wrangle columns for naming convention 
-# setnames(outcomes, 
-#          old = c(paste0("out_date_", event)), 
-#          new = c("event_date"))
-# 
-# outcomes$name <- event
-# 
-# head(outcomes)
+# Create a data frame for survival data: to avoid carrying covariates in the calculation
+survival_data <- input[,variable_names] 
 
 # follow-up start date: input$index_date
-population= "vaccinated_delta"
-#project = "electively_unvaccinated_delta"
-#project = "unvaccinated"
-
-# take ami as an example, 17 Jan 2022
 # can't use index_date as the start date of follow up as some index dates were after the end of the cohort
 survival_data <- survival_data %>% mutate(delta_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
                                           cohort_end_date = as.Date("2021-12-04", format = "%Y-%m-%d"))
 View(survival_data)
 
 is.Date(survival_data$cohort_end_date)
+
+# take ami as an example, 17 Jan 2022
 if(population == "vaccinated_delta"){
   #14 days after the second vaccination
   survival_data = survival_data %>% mutate(post_2vaccines_14days = as.Date(vax_date_covid_2)+14)
@@ -99,7 +71,6 @@ if(population == "vaccinated_delta"){
   survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(vax_date_covid_1,out_date_ami, death_date,cohort_end_date,na.rm = TRUE))
   survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
 }
-
 
 # follow-up years
 # some of the index_date were wrong? January 2022 after the end of the cohort?
@@ -134,6 +105,26 @@ as.numeric(n_events[1])/as.numeric(number_person_years_follow_up)
 
 
 
+# # read in event dates for outcome-of-interest
+# event_names <- c("ami",  "stroke_isch", 
+#                  "pe",   "dvt",
+#                  "tia",  "stroke_sah_hs", 
+#                  "hf",   "angina",
+#                  "ate",  "vte"
+# )
+# # create a new data frame with columns: patient_id, out_date for each outcome
+# event <- event_names[1]
+# outcomes <-input%>%dplyr::select(c("patient_id", 
+#                                    paste0("out_date_", event)))
+# 
+# # wrangle columns for naming convention 
+# setnames(outcomes, 
+#          old = c(paste0("out_date_", event)), 
+#          new = c("event_date"))
+# 
+# outcomes$name <- event
+# 
+# head(outcomes)
 
 # # outcome 1: ami
 # n_events[1] <- number_events(input$out_date_ami)
