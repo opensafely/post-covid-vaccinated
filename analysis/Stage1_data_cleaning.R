@@ -291,10 +291,11 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 4 (Inclusion): Know
 cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 5 (Inclusion): Registered in an English GP with TPP software for at least 6 months prior to the study start date")
 
 #Exclusion criteria 6: SARS-CoV-2 infection recorded prior to the start of follow-up
-input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_date, 1,0)# Determine infections prior to start date : 1-prior infection; 0 - No prior infection
-input$prior_infections[is.na(input$prior_infections)] <- 0
-input <- subset(input, input$prior_infections ==0)
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS-CoV-2 infection recorded prior index date")
+# Removed for now as we need those with covid history for a sensitivity analysis
+#input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_date, 1,0)# Determine infections prior to start date : 1-prior infection; 0 - No prior infection
+#input$prior_infections[is.na(input$prior_infections)] <- 0
+#input <- subset(input, input$prior_infections ==0)
+#cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS-CoV-2 infection recorded prior index date")
 
 
 #-------------------------------------------------#
@@ -309,7 +310,7 @@ if (cohort_name == "vaccinated") {
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): No record of two vaccination doses prior to the study end date") # Feed into the cohort flow
   
   #Exclusion criteria 8: Received a vaccination prior to 08-12-2020 (i.e., the start of the vaccination program)
-  input <- subset(input, input$vax_date_covid_1 >= as.Date("2020-12-08")|input$vax_date_covid_2 >= as.Date("2020-12-08"))
+  input <- subset(input, input$vax_date_covid_1 >= as.Date("2020-12-08")&input$vax_date_covid_2 >= as.Date("2020-12-08"))
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 8 (Exclusion): Recorded vaccination prior to the start date of vaccination program")
   
   #Exclusion criteria 9: Received a second dose vaccination before their first dose vaccination
@@ -327,6 +328,8 @@ if (cohort_name == "vaccinated") {
   
   #Determines mixed vaccination before 7/5/2021
   input$vax_mixed <- ifelse((input$vax_cat_product_1!=input$vax_cat_product_2 & (is.na(input$vax_date_covid_2)==FALSE & input$vax_date_covid_2 < as.Date ("2021-05-07")) ),1,0)
+  # Ensure vax_mixed is not NA but 0
+  input$vax_mixed <- replace(input$vax_mixed, is.na(input$vax_mixed),0)
   #Determines unknown vaccine product before 7/5/2021
   input$vax_prior_unknown <- ifelse(is.na(input$vax_cat_product_1) | is.na(input$vax_cat_product_2), 1,0)# unknown products
   input$vax_prior_unknown <- ifelse(is.na(input$vax_date_covid_2), 1,input$vax_prior_unknown) #unknown vaccination 2 date
