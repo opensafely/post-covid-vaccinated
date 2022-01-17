@@ -83,11 +83,20 @@ population= "vaccinated_delta"
 #project = "unvaccinated"
 
 # take ami as an example, 17 Jan 2022
+# can't use index_date as the start date of follow up as some index dates were after the end of the cohort
 
-survival_data <- survival_data %>% mutate(cohort_end_date = as.Date("2021-12-04"))
+
+
+survival_data <- survival_data %>% mutate(delta_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
+                                          cohort_end_date = as.Date("2021-12-04", format = "%Y-%m-%d"))
+View(survival_data)
+
 is.Date(survival_data$cohort_end_date)
 if(population == "vaccinated_delta"){
-  survival_data = survial_data %>% rowwise() %>% mutate(follow_up_end= min(out_date_ami, death_date, cohort_end_date,na.rm = TRUE))
+  #14 days after the second vaccination
+  survival_data = survival_data %>% mutate(post_2vaccines_14days = as.Date(vax_date_covid_2)+14)
+  survival_data = survival_data %>% rowwise() %>% mutate(follow_up_start= min(max(delta_start_date,post_2vaccines_14days,na.rm = TRUE), cohort_end_date, na.rm=TRUE),
+                                                         follow_up_end= min(out_date_ami, death_date, cohort_end_date,na.rm = TRUE))
 }else if(population=="electively_unvaccinated_delta"){
   survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
   survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(vax_date_covid_1,out_date_ami, death_date,cohort_end_date,na.rm = TRUE))
@@ -97,9 +106,9 @@ if(population == "vaccinated_delta"){
 
 # follow-up years
 # some of the index_date were wrong? January 2022 after the end of the cohort?
-survival_data = survival_data %>% mutate(follow_up_period = (as.Date(follow_up_end) - as.Date(index_date))/365.2)
+survival_data = survival_data %>% mutate(follow_up_period = (as.Date(follow_up_end) - as.Date(follow_up_start))/365.2)
 
-data<-survival_data %>% dplyr::select(c("out_date_ami", "death_date", "cohort_end_date","index_date" , "follow_up_end", "follow_up_period"))
+data<-survival_data %>% dplyr::select(c("out_date_ami", "death_date", "cohort_end_date","index_date" ,"follow_up_start", "follow_up_end", "follow_up_period"))
 View(data)
 names(survival_data)
 
@@ -114,7 +123,9 @@ head(survival_data$follow_up_period)
 
 number_person_years_follow_up  = sum(survival_data$follow_up_period, na.rm = TRUE)
 number_person_years_follow_up
-n_events[1]/number_person_years_follow_up 
+
+# incidence rate for ami
+as.numeric(n_events[1])/as.numeric(number_person_years_follow_up)
 
 # what is "date_expo_censor"?
 # else if (project == "unvaccinated"){
