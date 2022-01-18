@@ -27,6 +27,23 @@ if(population == "electively_unvaccinated"){
   input <- read_rds("output/input_electively_unvaccinated.rds")
 }
 
+outcome_names <- c("out_date_ami",  "out_date_stroke_isch", 
+                   "out_date_pe",   "out_date_dvt",
+                   "out_date_tia",  "out_date_stroke_sah_hs", 
+                   "out_date_hf",   "out_date_angina",
+                   "out_date_ate",  "out_date_vte"
+)
+
+# automation
+event_names<- substr(outcome_names, start=10, stop=nchar(outcome_names))
+event_names
+
+table_2 <- data.frame(matrix(ncol=4, nrow=length(outcome_names)))
+names <- c("outcomes", "event_counts", "pearson_years_follow_up", "incidence_rate")
+colnames(table_2) <- names
+table_2$outcomes <- event_names
+table_2
+
 n_events <- rep(0,10)
 
 number_events <- function(outcome)
@@ -35,16 +52,15 @@ number_events <- function(outcome)
   return(count)
 }
 
-outcome_names <- c("out_date_ami",  "out_date_stroke_isch", 
-                   "out_date_pe",   "out_date_dvt",
-                   "out_date_tia",  "out_date_stroke_sah_hs", 
-                   "out_date_hf",   "out_date_angina",
-                   "out_date_ate",  "out_date_vte"
-                   )
 
 n_events <- c(lapply(input[,outcome_names], number_events))
 
 n_events
+
+
+table_2$event_counts <- n_events
+
+
 
 # record variable names for covariate, qa which are not used in calculating incidence rate
 variable_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
@@ -58,7 +74,7 @@ survival_data <- survival_data %>% mutate(delta_start_date = as.Date("2021-06-01
                                           cohort_end_date = as.Date("2021-12-04", format = "%Y-%m-%d"))
 View(survival_data)
 
-is.Date(survival_data$cohort_end_date)
+#is.Date(survival_data$cohort_end_date)
 
 # take ami as an example, 17 Jan 2022
 if(population == "vaccinated_delta"){
@@ -94,6 +110,9 @@ number_person_years_follow_up
 
 # incidence rate for ami
 as.numeric(n_events[1])/as.numeric(number_person_years_follow_up)
+
+
+
 
 # what is "date_expo_censor"?
 # else if (project == "unvaccinated"){
