@@ -11,15 +11,15 @@ library(tidyverse)
              # before or in the absence of COVID-19 across the whole follow up period -
              # separately in subgroups defined by age and sex (RT - time being, for whole sample)
 
-#1.RISK START DATE
+#1.COHORT START DATE
 #a.Cohort start date 2021-06-1
 input$delta_start <- as.Date("2021-06-01", format="%Y-%m-%d")
-#b.if vaccinated, 14 days after the second vaccination
-input$immune_start <- as.Date(input$vax_date_covid_2)+14
+#b.if vaccinated, 2 WEEKS after the second vaccination
+input$immune_start <- as.Date(input$vax_date_covid_2)+15
 #c.At risk start time - latest of a,b as RISK - start date
 input$risk_start_date <- pmax(input$delta_start, input$immune_start, na.rm = TRUE)
 
-#2.RISK END DATE
+#2.COHORT END DATE
 #a.Cohort end date 2021-12-14 
 input$delta_end <- as.Date("2021-12-14", format="%Y-%m-%d")
 #b.sample follow up ends on Death date, if any
@@ -36,14 +36,20 @@ input$out_date_ami <- as.Date(input$out_date_ami, format="%Y-%m-%d")
 #input$out_ate <- as.Date(input$out_date_ate, format="%Y-%m-%d")
 #input$out_vte <- as.Date(input$out_date_vte, format="%Y-%m-%d")
 #d.Infection date(for the uninfected group)
-input$exp_date_covid19_confirmed <- as.Date(input$exp_date_covid19_confirmed,  format="%Y-%m-%d")
+#input$exp_date_covid19_confirmed <- as.Date(input$exp_date_covid19_confirmed,  format="%Y-%m-%d")
 #e.Risk end date - earliest of a,b, c, d for the non-exposed/uninfected group
 input$risk_end_date <- pmin(input$delta_end, 
                        input$death_date, 
-                       input$out_date_ami,
-                       input$exp_date_covid19_confirmed,  na.rm = TRUE)
+                       input$out_date_ami,na.rm = TRUE)
+                       #input$exp_date_covid19_confirmed,  
 
 table(input$risk_end_date)
+
+
+
+
+
+
 
 #3.Derive the event counts on days
 str(input$out_date_ami)#Date
