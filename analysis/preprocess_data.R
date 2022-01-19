@@ -20,6 +20,12 @@ for (i in c("index","vaccinated","electively_unvaccinated")) {
   
   tmp <- arrow::read_feather(file = paste0("output/input_",i,".feather"))
   
+  # Overwrite patient IDs for dummy data only ----------------------------------
+  
+  if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
+    tmp$patient_id <- df$patient_id
+  }
+  
   ## Identify dynamic variables in dataset
   
   keep <- c("patient_id",
