@@ -62,7 +62,7 @@ n_events <- c(lapply(input[,outcome_names], number_events))
 n_events
 
 
-table_2$event_count <- n_events
+table_2$event_count <- as.numeric(n_events)
 
 
 # record variable names for covariate, qa which are not used in calculating incidence rate
@@ -114,6 +114,10 @@ for(i in 1:length(event_date_names)){
 }
 
 table_2
+
+str(table_2)
+
+write.csv(table_2, file="output/table2_summary_stats.csv", row.names=F)
 
 # 
 # # #----------------------------------------------------------------------------------------
