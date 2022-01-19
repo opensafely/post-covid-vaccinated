@@ -183,10 +183,10 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Deep vein thrombosis
-    ### HES APC
-    tmp_out_date_dvt_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=dvt_dvt_icd10,
+    ### Primary care
+    tmp_out_date_dvt_snomed=patients.with_these_clinical_events(
+        all_dvt_codes_snomed_clinical,
+        returning="date",
         on_or_after=f"{index_date_variable}",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
@@ -196,9 +196,10 @@ def generate_common_variables(index_date_variable):
             "incidence": 0.03,
         },
     ),
-    tmp_out_date_dvt_pregnancy_hes=patients.admitted_to_hospital(
+    ### HES APC
+    tmp_out_date_dvt_hes=patients.admitted_to_hospital(
         returning="date_admitted",
-        with_these_diagnoses=dvt_pregnancy_icd10,
+        with_these_diagnoses=all_dvt_codes_icd10,
         on_or_after=f"{index_date_variable}",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
@@ -210,19 +211,7 @@ def generate_common_variables(index_date_variable):
     ),
     ### ONS
     tmp_out_date_dvt_death=patients.with_these_codes_on_death_certificate(
-        dvt_dvt_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.02,
-        },
-    ),
-    tmp_out_date_dvt_pregnancy_death=patients.with_these_codes_on_death_certificate(
-        dvt_pregnancy_icd10,
+        all_dvt_codes_icd10,
         returning="date_of_death",
         on_or_after=f"{index_date_variable}",
         match_only_underlying_cause=True,
@@ -235,7 +224,7 @@ def generate_common_variables(index_date_variable):
     ),
     ### Combined
     out_date_dvt=patients.minimum_of(
-        "tmp_out_date_dvt_hes", "tmp_out_date_dvt_death", "tmp_out_date_dvt_pregnancy_hes", "tmp_out_date_dvt_pregnancy_death"
+        "tmp_out_date_dvt_snomed","tmp_out_date_dvt_hes", "tmp_out_date_dvt_death"
     ),
 
     ## Pulmonary embolism
@@ -463,12 +452,24 @@ def generate_common_variables(index_date_variable):
         "tmp_out_date_angina_snomed", "tmp_out_date_angina_hes", "tmp_out_date_angina_death"
     ),
 
-
-    ## Other arterial embolism [rare so not analysed individually but contibrutes to 'arterial thrombosis events']
+    ## Arterial thrombosis events (i.e., any arterial event - this combines: AMI, ischaemic stroke, other arterial embolism)
+    ### Primary care
+    tmp_out_date_ate_snomed=patients.with_these_clinical_events(
+        all_ate_codes_snomed_clinical,
+        returning="date",
+        on_or_after=f"{index_date_variable}",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
     ### HES APC
-    tmp_out_date_oae_hes=patients.admitted_to_hospital(
+    tmp_out_date_ate_hes=patients.admitted_to_hospital(
         returning="date_admitted",
-        with_these_diagnoses=other_arterial_embolism_icd10, 
+        with_these_diagnoses=all_ate_codes_icd10,
         on_or_after=f"{index_date_variable}",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
@@ -479,8 +480,8 @@ def generate_common_variables(index_date_variable):
         },
     ),
     ### ONS
-    tmp_out_date_oae_death=patients.with_these_codes_on_death_certificate(
-        other_arterial_embolism_icd10,
+    tmp_out_date_ate_death=patients.with_these_codes_on_death_certificate(
+        all_ate_codes_icd10,
         returning="date_of_death",
         on_or_after=f"{index_date_variable}",
         match_only_underlying_cause=True,
@@ -491,10 +492,9 @@ def generate_common_variables(index_date_variable):
             "incidence": 0.02
         },
     ),
-
-    ## Arterial thrombosis events (i.e., any arterial event - this combines: AMI, ischaemic stroke, other arterial embolism)
+    ### Combined
     out_date_ate=patients.minimum_of(
-        "tmp_out_date_ami_snomed", "tmp_out_date_ami_hes", "tmp_out_date_ami_death", "tmp_out_date_oae_hes", "tmp_out_date_oae_death", "tmp_out_date_stroke_isch_snomed", "tmp_out_date_stroke_isch_hes", "tmp_out_date_stroke_isch_death"
+        "tmp_out_date_ate_snomed", "tmp_out_date_ate_hes", "tmp_out_date_ate_death"
     ),
 
     ## Venous thromboembolism events (i.e., any venous event) - this combines: PE, DVT, ICVT, Portal vein thrombosism, other DVT)
@@ -784,12 +784,24 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_stroke_isch_hes", "tmp_cov_bin_stroke_isch_snomed", "tmp_cov_bin_stroke_sah_hs_hes", "tmp_cov_bin_stroke_sah_hs_snomed",
     ),
 
-    ## Other arterial embolism  
-    cov_bin_other_arterial_embolism=patients.admitted_to_hospital(
+    ## Other arterial embolism
+    ### Primary care
+    tmp_cov_bin_other_arterial_embolism_snomed=patients.with_these_clinical_events(
+        other_arterial_embolism_snomed_clinical,
         returning='binary_flag',
-        with_these_diagnoses=other_arterial_embolism_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
+    ),
+    ### HES APC
+    tmp_cov_bin_other_arterial_embolism_hes=patients.admitted_to_hospital(
+        returning='binary_flag',
+        with_these_diagnoses=ami_icd10,
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+    ### Combined
+    cov_bin_other_arterial_embolism=patients.maximum_of(
+        "tmp_cov_bin_other_arterial_embolism_snomed", "tmp_cov_bin_other_arterial_embolism_hes",
     ),
     
     ## Venous thrombolism events
@@ -1141,6 +1153,7 @@ def generate_common_variables(index_date_variable):
     # Define subgroups (for variables that don't have a corresponding covariate only)
 
     ## Arterial thrombosis events (i.e., any arterial event - this combines: AMI, ischaemic stroke, other arterial embolism)
+    ## NB: prior ami is not included in all_ate_codes codelists (only incident ami) hence the use of the seperate covariates 
     sub_bin_ate=patients.maximum_of(
         "cov_bin_ami", "cov_bin_other_arterial_embolism", "tmp_cov_bin_stroke_isch_snomed", "tmp_cov_bin_stroke_isch_hes",
     ),
