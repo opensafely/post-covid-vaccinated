@@ -153,39 +153,6 @@ write.csv(table_2, file="output/table2_summary_stats.csv", row.names=F)
 # 
 # table_2
 
-# # writing code for a single outcome to start with: take ami as an example, 17 Jan 2022
-# if(population == "vaccinated_delta"){
-#   #14 days after the second vaccination
-#   survival_data = survival_data %>% mutate(post_2vaccines_14days = as.Date(vax_date_covid_2)+14)
-#   survival_data = survival_data %>% rowwise() %>% mutate(follow_up_start= min(max(cohort_start_date,post_2vaccines_14days,na.rm = TRUE), cohort_end_date, na.rm=TRUE),
-#                                                          follow_up_end= min(event_date, death_date, cohort_end_date,na.rm = TRUE))
-# }else if(population=="electively_unvaccinated_delta"){
-#   survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
-#   survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(vax_date_covid_1,out_date_ami, death_date,cohort_end_date,na.rm = TRUE))
-#   survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
-# }
-# 
-# # follow-up years
-# # some of the index_date were wrong? January 2022 after the end of the cohort?
-# survival_data = survival_data %>% mutate(follow_up_period = as.numeric((as.Date(follow_up_end) - as.Date(follow_up_start))/365.2))
-# 
-# # checking ---------
-# # data<-survival_data %>% dplyr::select(c("out_date_ami", "death_date", "cohort_end_date","index_date" ,"follow_up_start", "follow_up_end", "follow_up_period"))
-# # View(data)
-# # names(survival_data)
-# 
-# #number of person years follow up
-# table_2$pearson_years_follow_up[1]  = round(sum(survival_data$follow_up_period, na.rm = TRUE),1)
-# table_2$pearson_years_follow_up[1]
-# 
-# 
-# # incidence rate for ami
-# table_2$incidence_rate[1] = round(as.numeric(table_2$event_counts[1])/table_2$pearson_years_follow_up[1], 4)
-# 
-# table_2
-
-
-
 
 # what is "date_expo_censor"?
 # else if (project == "unvaccinated"){
