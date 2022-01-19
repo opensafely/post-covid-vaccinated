@@ -63,16 +63,17 @@ table_2$event_counts <- n_events
 
 
 # record variable names for covariate, qa which are not used in calculating incidence rate
-variable_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
+vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
 
 # Create a data frame for survival data: to avoid carrying covariates in the calculation
-survival_data <- input[,variable_names] 
+survival_data <- input[,vars_names] 
 
 # follow-up start date: input$index_date
 # can't use index_date as the start date of follow up as some index dates were after the end of the cohort
-survival_data <- survival_data %>% mutate(cohort_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
-                                          cohort_end_date = as.Date("2021-12-04", format = "%Y-%m-%d"))
-View(survival_data)
+survival_data <- survival_data %>% 
+                     mutate(cohort_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
+                     cohort_end_date = as.Date("2021-12-04", format = "%Y-%m-%d"))
+#View(survival_data)
 
 #is.Date(survival_data$cohort_end_date)
 
@@ -92,19 +93,18 @@ if(population == "vaccinated_delta"){
 # some of the index_date were wrong? January 2022 after the end of the cohort?
 survival_data = survival_data %>% mutate(follow_up_period = as.numeric((as.Date(follow_up_end) - as.Date(follow_up_start))/365.2))
 
-# checking
-data<-survival_data %>% dplyr::select(c("out_date_ami", "death_date", "cohort_end_date","index_date" ,"follow_up_start", "follow_up_end", "follow_up_period"))
-View(data)
-names(survival_data)
+# checking ---------
+# data<-survival_data %>% dplyr::select(c("out_date_ami", "death_date", "cohort_end_date","index_date" ,"follow_up_start", "follow_up_end", "follow_up_period"))
+# View(data)
+# names(survival_data)
 
-head(survival_data$follow_up_period)
+#number of person years follow up
+table_2$pearson_years_follow_up[1]  = sum(survival_data$follow_up_period, na.rm = TRUE)
+table_2$pearson_years_follow_up[1]
 
-number_person_years_follow_up  = sum(survival_data$follow_up_period, na.rm = TRUE)
-number_person_years_follow_up
 
 # incidence rate for ami
-as.numeric(n_events[1])/as.numeric(number_person_years_follow_up)
-
+table_2$incidence_rate[1] = as.numeric(n_events[1])/table_2$pearson_years_follow_up[1]
 
 
 
