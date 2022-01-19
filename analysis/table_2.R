@@ -44,7 +44,7 @@ colnames(table_2) <- col_headings
 table_2$event <- event_names
 table_2
 
-n_events <- rep(0,10)
+n_events <- rep(0,length(event_date_names))
 
 number_events <- function(outcome)
 {
@@ -104,7 +104,7 @@ summary_stats <- function(population, survival_data, event_count, event_date_nam
   return(c(pearson_years_follow_up, incidence_rate))
 }
 
-for(i in 1:10){
+for(i in 1:length(event_date_names)){
   table_2[i,3:4] <- summary_stats(population, survival_data, table_2$event_count, event_date_names, i)
 }
 
