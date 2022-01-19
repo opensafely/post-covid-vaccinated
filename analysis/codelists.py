@@ -772,3 +772,40 @@ diabetes_gestational_snomed_clinical = codelist_from_csv(
     system="snomed",
     column="code",
 )
+
+other_arterial_embolism_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-other_art_embol.csv",
+    system="snomed",
+    column="code",
+)
+
+dvt_dvt_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt_main.csv",
+    system="snomed",
+    column="code",
+)
+
+dvt_icvt_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt_icvt.csv",
+    system="snomed",
+    column="code",
+)
+
+portal_vein_thrombosis_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-pvt.csv",
+    system="snomed",
+    column="code",
+)
+
+dvt_pregnancy_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt-preg.csv",
+    system="snomed",
+    column="code",
+)
+
+other_dvt_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt-other.csv",
+    system="snomed",
+    column="code",
+)
+)
