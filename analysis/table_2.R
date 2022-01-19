@@ -20,11 +20,11 @@ population = "vaccinated_delta" #commented out when using project yaml
 # read in data------------------------------------------------------------
 
 if(population == "vaccinated_delta"){
-  input <- read_rds("output/input_vaccinated.rds")
+  input <- read_rds("output/input_vaccinated_stage1.rds")
 }
 
 if(population == "electively_unvaccinated"){
-  input <- read_rds("output/input_electively_unvaccinated.rds")
+  input <- read_rds("output/input_electively_unvaccinated_stage1.rds")
 }
 
 event_date_names <- c("out_date_ami",  "out_date_stroke_isch", 
