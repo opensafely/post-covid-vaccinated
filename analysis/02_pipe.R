@@ -169,6 +169,10 @@ if(startsWith(strata, "covid_pheno")==TRUE){
  
 
 
+analyses_not_run=data.frame(matrix(nrow=0,ncol = 7))
+colnames(analyses_not_run)=c("event","subgroup","strata","any exposures?", "any exposure events?", "any non exposed?", "more than 400 post exposure events?")
+
+
 #------------------------ SET DATES OUTSIDE RANGE AS NA ------------------------
 
 

@@ -132,15 +132,22 @@ coxfit <- function(data_surv, interval_names, covar_names){
 
 fit_model_reducedcovariates <- function(event, stratify_by_subgroup, stratify_by, survival_data,covar_names,input){
   list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event, stratify_by_subgroup, stratify_by, survival_data,cuts_days_since_expo)
+  if(length(list_data_surv_noncase_ids_interval_names)==1){
+    analyses_not_run <<- list_data_surv_noncase_ids_interval_names[[1]]
+    #analyses_not_run<<- not_run
+    return(fit_model_reducedcovariates)
+  }
+  
   data_surv <- list_data_surv_noncase_ids_interval_names[[1]]
   noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
   interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
   ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
   non_case_weight=list_data_surv_noncase_ids_interval_names[[5]]
-  more_than_400_events=list_data_surv_noncase_ids_interval_names[[6]]
-  more_than_400_events
-  if(more_than_400_events=="FALSE"){
-    print("too few events")
+  less_than_400_events=list_data_surv_noncase_ids_interval_names[[6]]
+  if(less_than_400_events=="TRUE"){
+    analyses_not_run[nrow(analyses_not_run)+1,]<<-c(event,stratify_by_subgroup,stratify_by,"TRUE","TRUE","TRUE","FALSE")
+    #not_run=analyses_not_run
+    #analyses_not_run<<- not_run
     return(fit_model_reducedcovariates)
   }
 

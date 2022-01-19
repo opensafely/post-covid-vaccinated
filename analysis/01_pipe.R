@@ -41,12 +41,12 @@ covid_history = args[[5]] #covid_history_false, covid_history_true
 
 #mdl="mdl_max_adj"
 #event_name="all"
-#strata="agegp_all"
+#strata="main"
 #project="vaccinated_delta"
-#covid_history="covid_history_false"
-# event="tia"
-# stratify_by_subgroup="main"
-# stratify_by="main"
+#covid_history="covid_history_true"
+#event="ami"
+#stratify_by_subgroup="agegp"
+#stratify_by="18_39"
 
 # Specify directories ----------------------------------------------------------
 output_dir <- "output"
@@ -72,6 +72,9 @@ lapply(split(ls_events_missing,seq(nrow(ls_events_missing))),
            input, cuts_days_since_expo,cuts_days_since_expo_reduced)
 )
    
+
+#Save csv of anlayses not run
+write.csv(analyses_not_run, paste0(output_dir,"/analyses_not_run_" , save_name ,"_",project,"_", mdl,"_",covid_history, ".csv"), row.names = T)
 
 
 #Combine all results into one .csv

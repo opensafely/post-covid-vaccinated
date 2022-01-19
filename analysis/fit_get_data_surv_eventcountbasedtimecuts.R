@@ -77,182 +77,195 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
   # WITH COVID
   #-------------------------------------------------------------------------------
   with_expo <- survival_data %>% filter(!is.na(expo_date))
+  any_exposures <- nrow(with_expo)>0
+  any_exposed_events <- nrow(with_expo %>% filter(is.na(event_date)==F))>0
   
-  if(startsWith(strata,"covid_pheno_")==T){
-    with_expo <- with_expo %>% 
-      dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH, date_expo_censor) %>%  
-      mutate(event_status = if_else( (!is.na(event_date)) & 
-                                       (
-                                         ((event_date <= follow_up_end) & ((follow_up_end != date_expo_censor) | is.na(date_expo_censor ))) | 
-                                           ((event_date < follow_up_end) & (follow_up_end == date_expo_censor)) 
-                                       ), 
-                                     1, 0))
-  }else{
-    with_expo <- with_expo %>% 
-      dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH) %>%  
-      mutate(event_status = if_else( (!is.na(event_date)) 
-                                     , 1, 0)) 
+  if(any_exposures==T & any_exposed_events ==T ){
+    if(startsWith(strata,"covid_pheno_")==T){
+      with_expo <- with_expo %>% 
+        dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH, date_expo_censor) %>%  
+        mutate(event_status = if_else( (!is.na(event_date)) & 
+                                         (
+                                           ((event_date <= follow_up_end) & ((follow_up_end != date_expo_censor) | is.na(date_expo_censor ))) | 
+                                             ((event_date < follow_up_end) & (follow_up_end == date_expo_censor)) 
+                                         ), 
+                                       1, 0))
+    }else{
+      with_expo <- with_expo %>% 
+        dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH) %>%  
+        mutate(event_status = if_else( (!is.na(event_date)) 
+                                       , 1, 0)) 
+      
+    }
     
+    
+    # ......................................
+    # CHUNK UP FOLLOW-UP PERIOD by CHANGE OF STATE OF EXPOSURE
+    
+    with_expo$day_to_expo <- as.numeric(with_expo$expo_date - as.Date(cohort_start_date))
+    
+    d1 <- with_expo %>% dplyr::select(patient_id, expo_date, event_date, DATE_OF_DEATH)
+    d2 <- with_expo %>% dplyr::select(patient_id, days_to_start, day_to_expo, days_to_end, event_status)
+    with_expo <- tmerge(data1=d1, data2=d2, id=patient_id,
+                        event=event(days_to_end, event_status), tstart=days_to_start, tstop = days_to_end,
+                        expo=tdc(day_to_expo)) 
+    
+    with_expo <- with_expo %>% dplyr::select(!id)
+    rm(list=c("d1", "d2", "non_cases", "cases"))
+    
+    # ----------------------- SPLIT POST-COVID TIME------------------------------
+    with_expo_postexpo <- with_expo %>% filter(expo==1)
+    
+    with_expo_postexpo <- with_expo_postexpo %>% rename(t0=tstart, t=tstop) %>% mutate(tstart=0, tstop=t-t0)
+    
+    
+    with_expo_postexpo <- survSplit(Surv(tstop, event)~., 
+                                    with_expo_postexpo,
+                                    cut=cuts_days_since_expo,
+                                    episode="days_cat"
+    )
+    
+    
+    with_expo_postexpo <- with_expo_postexpo %>% mutate(tstart=tstart+t0, tstop=tstop+t0) %>% dplyr::select(-c(t0,t))
+    
+    # ................... CONCAT BACK PRE-COVID TIME...................
+    with_expo_preexpo <- with_expo %>% filter(expo==0)
+    with_expo_preexpo$days_cat <- 0
+    ls_with_expo <- list(with_expo_preexpo, with_expo_postexpo)
+    with_expo <- do.call(rbind, lapply(ls_with_expo, function(x) x[match(names(ls_with_expo[[1]]), names(x))]))
+    
+    rm(list=c("ls_with_expo", "with_expo_preexpo", "with_expo_postexpo"))
+    
+    with_expo  <- with_expo %>%
+      group_by(patient_id) %>% arrange(days_cat) %>% mutate(last_step = ifelse(row_number()==n(),1,0))
+    with_expo$event  <- with_expo$event * with_expo$last_step
   }
   
   
-  # ......................................
-  # CHUNK UP FOLLOW-UP PERIOD by CHANGE OF STATE OF EXPOSURE
-  
-  with_expo$day_to_expo <- as.numeric(with_expo$expo_date - as.Date(cohort_start_date))
-  
-  d1 <- with_expo %>% dplyr::select(patient_id, expo_date, event_date, DATE_OF_DEATH)
-  d2 <- with_expo %>% dplyr::select(patient_id, days_to_start, day_to_expo, days_to_end, event_status)
-  with_expo <- tmerge(data1=d1, data2=d2, id=patient_id,
-                        event=event(days_to_end, event_status), tstart=days_to_start, tstop = days_to_end,
-                      expo=tdc(day_to_expo)) 
-  
-  with_expo <- with_expo %>% dplyr::select(!id)
-  rm(list=c("d1", "d2", "non_cases", "cases"))
-
-  # ----------------------- SPLIT POST-COVID TIME------------------------------
-  with_expo_postexpo <- with_expo %>% filter(expo==1)
-  
-  with_expo_postexpo <- with_expo_postexpo %>% rename(t0=tstart, t=tstop) %>% mutate(tstart=0, tstop=t-t0)
-
-  
-  with_expo_postexpo <- survSplit(Surv(tstop, event)~., 
-                                  with_expo_postexpo,
-                                  cut=cuts_days_since_expo,
-                                  episode="days_cat"
-  )
-  
-
-  with_expo_postexpo <- with_expo_postexpo %>% mutate(tstart=tstart+t0, tstop=tstop+t0) %>% dplyr::select(-c(t0,t))
-
-  # ................... CONCAT BACK PRE-COVID TIME...................
-  with_expo_preexpo <- with_expo %>% filter(expo==0)
-  with_expo_preexpo$days_cat <- 0
-  ls_with_expo <- list(with_expo_preexpo, with_expo_postexpo)
-  with_expo <- do.call(rbind, lapply(ls_with_expo, function(x) x[match(names(ls_with_expo[[1]]), names(x))]))
-  
-  rm(list=c("ls_with_expo", "with_expo_preexpo", "with_expo_postexpo"))
-  
-  with_expo  <- with_expo %>%
-    group_by(patient_id) %>% arrange(days_cat) %>% mutate(last_step = ifelse(row_number()==n(),1,0))
-  with_expo$event  <- with_expo$event * with_expo$last_step
   
 
   #===============================================================================
   #-   WITHOUT COVID
   #-------------------------------------------------------------------------------
   without_expo <- survival_data %>%filter(is.na(expo_date)) 
+  any_no_expo <- nrow(with_expo)>0
   
-  
-  
-  if(startsWith(strata,"covid_pheno_")==T){
-    without_expo <- without_expo %>% 
-      dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH, date_expo_censor) %>%  
-      mutate(event = if_else( (!is.na(event_date)) & 
-                                (
-                                  ((event_date <= follow_up_end) & ((follow_up_end != date_expo_censor) | is.na(date_expo_censor ))) | 
-                                    ((event_date < follow_up_end) & (follow_up_end == date_expo_censor)) 
-                                ), 
-                              1, 0))
+  if(any_no_expo == T & any_exposures== T & any_exposed_events == T ){
+    if(startsWith(strata,"covid_pheno_")==T){
+      without_expo <- without_expo %>% 
+        dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH, date_expo_censor) %>%  
+        mutate(event = if_else( (!is.na(event_date)) & 
+                                  (
+                                    ((event_date <= follow_up_end) & ((follow_up_end != date_expo_censor) | is.na(date_expo_censor ))) | 
+                                      ((event_date < follow_up_end) & (follow_up_end == date_expo_censor)) 
+                                  ), 
+                                1, 0))
+    }else{
+      without_expo <- without_expo %>%
+        dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH) %>% 
+        mutate(event = if_else( (!is.na(event_date)), 
+                                1, 0))
+    }
+    
+    
+    # ......................................
+    
+    without_expo$tstart<- without_expo$days_to_start
+    without_expo$tstop <- ifelse(without_expo$days_to_end ==0,  without_expo$days_to_end + 0.001, without_expo$days_to_end)
+    without_expo$expo<- c(0)
+    without_expo$days_cat <- c(0)
+    
+    
+    #===============================================================================
+    #-   RBIND WITH & WITHOUT COVID
+    #-------------------------------------------------------------------------------
+    common_cols <- intersect(colnames(without_expo), colnames(with_expo))
+    without_expo <- without_expo %>% dplyr::select(all_of(common_cols))
+    with_expo <- with_expo %>% dplyr::select(all_of(common_cols))
+    data_surv <-rbind(without_expo, with_expo)
+    
+    
+    
+    #===============================================================================
+    #   PIVOT WIDE for WEEKS_SINCE_COVID
+    #-------------------------------------------------------------------------------
+    #data_surv$days_to_expo <- as.numeric(data_surv$expo_date - as.Date(cohort_start_date)  ) #do I need this??
+    
+    interval_names <- mapply(function(x, y) ifelse(x == y, paste0("days", x), paste0("days", x, "_", y)), 
+                             lag(cuts_days_since_expo, default = 0), 
+                             cuts_days_since_expo, 
+                             SIMPLIFY = FALSE)
+    
+    
+    intervals <- mapply(c, lag(cuts_days_since_expo, default = 0), cuts_days_since_expo, SIMPLIFY = F)
+    
+    i<-0
+    for (ls in mapply(list, interval_names, intervals, SIMPLIFY = F)){
+      i <- i+1
+      data_surv[[ls[[1]]]] <- if_else(data_surv$days_cat==i, 1, 0)
+    }
+    
+    data_surv <- data_surv %>% left_join(df_sex)
+    
+    
+    # ============================= EVENTS COUNT =================================
+    which_days_since_covid <- function(row_data_surv, interval_names){
+      days_cols <- row_data_surv %>% dplyr::select(all_of(interval_names))
+      row_data_surv$expo_days <- names(days_cols)[which(days_cols == 1)]
+      row_data_surv$expo_days <- ifelse(is.na(row_data_surv$expo_days),"pre expo", row_data_surv$expo_days)
+      return(row_data_surv)
+    }
+    
+    get_tbl_event_count <- function(data_surv, interval_names){
+      df_events <- data_surv %>% filter(event==1)
+      ls_data_surv <- split(df_events, 1:nrow(df_events))
+      ls_data_surv <- lapply(ls_data_surv, which_days_since_covid, unlist(interval_names))
+      ls_data_surv <- do.call("rbind", ls_data_surv)
+      tbl_event_count <- aggregate(event ~ expo_days, ls_data_surv, sum)
+      tbl_event_count[nrow(tbl_event_count) + 1,] = c("all post expo", sum(head(tbl_event_count$event, (nrow(tbl_event_count)-1)))  )
+      return(tbl_event_count)
+    }
+    tbl_event_count_all <- get_tbl_event_count(data_surv, interval_names)
+    
+    tbl_event_count <- list(tbl_event_count_all) %>% reduce(left_join, by = "expo_days")
+    
+    event_count_levels <- c("pre expo", unlist(interval_names), "all post expo")
+    tbl_event_count_levels <- data.frame(event_count_levels)
+    names(tbl_event_count_levels) <- c("expo_days")
+    
+    
+    tbl_event_count <- merge(tbl_event_count_levels, tbl_event_count, all.x = TRUE)
+    tbl_event_count[is.na(tbl_event_count)] <- 0
+    
+    tbl_event_count <- tbl_event_count %>%
+      arrange(factor(expo_days, 
+                     levels = event_count_levels), 
+              expo_days)
+    
+    names(tbl_event_count) <- c("expo_week", "events_total")
+    ind_any_zeroeventperiod <- any((tbl_event_count$events_total == 0) & (!identical(cuts_days_since_expo, c(28, 196))))
+    
+    
+    if (identical(cuts_days_since_expo, c(28, 196))){
+      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_red_" , save_name, "_",stratify_by,"_",event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
+    } else (
+      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
+    )
+    
+    
+    #===============================================================================
+    # FINALIZE age, region, data_surv
+    #-------------------------------------------------------------------------------
+    #need to change to 400 but >=5 used to check on dummy data
+    less_than_400_events = any((as.numeric(tbl_event_count$events_total) <5) & (tbl_event_count$expo_week=="all post expo"))
+    data_surv <- data_surv %>% left_join(df_age_region)
+    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_weight, less_than_400_events))
+    
   }else{
-    without_expo <- without_expo %>%
-      dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH) %>% 
-      mutate(event = if_else( (!is.na(event_date)), 
-                              1, 0))
+    analyses_not_run[nrow(analyses_not_run)+1,]<- c(event,stratify_by_subgroup,stratify_by,any_exposures,any_exposed_events,any_no_expo,"FALSE")
+    
+    return(list(analyses_not_run))
   }
   
-  
-  # ......................................
-  
-  without_expo$tstart<- without_expo$days_to_start
-  without_expo$tstop <- ifelse(without_expo$days_to_end ==0,  without_expo$days_to_end + 0.001, without_expo$days_to_end)
-  without_expo$expo<- c(0)
-  without_expo$days_cat <- c(0)
-  
- 
-  #===============================================================================
-  #-   RBIND WITH & WITHOUT COVID
-  #-------------------------------------------------------------------------------
-  common_cols <- intersect(colnames(without_expo), colnames(with_expo))
-  without_expo <- without_expo %>% dplyr::select(all_of(common_cols))
-  with_expo <- with_expo %>% dplyr::select(all_of(common_cols))
-  data_surv <-rbind(without_expo, with_expo)
-  
-  
-  
-  #===============================================================================
-  #   PIVOT WIDE for WEEKS_SINCE_COVID
-  #-------------------------------------------------------------------------------
-  #data_surv$days_to_expo <- as.numeric(data_surv$expo_date - as.Date(cohort_start_date)  ) #do I need this??
-  
-  interval_names <- mapply(function(x, y) ifelse(x == y, paste0("days", x), paste0("days", x, "_", y)), 
-                           lag(cuts_days_since_expo, default = 0), 
-                           cuts_days_since_expo, 
-                           SIMPLIFY = FALSE)
-  
- 
-  intervals <- mapply(c, lag(cuts_days_since_expo, default = 0), cuts_days_since_expo, SIMPLIFY = F)
- 
-  i<-0
-  for (ls in mapply(list, interval_names, intervals, SIMPLIFY = F)){
-    i <- i+1
-    data_surv[[ls[[1]]]] <- if_else(data_surv$days_cat==i, 1, 0)
-  }
-  
-  data_surv <- data_surv %>% left_join(df_sex)
-  
-  
-  # ============================= EVENTS COUNT =================================
-  which_days_since_covid <- function(row_data_surv, interval_names){
-    days_cols <- row_data_surv %>% dplyr::select(all_of(interval_names))
-    row_data_surv$expo_days <- names(days_cols)[which(days_cols == 1)]
-    row_data_surv$expo_days <- ifelse(is.na(row_data_surv$expo_days),"pre expo", row_data_surv$expo_days)
-    return(row_data_surv)
-  }
-  
-  get_tbl_event_count <- function(data_surv, interval_names){
-    df_events <- data_surv %>% filter(event==1)
-    ls_data_surv <- split(df_events, 1:nrow(df_events))
-    ls_data_surv <- lapply(ls_data_surv, which_days_since_covid, unlist(interval_names))
-    ls_data_surv <- do.call("rbind", ls_data_surv)
-    tbl_event_count <- aggregate(event ~ expo_days, ls_data_surv, sum)
-    tbl_event_count[nrow(tbl_event_count) + 1,] = c("all post expo", sum(head(tbl_event_count$event, (nrow(tbl_event_count)-1)))  )
-    return(tbl_event_count)
-  }
-  tbl_event_count_all <- get_tbl_event_count(data_surv, interval_names)
-
-  tbl_event_count <- list(tbl_event_count_all) %>% reduce(left_join, by = "expo_days")
-
-  event_count_levels <- c("pre expo", unlist(interval_names), "all post expo")
-  tbl_event_count_levels <- data.frame(event_count_levels)
-  names(tbl_event_count_levels) <- c("expo_days")
-  
-
-  tbl_event_count <- merge(tbl_event_count_levels, tbl_event_count, all.x = TRUE)
-  tbl_event_count[is.na(tbl_event_count)] <- 0
-  
-  tbl_event_count <- tbl_event_count %>%
-    arrange(factor(expo_days, 
-                   levels = event_count_levels), 
-            expo_days)
-  
-  names(tbl_event_count) <- c("expo_week", "events_total")
-  ind_any_zeroeventperiod <- any((tbl_event_count$events_total == 0) & (!identical(cuts_days_since_expo, c(28, 365))))
-  
-
-  if (identical(cuts_days_since_expo, c(28, 365))){
-    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_red_" , save_name, "_",stratify_by,"_",event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
-  } else (
-    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
-  )
-  
-  
-  #===============================================================================
-  # FINALIZE age, region, data_surv
-  #-------------------------------------------------------------------------------
- #need to change to 400 but >=5 used to check on dummy data
-   more_than_400_events = any((as.numeric(tbl_event_count$events_total) >=5) & (tbl_event_count$expo_week=="all post expo"))
-  data_surv <- data_surv %>% left_join(df_age_region)
-  return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_weight, more_than_400_events))
  
 }
