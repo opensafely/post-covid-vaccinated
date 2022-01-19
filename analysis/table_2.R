@@ -56,14 +56,11 @@ number_events <- function(outcome)
   return(count)
 }
 
-
 n_events <- c(lapply(input[,outcome_names], number_events))
 
 n_events
 
-
 table_2$event_count <- as.numeric(n_events)
-
 
 # record variable names for covariate, qa which are not used in calculating incidence rate
 vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
