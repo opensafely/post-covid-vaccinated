@@ -23,9 +23,9 @@ if(population == "vaccinated_delta"){
   input <- read_rds("output/input_vaccinated.rds")
 }
 
-# if(population == "electively_unvaccinated"){
-#   input <- read_rds("output/input_electively_unvaccinated.rds")
-# }
+if(population == "electively_unvaccinated"){
+  input <- read_rds("output/input_electively_unvaccinated.rds")
+}
 
 event_date_names <- c("out_date_ami",  "out_date_stroke_isch", 
                    "out_date_pe",   "out_date_dvt",
