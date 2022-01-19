@@ -469,11 +469,6 @@ all_vte_codes_icd10 = combine_codelists(
     pe_icd10
 )
 
-all_vte_codes_snomed_clinical = combine_codelists(
-    pe_snomed_clinical,
-    dvt_icvt_snomed_clinical
-)
-
 prostate_cancer_icd10 = codelist_from_csv(
     "codelists/user-RochelleKnight-prostate_cancer_snomed.csv",
     system="icd10",
@@ -808,4 +803,34 @@ other_dvt_snomed_clinical = codelist_from_csv(
     system="snomed",
     column="code",
 )
+
+all_dvt_codes_snomed_clinical = combine_codelists(
+    dvt_dvt_snomed_clinical, 
+    dvt_pregnancy_snomed_clinical
+)
+
+all_dvt_codes_icd10 = combine_codelists(
+    dvt_dvt_icd10, 
+    dvt_pregnancy_icd10
+)
+
+all_vte_codes_snomed_clinical = combine_codelists(
+    portal_vein_thrombosis_snomed_clinical, 
+    dvt_dvt_snomed_clinical, 
+    dvt_icvt_snomed_clinical, 
+    dvt_pregnancy_snomed_clinical, 
+    other_dvt_snomed_clinical, 
+    pe_snomed_clinical
+)
+
+all_ate_codes_snomed_clinical = combine_codelists(
+    ami_snomed_clinical, 
+    other_arterial_embolism_snomed_clinical, 
+    stroke_isch_snomed_clinical
+)
+
+all_ate_codes_icd10 = combine_codelists(
+    ami_icd10, 
+    other_arterial_embolism_icd10, 
+    stroke_isch_icd10
 )
