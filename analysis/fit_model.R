@@ -42,7 +42,7 @@ collapse_categorical_covars <- function(data_surv){
                                                cov_cat_deprivation=="3"~"2",
                                                cov_cat_deprivation=="4"~"3",
                                                cov_cat_deprivation=="5"~"3",
-                                               TRUE~"other"))
+                                               TRUE~"other"))#remove other category before merging
     data_surv$cov_cat_deprivation=as.factor(data_surv$cov_cat_deprivation)
     data_surv$cov_cat_deprivation = relevel(data_surv$cov_cat_deprivation, ref = as.character(calculate_mode(data_surv$cov_cat_deprivation)))
     
