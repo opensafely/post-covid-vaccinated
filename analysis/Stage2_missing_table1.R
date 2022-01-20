@@ -230,5 +230,5 @@ table1$Covariate=gsub("cov_bin_", "History of ",table1$Covariate)
 table1$Covariate=gsub("cov_\\D\\D\\D_", "",table1$Covariate)
 table1$Covariate=gsub("_", " ",table1$Covariate)
 
-write.csv(table1, file = file.path("output", paste0("Table_1_",cohort_name, ".csv")) , row.names=F)
+write.csv(table1, file = file.path("output", paste0("Table1_",cohort_name, ".csv")) , row.names=F)
 
