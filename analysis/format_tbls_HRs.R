@@ -122,13 +122,43 @@ if(length(event_count_done)>0){
   
 }
 
-
-df_event_counts=df_event_counts%>%rename(term=expo_week)
-df_event_counts=df_event_counts%>%select(term,events_total,event,strata)
-combined_hr_event_counts=df_hr%>%left_join(df_event_counts, by=c("term","event","strata"))
-colnames(combined_hr_event_counts)
-combined_hr_event_counts=combined_hr_event_counts%>%select(term,estimate,conf.low,conf.high,std.error,robust.se,P,events_total,
-                                                           event,strata,project,model,covid_history,covariates_removed,cat_covars_collapsed)
-
-write.csv(combined_hr_event_counts,paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
-
+if(length(results_done)>0){
+  outcomes=unique(df_hr$event)
+  event_counts_to_left_join=data.frame(matrix(nrow=0,ncol=5))
+  colnames(event_counts_to_left_join)=c("term","strata","event","expo_week","events_total")
+  
+  for(event_name in outcomes){
+    df_hr_event=df_hr%>%filter(event==event_name)
+    subgroup=unique(df_hr_event$strata)
+    for(subgroup_name in subgroup){
+      df_hr_event_subgroup=df_hr_event%>%filter(strata==subgroup_name)
+      df_counts_subgroup=df_event_counts%>%filter(event==event_name & strata==subgroup_name)
+      df_hr_event_subgroup=df_hr_event_subgroup[1:nrow(df_counts_subgroup),]
+      df_hr_event_subgroup$expo_week=df_counts_subgroup$expo_week
+      df_hr_event_subgroup$events_total=df_counts_subgroup$events_total
+      df_hr_event_subgroup=df_hr_event_subgroup%>%select(term,strata,event,expo_week,events_total)
+      event_counts_to_left_join=rbind(event_counts_to_left_join,df_hr_event_subgroup)
+    }
+  }
+  
+  combined_hr_event_counts=df_hr%>%left_join(event_counts_to_left_join, by=c("term","event","strata"))
+  
+  
+  
+  if(mdl=="mdl_max_adj"){
+    combined_hr_event_counts=combined_hr_event_counts%>%select(term,estimate,conf.low,conf.high,std.error,robust.se,P,expo_week,events_total,
+                                                               event,strata,project,model,covid_history,covariates_removed,cat_covars_collapsed)
+  }else{
+    combined_hr_event_counts=combined_hr_event_counts%>%select(term,estimate,conf.low,conf.high,std.error,robust.se,P,expo_week,events_total,
+                                                               event,strata,project,model,covid_history)
+    
+  }
+  
+  write.csv(combined_hr_event_counts,paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
+  
+}else if(length(results_done)==0){
+  no_results=data.frame(matrix(nrow = 1,ncol = 1))
+  colnames(no_results)="no_results"
+  write.csv(combined_hr_event_counts,paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
+  
+}
