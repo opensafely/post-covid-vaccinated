@@ -39,9 +39,9 @@ covid_history = args[[5]] #covid_history_false, covid_history_true
 #To Test
 ########
 
-#mdl="mdl_max_adj"
+#mdl="mdl_agesex"
 #event_name="all"
-#strata="covid_pheno_all"
+#strata="agegp_all"
 #project="vaccinated_delta"
 #covid_history="covid_history_false"
 #event="ami"
