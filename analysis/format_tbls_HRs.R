@@ -123,6 +123,7 @@ if(length(event_count_done)>0){
 }
 
 if(length(results_done)>0){
+  #not sure if there's an easier way to join all the event counts on?
   outcomes=unique(df_hr$event)
   event_counts_to_left_join=data.frame(matrix(nrow=0,ncol=5))
   colnames(event_counts_to_left_join)=c("term","strata","event","expo_week","events_total")
