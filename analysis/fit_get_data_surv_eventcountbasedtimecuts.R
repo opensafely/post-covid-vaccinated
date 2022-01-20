@@ -245,18 +245,19 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
     names(tbl_event_count) <- c("expo_week", "events_total")
     ind_any_zeroeventperiod <- any((tbl_event_count$events_total == 0) & (!identical(cuts_days_since_expo, c(28, 196))))
     
+    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
     
-    if (identical(cuts_days_since_expo, c(28, 196))){
-      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_red_" , save_name, "_",stratify_by,"_",event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
-    } else (
-      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
-    )
+    #if (identical(cuts_days_since_expo, c(28, 196))){
+    #  write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_red_" , save_name, "_",stratify_by,"_",event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
+    #} else (
+    #  write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
+    #)
     
     
     #===============================================================================
     # FINALIZE age, region, data_surv
     #-------------------------------------------------------------------------------
-    #need to change to 400 but >=5 used to check on dummy data
+    #Can change <400 to be lower to test on dummy data
     less_than_400_events = any((as.numeric(tbl_event_count$events_total) <5) & (tbl_event_count$expo_week=="all post expo"))
     data_surv <- data_surv %>% left_join(df_age_region)
     return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_weight, less_than_400_events))
