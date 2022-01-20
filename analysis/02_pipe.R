@@ -7,9 +7,9 @@
 
 # specify path to data
 if(project=="vaccinated_delta"){
-  master_df_fpath <- "output/input_vaccinated.rds"
+  master_df_fpath <- "output/input_vaccinated_stage1.rds"
 }else if(project=="electively_unvaccinated_delta"){
-  master_df_fpath <- "output/input_electively_unvaccinated.rds"
+  master_df_fpath <- "output/input_electively_unvaccinated_stage1.rds"
 }
 
 
@@ -193,28 +193,6 @@ get_pheno_specific_dataset <- function(survival_data, pheno_of_interest){
   survival_data$expo_date <- as.Date(ifelse((!is.na(survival_data$date_expo_censor)) & (survival_data$expo_date >= survival_data$date_expo_censor), NA, survival_data$expo_date), origin='1970-01-01')
   survival_data$event_date <- as.Date(ifelse((!is.na(survival_data$date_expo_censor)) & (survival_data$event_date >= survival_data$date_expo_censor), NA, survival_data$event_date), origin='1970-01-01')
   return(survival_data)
-}
-
-
-
-##Should of been done in earlier script already
-#-------------------------------- FACTOR ---------------------------------------
-input$region_name=gsub(" ","_",input$region_name)
-input_covs=(c(colnames(input)[grepl("cov_", colnames(input))],"region_name"))
-
-factor_covars <- input_covs[!input_covs=="cov_num_consulation_rate"]
-#factor_covars <- names(covars)[names(covars) != "patient_id"]
-
-mk_factor_orderlevels <- function(input, colname)
-{
-  input <- input %>% mutate(
-    !!sym(colname) := factor(!!sym(colname), levels = str_sort(unique(input[[colname]]), numeric = TRUE)))
-  return(input)
-}
-
-for (colname in factor_covars){
-  print(colname)
-  input <- mk_factor_orderlevels(input, colname)
 }
 
 

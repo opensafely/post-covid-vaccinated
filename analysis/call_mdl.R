@@ -32,17 +32,17 @@ get_vacc_res <- function(event,stratify_by_subgroup,stratify_by,input,cuts_days_
   
   if(stratify_by_subgroup!="cov_cat_ethnicity" & stratify_by_subgroup!="SEX" & strata !="prior_history_all"){
     covar_names <- c(colnames(input)[grepl("cov_", colnames(input))],"patient_id")
-    covar_names = covar_names[!covar_names %in% c("cov_bin_healthcare_worker","cov_bin_carehome_status","cov_bin_diabetes_type1","cov_bin_diabetes_type2","cov_bin_diabetes_other","cov_bin_diabetes_gestational","cov_bin_lipid_medications_dmd")]
+    covar_names = covar_names[!covar_names %in% c("cov_bin_diabetes_type1","cov_bin_diabetes_type2","cov_bin_diabetes_other","cov_bin_diabetes_gestational")]
   }else if(stratify_by_subgroup=="cov_cat_ethnicity"| stratify_by_subgroup=="SEX"){
     survival_data=survival_data%>%filter_at(stratify_by_subgroup,all_vars(.==stratify_by))
     covar_names <- c(colnames(input)[grepl("cov_", colnames(input))],"patient_id")
     covar_names <- covar_names[!covar_names==stratify_by_subgroup]
-    covar_names = covar_names[!covar_names %in% c("cov_bin_healthcare_worker","cov_bin_carehome_status","cov_bin_diabetes_type1","cov_bin_diabetes_type2","cov_bin_diabetes_other","cov_bin_diabetes_gestational","cov_bin_lipid_medications_dmd")]
+    covar_names = covar_names[!covar_names %in% c("cov_bin_diabetes_type1","cov_bin_diabetes_type2","cov_bin_diabetes_other","cov_bin_diabetes_gestational")]
   }else if(startsWith(strata,"prior_history")==TRUE){
     survival_data=survival_data%>%filter_at(stratify_by_subgroup,all_vars(.==stratify_by))
     survival_data=survival_data%>%dplyr::select(!stratify_by_subgroup)
     covar_names <- c(colnames(input)[grepl("cov_", colnames(input))],"patient_id")
-    covar_names = covar_names[!covar_names %in% c("cov_bin_healthcare_worker","cov_bin_carehome_status","cov_bin_diabetes_type1","cov_bin_diabetes_type2","cov_bin_diabetes_other","cov_bin_diabetes_gestational","cov_bin_lipid_medications_dmd")]
+    covar_names = covar_names[!covar_names %in% c("cov_bin_diabetes_type1","cov_bin_diabetes_type2","cov_bin_diabetes_other","cov_bin_diabetes_gestational")]
   }
  
   # join core data with outcomes
@@ -57,11 +57,6 @@ get_vacc_res <- function(event,stratify_by_subgroup,stratify_by,input,cuts_days_
     survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(vax_date_covid_1,event_date, DATE_OF_DEATH,cohort_end_date,na.rm = TRUE))
     survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
-  }else if (project == "unvaccinated"){
-    survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
-    survival_data$follow_up_start=cohort_start_date
-    survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, vax_date_covid_1, DATE_OF_DEATH,cohort_end_date,date_expo_censor,na.rm = TRUE))
-    survival_data <- survival_data %>% dplyr::select(!vax_date_covid_1)
   }
   
   # detect if a column is of date type, if so impose study start/end dates
@@ -92,7 +87,7 @@ get_vacc_res <- function(event,stratify_by_subgroup,stratify_by,input,cuts_days_
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(follow_up_end, date_expo_censor,na.rm = TRUE))
   }
     
-  survival_data=survival_data%>%filter(follow_up_end>=follow_up_start)#can remove once studydef is updated
+  survival_data=survival_data%>%filter(follow_up_end>follow_up_start)
   
   res_vacc <- fit_model_reducedcovariates(event, stratify_by_subgroup, stratify_by, survival_data,covar_names,input)
   return(res_vacc)

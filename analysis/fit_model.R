@@ -41,8 +41,7 @@ collapse_categorical_covars <- function(data_surv){
                                                cov_cat_deprivation=="2"~"1",
                                                cov_cat_deprivation=="3"~"2",
                                                cov_cat_deprivation=="4"~"3",
-                                               cov_cat_deprivation=="5"~"3",
-                                               TRUE~"other"))#remove other category before merging
+                                               cov_cat_deprivation=="5"~"3"))#remove other category before merging
     data_surv$cov_cat_deprivation=as.factor(data_surv$cov_cat_deprivation)
     data_surv$cov_cat_deprivation = relevel(data_surv$cov_cat_deprivation, ref = as.character(calculate_mode(data_surv$cov_cat_deprivation)))
     
@@ -53,8 +52,7 @@ collapse_categorical_covars <- function(data_surv){
                                      case_when(cov_cat_smoking_status=="N"~"N",
                                                cov_cat_smoking_status=="E"~"S",
                                                cov_cat_smoking_status=="S"~"S",
-                                               cov_cat_smoking_status=="M"~"M",
-                                               TRUE~"other"))
+                                               cov_cat_smoking_status=="M"~"M"))
     data_surv$cov_cat_smoking_status=as.factor(data_surv$cov_cat_smoking_status)
     data_surv$cov_cat_smoking_status = relevel(data_surv$cov_cat_smoking_status, ref = as.character(calculate_mode(data_surv$cov_cat_smoking_status)))
   }
@@ -114,8 +112,8 @@ coxfit <- function(data_surv, interval_names, covar_names){
   fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
   robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)##?for robust standard errors
   
+  
   # Results ----
-  #Not sure how to get the p-values out for each level of the covariates?
   results=as.data.frame(names(fit_cox_model$coefficients))
   colnames(results)="term"
   results$estimate=exp(fit_cox_model$coefficients)
@@ -127,6 +125,17 @@ coxfit <- function(data_surv, interval_names, covar_names){
     results$covariates_removed=paste0(covars_to_remove, collapse = ",")
     results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
   }
+  
+  #Add in P-values to results table
+  #Can only get for covariate as a whole and not for each level so left join onto main covariate name
+  results$covariate=results$term
+  results$covariate=sub('\\=.*', '', results$covariate)
+  anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
+  anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
+  anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
+  results=results%>%left_join(anova_fit_cox_model,by="covariate")
+  
+  
   return(results)
 }
 
@@ -134,7 +143,6 @@ fit_model_reducedcovariates <- function(event, stratify_by_subgroup, stratify_by
   list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event, stratify_by_subgroup, stratify_by, survival_data,cuts_days_since_expo)
   if(length(list_data_surv_noncase_ids_interval_names)==1){
     analyses_not_run <<- list_data_surv_noncase_ids_interval_names[[1]]
-    #analyses_not_run<<- not_run
     return(fit_model_reducedcovariates)
   }
   
@@ -146,8 +154,6 @@ fit_model_reducedcovariates <- function(event, stratify_by_subgroup, stratify_by
   less_than_400_events=list_data_surv_noncase_ids_interval_names[[6]]
   if(less_than_400_events=="TRUE"){
     analyses_not_run[nrow(analyses_not_run)+1,]<<-c(event,stratify_by_subgroup,stratify_by,"TRUE","TRUE","TRUE","FALSE")
-    #not_run=analyses_not_run
-    #analyses_not_run<<- not_run
     return(fit_model_reducedcovariates)
   }
 
