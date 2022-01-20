@@ -35,7 +35,7 @@ event_date_names <- c("out_date_ami",  "out_date_stroke_isch",
 )
 
 # some index_date was later than the study end date
-View(input[which(input$index_date > "2021-12-04"),])
+View(input[which(input$index_date > "2021-12-14"),])
 
 
 # automation
@@ -72,7 +72,7 @@ survival_data <- input[,vars_names]
 # can't use index_date as the start date of follow up as some index dates were after the end of the cohort
 survival_data <- survival_data %>% 
                      mutate(cohort_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
-                            cohort_end_date = as.Date("2021-12-04", format = "%Y-%m-%d"))
+                            cohort_end_date = as.Date("2021-12-14", format = "%Y-%m-%d"))
 
 #View(survival_data)
 
