@@ -28,7 +28,8 @@
 ###############################################
 library(readr)
 library(dplyr)
-
+library(data.table)
+library(tidyverse)
 
 # Get dataset for either the vaccinated or electively unvaccinated subcohort
 # Specify command arguments ----------------------------------------------------
@@ -107,7 +108,7 @@ write.csv(check_dates, file = file.path("output", paste0("Check_dates_range_",co
 input$cov_cat_smoking_status <- replace(input$cov_cat_smoking_status, is.na(input$cov_cat_smoking_status),"M")
 
 # Check ethnicity categories (NOTE: No NA for ethnicity in this dummy data)
-# table(input$cov_cat_ethnicity)
+#table(input$cov_cat_ethnicity)
 
 
 #####################
@@ -117,8 +118,8 @@ input$cov_cat_smoking_status <- replace(input$cov_cat_smoking_status, is.na(inpu
 #Define populations of interest
 pop <- data.frame(rbind(c("Whole_population","!is.na(input$patient_id)"),
                         c("COVID_exposed","is.na(input$exp_date_covid19_confirmed)==F"),
-                        c("COVID_hospitalised","input$exp_cat_covid19_hospital=='hospitalised'"),
-                        c("COVID_non_hospitalised","input$exp_cat_covid19_hospital=='non_hospitalised'")
+                        c("COVID_hospitalised","input$sub_cat_covid19_hospital=='hospitalised'"),
+                        c("COVID_non_hospitalised","input$sub_cat_covid19_hospital=='non_hospitalised'")
 ), stringsAsFactors = FALSE)
 
 colnames(pop) <- c("name","condition")
@@ -184,7 +185,7 @@ for (j in 1:nrow(pop)) {
   
   #Categorical covariates
   cat_pop=df %>% dplyr::select(categorical_cov)
-  #cat_pop= cat_pop %>% mutate_if(is.character,as.factor)
+  cat_pop= cat_pop %>% mutate_if(is.character,as.factor)
   cat_summary=as.data.frame(summary(cat_pop,maxsum=50))
   cat_summary[,population]=cat_summary$Freq
   cat_summary=rename(cat_summary, Covariate_level = Freq, Covariate = Var2)
@@ -201,7 +202,7 @@ for (j in 1:nrow(pop)) {
   
   #Binary covariates
   bin_pop=df %>% dplyr::select(binary_cov)
-  #bin_pop= bin_pop %>% mutate_if(is.logical,as.factor)
+  bin_pop= bin_pop %>% mutate_if(is.logical,as.factor)
   bin_summary=as.data.frame(summary(bin_pop,maxsum=50))
   bin_summary[,population]=bin_summary$Freq
   bin_summary=rename(bin_summary, Covariate_level = Freq, Covariate = Var2)
