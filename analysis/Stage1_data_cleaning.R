@@ -21,7 +21,7 @@
 ## 0. Load relevant libraries and read data/arguments
 ## 1. Prepare all variables (re-factoring, re-typing)
 ##    1.a. Set factor variables as factor
-##    1.b. Set the group with the highest frequency as the reference group
+##    1.b. Set the group with the highest frequency as the reference group and rename some categories
 ##    1.c. Check that continuous variables are defined as numeric variables
 ##    1.d. Check and specify date format for date variables
 ##    1.e. Apply changes in the input dataset
@@ -33,7 +33,7 @@
 ##    3.c. Create csv file 
 ## 4. Create the final stage 1 dataset 
 ## 
-## NOTE: This code output are 3 .csv files and 1 R dataset
+## NOTE: This code outputs 3 .csv files and 1 R dataset
 ##       Output files have a specific name to reflect either the Vaccinated 
 ##       or Electively unvaccinated cohort
 ##
@@ -57,14 +57,13 @@ cohort_name = args[[2]] # either "vaccinated" or "electively_unvaccinated"
 
 input <-read_rds(input_filename)
 
-# NOTE: Once study definition is updated, input_filename will be either 
-# output/input_vaccinated.rds or output/input_electively_unvaccinated.rds
 
 # Define general start date and end date
 start_date = as.Date("2021-06-01")
 end_date = as.Date("2021-12-14") # General End date: 2021-12-14 (Decision on Dec 20th 2021)
 
 # NOTE: no censoring of end date for death/event at this stage
+
 
 ######################################################
 # 1. Prepare all variables (re-factoring, re-typing) # 
@@ -104,10 +103,9 @@ for (colname in factor_names){
   covars <- mk_factor_orderlevels(covars, colname)
 }
 
-
-#----------------------------------------------------------------------#
-# 1.b. Set the group with the highest frequency as the reference group #
-#----------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
+# 1.b. Set the group with the highest frequency as the reference group and rename some categories #
+#-------------------------------------------------------------------------------------------------#
 # Relevel
 
 # Check the frequency for each factor level
@@ -121,12 +119,8 @@ calculate_mode <- function(x) {
 
 # For the following variables, the first level (reference level) is not the one with the highest frequency
 # Set the most frequently occurred level as the reference for a factor variable
-covars$cov_cat_ethnicity = relevel(covars$cov_cat_ethnicity, ref = as.character(calculate_mode(covars$cov_cat_ethnicity)))
-covars$cov_cat_smoking_status = relevel(covars$cov_cat_smoking_status, ref = as.character(calculate_mode(covars$cov_cat_smoking_status)))
 covars$cov_cat_region = relevel(covars$cov_cat_region, ref = as.character(calculate_mode(covars$cov_cat_region)))
-
 covars$sub_cat_covid19_hospital = relevel(covars$sub_cat_covid19_hospital, ref = as.character(calculate_mode(covars$sub_cat_covid19_hospital)))
-
 covars$vax_cat_jcvi_group = relevel(covars$vax_cat_jcvi_group, ref = as.character(calculate_mode(covars$vax_cat_jcvi_group)))
 if (cohort_name == "vaccinated") {
   covars$vax_cat_product_1 = relevel(covars$vax_cat_product_1, ref = as.character(calculate_mode(covars$vax_cat_product_1)))
@@ -134,13 +128,34 @@ if (cohort_name == "vaccinated") {
   covars$vax_cat_product_3 = relevel(covars$vax_cat_product_3, ref = as.character(calculate_mode(covars$vax_cat_product_3)))
 }
 
-#combine groups in deprivation: First - most deprived; fifth -least deprived
+# Combine groups in deprivation: First - most deprived; fifth -least deprived and relevel
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==1 | levels(covars$cov_cat_deprivation)==2] <-"1-2 (most deprived)"
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==3 | levels(covars$cov_cat_deprivation)==4] <-"3-4"
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==5 | levels(covars$cov_cat_deprivation)==6] <-"5-6"
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==7 | levels(covars$cov_cat_deprivation)==8] <-"7-8"
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==9 | levels(covars$cov_cat_deprivation)==10] <-"9-10 (least deprived)"
 covars$cov_cat_deprivation = relevel(covars$cov_cat_deprivation, ref = as.character(calculate_mode(covars$cov_cat_deprivation))) # added
+
+# Rename/relevel ethnicity categories     #table(covars$cov_cat_ethnicity)
+levels(covars$cov_cat_ethnicity) <- union(levels(covars$cov_cat_ethnicity), "Missing") # NOTE: No NA for ethnicity in this dummy data -> Add a missing category
+covars$cov_cat_ethnicity <- replace(covars$cov_cat_ethnicity, is.na(covars$cov_cat_ethnicity),"Missing") # If NA, then replace by "Missing"
+
+levels(covars$cov_cat_ethnicity) <- c("White","Mixed","South Asian","Black African and Caribbean","Other","Missing") # Similar to the commented out 5 lines of code below
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "1"] <- "White"
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "2"] <- "Mixed"
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "3"] <- "South Asian"
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "4"] <- "Black African and Caribbean"
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "5"] <- "Chinese and other" 
+covars$cov_cat_ethnicity = relevel(covars$cov_cat_ethnicity, ref = as.character(calculate_mode(covars$cov_cat_ethnicity)))
+
+# Rename/relevel smoking status categories       #table(covars$cov_cat_smoking_status)
+covars$cov_cat_smoking_status <- replace(covars$cov_cat_smoking_status, is.na(covars$cov_cat_smoking_status),"M")
+levels(covars$cov_cat_smoking_status) <- c("Ex-Smoker","Missing","Non-Smoker","Smoker") # Similar to the commented out 5 lines of code below
+#levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "E"] <- "Ex-Smoker"
+#levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "M"] <- "Missing"
+#levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "N"] <- "Non-Smoker"
+#levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "S"] <- "Smoker"
+covars$cov_cat_smoking_status = relevel(covars$cov_cat_smoking_status, ref = as.character(calculate_mode(covars$cov_cat_smoking_status)))
 
 # A simple check if factor reference level has changed
 #lapply(covars[,c("cov_cat_ethnicity", "cov_cat_smoking_status", "cov_cat_region","cov_cat_deprivation","exp_cat_covid19_hospital","vax_cat_jcvi_group","vax_cat_product_1","vax_cat_product_2","vax_cat_product_3")], table)
@@ -173,7 +188,6 @@ date_names <- tidyselect::vars_select(names(input), starts_with(c('index_date','
 for (colname in date_names){
   input[[colname]] <- as.Date(input[[colname]])
 }
-
 
 #-----------------------------------------#
 # 1.e. Apply changes in the input dataset #

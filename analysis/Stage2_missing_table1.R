@@ -14,8 +14,7 @@
 ## Content: 
 ## 0. Load relevant libraries and read data/arguments
 ## 1. Output missing data  and range check tables
-## 2. Replace missing by a missing category
-## 3. Output table 1
+## 2. Output table 1
 ## 
 ## NOTE: This code outputs 3 .csv files and 1 R dataset
 ##       Output files have a specific name to reflect either the Vaccinated 
@@ -43,6 +42,14 @@ input <-read_rds(input_filename)
 # 1. Output missing data table #
 ################################
 N <- nrow(input)
+
+# Turn the missing category in smoking status and ethnicity variables into NA 
+# Only for the purpose of generating the missing data table
+input$cov_cat_smoking_status[input$cov_cat_smoking_status == "M"] <- NA
+input$cov_cat_ethnicity[input$cov_cat_ethnicity == "6"] <- NA
+
+#table(input$cov_cat_smoking_status)
+#table(input$cov_cat_ethnicity)
 
 #-----------------------------------------------------------------------#
 # 1.a. Create a table with missing data information (N,%) for variables #
@@ -99,20 +106,8 @@ for (i in date_variables_names){
 write.csv(check_dates, file = file.path("output", paste0("Check_dates_range_",cohort_name, ".csv")) , row.names=F)
 
 
-############################################
-# 2. Replace missing by a missing category #
-############################################
-
-# Change for smoking status variable
-#table(input$cov_cat_smoking_status)
-input$cov_cat_smoking_status <- replace(input$cov_cat_smoking_status, is.na(input$cov_cat_smoking_status),"M")
-
-# Check ethnicity categories (NOTE: No NA for ethnicity in this dummy data)
-#table(input$cov_cat_ethnicity)
-
-
 #####################
-# 3. Output table 1 #
+# 2. Output table 1 #
 #####################
 
 #Define populations of interest
