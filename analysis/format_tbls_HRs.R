@@ -66,7 +66,7 @@ if(length(results_done)>0){
   df_hr <- rbindlist(result_file_paths, fill=TRUE)
   df_hr <- df_hr %>% mutate_if(is.numeric, round, digits=5)%>%select(-V1)
   
-  write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv"), row.names = F)
+  #write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv"), row.names = F)
   
 }
 
@@ -112,23 +112,23 @@ if(length(event_count_done)>0){
   event_counts_completed <- pmap(list(event_count_done, results_needed$event, results_needed$save_name, results_needed$which_strata,results_needed$project, results_needed$mdl,results_needed$covid_history), 
                                  function(fpath, event, save_name, which_strata, project, mdl,covid_history){ 
                                    df <- fread(fpath) 
-                                   df$event <- event
-                                   df$subgroup <- save_name
-                                   df$strata <- which_strata
-                                   df$project <- project
-                                   df$mdl <- mdl
-                                   df$covid_history <- covid_history
                                    return(df)
                                  })
   
   
   
-  df_hr <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
-  
-  write.csv(df_hr, paste0(output_dir,"/compiled_event_counts_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
+  df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
+  #write.csv(df_hr, paste0(output_dir,"/compiled_event_counts_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
   
 }
 
 
+df_event_counts=df_event_counts%>%rename(term=expo_week)
+df_event_counts=df_event_counts%>%select(term,events_total,event,strata)
+combined_hr_event_counts=df_hr%>%left_join(df_event_counts, by=c("term","event","strata"))
+colnames(combined_hr_event_counts)
+combined_hr_event_counts=combined_hr_event_counts%>%select(term,estimate,conf.low,conf.high,std.error,robust.se,P,events_total,
+                                                           event,strata,project,model,covid_history,covariates_removed,cat_covars_collapsed)
 
+write.csv(combined_hr_event_counts,paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
 
