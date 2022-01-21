@@ -101,7 +101,7 @@ coxfit <- function(data_surv, interval_names, covar_names){
 
   #If subgroup is not age then add in age spline otherwise use age and age_sq
   if ((startsWith(strata,"agegp_"))==F){
-    surv_formula <- paste(surv_formula, "rms::rcs(data_surv$age,knot_placement)", sep="+")
+    surv_formula <- paste(surv_formula, "rms::rcs(age,knot_placement)", sep="+")
   }else if ((startsWith(strata,"agegp_"))==T){
     surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
   }
