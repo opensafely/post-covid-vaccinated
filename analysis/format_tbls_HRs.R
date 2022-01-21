@@ -160,6 +160,6 @@ if(length(results_done)>0){
 }else if(length(results_done)==0){
   no_results=data.frame(matrix(nrow = 1,ncol = 1))
   colnames(no_results)="no_results"
-  write.csv(combined_hr_event_counts,paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
+  write.csv(no_results,paste0(output_dir,"/compiled_HR_results_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
   
 }
