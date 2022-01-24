@@ -7,57 +7,80 @@ library(tidyverse)
 #-----------------------------------------------
 #Step1.Calculate the average daily CVD incidence
 #-----------------------------------------------
-#Description: Calculate the average daily CVD incidence -
-             # before or in the absence of COVID-19 across the whole follow up period -
-             # separately in subgroups defined by age and sex (RT - time being, for whole sample)
 
-#1.COHORT START DATE
-#a.Cohort start date 2021-06-1
-input$delta_start <- as.Date("2021-06-01", format="%Y-%m-%d")
-#b.if vaccinated, 2 WEEKS after the second vaccination
-input$immune_start <- as.Date(input$vax_date_covid_2)+15
-#c.At risk start time - latest of a,b as RISK - start date
-input$risk_start_date <- pmax(input$delta_start, input$immune_start, na.rm = TRUE)
+#1.COHORT Dates
+data$cohort_start <- as.Date("2021-06-01", format="%Y-%m-%d")
+data$cohort_end <- as.Date("2021-12-14", format="%Y-%m-%d")
 
-#2.COHORT END DATE
-#a.Cohort end date 2021-12-14 
-input$delta_end <- as.Date("2021-12-14", format="%Y-%m-%d")
-#b.sample follow up ends on Death date, if any
-input$death_date <- as.Date(input$death_date, format="%Y-%m-%d")
-#c.sample follow up ends on outcome event, if any
-input$out_date_ami <- as.Date(input$out_date_ami, format="%Y-%m-%d")
-#input$out_stroke_isch <- as.Date(input$out_date_stroke_isch, format="%Y-%m-%d")
-#input$out_dvt <- as.Date(input$out_date_dvt, format="%Y-%m-%d")
-#input$out_pe <- as.Date(input$out_date_pe, format="%Y-%m-%d")
-#input$out_tia <- as.Date(input$out_date_tia, format="%Y-%m-%d")
-#input$out_stroke_sah_hs <- as.Date(input$out_date_stroke_sah_hs, format="%Y-%m-%d")
-#input$out_hf <- as.Date(input$out_date_hf, format="%Y-%m-%d")
-#input$out_angina <- as.Date(input$out_date_angina, format="%Y-%m-%d")
-#input$out_ate <- as.Date(input$out_date_ate, format="%Y-%m-%d")
-#input$out_vte <- as.Date(input$out_date_vte, format="%Y-%m-%d")
-#d.Infection date(for the uninfected group)
-#input$exp_date_covid19_confirmed <- as.Date(input$exp_date_covid19_confirmed,  format="%Y-%m-%d")
-#e.Risk end date - earliest of a,b, c, d for the non-exposed/uninfected group
-input$risk_end_date <- pmin(input$delta_end, 
-                       input$death_date, 
-                       input$out_date_ami,na.rm = TRUE)
-                       #input$exp_date_covid19_confirmed,  
+#2.Follow up period in vaccinated COHORT
+data$fp_start <- pmax(data$cohort_start, data$vax_date_covid_2+15, na.rm = TRUE)
+data$fp_end <- pmin(data$out_date_ate+1, data$death_date+1, data$cohort_end, na.rm = TRUE)
+data$fp_period <- data$fp_end - data$fp_start
 
-table(input$risk_end_date)
+#3.clean data(may not be required in actual data, but no harm anyway)
+range(data$fp_period)#-239  to 196 days
+data <- subset(data, data$fp_period < 197)
+data <- subset(data, data$fp_period > 0)
+#filter events after end of follow up period
+table(data$out_date_ate > data$fp_end, useNA = "ifany")# 2,383 people had events after the end of follow up
+table(data$out_date_ate == data$fp_end, useNA = "ifany") # 73 people had events at the end date of follow up
+data <- subset(data, data$out_date_ate <= data$fp_end | is.na(data$out_date_ate))
 
+#Person days or years
+fp_person_days <- sum(data$fp_period)#  unit <- person days
+print(fp_person_days) #Time difference of 12870683 person-days
+fp_person_years <- fp_person_days/365 #  unit <- person years
+print(fp_person_years)#Time difference of 35262.15 person years
 
+#4.Count events
+sum(!is.na(data$death_date))# 64,744 deaths in 86,856 followed up.
+sum(!is.na(data$out_date_ate))# 12,595 ate 86,856 followed up.
+sum(!is.na(data$exp_date_covid19_confirmed))#13,915 covid19 infection events.
+sum(!is.na(data$out_date_ate < data$exp_date_covid19_confirmed))#2029
 
+#5.Incidence rate over the follow up period
+#Number of new ate events / sum of person-time at risk
+#Numerator
+ate_total <- sum(!is.na(data$out_date_ate))# 12,595 ate 86,856 followed up.
+print(ate_total)
+ate_in_exposed <- sum(data$out_date_ate >= data$exp_date_covid19_confirmed, na.rm = T)#924 ate 13,915 covid19 infection events
+print(ate_in_exposed)
+ate_in_unexposed <- sum(data$out_date_ate < data$exp_date_covid19_confirmed, na.rm = T)#924 ate 13,915 covid19 infection events
+print(ate_in_unexposed)
+ate_in_unexposed <- ate_total - ate_in_exposed
+print(ate_in_unexposed)# 11671
 
+#Incidence rate in unexposed
+str(ate_in_unexposed)
+str(fp_person_days)
+fp_person_days <- as.integer(fp_person_days)
+incidence_rate <- ate_in_unexposed/fp_person_days
+print(incidence_rate)# 0.0009074111
+incidence_rate*100000# 90.74111 per 100,000 person days follow up
 
+#Average daily incidence
+#set the ate status in unexposed
+data$ate_status_in_unexposed <- ifelse((data$out_date_ate < data$exp_date_covid19_confirmed) |
+                                         (check$out_date_ate>0 & is.na(check$exp_date_covid19_confirmed)),1,0)
+data$ate_status_in_unexposed[is.na(data$ate_status_in_unexposed)] <- 0
+table(data$ate_status_in_unexposed, useNA = "ifany")
 
+library(survival)
+#Set the variables
+fp_period <- data$fp_period # follw up time
+ate_status_in_unexposed <- data$ate_status_in_unexposed #events in unexposed
 
-#3.Derive the event counts on days
-str(input$out_date_ami)#Date
-table(input$out_date_ami>0)#7805 AMI events 
-table(input$out_date_ami)
+#Null model
+M0 <- survfit(Surv(fp_period, ate_status_in_unexposed)~1, data=data) 
+M0
 
-table(input$cov_num_age)
-table(input$cov_cat_sex)
+#Retrieve variables from the model
+daily_incidence <- data.frame(time=M0$time, n_event=M0$n.event, n_risk=M0$n.risk )
+
+#Daily incidence proportion and average daily incidence proportion
+daily_incidence$incidence_proportion <- daily_incidence$n_event/daily_incidence$n_risk
+mean(daily_incidence$incidence_proportion)*100000  # 90.4763 per 100,000 people 
+
 #----------------------------------------
 #Step2. Calculate the daily CVD incidence
 #----------------------------------------
