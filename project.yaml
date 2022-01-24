@@ -64,6 +64,7 @@ actions:
         IE_criteria: output/Cohort_flow_vaccinated.csv
       highly_sensitive:
         cohort: output/input_vaccinated_stage1.rds
+
   venn_diagram_vaccinated:
     run: r:latest analysis/venn_diagram.R vaccinated
     needs: [preprocess_data]
@@ -77,7 +78,7 @@ actions:
         subarachnoid_haemorrhage_and_haemorrhagic_stroke: output/vaccinated_f6_venn_stroke_sah_hs.png
         heart_failure: output/vaccinated_f7_venn_hf.png
         angina_pectoris: output/vaccinated_f8_venn_angina.png
-        all_arterial_thrombotic_and_embolization_events: output/vaccinated_f9_venn_oae.png
+        all_arterial_thrombotic_and_embolization_events: output/vaccinated_f9_venn_ate.png
         all_venous_thromboembolism_events: output/vaccinated_f10_venn_vte.png 
 
   venn_diagram_electively_unvaccinated:
@@ -93,5 +94,5 @@ actions:
         subarachnoid_haemorrhage_and_haemorrhagic_stroke: output/electively_unvaccinated_f6_venn_stroke_sah_hs.png
         heart_failure: output/electively_unvaccinated_f7_venn_hf.png
         angina_pectoris: output/electively_unvaccinated_f8_venn_angina.png
-        all_arterial_thrombotic_and_embolization_events: output/electively_unvaccinated_f9_venn_oae.png
+        all_arterial_thrombotic_and_embolization_events: output/electively_unvaccinated_f9_venn_ate.png
         all_venous_thromboembolism_events: output/electively_unvaccinated_f10_venn_vte.png 
