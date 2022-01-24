@@ -110,3 +110,9 @@ user/hjforbes/type-1-diabetes/674fbd7a
 user/hjforbes/type-2-diabetes/3530d710
 user/hjforbes/other-or-nonspecific-diabetes/0311f0a6
 user/hjforbes/gestational-diabetes/1ed423d1
+user/tomsrenin/dvt_main/1c76a027
+user/tomsrenin/dvt_icvt/03672cf2
+user/tomsrenin/pvt/51484687
+user/tomsrenin/dvt-preg/6a57b9bc
+user/tomsrenin/other_art_embol/3838d352
+user/tomsrenin/dvt-other/1f29601d
