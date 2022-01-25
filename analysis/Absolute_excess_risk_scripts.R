@@ -4,64 +4,58 @@
 
 library(tidyverse)
 
+data <- input_vaccinated
+
 #-----------------------------------------------
 #Step1.Calculate the average daily CVD incidence
 #-----------------------------------------------
-
+#Outcome1 - AMI
+#Vaccinated cohort starts on 1/6/2021 and ends on 14/12/2021
 #1.COHORT Dates
 data$cohort_start <- as.Date("2021-06-01", format="%Y-%m-%d")
 data$cohort_end <- as.Date("2021-12-14", format="%Y-%m-%d")
 
 #2.Follow up period in vaccinated COHORT
+#Index starts on the latest of: 1) cohort start date; 2)two weeks after the 2nd vaccination
 data$fp_start <- pmax(data$cohort_start, data$vax_date_covid_2+15, na.rm = TRUE)
+#Index ends on the earliest of: 1) Cohort end date; 2)CVD event; 3)death
 data$fp_end <- pmin(data$out_date_ate+1, data$death_date+1, data$cohort_end, na.rm = TRUE)
+#Index follow up period is the difference between follow up start and end.
 data$fp_period <- data$fp_end - data$fp_start
 
-#3.clean data(may not be required in actual data, but no harm anyway)
-range(data$fp_period)#-239  to 196 days
-data <- subset(data, data$fp_period < 197)
-data <- subset(data, data$fp_period > 0)
-#filter events after end of follow up period
-table(data$out_date_ate > data$fp_end, useNA = "ifany")# 2,383 people had events after the end of follow up
-table(data$out_date_ate == data$fp_end, useNA = "ifany") # 73 people had events at the end date of follow up
-data <- subset(data, data$out_date_ate <= data$fp_end | is.na(data$out_date_ate))
-
-#Person days or years
+#3.Person days or years
 fp_person_days <- sum(data$fp_period)#  unit <- person days
-print(fp_person_days) #Time difference of 12870683 person-days
+print(fp_person_days) #Time difference of 210743 person-days
 fp_person_years <- fp_person_days/365 #  unit <- person years
-print(fp_person_years)#Time difference of 35262.15 person years
+print(fp_person_years)#Time difference of 577.3781 person years
 
 #4.Count events
-sum(!is.na(data$death_date))# 64,744 deaths in 86,856 followed up.
-sum(!is.na(data$out_date_ate))# 12,595 ate 86,856 followed up.
-sum(!is.na(data$exp_date_covid19_confirmed))#13,915 covid19 infection events.
-sum(!is.na(data$out_date_ate < data$exp_date_covid19_confirmed))#2029
+sum(!is.na(data$death_date))# Total deaths
+sum(!is.na(data$out_date_ate))# Total events
+sum(!is.na(data$exp_date_covid19_confirmed))# Total COVID19 cases
 
 #5.Incidence rate over the follow up period
-#Number of new ate events / sum of person-time at risk
-#Numerator
-ate_total <- sum(!is.na(data$out_date_ate))# 12,595 ate 86,856 followed up.
-print(ate_total)
-ate_in_exposed <- sum(data$out_date_ate >= data$exp_date_covid19_confirmed, na.rm = T)#924 ate 13,915 covid19 infection events
-print(ate_in_exposed)
-ate_in_unexposed <- sum(data$out_date_ate < data$exp_date_covid19_confirmed, na.rm = T)#924 ate 13,915 covid19 infection events
-print(ate_in_unexposed)
+#Number of new events / sum of person-time at risk
+
+#5.1Numerator- Events in unexposed
+ate_total <- sum(!is.na(data$out_date_ate))
+print(ate_total)# Total events
+ate_in_exposed <- sum(data$out_date_ate >= data$exp_date_covid19_confirmed, na.rm = T)
+print(ate_in_exposed)#  Events in exposed
 ate_in_unexposed <- ate_total - ate_in_exposed
-print(ate_in_unexposed)# 11671
+print(ate_in_unexposed)#Events in unexposed
 
-#Incidence rate in unexposed
-str(ate_in_unexposed)
-str(fp_person_days)
+#5.2 Denominator- sum of person-time at risk
 fp_person_days <- as.integer(fp_person_days)
-incidence_rate <- ate_in_unexposed/fp_person_days
-print(incidence_rate)# 0.0009074111
-incidence_rate*100000# 90.74111 per 100,000 person days follow up
 
-#Average daily incidence
-#set the ate status in unexposed
+#5.3 Incidence rate in unexposed
+incidence_rate <- ate_in_unexposed/fp_person_days*100000
+print(incidence_rate) # Incidence rate in unexposed per 100,000 person days follow up
+
+#6. Method 2 (alternative) - Average daily incidence
+#Event status in unexposed
 data$ate_status_in_unexposed <- ifelse((data$out_date_ate < data$exp_date_covid19_confirmed) |
-                                         (check$out_date_ate>0 & is.na(check$exp_date_covid19_confirmed)),1,0)
+                                         (data$out_date_ate>0 & is.na(data$exp_date_covid19_confirmed)),1,0)
 data$ate_status_in_unexposed[is.na(data$ate_status_in_unexposed)] <- 0
 table(data$ate_status_in_unexposed, useNA = "ifany")
 
