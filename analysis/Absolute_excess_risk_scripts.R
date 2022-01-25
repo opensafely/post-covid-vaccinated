@@ -113,14 +113,17 @@ hr_ate_196 <- subset(hr, hr$project == "vaccinated_delta" &  hr$event == "ate" &
 lifetable_ate$h <- ifelse(lifetable_ate$days < 29, rep(hr_ate_28$estimate),0)
 lifetable_ate$h <- ifelse(lifetable_ate$days > 28, rep(hr_ate_196$estimate),lifetable_ate$h)
 
-  0.000453725*100
+lifetable_ate$qh <- lifetable_ate$q*lifetable_ate$h
+lifetable_ate$'1-qh' <- 1 - lifetable_ate$qh
+lifetable_ate$sc <- cumprod(lifetable_ate$`1-qh`)
 
-0.000453725*188
-#the changes in absolute risk of ATE after exposed to COVID19 on day 342(49 weeks) would be 0.045%
-#ie 0.085 more events 49 weeks after 188 covid19 events
+#S-SC =difference in absolute risk
 
-#plotting
+lifetable_ate$'sc-s' <- lifetable_ate$sc - lifetable_ate$s
 
+#Sample results and interpretation.
+9.887190e-02*100 #the changes in absolute risk of ATE after exposed to COVID19 on day 196 (28 weeks) would be 9.88%
+9.887190e-02*188 # 18.58792 more ate events 28 weeks after 188 covid19 events - in the vaccinated delta population.
 
 
 #----------------------------------------
