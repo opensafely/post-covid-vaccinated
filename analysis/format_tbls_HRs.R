@@ -118,7 +118,7 @@ if(length(event_count_done)>0){
   
   
   df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
-  #write.csv(df_hr, paste0(output_dir,"/compiled_event_counts_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
+  write.csv(df_hr, paste0(output_dir,"/compiled_event_counts_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
   
 }
 
