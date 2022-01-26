@@ -39,7 +39,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.05,
+            "incidence": 0.1,
         },
     ),
     ## First COVID-19 code (diagnosis, positive test or sequalae) in primary care
@@ -56,7 +56,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.05,
+            "incidence": 0.1,
         },
     ),
     ## Start date of episode with confirmed diagnosis in any position
@@ -69,7 +69,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.05,
+            "incidence": 0.1,
         },
     ),
     ## Date of death with SARS-COV-2 infection listed as primary or underlying cause
@@ -82,7 +82,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1
         },
     ),
     ## Generate variable to identify first date of confirmed COVID
@@ -103,7 +103,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -116,7 +116,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -129,7 +129,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1,
         },
     ),
     ### Combined
@@ -148,7 +148,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -161,7 +161,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -174,7 +174,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1
         },
     ),
     ### Combined
@@ -193,7 +193,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -206,7 +206,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -219,7 +219,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02,
+            "incidence": 0.1,
         },
     ),
     ### Combined
@@ -238,7 +238,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -251,7 +251,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -264,7 +264,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1
         },
     ),
     ### Combined
@@ -283,7 +283,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -296,7 +296,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -309,7 +309,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1
         },
     ),
     ### Combined
@@ -328,7 +328,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -341,7 +341,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -354,7 +354,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1
         },
     ),
     ### Combined
@@ -373,7 +373,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -386,7 +386,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -399,7 +399,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1
         },
     ),
     ### Combined
@@ -418,7 +418,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -431,7 +431,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -444,7 +444,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1
         },
     ),
     ### Combined
@@ -463,7 +463,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -476,7 +476,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -489,7 +489,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1
         },
     ),
     ### Combined
@@ -508,7 +508,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### HES APC
@@ -521,7 +521,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
     ### ONS
@@ -534,7 +534,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.02
+            "incidence": 0.1
         },
     ),
     ### Combined
@@ -552,7 +552,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
 
@@ -566,7 +566,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
 
@@ -580,7 +580,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
 
@@ -594,7 +594,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.03,
+            "incidence": 0.1,
         },
     ),
 
@@ -732,20 +732,20 @@ def generate_common_variables(index_date_variable):
         ami_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_ami_prior_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ami_prior_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     tmp_cov_bin_ami_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ami_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_ami=patients.maximum_of(
@@ -758,26 +758,26 @@ def generate_common_variables(index_date_variable):
         stroke_isch_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     tmp_cov_bin_stroke_sah_hs_snomed=patients.with_these_clinical_events(
         stroke_sah_hs_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_stroke_isch_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=stroke_isch_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     tmp_cov_bin_stroke_sah_hs_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=stroke_sah_hs_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_all_stroke=patients.maximum_of(
@@ -790,14 +790,14 @@ def generate_common_variables(index_date_variable):
         other_arterial_embolism_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_other_arterial_embolism_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ami_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_other_arterial_embolism=patients.maximum_of(
@@ -810,14 +810,14 @@ def generate_common_variables(index_date_variable):
         all_vte_codes_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_vte_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=all_vte_codes_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_vte=patients.maximum_of(
@@ -830,14 +830,14 @@ def generate_common_variables(index_date_variable):
         hf_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_hf_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=hf_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_hf=patients.maximum_of(
@@ -850,14 +850,14 @@ def generate_common_variables(index_date_variable):
         angina_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_angina_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=angina_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_angina=patients.maximum_of(
@@ -870,28 +870,28 @@ def generate_common_variables(index_date_variable):
         dementia_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC (Hospital Episode Statistics Admitted Patient Care)
     tmp_cov_bin_dementia_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=dementia_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Primary care - vascular
     tmp_cov_bin_dementia_vascular_snomed=patients.with_these_clinical_events(
         dementia_vascular_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC - vascular
     tmp_cov_bin_dementia_vascular_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=dementia_vascular_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_dementia=patients.maximum_of(
@@ -904,14 +904,14 @@ def generate_common_variables(index_date_variable):
         liver_disease_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_liver_disease_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=liver_disease_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_liver_disease=patients.maximum_of(
@@ -924,14 +924,14 @@ def generate_common_variables(index_date_variable):
         ckd_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_chronic_kidney_disease_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ckd_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_chronic_kidney_disease=patients.maximum_of(
@@ -944,14 +944,14 @@ def generate_common_variables(index_date_variable):
         cancer_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_cancer_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=cancer_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_cancer=patients.maximum_of(
@@ -964,21 +964,21 @@ def generate_common_variables(index_date_variable):
         hypertension_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_hypertension_hes=patients.admitted_to_hospital(
        returning='binary_flag',
        with_these_diagnoses=hypertension_icd10,
        on_or_before=f"{index_date_variable}",
-       return_expectations={"incidence": 0.01},
+       return_expectations={"incidence": 0.1},
     ),
     ### DMD
     tmp_cov_bin_hypertension_drugs_dmd=patients.with_these_clinical_events(
         hypertension_drugs_dmd,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_hypertension=patients.maximum_of(
@@ -991,21 +991,21 @@ def generate_common_variables(index_date_variable):
     #     diabetes_snomed_clinical,
     #     returning='binary_flag',
     #     on_or_before=f"{index_date_variable}",
-    #     return_expectations={"incidence": 0.01},
+    #     return_expectations={"incidence": 0.1},
     # ),
     # ### HES APC
     # tmp_cov_bin_diabetes_hes=patients.admitted_to_hospital(
     #    returning='binary_flag',
     #    with_these_diagnoses=diabetes_icd10,
     #    on_or_before=f"{index_date_variable}",
-    #    return_expectations={"incidence": 0.01},
+    #    return_expectations={"incidence": 0.1},
     # ),
     # ### DMD
     # tmp_cov_bin_diabetes_dmd=patients.with_these_clinical_events(
     #     diabetes_drugs_dmd,
     #     returning='binary_flag',
     #     on_or_before=f"{index_date_variable}",
-    #     return_expectations={"incidence": 0.01},
+    #     return_expectations={"incidence": 0.1},
     # ),
     # ### Combined
     # cov_bin_diabetes = patients.maximum_of(
@@ -1017,7 +1017,7 @@ def generate_common_variables(index_date_variable):
         diabetes_type1_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
 
     ## Type 2 diabetes
@@ -1025,7 +1025,7 @@ def generate_common_variables(index_date_variable):
         diabetes_type2_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.05},
+        return_expectations={"incidence": 0.1},
     ),
 
     ## Other or non-specific diabetes
@@ -1033,7 +1033,7 @@ def generate_common_variables(index_date_variable):
         diabetes_other_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
 
     ## Gestational diabetes
@@ -1041,7 +1041,7 @@ def generate_common_variables(index_date_variable):
         diabetes_gestational_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
 
     ## Any diabetes
@@ -1055,14 +1055,14 @@ def generate_common_variables(index_date_variable):
         bmi_obesity_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_obesity_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=bmi_obesity_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_obesity=patients.maximum_of(
@@ -1075,14 +1075,14 @@ def generate_common_variables(index_date_variable):
         depression_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_depression_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=depression_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_depression=patients.maximum_of(
@@ -1095,14 +1095,14 @@ def generate_common_variables(index_date_variable):
         copd_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_chronic_obstructive_pulmonary_disease_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses= copd_icd10,
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
     ### Combined
     cov_bin_chronic_obstructive_pulmonary_disease=patients.maximum_of(
@@ -1114,7 +1114,7 @@ def generate_common_variables(index_date_variable):
         lipid_lowering_dmd,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
 
     ## Antiplatelet_medications
@@ -1122,7 +1122,7 @@ def generate_common_variables(index_date_variable):
         antiplatelet_dmd,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
 
     ## Anticoagulation_medications
@@ -1130,7 +1130,7 @@ def generate_common_variables(index_date_variable):
         anticoagulant_dmd, 
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
    
     ## Combined oral contraceptive pill
@@ -1139,7 +1139,7 @@ def generate_common_variables(index_date_variable):
         cocp_dmd, 
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
 
     ## Hormone replacement therapy
@@ -1147,7 +1147,7 @@ def generate_common_variables(index_date_variable):
         hrt_dmd, 
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.01},
+        return_expectations={"incidence": 0.1},
     ),
 
     # Define subgroups (for variables that don't have a corresponding covariate only)
@@ -1167,7 +1167,7 @@ def generate_common_variables(index_date_variable):
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.05,
+            "incidence": 0.5,
         },
     ),
     ## History of COVID-19 
@@ -1177,7 +1177,7 @@ def generate_common_variables(index_date_variable):
         test_result="positive",
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.05},
+        return_expectations={"incidence": 0.1},
     ),
     ### COVID-19 code (diagnosis, positive test or sequalae) in primary care
     tmp_sub_bin_covid19_confirmed_history_snomed=patients.with_these_clinical_events(
@@ -1188,14 +1188,14 @@ def generate_common_variables(index_date_variable):
         ),
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.05},
+        return_expectations={"incidence": 0.1},
     ),
     ### Hospital episode with confirmed diagnosis in any position
     tmp_sub_bin_covid19_confirmed_history_hes=patients.admitted_to_hospital(
         with_these_diagnoses=covid_codes,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.05},
+        return_expectations={"incidence": 0.1},
     ),
     ## Generate variable to identify first date of confirmed COVID
     sub_bin_covid19_confirmed_history=patients.maximum_of(
