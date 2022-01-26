@@ -133,7 +133,7 @@ lifetable$'1-q' <- 1 - lifetable$q
 lifetable$s <- cumprod(lifetable$`1-q`)
 
 #b.Exposed population parameters
-#h = maximally adjusted hazard ratios                                            #RT- to add file path
+#h = maximally adjusted hazard ratios                                            #RT- to add output file path
 hr <- compiled_hr_results_main_vaccinated_delta_mdl_max_adj_covid_history_false
 
 #locate the estimates
@@ -163,23 +163,23 @@ lifetable$AER_p <- lifetable$AER*100
 ##########################
 #plotting
 ######All-life table######
-event<-rep('ARTERIAL THROMBOTIC EVENTS',196)
-subgroup<-rep('All',196)
-x_days_since_covid<-c(1:196)
-weeks_since_covid<-c(rep('1',7), rep('2',7),rep('3-4',14),rep('5-8',28), rep('9-12',28),rep('13-28',98), rep('27-49',160))
-q_estimated_average_incidence_rate<-rep(incidence_rate, 196)
-HR <-c(rep(21.7,7),rep(3.87, 7),rep(2.8,14),rep(2,28),rep(1.58,28),rep(1.34, 98), rep(1.34,160))
+plot(lifetable$days, lifetable$AER_p)
 
-life_table_all<-data.frame(event,subgroup,x_days_since_covid,weeks_since_covid,q_estimated_average_incidence_rate,HR)
-life_table_all$one_minus_q<-1-life_table_all$q_estimated_average_incidence_rate
-life_table_all$S<-cumprod(life_table_all$one_minus_q)
-life_table_all$qh<-life_table_all$q_estimated_average_incidence_rate*life_table_all$HR
-life_table_all$one_minus_qh<-1- life_table_all$qh
-life_table_all$SC<-cumprod(life_table_all$one_minus_qh)
-life_table_all$AER<-life_table_all$S- life_table_all$SC
-life_table_all$AER_percent<-life_table_all$AER*100
 
-1367059*life_table_all[196,12] #7268.796
 
-p_line<-ggplot(life_table_average,
-               
+p_line<-ggplot(lifetable,
+               aes(x=days,
+                   y=AER_p,
+                   group=1)) +
+  #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
+  #              position=position_dodge(.9))+
+  geom_line(size=1.5)+
+  #geom_point()+
+  scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200),limits = c(0,200))+
+  scale_y_continuous(limits = c(0,10))+
+  labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
+       title = 'Arterial Thrombotic Events')+
+  theme(plot.title = element_text(hjust = 0.5))
+ 
+p_line
+      #RT - to add plot saving file location         
