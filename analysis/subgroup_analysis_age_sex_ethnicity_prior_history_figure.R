@@ -172,14 +172,13 @@ combined_subgroup_HR$event <- factor(combined_subgroup_HR$event, levels=c("Acute
 event_names=unique(combined_subgroup_HR$event)
 event_names="Acute myocardial infarction"
 event="Acute myocardial infarction"
-min_plot <- 0.25
-max_plot <- 10
+
 
 df=combined_subgroup_HR[combined_subgroup_HR$event==event,]
 
 subgroup_levels=c()
 colour_levels=c()
-
+event_strata=unique(df$strata)
 if("Prior history of event" %in% event_strata){
   subgroup_levels=append(subgroup_levels,"Prior history of event")
   colour_levels=append(colour_levels,"#ff7f00")
@@ -236,10 +235,11 @@ if("Ethnicity: Mixed" %in% event_strata){
 combined_subgroup_HR$strata <- factor(combined_subgroup_HR$strata, levels=subgroup_levels)
 combined_subgroup_HR$colour <- factor(combined_subgroup_HR$colour, levels=colour_levels)
 
+min_plot <- 0.25
+max_plot <- 3
 
 ggplot2::ggplot(data = combined_subgroup_HR[combined_subgroup_HR$event==event,], 
                 mapping = ggplot2::aes(x = time, y = estimate, color = strata, shape = strata, fill = strata)) +
-  ggplot2::facet_wrap(subgroup~.)+
   ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
   ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5))+
   ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf.low<min_plot,min_plot,conf.low), 
@@ -254,15 +254,19 @@ ggplot2::ggplot(data = combined_subgroup_HR[combined_subgroup_HR$event==event,],
   ggplot2::scale_shape_manual(values = c(rep(21,13)), labels = levels(combined_subgroup_HR$strata)) +
   #    ggplot2::scale_shape_manual(values = c(rep(c(21,22),4),23,24,rep(c(21,22),2),23,24,25), labels = levels(combined_subgroup_HR$strata)) + 
   ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-  ggplot2::guides(fill=ggplot2::guide_legend(ncol=2,byrow=FALSE)) 
-ggplot2::theme_minimal() +
+  ggplot2::guides(fill=ggplot2::guide_legend(ncol = 4, byrow = FALSE)) +
+  ggplot2::theme_minimal() +
   ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
                  panel.grid.minor = ggplot2::element_blank(),
+                 panel.spacing.x = ggplot2::unit(0.5, "lines"),
+                 panel.spacing.y = ggplot2::unit(0, "lines"),
                  legend.key = ggplot2::element_rect(colour = NA, fill = NA),
                  legend.title = ggplot2::element_blank(),
                  legend.position="bottom",
-                 plot.background = ggplot2::element_rect(fill = "white", colour = "white")) 
+                 plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
+  ggplot2::facet_wrap(subgroup~.,ncol=2)
 
+ggplot2::ggsave(paste0("output/age_sex__ethnicity_prior_history_weeks_figures.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
 
 
 
