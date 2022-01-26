@@ -50,9 +50,9 @@ for (i in 1:nrow(results_needed)) {
 
 
 
-if(length(results_missing)>0){
-  results_needed <- anti_join(results_needed, results_missing)
-}
+#if(length(results_missing)>0){
+#  results_needed <- anti_join(results_needed, results_missing)
+#}
 
 
 result_file_paths <- pmap(list(results_done), 
@@ -120,7 +120,11 @@ if(length(event_count_done)>0){
   df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
   write.csv(df_event_counts, paste0(output_dir,"/compiled_event_counts_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
   
-}
+}else if(length(event_count_done)==0){
+  no_event_counts=data.frame(matrix(nrow = 1,ncol = 1))
+  colnames(no_event_counts)="no_results"
+  write.csv(no_event_counts,paste0(output_dir,"/compiled_event_counts_",save_name ,"_",project,"_", mdl,"_",covid_history, ".csv") , row.names=F)
+}  
 
 if(length(results_done)>0){
   #not sure if there's an easier way to join all the event counts on?
