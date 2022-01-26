@@ -5,31 +5,28 @@
 library(tidyverse)
 library(survival)
 
-# Define empty results table
-
+#Define empty results table
 excess_risk <- data.frame(outcome = character(),
                           estimate = numeric(),
                           stringsAsFactors = FALSE)
 
 # Specify data input
-
 input <- "input_vaccinated"
 
 # Load data
-
-data <- readr::read_rds(paste0("output/",input,"_stage1.rds"))
+input_data <- readr::read_rds(paste0("output/",input,".rds"))
 
 # Identify outcomes
-
-outcomes <- colnames(data)[substr(colnames(data),1,4)=="out_"]
+outcomes <- colnames(input_data)[substr(colnames(input_data),1,4)=="out_"]
+outcomes <- gsub("out_date_","",outcomes)
+outcomes <- outcomes[5:14] # no HRs for diabetes currently so remove those outcomes
 
 # Specify outcome
-
 for (outcome in outcomes) {
 
 
 #Outcome- OTHER ARTERIAL THROMBOTIC EVENTS
-data <- data[,c("patient_id", "vax_date_covid_2",  "death_date", outcome, "exp_date_covid19_confirmed")]
+data <- input_data[,c("patient_id", "vax_date_covid_2",  "death_date", paste0("out_date_",outcome), "exp_date_covid19_confirmed")]
 colnames(data) <- c("patient_id", "vax_date_covid_2",  "death_date", "outcome", "exp_date_covid19_confirmed")
 
 #-----------------------------------------------
@@ -145,7 +142,7 @@ lifetable<- as.data.frame(daily_incidence)
 
 #a.Unexposed population parameters
 #Gather existing variables
-lifetable$event <- gsub("out_date_","",outcome)
+lifetable$event <- outcome
 lifetable$agegp <- "ALL"
 lifetable$sex <- "ALL"
 lifetable$days <- lifetable$time
@@ -160,10 +157,10 @@ lifetable$s <- cumprod(lifetable$`1-q`)
 hr <- compiled_hr_results_main_vaccinated_delta_mdl_max_adj_covid_history_false
 
 #locate the estimates
-hr_ate_28 <- subset(hr, hr$project == "vaccinated_delta" &  hr$event == "ate" &
+hr_ate_28 <- subset(hr, hr$project == "vaccinated_delta" &  hr$event == outcome &
                       hr$model == "mdl_max_adj" & hr$term == "days0_28")
 
-hr_ate_196 <- subset(hr, hr$project == "vaccinated_delta" &  hr$event == "ate" &
+hr_ate_196 <- subset(hr, hr$project == "vaccinated_delta" &  hr$event == outcome &
                        hr$model == "mdl_max_adj" & hr$term == "days28_196")
 
 #assign the estimates
