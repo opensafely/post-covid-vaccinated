@@ -3,6 +3,7 @@
 #Scripts: Renin Toms, Xiyun Jiang
 
 library(tidyverse)
+library(survival)
 
 #OTHER ARTERIAL THROMBOTIC EVENTS
 data <- (input_vaccinated[c("patient_id", "vax_date_covid_2",  "death_date", "out_date_ate", "exp_date_covid19_confirmed")])
@@ -64,7 +65,7 @@ incidence_rate <- ate_in_unexposed/fp_person_days*100000
 print(incidence_rate) # Incidence rate in unexposed per 100,000 person days follow up
 
 #6. Method 2 (alternative) - Average daily incidence
-library(survival)
+
 
 #Pre-process the variables
 data$ate_in_unexposed <- ifelse((data$out_date_ate < data$exp_date_covid19_confirmed) |
