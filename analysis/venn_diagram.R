@@ -90,6 +90,34 @@ venn_digram <- function(outcome_names, figure_title)
   return(g)
 }
 
+
+venn_digram2 <- function(outcome_names, figure_name, figure_title)
+{
+  print(outcome_names)
+  n_src = length(outcome_names)
+  if(n_src ==3){
+    index1 <- which(!is.na(input[,outcome_names[1]]))
+    index2 <- which(!is.na(input[,outcome_names[2]]))
+    index3 <- which(!is.na(input[,outcome_names[3]]))
+    index = list(index1, index2, index3)
+    names(index) <- c("SNOMED", "Hospital Episodes", "Deaths")
+    mycol=c("thistle", "lightcyan", "lemonchiffon")
+  }else{
+    print("number of data sources != 3")
+  }
+  svglite(file= paste0("output/",figure_name, ".svg"))
+  g <- ggvenn(
+    index, 
+    fill_color = mycol,
+    stroke_color = "white",
+    text_size = 5,
+    set_name_size = 5, 
+    fill_alpha = 0.9
+  ) +  ggtitle(figure_title) +
+    theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"))
+  print(g)
+  dev.off()
+}
 #-Apply the relevant function to each outcome-----------------------------------
 # Rules: three data sources in the order of "SNOMED", "Hospital Episode", "Deaths"
 # outcome 1: ami
@@ -160,6 +188,17 @@ outcome_names
 length(unique(outcome_names))
 
 unique_outcome_names <- unique(outcome_names)
+
+#--10 separate svg files, one for each outcome-----------------------------
+for (i in unique_outcome_names){
+  print(i)
+  index <- which(outcome_names == i)
+  venn_outcome <- outcome_full_names_sources[index]
+  if(length(venn_outcome)!=3){print("number of data sources > 3!")}
+  figure_name = figure_title <- paste0(population, "_", i)
+  venn_digram2(venn_outcome,figure_name, figure_title)
+}
+
 #index <- which(outcome_names == unique_outcome_names[1])
 
 #venn_outcome <- outcome_full_names_sources[index]
@@ -167,15 +206,15 @@ unique_outcome_names <- unique(outcome_names)
 #g1 <- venn_digram(venn_outcome, outcome_names[1])
 
 
-for (i in unique_outcome_names){
-  print(i)
-  index <- which(outcome_names == i)
-  venn_outcome <- outcome_full_names_sources[index]
-  if(length(venn_outcome)!=3){print("number of data sources > 3!")}
-  j = which(unique_outcome_names==i) 
-  g <- venn_digram(venn_outcome,i)
-  print(g)
-}
+# for (i in unique_outcome_names){
+#   print(i)
+#   index <- which(outcome_names == i)
+#   venn_outcome <- outcome_full_names_sources[index]
+#   if(length(venn_outcome)!=3){print("number of data sources > 3!")}
+#   j = which(unique_outcome_names==i) 
+#   g <- venn_digram(venn_outcome,i)
+#   print(g)
+# }
 
 # approach two automation: one venn diagram in one svg file
 # approach one: 10 venn diagrams in one svg file
