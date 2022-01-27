@@ -146,3 +146,32 @@ svglite(file=file.path("output", figure_name), width=25, height=15)
 grid.arrange(g1, g2, g3, g4, g5, g6, g7, g8, g9, g10, ncol=5)
 dev.off()
 
+
+#----------Approach 2: automation----------------#
+# pitfall: lose figure titles
+
+outcome_full_names_sources <- tidyselect::vars_select(names(input), starts_with('tmp_out_date_', ignore.case = TRUE))
+outcome_names_sources <- gsub("tmp_out_date_","",outcome_full_names_sources) #delete the prefix
+outcome_names <- gsub("_snomed","",outcome_names_sources) 
+outcome_names <- gsub("_hes","",outcome_names) 
+outcome_names <- gsub("_death","",outcome_names) 
+
+outcome_names
+
+length(unique(outcome_names))
+
+unique_outcome_names <- unique(outcome_names)
+index <- which(outcome_names == unique_outcome_names[1])
+
+venn_outcome <- outcome_full_names_sources[index]
+g1 <- venn_digram(venn_outcome, "Acute Myocardial Infarction")
+g1 <- venn_digram(venn_outcome, outcome_names[1])
+
+
+for (i in unique_outcome_names){
+  print(i)
+  index <- which(outcome_names == i)
+  venn_outcome <- outcome_full_names_sources[index]
+  if(length(venn_outcome)!=3){print("number of data sources > 3!")}
+  venn_digram(venn_outcome,i)
+}
