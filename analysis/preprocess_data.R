@@ -155,6 +155,12 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   
   saveRDS(tmp1, file = paste0("output/input_",j,".rds"))
   
+  # Describe data --------------------------------------------------------------
+  
+  sink(paste0("output/describe_input_",j,"_stage0.txt"))
+  print(Hmisc::describe(tmp1))
+  sink()
+  
   # Restrict columns and save Venn diagram input dataset -----------------------
   
   tmp2 <- tmp[,c("patient_id",colnames(tmp)[grepl("out_",colnames(tmp))])]

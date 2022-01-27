@@ -40,6 +40,8 @@ actions:
       highly_sensitive:
         cohort_vaccinated: output/input_vaccinated.rds
         cohort_electively_unvaccinated: output/input_electively_unvaccinated.rds
+        describe_vaccinated: output/describe_input_vaccinated_stage0.txt
+        describe_electively_unvaccinated: output/describe_input_electively_unvaccinated_stage0.txt
         venn_vaccinated: output/venn_vaccinated.rds
         venn_electively_unvaccinated: output/venn_electively_unvaccinated.rds
 
