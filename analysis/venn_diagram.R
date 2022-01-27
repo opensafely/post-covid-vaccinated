@@ -101,7 +101,6 @@ g1 <- venn_digram(ami_names, "Acute Myocardial Infarction")
 stroke_names <- c("tmp_out_date_stroke_isch_snomed", "tmp_out_date_stroke_isch_hes", "tmp_out_date_stroke_isch_death")
 g2 <- venn_digram(stroke_names,"Ischaemic Stroke")
 
-
 # outcome 3: pe
 pe_names <- c("tmp_out_date_pe_snomed", "tmp_out_date_pe_hes", "tmp_out_date_pe_death")
 g3 <- venn_digram(pe_names, "Pulmonary Embolism")
@@ -161,11 +160,11 @@ outcome_names
 length(unique(outcome_names))
 
 unique_outcome_names <- unique(outcome_names)
-index <- which(outcome_names == unique_outcome_names[1])
+#index <- which(outcome_names == unique_outcome_names[1])
 
-venn_outcome <- outcome_full_names_sources[index]
-g1 <- venn_digram(venn_outcome, "Acute Myocardial Infarction")
-g1 <- venn_digram(venn_outcome, outcome_names[1])
+#venn_outcome <- outcome_full_names_sources[index]
+#g1 <- venn_digram(venn_outcome, "Acute Myocardial Infarction")
+#g1 <- venn_digram(venn_outcome, outcome_names[1])
 
 
 for (i in unique_outcome_names){
@@ -173,5 +172,10 @@ for (i in unique_outcome_names){
   index <- which(outcome_names == i)
   venn_outcome <- outcome_full_names_sources[index]
   if(length(venn_outcome)!=3){print("number of data sources > 3!")}
-  venn_digram(venn_outcome,i)
+  j = which(unique_outcome_names==i) 
+  g <- venn_digram(venn_outcome,i)
+  print(g)
 }
+
+# approach two automation: one venn diagram in one svg file
+# approach one: 10 venn diagrams in one svg file
