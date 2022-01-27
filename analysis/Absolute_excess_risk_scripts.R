@@ -1,25 +1,25 @@
 #Project:Vaccinated delta wave population study
 #Branch:Absolute excess risk calculations
-#Scripts: Renin Toms, Xiyun Jiang
+#Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
 library(tidyverse)
 library(survival)
 
-#Define empty results table
-excess_risk <- data.frame(outcome = character(),
-                          estimate = numeric(),
-                          stringsAsFactors = FALSE)
-
 # Specify data input
-input <- "input_vaccinated"
-
+input <- "input_vaccinated"                                                      # Option 2: input_electively_unvaccinated
 # Load data
 input_data <- readr::read_rds(paste0("output/",input,".rds"))
 
+#Define empty results table
+excess_risk <- data.frame(outcome = character(),
+                          aer = numeric(),
+                          stringsAsFactors = FALSE)
+
 # Identify outcomes
-outcomes <- colnames(input_data)[substr(colnames(input_data),1,4)=="out_"]
-outcomes <- gsub("out_date_","",outcomes)
-outcomes <- outcomes[5:14] # no HRs for diabetes currently so remove those outcomes
+#variable name str <- input_data$out_date_ami
+outcomes <- colnames(input_data)[substr(colnames(input_data),1,4)=="out_"]       # choose variable names starts with "out_"
+outcomes <- gsub("out_date_","",outcomes)                                        # refine the outcome names
+outcomes <- outcomes[5:14]                                                       # no HRs for diabetes currently so remove those outcomes
 
 # Specify outcome
 for (outcome in outcomes) {
