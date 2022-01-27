@@ -37,6 +37,9 @@ actions:
     run: r:latest analysis/preprocess_data.R
     needs: [generate_study_population_index, generate_study_population_vaccinated, generate_study_population_electively_unvaccinated]
     outputs:
+      moderately_sensitive:
+        describe_vaccinated: output/describe_input_vaccinated_stage0.txt
+        describe_electively_unvaccinated: output/describe_input_electively_unvaccinated_stage0.txt
       highly_sensitive:
         cohort_vaccinated: output/input_vaccinated.rds
         cohort_electively_unvaccinated: output/input_electively_unvaccinated.rds
