@@ -98,10 +98,10 @@ coxfit <- function(data_surv, interval_names, covar_names){
   if ((startsWith(strata,"sex_"))==F & (!"SEX" %in% covariates_excl_region_sex_age)){
     surv_formula <- paste(surv_formula, "SEX", sep="+")
   }
-
+  
   #If subgroup is not age then add in age spline otherwise use age and age_sq
   if ((startsWith(strata,"agegp_"))==F){
-    surv_formula <- paste(surv_formula, "rms::rcs(age,knot_placement)", sep="+")
+    surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
   }else if ((startsWith(strata,"agegp_"))==T){
     surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
   }
@@ -134,7 +134,6 @@ coxfit <- function(data_surv, interval_names, covar_names){
   anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
   anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
   results=results%>%left_join(anova_fit_cox_model,by="covariate")
-  
   
   return(results)
 }
