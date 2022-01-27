@@ -68,10 +68,10 @@ combined_subgroup_HR$strata <- ifelse(endsWith(combined_subgroup_HR$strata,"TRUE
 
 # Give ethnicity estimates extra space -----------------------------------------
 
-combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Ethnicity: South Asian", combined_subgroup_HR$time-0.5, combined_subgroup_HR$time)
-combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Ethnicity: Other Ethnic Groups", combined_subgroup_HR$time-1.0, combined_subgroup_HR$time)
-combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Ethnicity: Mixed", combined_subgroup_HR$time+0.5, combined_subgroup_HR$time)
-combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Ethnicity: Black", combined_subgroup_HR$time+1.0, combined_subgroup_HR$time)
+combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Ethnicity: South Asian", combined_subgroup_HR$time-0.25, combined_subgroup_HR$time)
+combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Ethnicity: Other Ethnic Groups", combined_subgroup_HR$time-0.5, combined_subgroup_HR$time)
+combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Ethnicity: Mixed", combined_subgroup_HR$time+0.25, combined_subgroup_HR$time)
+combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Ethnicity: Black", combined_subgroup_HR$time+0.5, combined_subgroup_HR$time)
 
 # Specify line colours ---------------------------------------------------------
 
@@ -118,186 +118,116 @@ combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Age group: 40-
 combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Age group: 60-79", combined_subgroup_HR$time-0.5, combined_subgroup_HR$time)
 combined_subgroup_HR$time <- ifelse(combined_subgroup_HR$strata=="Age group: 80-110", combined_subgroup_HR$time+0.25, combined_subgroup_HR$time)
 
+# Which events to run for
+# Only plot for events that have results for all levels of all subgroups 
+outcome_names=unique(combined_subgroup_HR$event)
+events_to_plot=c()
+not_plot=c()
+for(outcome in outcome_names){
+  df=combined_subgroup_HR%>%filter(event==outcome)
+  number_of_subgroups=length(unique(df$strata))
+  if(number_of_subgroups==13){
+    events_to_plot=append(events_to_plot,outcome)
+  }else{
+    not_plot=append(not_plot,outcome)
+  }
+}
 
-
+combined_subgroup_HR=combined_subgroup_HR%>%filter(event %in% events_to_plot)
 
 # Factor variables for ordering-------------------------------------------------
 
-combined_subgroup_HR$subgroup <- factor(combined_subgroup_HR$subgroup, levels=c("Prior history of event",
-                                                                                "Age group",
-                                                                                "Sex",
-                                                                                "Ethnicity")) 
+if(nrow(combined_subgroup_HR)>0){
+  combined_subgroup_HR$subgroup <- factor(combined_subgroup_HR$subgroup, levels=c("Prior history of event",
+                                                                                  "Age group",
+                                                                                  "Sex",
+                                                                                  "Ethnicity")) 
+  
+  
+  combined_subgroup_HR$strata <- factor(combined_subgroup_HR$strata, levels=c("Prior history of event",
+                                                                              "No prior history of event",
+                                                                              "Age group: 18-39",
+                                                                              "Age group: 40-59",
+                                                                              "Age group: 60-79",
+                                                                              "Age group: 80-110",
+                                                                              "Sex: Female",
+                                                                              "Sex: Male",
+                                                                              "Ethnicity: White",
+                                                                              "Ethnicity: Black",
+                                                                              "Ethnicity: South Asian",
+                                                                              "Ethnicity: Other Ethnic Groups",
+                                                                              "Ethnicity: Mixed"))
+  
+  combined_subgroup_HR$colour <- factor(combined_subgroup_HR$colour, levels=c("#ff7f00",
+                                                                              "#fdbf6f",
+                                                                              "#006d2c",
+                                                                              "#31a354",
+                                                                              "#74c476",
+                                                                              "#bae4b3",
+                                                                              "#6a3d9a",
+                                                                              "#cab2d6",
+                                                                              "#08519c",
+                                                                              "#2171b5",
+                                                                              "#4292c6",
+                                                                              "#6baed6",
+                                                                              "#9ecae1"))
+}
 
 
-# combined_subgroup_HR$strata <- factor(combined_subgroup_HR$strata, levels=c("Prior history of event",
-#                                           "No prior history of event",
-#                                           "Age group: 18-39",
-#                                           "Age group: 40-59",
-#                                           "Age group: 60-79",
-#                                           "Age group: 80-110",
-#                                           "Sex: Female",
-#                                           "Sex: Male",
-#                                           "Ethnicity: White",
-#                                           "Ethnicity: Black",
-#                                           "Ethnicity: South Asian",
-#                                           "Ethnicity: Other Ethnic Groups",
-#                                           "Ethnicity: Mixed"))
-# 
-# combined_subgroup_HR$colour <- factor(combined_subgroup_HR$colour, levels=c("#ff7f00",
-#                                         "#fdbf6f",
-#                                         "#006d2c",
-#                                         "#31a354",
-#                                         "#74c476",
-#                                         "#bae4b3",
-#                                         "#6a3d9a",
-#                                         "#cab2d6",
-#                                         "#08519c",
-#                                         "#2171b5",
-#                                         "#4292c6",
-#                                         "#6baed6",
-#                                         "#9ecae1")) 
-# 
-combined_subgroup_HR$event <- factor(combined_subgroup_HR$event, levels=c("Acute myocardial infarction",
-                                                                          "Ischaemic stroke",
-                                                                          "Pulmonary embolism",
-                                                                          "Deep vein thrombosis",
-                                                                          "Transient ischaemic attack",
-                                                                          "Subarachnoid haemorrhage and haemorrhagic stroke",
-                                                                          "Heart failure",
-                                                                          "Angina",
-                                                                          "Arterial thromboses",
-                                                                          "Venous thromboembolism"))
+
 
 # Plot figures------------------------------------------------------------------
-event_names=unique(combined_subgroup_HR$event)
-event_names="Acute myocardial infarction"
-event="Acute myocardial infarction"
-
-
-df=combined_subgroup_HR[combined_subgroup_HR$event==event,]
-
-subgroup_levels=c()
-colour_levels=c()
-event_strata=unique(df$strata)
-if("Prior history of event" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Prior history of event")
-  colour_levels=append(colour_levels,"#ff7f00")
-}
-if("No prior history of event" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"No prior history of event")
-  colour_levels=append(colour_levels,"#fdbf6f")
-}
-if("Age group: 18-39" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Age group: 18-39")
-  colour_levels=append(colour_levels,"#006d2c")
-}
-if("Age group: 40-59" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Age group: 40-59")
-  colour_levels=append(colour_levels,"#31a354")
-}
-if("Age group: 60-79" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Age group: 60-79")
-  colour_levels=append(colour_levels,"#74c476")
-}
-if("Age group: 80-110" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Age group: 80-110")
-  colour_levels=append(colour_levels,"#bae4b3")
-}
-if("Sex: Female" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Sex: Female")
-  colour_levels=append(colour_levels,"#6a3d9a")
-}
-if("Sex: Male" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Sex: Male")
-  colour_levels=append(colour_levels,"#cab2d6")
-}
-if("Ethnicity: White" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Ethnicity: White")
-  colour_levels=append(colour_levels,"#08519c")
-}
-if("Ethnicity: Black" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Ethnicity: Black")
-  colour_levels=append(colour_levels,"#2171b5")
-}
-if("Ethnicity: South Asian" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Ethnicity: South Asian")
-  colour_levels=append(colour_levels,"#4292c6")
-}
-if("Ethnicity: Other Ethnic Groups" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Ethnicity: Other Ethnic Groups")
-  colour_levels=append(colour_levels,"#6baed6")
-}
-if("Ethnicity: Mixed" %in% event_strata){
-  subgroup_levels=append(subgroup_levels,"Ethnicity: Mixed")
-  colour_levels=append(colour_levels,"#9ecae1")
-}
-
-combined_subgroup_HR$strata <- factor(combined_subgroup_HR$strata, levels=subgroup_levels)
-combined_subgroup_HR$colour <- factor(combined_subgroup_HR$colour, levels=colour_levels)
 
 min_plot <- 0.25
-max_plot <- 3
-
-ggplot2::ggplot(data = combined_subgroup_HR[combined_subgroup_HR$event==event,], 
-                mapping = ggplot2::aes(x = time, y = estimate, color = strata, shape = strata, fill = strata)) +
-  ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-  ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5))+
-  ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf.low<min_plot,min_plot,conf.low), 
-                                                ymax = ifelse(conf.high>max_plot,max_plot,conf.high),  
-                                                width = 0), 
-                         position = ggplot2::position_dodge(width = 1))+
-  ggplot2::geom_line(position = ggplot2::position_dodge(width = 0.5)) +
-  #ggplot2::scale_y_continuous(lim = c(0.25,64), breaks = c(0.25,0.5,1,2,4,8,16,32,64), trans = "log") +
-  ggplot2::scale_x_continuous(lim = c(0,28), breaks = seq(0,28,4)) +
-  ggplot2::scale_fill_manual(values = levels(combined_subgroup_HR$colour), labels = levels(combined_subgroup_HR$strata))+ 
-  ggplot2::scale_color_manual(values = levels(combined_subgroup_HR$colour), labels = levels(combined_subgroup_HR$strata)) +
-  ggplot2::scale_shape_manual(values = c(rep(21,13)), labels = levels(combined_subgroup_HR$strata)) +
-  #    ggplot2::scale_shape_manual(values = c(rep(c(21,22),4),23,24,rep(c(21,22),2),23,24,25), labels = levels(combined_subgroup_HR$strata)) + 
-  ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-  ggplot2::guides(fill=ggplot2::guide_legend(ncol = 4, byrow = FALSE)) +
-  ggplot2::theme_minimal() +
-  ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
-                 panel.grid.minor = ggplot2::element_blank(),
-                 panel.spacing.x = ggplot2::unit(0.5, "lines"),
-                 panel.spacing.y = ggplot2::unit(0, "lines"),
-                 legend.key = ggplot2::element_rect(colour = NA, fill = NA),
-                 legend.title = ggplot2::element_blank(),
-                 legend.position="bottom",
-                 plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
-  ggplot2::facet_wrap(subgroup~.,ncol=2)
-
-ggplot2::ggsave(paste0("output/age_sex__ethnicity_prior_history_weeks_figures.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
-
-
-
-for (event in event_names) {
-  
-  ggplot2::ggplot(data = combined_subgroup_HR[combined_subgroup_HR$event==event,], 
-                  mapping = ggplot2::aes(x = time, y = estimate, color = strata, shape = strata, fill = strata)) +
-    ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-    ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
-    ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf.low<min_plot,min_plot,conf.low), 
-                                                  ymax = ifelse(conf.high>max_plot,max_plot,conf.high),  
-                                                  width = 0), 
-                           position = ggplot2::position_dodge(width = 1)) +
-    ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) +
-    ggplot2::scale_y_continuous(lim = c(0.25,64), breaks = c(0.25,0.5,1,2,4,8,16,32,64), trans = "log") +
-    ggplot2::scale_x_continuous(lim = c(0,44), breaks = seq(0,28,4)) +
-    ggplot2::scale_fill_manual(values = levels(combined_subgroup_HR$colour), labels = levels(combined_subgroup_HR$strata)) +
-    ggplot2::scale_color_manual(values = levels(combined_subgroup_HR$colour), labels = levels(combined_subgroup_HR$strata)) +
-    ggplot2::scale_shape_manual(values = c(rep(c(21,22),4),23,24,rep(c(21,22),2),23,24,25), labels = levels(combined_subgroup_HR$strata)) +
-    ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-    ggplot2::guides(fill=ggplot2::guide_legend(ncol=2,byrow=FALSE)) +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
-                   panel.grid.minor = ggplot2::element_blank(),
-                   legend.key = ggplot2::element_rect(colour = NA, fill = NA),
-                   legend.title = ggplot2::element_blank(),
-                   legend.position="bottom",
-                   plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
-    ggplot2::facet_wrap(subgroup~.)
-  
-  #ggplot2::ggsave(paste0("output/ccu002_01_main_figures_2_3_",tolower(gsub("_event","",event)),".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
-  
+max_plot <- 64
+events_to_plot
+event_name="Acute myocardial infarction" 
+if(length(events_to_plot)>0){
+  for(event_name in events_to_plot){
+    ggplot2::ggplot(data = combined_subgroup_HR[combined_subgroup_HR$event==event_name,], 
+                    mapping = ggplot2::aes(x = time, y = estimate, color = strata, shape = strata, fill = strata)) +
+      ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
+      ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5))+
+      ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf.low<min_plot,min_plot,conf.low), 
+                                                    ymax = ifelse(conf.high>max_plot,max_plot,conf.high),  
+                                                    width = 0), 
+                             position = ggplot2::position_dodge(width = 1))+
+      ggplot2::geom_line(position = ggplot2::position_dodge(width = 0.5)) +
+      ggplot2::scale_y_continuous(lim = c(0.01,64), breaks = c(0.25,0.5,1,2,4,8,16,32,64), trans = "log") +
+      
+      #ggplot2::scale_y_continuous(lim = c(0.25,64), breaks = c(0.25,0.5,1,2,4,8,16,32,64), trans = "log") +
+      ggplot2::scale_x_continuous(lim = c(0,28), breaks = seq(0,28,4)) +
+      ggplot2::scale_fill_manual(values = levels(combined_subgroup_HR$colour), labels = levels(combined_subgroup_HR$strata))+ 
+      ggplot2::scale_color_manual(values = levels(combined_subgroup_HR$colour), labels = levels(combined_subgroup_HR$strata)) +
+      ggplot2::scale_shape_manual(values = c(rep(21,13)), labels = levels(combined_subgroup_HR$strata)) +
+      #    ggplot2::scale_shape_manual(values = c(rep(c(21,22),4),23,24,rep(c(21,22),2),23,24,25), labels = levels(combined_subgroup_HR$strata)) + 
+      ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol = 4, byrow = FALSE)) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     panel.spacing.x = ggplot2::unit(0.5, "lines"),
+                     panel.spacing.y = ggplot2::unit(0, "lines"),
+                     legend.key = ggplot2::element_rect(colour = NA, fill = NA),
+                     legend.title = ggplot2::element_blank(),
+                     legend.position="bottom",
+                     plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
+      ggplot2::facet_wrap(subgroup~.,ncol=2)
+    
+    save_name=gsub(" ","_",event_name)
+    ggplot2::ggsave(paste0("output/figure_3_",save_name,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+  }
 }
+
+if(length(not_plot)>0){
+  for(event_name in not_plot){
+    df <- data.frame()
+    ggplot2::ggplot(df) + geom_point() + xlim(0, 10) + ylim(0, 100)
+    save_name=gsub(" ","_",event_name)
+    ggplot2::ggsave(paste0("output/figure_3_",save_name,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+    
+  }
+}
+
+
 
