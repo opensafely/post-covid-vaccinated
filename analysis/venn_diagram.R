@@ -67,49 +67,6 @@ if(population == "electively_unvaccinated"){
 # -- write a function to create a venn diagram ------------------------------
 
 # Rules: three data sources in the order of "SNOMED", "Hospital Episode", "Deaths"
-# Once the study definition is updated, n_src = 4 can be removed
-venn_digram <- function(outcome_names, figure_name, figure_title)
-{
-  print(outcome_names)
-  n_src = length(outcome_names)
-  if(n_src ==2){
-    index1 <- which(!is.na(input[,outcome_names[1]]))
-    index2 <- which(!is.na(input[,outcome_names[2]]))
-    index = list(index1, index2)
-    names(index) <- c("Hospital Episodes", "Deaths")
-    mycol=c("thistle", "lightcyan")
-  }
-  if(n_src ==3){
-    index1 <- which(!is.na(input[,outcome_names[1]]))
-    index2 <- which(!is.na(input[,outcome_names[2]]))
-    index3 <- which(!is.na(input[,outcome_names[3]]))
-    index = list(index1, index2, index3)
-    names(index) <- c("SNOMED", "Hospital Episodes", "Deaths")
-    mycol=c("thistle", "lightcyan", "lemonchiffon")
-  }
-  if(n_src ==4){
-    index1 <- which(!is.na(input[,outcome_names[1]]))
-    index2 <- which(!is.na(input[,outcome_names[2]]))
-    index3 <- which(!is.na(input[,outcome_names[3]]))
-    index4 <- which(!is.na(input[,outcome_names[4]]))
-    index = list(index1, index2, index3, index4)
-    names(index) <-  c("HE", "Preg HE", "Deaths", "Preg D")
-    mycol=c("thistle", "lightcyan", "lemonchiffon", "orange")
-  }
-  #print(index)
-  png(file=file.path("output", figure_name))
-  print(ggvenn(
-    index, 
-    fill_color = mycol,
-    stroke_color = "white",
-    text_size = 5,
-    set_name_size = 5, 
-    fill_alpha = 0.9
-  ) +  ggtitle(figure_title) +
-    theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold")))
-  dev.off()
-}
-
 
 venn_digram_svg <- function(outcome_names, figure_name, figure_title)
  {
