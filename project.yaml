@@ -69,30 +69,30 @@ actions:
     run: r:latest analysis/venn_diagram.R vaccinated
     needs: [preprocess_data]
     outputs:
-      highly_sensitive:
-        acute_myocardial_infarction: output/vaccinated_f1_venn_ami.png
-        ischaemic_stroke: output/vaccinated_f2_venn_stroke.png
-        pulmonary_embolism: output/vaccinated_f3_venn_pe.png
-        deep_vein_thrombosis: output/vaccinated_f4_venn_dvt.png
-        transient_ischaemic_attack: output/vaccinated_f5_venn_tia.png
-        subarachnoid_haemorrhage_and_haemorrhagic_stroke: output/vaccinated_f6_venn_stroke_sah_hs.png
-        heart_failure: output/vaccinated_f7_venn_hf.png
-        angina_pectoris: output/vaccinated_f8_venn_angina.png
-        all_arterial_thrombotic_and_embolization_events: output/vaccinated_f9_venn_ate.png
-        all_venous_thromboembolism_events: output/vaccinated_f10_venn_vte.png 
+      moderately_sensitive:
+        acute_myocardial_infarction: output/vaccinated_f1_venn_ami.svg
+        ischaemic_stroke: output/vaccinated_f2_venn_stroke.svg
+        pulmonary_embolism: output/vaccinated_f3_venn_pe.svg
+        deep_vein_thrombosis: output/vaccinated_f4_venn_dvt.svg
+        transient_ischaemic_attack: output/vaccinated_f5_venn_tia.svg
+        subarachnoid_haemorrhage_and_haemorrhagic_stroke: output/vaccinated_f6_venn_stroke_sah_hs.svg
+        heart_failure: output/vaccinated_f7_venn_hf.svg
+        angina_pectoris: output/vaccinated_f8_venn_angina.svg
+        all_arterial_thrombotic_and_embolization_events: output/vaccinated_f9_venn_ate.svg
+        all_venous_thromboembolism_events: output/vaccinated_f10_venn_vte.svg 
 
   venn_diagram_electively_unvaccinated:
     run: r:latest analysis/venn_diagram.R electively_unvaccinated
     needs: [preprocess_data]
     outputs:
-      highly_sensitive:
-        acute_myocardial_infarction: output/electively_unvaccinated_f1_venn_ami.png
-        ischaemic_stroke: output/electively_unvaccinated_f2_venn_stroke.png
-        pulmonary_embolism: output/electively_unvaccinated_f3_venn_pe.png
-        deep_vein_thrombosis: output/electively_unvaccinated_f4_venn_dvt.png
-        transient_ischaemic_attack: output/electively_unvaccinated_f5_venn_tia.png
-        subarachnoid_haemorrhage_and_haemorrhagic_stroke: output/electively_unvaccinated_f6_venn_stroke_sah_hs.png
-        heart_failure: output/electively_unvaccinated_f7_venn_hf.png
-        angina_pectoris: output/electively_unvaccinated_f8_venn_angina.png
-        all_arterial_thrombotic_and_embolization_events: output/electively_unvaccinated_f9_venn_ate.png
-        all_venous_thromboembolism_events: output/electively_unvaccinated_f10_venn_vte.png 
+      moderately_sensitive:
+        acute_myocardial_infarction: output/electively_unvaccinated_f1_venn_ami.svg
+        ischaemic_stroke: output/electively_unvaccinated_f2_venn_stroke.svg
+        pulmonary_embolism: output/electively_unvaccinated_f3_venn_pe.svg
+        deep_vein_thrombosis: output/electively_unvaccinated_f4_venn_dvt.svg
+        transient_ischaemic_attack: output/electively_unvaccinated_f5_venn_tia.svg
+        subarachnoid_haemorrhage_and_haemorrhagic_stroke: output/electively_unvaccinated_f6_venn_stroke_sah_hs.svg
+        heart_failure: output/electively_unvaccinated_f7_venn_hf.svg
+        angina_pectoris: output/electively_unvaccinated_f8_venn_angina.svg
+        all_arterial_thrombotic_and_embolization_events: output/electively_unvaccinated_f9_venn_ate.svg
+        all_venous_thromboembolism_events: output/electively_unvaccinated_f10_venn_vte.svg
