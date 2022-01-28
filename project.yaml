@@ -38,13 +38,10 @@ actions:
     needs: [generate_study_population_index, generate_study_population_vaccinated, generate_study_population_electively_unvaccinated]
     outputs:
       moderately_sensitive:
-        describe_vaccinated: output/describe_input_vaccinated_stage0.txt
-        describe_electively_unvaccinated: output/describe_input_electively_unvaccinated_stage0.txt
+        describe: output/describe_*.txt
       highly_sensitive:
-        cohort_vaccinated: output/input_vaccinated.rds
-        cohort_electively_unvaccinated: output/input_electively_unvaccinated.rds
-        venn_vaccinated: output/venn_vaccinated.rds
-        venn_electively_unvaccinated: output/venn_electively_unvaccinated.rds
+        cohort: output/input_*.rds
+        venn: output/venn_*.rds
 
   stage1_data_cleaning_electively_unvaccinated:
     run: r:latest analysis/Stage1_data_cleaning.R output/input_electively_unvaccinated.rds electively_unvaccinated

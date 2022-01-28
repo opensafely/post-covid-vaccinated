@@ -20,6 +20,12 @@ for (i in c("index","vaccinated","electively_unvaccinated")) {
   
   tmp <- arrow::read_feather(file = paste0("output/input_",i,".feather"))
   
+   # Describe data --------------------------------------------------------------
+  
+  sink(paste0("output/describe_input_",i,"_studydefinition.txt"))
+  print(Hmisc::describe(tmp))
+  sink()
+
   # Overwrite patient IDs for dummy data only ----------------------------------
   
   if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
