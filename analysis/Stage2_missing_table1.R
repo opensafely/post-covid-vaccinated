@@ -188,7 +188,7 @@ for (j in 1:nrow(pop)) {
   
   #Numerical covariates
   num_pop=df %>% dplyr::select(numerical_cov)
-  num_summary=as.data.frame(summary(num_pop,maxsum=50))
+  num_summary=as.data.frame(summary(num_pop))
   num_summary[,population]=num_summary$Freq
   num_summary=rename(num_summary, Covariate_level = Freq, Covariate = Var2)
   num_summary=num_summary%>% dplyr::select("Covariate","Covariate_level",population)
@@ -197,7 +197,7 @@ for (j in 1:nrow(pop)) {
   #Binary covariates
   bin_pop=df %>% dplyr::select(binary_cov)
   bin_pop= bin_pop %>% mutate_if(is.logical,as.factor)
-  bin_summary=as.data.frame(summary(bin_pop,maxsum=50))
+  bin_summary=as.data.frame(summary(bin_pop))
   bin_summary[,population]=bin_summary$Freq
   bin_summary=rename(bin_summary, Covariate_level = Freq, Covariate = Var2)
   bin_summary <- bin_summary %>% filter(str_detect(Covariate_level, "^TRUE"))
