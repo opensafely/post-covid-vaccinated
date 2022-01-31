@@ -70,6 +70,11 @@ for (i in c("index","vaccinated","electively_unvaccinated")) {
   
 }
 
+# Remove vax_date_covid_* variables --------------------------------------------
+# NB: These will be removed from future study definitions
+
+df[,c("vax_date_covid_1","vax_date_covid_2","vax_date_covid_3")] <- NULL
+
 # Remove temporary datasets ----------------------------------------------------
 
 rm(tmp, tmp_dynamic, tmp_static)
