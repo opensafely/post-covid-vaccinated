@@ -118,7 +118,7 @@ if(ncol(main_max_adj_HR)==8 & ncol(main_age_sex_HR)==8 & ncol(prior_covid_HR)==8
   
   df_HR_counts <- df_HR_counts[order(df_HR_counts$tidy_event, df_HR_counts$tidy_strata,df_HR_counts$type),]
   
-  write.csv(df,paste0("output/supplementary_table_1_",project,"_.csv"))
+  write.csv(df_HR_counts,paste0("output/supplementary_table_1_",project,"_.csv"))
   
 }else{
   df=data.frame(ncol=1)
