@@ -118,6 +118,11 @@ for (i in colnames(df)[grepl("_bin",colnames(df))]) {
   df[,i] <- as.logical(df[,i])
 }
 
+# Overwrite vaccination information for dummy data only ------------------------
+
+if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
+  source("analysis/modify_dummy_vax_data.R")
+}
 # Split into "vaccinated" and "electively_unvaccinated" cohorts ----------------
 
 for (j in c("vaccinated","electively_unvaccinated")) {
@@ -203,10 +208,4 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   
   saveRDS(tmp2, file = paste0("output/venn_",j,".rds"))
   
-}
-
-# Update vaccine products for dummy data only ----------------------------------
-
-if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
-  source("analysis/modify_dummy_data.R")
 }
