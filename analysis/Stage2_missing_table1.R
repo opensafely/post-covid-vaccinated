@@ -29,11 +29,12 @@ library(readr)
 library(dplyr)
 library(data.table)
 library(tidyverse)
+library(lubridate)
 
 # Get dataset for either the vaccinated or electively unvaccinated subcohort
 # Specify command arguments ----------------------------------------------------
 args = commandArgs(trailingOnly=TRUE)
-input_filename = args[[1]] # tested with output/input.rds
+input_filename = args[[1]] # either "output_vaccinated/input.rds" or "output_electively_unvaccinated/input.rds"
 cohort_name = args[[2]] # either "vaccinated" or "electively_unvaccinated"
 
 input <-read_rds(input_filename)
@@ -70,9 +71,7 @@ for (i in covariate_names){
 #---------------------------------------------------------------#
 check_range <- data.frame(variable = character(), Minimum_value = character(), Maximum_value = character())
 numeric_var_names=colnames(select_if(input, is.numeric))
-#numeric_var_names = numeric_var_names [!numeric_var_names == "patient_id"]
-numeric_var_names = numeric_var_names [!numeric_var_names %in% c("patient_id","start_alive","vax_mixed","vax_prior_unknown")]
-# NOTE: change "start_alive","vax_mixed","vax_prior_unknown" to categorical/factor type in stage 1
+numeric_var_names = numeric_var_names [!numeric_var_names == "patient_id"]
 
 for (i in numeric_var_names){
   check_range[nrow(check_range)+1,1] <- i
@@ -93,7 +92,7 @@ write.csv(check_both, file = file.path("output", paste0("Check_missing_range_",c
 # 1.d. Create a table with min and max for date variables #
 #---------------------------------------------------------#
 check_dates <- data.frame(variable = character(), Ealiest_date = character(), Latest_date = character())
-date_variables_names <- tidyselect::vars_select(names(input), starts_with(c('index_date','death_date','exp_date','out_date','vax_date'), ignore.case = TRUE))
+date_variables_names <- colnames(select_if(input, is.Date))
 input_date <- input[,date_variables_names]
 
 for (i in date_variables_names){
