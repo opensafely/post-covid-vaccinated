@@ -4,7 +4,6 @@ library(magrittr)
 
 # Define parameters ------------------------------------------------------------
 
-## Study start date
 study_start <- "2021-06-01"
 
 # Create spine dataset ---------------------------------------------------------
@@ -123,6 +122,87 @@ for (i in colnames(df)[grepl("_bin",colnames(df))]) {
 if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
   source("analysis/modify_dummy_vax_data.R")
 }
+
+# Identify all vaccinations for a given product --------------------------------
+
+for (cat_product in c("AstraZeneca","Pfizer","Moderna")) {
+  
+  tmp <- df %>%
+    select(patient_id, matches(paste0("vax\\_date\\_",cat_product,"\\_\\d+"))) %>%
+    pivot_longer(
+      cols = -patient_id,
+      values_to = "date_covid",
+      values_drop_na = TRUE
+    ) %>%
+    select(-name) %>%
+    group_by(patient_id) %>%
+    mutate(vax_index = order(date_covid))
+  
+  colnames(tmp) <- c("patient_id","date_covid",paste0("vax_index_",cat_product))
+  
+  assign(paste0("tmp_",cat_product), tmp)
+  
+}
+
+# Combine vaccinations for each product into a wide format table ---------------
+
+tmp <- df %>% 
+  filter_at(vars(starts_with("vax_date")), all_vars(is.na(.))) %>%
+  select(patient_id) %>% 
+  full_join(
+    tmp_Pfizer %>%
+      full_join(tmp_AstraZeneca, by=c("patient_id", "date_covid")) %>%
+      full_join(tmp_Moderna, by=c("patient_id", "date_covid")),
+    by = "patient_id"
+  ) 
+
+
+# Determine product at each vaccination date -----------------------------------
+
+tmp$cat_product <- ""
+
+tmp$cat_product <- ifelse(!is.na(tmp$vax_index_AstraZeneca) & 
+                            is.na(tmp$vax_index_Pfizer) & 
+                            is.na(tmp$vax_index_Moderna),
+                          "AstraZeneca",tmp$cat_product)
+
+tmp$cat_product <- ifelse(is.na(tmp$vax_index_AstraZeneca) & 
+                            !is.na(tmp$vax_index_Pfizer) & 
+                            is.na(tmp$vax_index_Moderna),
+                          "Pfizer",tmp$cat_product)
+
+tmp$cat_product <- ifelse(is.na(tmp$vax_index_AstraZeneca) & 
+                            is.na(tmp$vax_index_Pfizer) & 
+                            !is.na(tmp$vax_index_Moderna),
+                          "Moderna",tmp$cat_product)
+
+tmp$cat_product <- ifelse((!is.na(tmp$vax_index_AstraZeneca)) + 
+                            (!is.na(tmp$vax_index_Pfizer)) + 
+                            (!is.na(tmp$vax_index_Moderna)) > 1,
+                          "duplicate",tmp$cat_product)
+
+# Determine vaccination order --------------------------------------------------
+
+tmp <- tmp %>%
+  arrange(patient_id, date_covid) %>%
+  group_by(patient_id) %>%
+  mutate(vax_index=row_number()) %>%
+  ungroup()
+
+# Make summary variables for vaccination dates and products --------------------
+
+tmp <- tmp %>%
+  pivot_wider(
+    id_cols= patient_id,
+    names_from = c("vax_index"),
+    values_from = c("date_covid", "cat_product"),
+    names_glue = "vax_{.value}_{vax_index}"
+  )
+
+# Add summary variables to main data -------------------------------------------
+
+df <- merge(df, tmp, by = "patient_id", all.x = TRUE)
+
 # Split into "vaccinated" and "electively_unvaccinated" cohorts ----------------
 
 for (j in c("vaccinated","electively_unvaccinated")) {
@@ -131,7 +211,6 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   
   tmp <- df 
   
-  # Perform cohort specific preprocessing steps --------------------------------
   # Remove dynamic variables from 'other' dataset --------------------------------
   
   tmp[,colnames(tmp)[grepl(paste0("_",ifelse(j=="vaccinated","electively_unvaccinated","vaccinated")),colnames(tmp))]] <- NULL
@@ -190,7 +269,9 @@ for (j in c("vaccinated","electively_unvaccinated")) {
               colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
               colnames(tmp)[grepl("cov_",colnames(tmp))], # Covariates
               colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
-              colnames(tmp)[grepl("vax_",colnames(tmp))])] # Vaccination
+              colnames(tmp)[grepl("vax_date_eligible",colnames(tmp))], # Vaccination eligbility
+              colnames(tmp)[grepl("vax_date_covid_",colnames(tmp))], # Vaccination dates
+              colnames(tmp)[grepl("vax_cat_",colnames(tmp))])] # Vaccination products and JCVI groupings
   
   tmp1[,colnames(tmp)[grepl("tmp_out_",colnames(tmp))]] <- NULL
   
