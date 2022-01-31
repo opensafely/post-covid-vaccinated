@@ -128,15 +128,15 @@ if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
 for (cat_product in c("AstraZeneca","Pfizer","Moderna")) {
   
   tmp <- df %>%
-    select(patient_id, matches(paste0("vax\\_date\\_",cat_product,"\\_\\d+"))) %>%
-    pivot_longer(
+    dplyr::select(patient_id, tidyr::matches(paste0("vax\\_date\\_",cat_product,"\\_\\d+"))) %>%
+    tidyr::pivot_longer(
       cols = -patient_id,
       values_to = "date_covid",
       values_drop_na = TRUE
     ) %>%
-    select(-name) %>%
-    group_by(patient_id) %>%
-    mutate(vax_index = order(date_covid))
+    dplyr::select(-name) %>%
+    dplyr::group_by(patient_id) %>%
+    dplyr::mutate(vax_index = order(date_covid))
   
   colnames(tmp) <- c("patient_id","date_covid",paste0("vax_index_",cat_product))
   
@@ -147,12 +147,12 @@ for (cat_product in c("AstraZeneca","Pfizer","Moderna")) {
 # Combine vaccinations for each product into a wide format table ---------------
 
 tmp <- df %>% 
-  filter_at(vars(starts_with("vax_date")), all_vars(is.na(.))) %>%
-  select(patient_id) %>% 
-  full_join(
+  dplyr::filter_at(dplyr::vars(tidyr::starts_with("vax_date")), dplyr::all_vars(is.na(.))) %>%
+  dplyr::select(patient_id) %>% 
+  dplyr::full_join(
     tmp_Pfizer %>%
-      full_join(tmp_AstraZeneca, by=c("patient_id", "date_covid")) %>%
-      full_join(tmp_Moderna, by=c("patient_id", "date_covid")),
+      dplyr::full_join(tmp_AstraZeneca, by=c("patient_id", "date_covid")) %>%
+      dplyr::full_join(tmp_Moderna, by=c("patient_id", "date_covid")),
     by = "patient_id"
   ) 
 
@@ -184,15 +184,15 @@ tmp$cat_product <- ifelse((!is.na(tmp$vax_index_AstraZeneca)) +
 # Determine vaccination order --------------------------------------------------
 
 tmp <- tmp %>%
-  arrange(patient_id, date_covid) %>%
-  group_by(patient_id) %>%
-  mutate(vax_index=row_number()) %>%
-  ungroup()
+  dplyr::arrange(patient_id, date_covid) %>%
+  dplyr::group_by(patient_id) %>%
+  dplyr::mutate(vax_index=dplyr::row_number()) %>%
+  dplyr::ungroup()
 
 # Make summary variables for vaccination dates and products --------------------
 
 tmp <- tmp %>%
-  pivot_wider(
+  tidyr::pivot_wider(
     id_cols= patient_id,
     names_from = c("vax_index"),
     values_from = c("date_covid", "cat_product"),
