@@ -29,8 +29,8 @@ cohort_end_date <- as.Date("2021-12-14")
 #a reduced number of time periods is used
 #cuts_days_since_expo=c(28,365) 
 
-cuts_days_since_expo <- c(14, 28, 56, 84, 196) 
-cuts_days_since_expo_reduced <- c(28,196) 
+cuts_days_since_expo <- c(14, 28, 56, 84, 197) 
+cuts_days_since_expo_reduced <- c(28,197) 
 
 
 # ---------------------- READ IN DATA ------------------------------------------
