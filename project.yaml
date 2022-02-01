@@ -6,6 +6,12 @@ expectations:
 
 
 actions:
+  active_analyses:
+    run: r:latest analysis/active_analyses.R
+    outputs:
+      highly_sensitive:
+        active_analyses: output/active_analyses.rds
+
   vax_eligibility_inputs:
     run: r:latest analysis/vax_eligibility_inputs.R
     outputs:
