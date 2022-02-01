@@ -52,10 +52,9 @@ library(stringr)
 # Get dataset for either the vaccinated or electively unvaccinated subcohort
 # Specify command arguments ----------------------------------------------------
 args = commandArgs(trailingOnly=TRUE)
-input_filename = args[[1]] # tested with output/input.rds
-cohort_name = args[[2]] # either "vaccinated" or "electively_unvaccinated"
+cohort_name = args[[1]] # either "vaccinated" or "electively_unvaccinated"
 
-input <-read_rds(input_filename)
+input <- read_rds(paste0("output/input_",cohort_name,".rds"))
 
 
 # Define general start date and end date
@@ -260,7 +259,7 @@ QA_summary[8,2]=nrow(input)-nrow(input_QA)
 
 
 #Save Qa summary as .csv
-write.csv(QA_summary, file = file.path("output", paste0("QA_summary_",cohort_name, ".csv")) , row.names=F)
+write.csv(QA_summary, file = file.path("output", paste0("qa_summary_",cohort_name, ".csv")) , row.names=F)
 
 # Remove QA variables from dataset
 input <- input_QA[ , !names(input_QA) %in% c("qa_num_birth_year", "qa_bin_pregnancy", "qa_bin_prostate_cancer")]
@@ -381,7 +380,7 @@ if (cohort_name == "vaccinated") {
 #----------------------#
 # 3.d. Create csv file #
 #----------------------#
-write.csv(cohort_flow, file = file.path("output", paste0("Cohort_flow_",cohort_name, ".csv")) , row.names=F)
+write.csv(cohort_flow, file = file.path("output", paste0("cohort_flow_",cohort_name, ".csv")) , row.names=F)
 
 #-------------------------------------#
 # 4. Create the final stage 1 dataset #
