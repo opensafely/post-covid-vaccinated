@@ -64,3 +64,21 @@ actions:
         IE_criteria: output/Cohort_flow_vaccinated.csv
       highly_sensitive:
         cohort: output/input_vaccinated_stage1.rds
+
+  stage2_missing_table1_electively_unvaccinated:
+    run: r:latest analysis/Stage2_missing_table1.R output/input_electively_unvaccinated_stage1.rds electively_unvaccinated
+    needs: [stage1_data_cleaning_electively_unvaccinated]
+    outputs:
+      moderately_sensitive:
+        Missing_RangeChecks: output/Check_missing_range_electively_unvaccinated.csv
+        DateChecks: output/Check_dates_range_electively_unvaccinated.csv
+        Descriptive_Table: output/Table1_electively_unvaccinated.csv
+
+  stage2_missing_table1_vaccinated:
+    run: r:latest analysis/Stage2_missing_table1.R output/input_vaccinated_stage1.rds vaccinated
+    needs: [stage1_data_cleaning_vaccinated]
+    outputs:
+      moderately_sensitive:
+        Missing_RangeChecks: output/Check_missing_range_vaccinated.csv
+        DateChecks: output/Check_dates_range_vaccinated.csv
+        Descriptive_Table: output/Table1_vaccinated.csv

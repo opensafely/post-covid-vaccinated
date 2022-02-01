@@ -21,7 +21,7 @@
 ## 0. Load relevant libraries and read data/arguments
 ## 1. Prepare all variables (re-factoring, re-typing)
 ##    1.a. Set factor variables as factor
-##    1.b. Set the group with the highest frequency as the reference group
+##    1.b. Set the group with the highest frequency as the reference group and rename some categories
 ##    1.c. Check that continuous variables are defined as numeric variables
 ##    1.d. Check and specify date format for date variables
 ##    1.e. Apply changes in the input dataset
@@ -33,7 +33,7 @@
 ##    3.c. Create csv file 
 ## 4. Create the final stage 1 dataset 
 ## 
-## NOTE: This code output are 3 .csv files and 1 R dataset
+## NOTE: This code outputs 3 .csv files and 1 R dataset
 ##       Output files have a specific name to reflect either the Vaccinated 
 ##       or Electively unvaccinated cohort
 ##
@@ -57,14 +57,13 @@ cohort_name = args[[2]] # either "vaccinated" or "electively_unvaccinated"
 
 input <-read_rds(input_filename)
 
-# NOTE: Once study definition is updated, input_filename will be either 
-# output/input_vaccinated.rds or output/input_electively_unvaccinated.rds
 
 # Define general start date and end date
 start_date = as.Date("2021-06-01")
 end_date = as.Date("2021-12-14") # General End date: 2021-12-14 (Decision on Dec 20th 2021)
 
 # NOTE: no censoring of end date for death/event at this stage
+
 
 ######################################################
 # 1. Prepare all variables (re-factoring, re-typing) # 
@@ -104,10 +103,9 @@ for (colname in factor_names){
   covars <- mk_factor_orderlevels(covars, colname)
 }
 
-
-#----------------------------------------------------------------------#
-# 1.b. Set the group with the highest frequency as the reference group #
-#----------------------------------------------------------------------#
+#-------------------------------------------------------------------------------------------------#
+# 1.b. Set the group with the highest frequency as the reference group and rename some categories #
+#-------------------------------------------------------------------------------------------------#
 # Relevel
 
 # Check the frequency for each factor level
@@ -121,12 +119,8 @@ calculate_mode <- function(x) {
 
 # For the following variables, the first level (reference level) is not the one with the highest frequency
 # Set the most frequently occurred level as the reference for a factor variable
-covars$cov_cat_ethnicity = relevel(covars$cov_cat_ethnicity, ref = as.character(calculate_mode(covars$cov_cat_ethnicity)))
-covars$cov_cat_smoking_status = relevel(covars$cov_cat_smoking_status, ref = as.character(calculate_mode(covars$cov_cat_smoking_status)))
 covars$cov_cat_region = relevel(covars$cov_cat_region, ref = as.character(calculate_mode(covars$cov_cat_region)))
-
 covars$sub_cat_covid19_hospital = relevel(covars$sub_cat_covid19_hospital, ref = as.character(calculate_mode(covars$sub_cat_covid19_hospital)))
-
 covars$vax_cat_jcvi_group = relevel(covars$vax_cat_jcvi_group, ref = as.character(calculate_mode(covars$vax_cat_jcvi_group)))
 if (cohort_name == "vaccinated") {
   covars$vax_cat_product_1 = relevel(covars$vax_cat_product_1, ref = as.character(calculate_mode(covars$vax_cat_product_1)))
@@ -134,13 +128,34 @@ if (cohort_name == "vaccinated") {
   covars$vax_cat_product_3 = relevel(covars$vax_cat_product_3, ref = as.character(calculate_mode(covars$vax_cat_product_3)))
 }
 
-#combine groups in deprivation: First - most deprived; fifth -least deprived
+# Combine groups in deprivation: First - most deprived; fifth -least deprived and relevel
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==1 | levels(covars$cov_cat_deprivation)==2] <-"1-2 (most deprived)"
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==3 | levels(covars$cov_cat_deprivation)==4] <-"3-4"
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==5 | levels(covars$cov_cat_deprivation)==6] <-"5-6"
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==7 | levels(covars$cov_cat_deprivation)==8] <-"7-8"
 levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==9 | levels(covars$cov_cat_deprivation)==10] <-"9-10 (least deprived)"
 covars$cov_cat_deprivation = relevel(covars$cov_cat_deprivation, ref = as.character(calculate_mode(covars$cov_cat_deprivation))) # added
+
+# Rename/relevel ethnicity categories     #table(covars$cov_cat_ethnicity)
+levels(covars$cov_cat_ethnicity) <- union(levels(covars$cov_cat_ethnicity), "Missing") # NOTE: No NA for ethnicity in this dummy data -> Add a missing category
+covars$cov_cat_ethnicity <- replace(covars$cov_cat_ethnicity, is.na(covars$cov_cat_ethnicity),"Missing") # If NA, then replace by "Missing"
+
+levels(covars$cov_cat_ethnicity) <- c("White","Mixed","South Asian","Black African and Caribbean","Other","Missing") # Similar to the commented out 5 lines of code below
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "1"] <- "White"
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "2"] <- "Mixed"
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "3"] <- "South Asian"
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "4"] <- "Black African and Caribbean"
+#levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "5"] <- "Chinese and other" 
+covars$cov_cat_ethnicity = relevel(covars$cov_cat_ethnicity, ref = as.character(calculate_mode(covars$cov_cat_ethnicity)))
+
+# Rename/relevel smoking status categories       #table(covars$cov_cat_smoking_status)
+covars$cov_cat_smoking_status <- replace(covars$cov_cat_smoking_status, is.na(covars$cov_cat_smoking_status),"M")
+levels(covars$cov_cat_smoking_status) <- c("Ex-Smoker","Missing","Non-Smoker","Smoker") # Similar to the commented out 5 lines of code below
+#levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "E"] <- "Ex-Smoker"
+#levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "M"] <- "Missing"
+#levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "N"] <- "Non-Smoker"
+#levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "S"] <- "Smoker"
+covars$cov_cat_smoking_status = relevel(covars$cov_cat_smoking_status, ref = as.character(calculate_mode(covars$cov_cat_smoking_status)))
 
 # A simple check if factor reference level has changed
 #lapply(covars[,c("cov_cat_ethnicity", "cov_cat_smoking_status", "cov_cat_region","cov_cat_deprivation","exp_cat_covid19_hospital","vax_cat_jcvi_group","vax_cat_product_1","vax_cat_product_2","vax_cat_product_3")], table)
@@ -173,7 +188,6 @@ date_names <- tidyselect::vars_select(names(input), starts_with(c('index_date','
 for (colname in date_names){
   input[[colname]] <- as.Date(input[[colname]])
 }
-
 
 #-----------------------------------------#
 # 1.e. Apply changes in the input dataset #
@@ -248,6 +262,8 @@ QA_summary[8,2]=nrow(input)-nrow(input_QA)
 #Save Qa summary as .csv
 write.csv(QA_summary, file = file.path("output", paste0("QA_summary_",cohort_name, ".csv")) , row.names=F)
 
+# Remove QA variables from dataset
+input <- input_QA[ , !names(input_QA) %in% c("qa_num_birth_year", "qa_bin_pregnancy", "qa_bin_prostate_cancer")]
 
 
 #########################################
@@ -259,8 +275,8 @@ write.csv(QA_summary, file = file.path("output", paste0("QA_summary_",cohort_nam
 cohort_flow <- data.frame(N = numeric(),
                           Description = character(),
                           stringsAsFactors = FALSE)
-cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input_QA),"Study defined sample size")
-input<-input_QA
+cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
+
 
 #----------------------------------------------------------------#
 # 3.a. Apply the 6 common criteria applicable to both sub-cohort #
@@ -305,8 +321,8 @@ cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 5 (Inclusion): Regi
 if (cohort_name == "vaccinated") {
 
   #Exclusion criteria 7: Do not have a record of two vaccination doses prior to the study end date
-  input$vacc_gap <- input$vax_date_covid_2 - input$vax_date_covid_1 #Determine the vaccination gap in days : gap is NA if any vaccine date is missing
-  input <- input[!is.na(input$vacc_gap),] # Subset the fully vaccinated group
+  input$vax_gap <- input$vax_date_covid_2 - input$vax_date_covid_1 #Determine the vaccination gap in days : gap is NA if any vaccine date is missing
+  input <- input[!is.na(input$vax_gap),] # Subset the fully vaccinated group
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): No record of two vaccination doses prior to the study end date") # Feed into the cohort flow
   
   #Exclusion criteria 8: Received a vaccination prior to 08-12-2020 (i.e., the start of the vaccination program)
@@ -314,11 +330,11 @@ if (cohort_name == "vaccinated") {
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 8 (Exclusion): Recorded vaccination prior to the start date of vaccination program")
   
   #Exclusion criteria 9: Received a second dose vaccination before their first dose vaccination
-  input <- subset(input, input$vacc_gap >= 0) # Keep those with positive vaccination gap
+  input <- subset(input, input$vax_gap >= 0) # Keep those with positive vaccination gap
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 9 (Exclusion): Second dose vaccination recorded before the first dose vaccination")
   
   #Exclusion criteria 10: Received a second dose vaccination less than three weeks after their first dose
-  input <- subset(input, input$vacc_gap >= 21) # Keep those with at least 3 weeks vaccination gap
+  input <- subset(input, input$vax_gap >= 21) # Keep those with at least 3 weeks vaccination gap
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 10 (Exclusion): Second dose vaccination recorded less than three weeks after the first dose")
   
   #Exclusion criteria 11: Mixed vaccine products received before 07-05-2021
@@ -344,16 +360,16 @@ if (cohort_name == "vaccinated") {
   #Exclusion criteria 7: Have a record of one or more vaccination prior index date
   # i.e. Have a record of a first vaccination prior index date (no more vax 2 and 3 variables available in this dataset)
   #a.Determine the vaccination status on index start date
-  input$prior_vacc1 <- ifelse(input$vax_date_covid_1 <= input$index_date, 1,0)
-  input$prior_vacc1[is.na(input$prior_vacc1)] <- 0
-  #input$prior_vacc2 <- ifelse(input$vax_date_covid_2 <= input$index_date, 1,0)
-  #input$prior_vacc2[is.na(input$prior_vacc2)] <- 0
-  #input$prior_vacc3 <- ifelse(input$vax_date_covid_3 <= input$index_date, 1,0)
-  #input$prior_vacc3[is.na(input$prior_vacc3)] <- 0
-  #input$prior_vacc <- ifelse((input$prior_vacc1==1 | input$prior_vacc2==1 |input$prior_vacc3==1), 1,0)
+  input$prior_vax1 <- ifelse(input$vax_date_covid_1 <= input$index_date, 1,0)
+  input$prior_vax1[is.na(input$prior_vax1)] <- 0
+  #input$prior_vax2 <- ifelse(input$vax_date_covid_2 <= input$index_date, 1,0)
+  #input$prior_vax2[is.na(input$prior_vax2)] <- 0
+  #input$prior_vax3 <- ifelse(input$vax_date_covid_3 <= input$index_date, 1,0)
+  #input$prior_vax3[is.na(input$prior_vax3)] <- 0
+  #input$prior_vax <- ifelse((input$prior_vax1==1 | input$prior_vax2==1 |input$prior_vax3==1), 1,0)
   #Note NAs don't have any vaccination date, hence move to '0' or unvaccinated category
-  #input$prior_vacc[is.na(input$prior_vacc)] <- 0
-  input <- subset(input, input$prior_vacc1 == 0) #Exclude people with prior vaccination
+  #input$prior_vax[is.na(input$prior_vax)] <- 0
+  input <- subset(input, input$prior_vax1 == 0) #Exclude people with prior vaccination
   cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): Have a record of a first vaccination prior index date")
   
   #Exclusion criteria 8: Missing JCVI group
@@ -370,4 +386,7 @@ write.csv(cohort_flow, file = file.path("output", paste0("Cohort_flow_",cohort_n
 #-------------------------------------#
 # 4. Create the final stage 1 dataset #
 #-------------------------------------#
+# Remove inclusion/exclusion variables from dataset
+input <- input[ , !names(input) %in% c("start_alive", "vax_gap", "vax_mixed", "vax_prior_unknown", "prior_vax1")]
+
 saveRDS(input, file = file.path("output", paste0("input_",cohort_name, "_stage1.rds")))
