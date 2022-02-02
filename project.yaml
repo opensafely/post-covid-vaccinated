@@ -66,7 +66,7 @@ actions:
         cohort: output/input_vaccinated_stage1.rds
 
   stage2_missing_table1_electively_unvaccinated:
-    run: r:latest analysis/Stage2_missing_table1.R output/input_electively_unvaccinated_stage1.rds electively_unvaccinated
+    run: r:latest analysis/Stage2_missing_table1.R electively_unvaccinated
     needs: [stage1_data_cleaning_electively_unvaccinated]
     outputs:
       moderately_sensitive:
@@ -75,7 +75,7 @@ actions:
         Descriptive_Table: output/Table1_electively_unvaccinated.csv
 
   stage2_missing_table1_vaccinated:
-    run: r:latest analysis/Stage2_missing_table1.R output/input_vaccinated_stage1.rds vaccinated
+    run: r:latest analysis/Stage2_missing_table1.R vaccinated
     needs: [stage1_data_cleaning_vaccinated]
     outputs:
       moderately_sensitive:
