@@ -43,42 +43,29 @@ actions:
         cohort: output/input_*.rds
         venn: output/venn_*.rds
 
-  stage1_data_cleaning_electively_unvaccinated:
-    run: r:latest analysis/Stage1_data_cleaning.R electively_unvaccinated
+  stage1_data_cleaning_both:
+    run: r:latest analysis/Stage1_data_cleaning.R both
     needs: [preprocess_data]
     outputs:
       moderately_sensitive:
-        refactoring: output/meta_data_factors_electively_unvaccinated.csv
-        QA_rules: output/QA_summary_electively_unvaccinated.csv
-        IE_criteria: output/Cohort_flow_electively_unvaccinated.csv
+        refactoring_unvax: output/meta_data_factors_electively_unvaccinated.csv
+        refactoring_vax: output/meta_data_factors_vaccinated.csv
+        QA_rules_unvax: output/QA_summary_electively_unvaccinated.csv
+        QA_rules_vax: output/QA_summary_vaccinated.csv
+        IE_criteria_unvax: output/Cohort_flow_electively_unvaccinated.csv
+        IE_criteria_vax: output/Cohort_flow_vaccinated.csv
       highly_sensitive:
-        cohort: output/input_electively_unvaccinated_stage1.rds
+        cohort_unvax: output/input_electively_unvaccinated_stage1.rds
+        cohort_vax: output/input_vaccinated_stage1.rds
 
-  stage1_data_cleaning_vaccinated:
-    run: r:latest analysis/Stage1_data_cleaning.R vaccinated
-    needs: [preprocess_data]
+  stage2_missing_table1_both:
+    run: r:latest analysis/Stage2_missing_table1.R both
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
-        refactoring: output/meta_data_factors_vaccinated.csv
-        QA_rules: output/QA_summary_vaccinated.csv
-        IE_criteria: output/Cohort_flow_vaccinated.csv
-      highly_sensitive:
-        cohort: output/input_vaccinated_stage1.rds
-
-  stage2_missing_table1_electively_unvaccinated:
-    run: r:latest analysis/Stage2_missing_table1.R electively_unvaccinated
-    needs: [stage1_data_cleaning_electively_unvaccinated]
-    outputs:
-      moderately_sensitive:
-        Missing_RangeChecks: output/Check_missing_range_electively_unvaccinated.csv
-        DateChecks: output/Check_dates_range_electively_unvaccinated.csv
-        Descriptive_Table: output/Table1_electively_unvaccinated.csv
-
-  stage2_missing_table1_vaccinated:
-    run: r:latest analysis/Stage2_missing_table1.R vaccinated
-    needs: [stage1_data_cleaning_vaccinated]
-    outputs:
-      moderately_sensitive:
-        Missing_RangeChecks: output/Check_missing_range_vaccinated.csv
-        DateChecks: output/Check_dates_range_vaccinated.csv
-        Descriptive_Table: output/Table1_vaccinated.csv
+        Missing_RangeChecks_unvax: output/Check_missing_range_electively_unvaccinated.csv
+        DateChecks_unvax: output/Check_dates_range_electively_unvaccinated.csv
+        Descriptive_Table_unvax: output/Table1_electively_unvaccinated.csv
+        Missing_RangeChecks_vax: output/Check_missing_range_vaccinated.csv
+        DateChecks_vax: output/Check_dates_range_vaccinated.csv
+        Descriptive_Table_vax: output/Table1_vaccinated.csv

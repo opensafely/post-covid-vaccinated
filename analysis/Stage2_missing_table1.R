@@ -34,7 +34,7 @@ library(lubridate)
 # Get dataset for either the vaccinated or electively unvaccinated subcohort
 # Specify command arguments ----------------------------------------------------
 args = commandArgs(trailingOnly=TRUE)
-cohort_name = args[[1]] # either "vaccinated" or "electively_unvaccinated"
+cohort_name = args[[1]] # either "vaccinated" or "electively_unvaccinated" or "both"
 
 
 stage2 <- function(cohort_name){
@@ -230,4 +230,12 @@ stage2 <- function(cohort_name){
 }
 
 
-stage2(cohort_name)
+
+
+if (!cohort_name == "both") {
+  stage2(cohort_name)
+}
+if (cohort_name == "both") {
+  stage2("electively_unvaccinated")
+  stage2("vaccinated")
+}
