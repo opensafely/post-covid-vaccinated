@@ -6,7 +6,8 @@ library(tidyverse)
 library(survival)
 
 # Specify data input
-input <- "input_vaccinated"                                                      # Option 2: input_electively_unvaccinated
+input <- "input_vaccinated_stage1"                                                      # Option 2: input_electively_unvaccinated_stage1
+
 # Load data
 input_data <- readr::read_rds(paste0("output/",input,".rds"))
 
