@@ -14,12 +14,15 @@
 
 library(readr); library("ggvenn"); library("svglite"); library("gridExtra")
 
-args = commandArgs(trailingOnly=TRUE)
-population  = args[[1]] # vaccinated population or electively unvaccinated population
+args <- commandArgs(trailingOnly=TRUE)
 
-# If working on local PC with dummy data, uncomment the following two lines
-population="vaccinated" #this will need to be removed when using project yaml
-#population="electively_unvaccinated" #this will need to be removed when using project yaml
+if(length(args)==0){
+  # use for interactive testing
+  population <- "vaccinated"
+} else {
+  population <- args[[1]]
+}
+
 
 
 # read in data------------------------------------------------------------
