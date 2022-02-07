@@ -35,7 +35,7 @@ event_date_names <- c("out_date_ami",  "out_date_stroke_isch",
 )
 
 # some index_date was later than the study end date
-View(input[which(input$index_date > "2021-12-14"),])
+# View(input[which(input$index_date > "2021-12-14"),])
 
 
 # automation
