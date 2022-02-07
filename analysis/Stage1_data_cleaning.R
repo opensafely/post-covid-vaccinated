@@ -52,10 +52,12 @@ library(stringr)
 # Get dataset for either the vaccinated or electively unvaccinated subcohort
 # Specify command arguments ----------------------------------------------------
 args = commandArgs(trailingOnly=TRUE)
+
 cohort_name = args[[1]] # either "vaccinated" or "electively_unvaccinated" or "both"
 
 
 stage1 <- function(cohort_name){
+
   
     input <- read_rds(file.path("output", paste0("input_",cohort_name,".rds")))
                            
@@ -393,6 +395,7 @@ stage1 <- function(cohort_name){
     saveRDS(input, file = file.path("output", paste0("input_",cohort_name, "_stage1.rds")))
 
 }
+
 
 
 if (cohort_name == "both") {
