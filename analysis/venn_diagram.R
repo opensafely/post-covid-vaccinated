@@ -14,11 +14,11 @@
 
 library(readr); library("ggvenn"); library("svglite"); library("gridExtra")
 
-# args = commandArgs(trailingOnly=TRUE)
-# population  = args[[1]] # vaccinated population or electively unvaccinated population
+args = commandArgs(trailingOnly=TRUE)
+population  = args[[1]] # vaccinated population or electively unvaccinated population
 
 # If working on local PC with dummy data, uncomment the following two lines
-population="vaccinated" #this will need to be removed when using project yaml
+#population="vaccinated" #this will need to be removed when using project yaml
 #population="electively_unvaccinated" #this will need to be removed when using project yaml
 
 
