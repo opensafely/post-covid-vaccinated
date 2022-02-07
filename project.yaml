@@ -50,7 +50,7 @@ actions:
         venn: output/venn_*.rds
 
 
-  stage1_data_cleaning_both:
+  stage1_data_cleaning:
     run: r:latest analysis/Stage1_data_cleaning.R both
     needs: [preprocess_data]
     outputs:
@@ -61,9 +61,9 @@ actions:
       highly_sensitive:
         cohort: output/input_*_stage1.rds
 
-  stage2_missing_table1_both:
+  stage2_missing_table1:
     run: r:latest analysis/Stage2_missing_table1.R both
-    needs: [stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning]
     outputs:
       moderately_sensitive:
         Missing_RangeChecks: output/Check_missing_range_*.csv
@@ -74,14 +74,14 @@ actions:
 
   venn_diagram_vaccinated:
     run: r:latest analysis/venn_diagram.R vaccinated
-    needs: [preprocess_data, stage1_data_cleaning_vaccinated]
+    needs: [preprocess_data, stage1_data_cleaning]
     outputs:
       moderately_sensitive:
           venn_vaccinated: output/venn_vaccinated.svg
 
   venn_diagram_electively_unvaccinated:
     run: r:latest analysis/venn_diagram.R electively_unvaccinated
-    needs: [preprocess_data, stage1_data_cleaning_electively_unvaccinated]
+    needs: [preprocess_data, stage1_data_cleaning]
     outputs:
       moderately_sensitive:
           venn_electively_unvaccinated: output/venn_electively_unvaccinated.svg
