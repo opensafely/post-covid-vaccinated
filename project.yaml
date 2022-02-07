@@ -48,24 +48,17 @@ actions:
     needs: [preprocess_data]
     outputs:
       moderately_sensitive:
-        refactoring_unvax: output/meta_data_factors_electively_unvaccinated.csv
-        refactoring_vax: output/meta_data_factors_vaccinated.csv
-        QA_rules_unvax: output/QA_summary_electively_unvaccinated.csv
-        QA_rules_vax: output/QA_summary_vaccinated.csv
-        IE_criteria_unvax: output/Cohort_flow_electively_unvaccinated.csv
-        IE_criteria_vax: output/Cohort_flow_vaccinated.csv
+        refactoring: output/meta_data_factors_*.csv
+        QA_rules: output/QA_summary_*.csv
+        IE_criteria: output/Cohort_flow_*.csv
       highly_sensitive:
-        cohort_unvax: output/input_electively_unvaccinated_stage1.rds
-        cohort_vax: output/input_vaccinated_stage1.rds
+        cohort: output/input_*_stage1.rds
 
   stage2_missing_table1_both:
     run: r:latest analysis/Stage2_missing_table1.R both
     needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
-        Missing_RangeChecks_unvax: output/Check_missing_range_electively_unvaccinated.csv
-        DateChecks_unvax: output/Check_dates_range_electively_unvaccinated.csv
-        Descriptive_Table_unvax: output/Table1_electively_unvaccinated.csv
-        Missing_RangeChecks_vax: output/Check_missing_range_vaccinated.csv
-        DateChecks_vax: output/Check_dates_range_vaccinated.csv
-        Descriptive_Table_vax: output/Table1_vaccinated.csv
+        Missing_RangeChecks: output/Check_missing_range_*.csv
+        DateChecks: output/Check_dates_range_*.csv
+        Descriptive_Table: output/Table1_*.csv
