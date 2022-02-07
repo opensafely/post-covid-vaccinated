@@ -230,12 +230,9 @@ stage2 <- function(cohort_name){
 }
 
 
-
-
-if (!cohort_name == "both") {
-  stage2(cohort_name)
-}
 if (cohort_name == "both") {
   stage2("electively_unvaccinated")
   stage2("vaccinated")
+} else{
+  stage2(cohort_name)
 }

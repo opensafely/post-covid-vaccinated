@@ -118,7 +118,6 @@ stage1 <- function(cohort_name){
     
     # For the following variables, the first level (reference level) is not the one with the highest frequency
     # Set the most frequently occurred level as the reference for a factor variable
-    covars$cov_cat_region = relevel(covars$cov_cat_region, ref = as.character(calculate_mode(covars$cov_cat_region)))
     covars$sub_cat_covid19_hospital = relevel(covars$sub_cat_covid19_hospital, ref = as.character(calculate_mode(covars$sub_cat_covid19_hospital)))
     covars$vax_cat_jcvi_group = relevel(covars$vax_cat_jcvi_group, ref = as.character(calculate_mode(covars$vax_cat_jcvi_group)))
     if (cohort_name == "vaccinated") {
@@ -155,6 +154,10 @@ stage1 <- function(cohort_name){
     #levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "N"] <- "Non-Smoker"
     #levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "S"] <- "Smoker"
     covars$cov_cat_smoking_status = relevel(covars$cov_cat_smoking_status, ref = as.character(calculate_mode(covars$cov_cat_smoking_status)))
+
+    # Relevel region taking London as the reference rather than the mode (agreed following 03/02/2022 meeting)
+    covars$cov_cat_region = relevel(covars$cov_cat_region, ref = "London")
+    #covars$cov_cat_region = relevel(covars$cov_cat_region, ref = as.character(calculate_mode(covars$cov_cat_region)))
     
     # A simple check if factor reference level has changed
     #lapply(covars[,c("cov_cat_ethnicity", "cov_cat_smoking_status", "cov_cat_region","cov_cat_deprivation","exp_cat_covid19_hospital","vax_cat_jcvi_group","vax_cat_product_1","vax_cat_product_2","vax_cat_product_3")], table)
@@ -392,10 +395,9 @@ stage1 <- function(cohort_name){
 }
 
 
-if (!cohort_name == "both") {
-  stage1(cohort_name)
-}
 if (cohort_name == "both") {
   stage1("electively_unvaccinated")
   stage1("vaccinated")
+} else{
+  stage1(cohort_name)
 }
