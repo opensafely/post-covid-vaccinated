@@ -99,14 +99,15 @@ actions:
 
   venn_diagram_vaccinated:
     run: r:latest analysis/venn_diagram.R vaccinated
-    needs: [preprocess_data]
+    needs: [preprocess_data, stage1_data_cleaning_vaccinated]
     outputs:
       moderately_sensitive:
           venn_vaccinated: output/venn_vaccinated.svg
 
   venn_diagram_electively_unvaccinated:
     run: r:latest analysis/venn_diagram.R electively_unvaccinated
-    needs: [preprocess_data]
+    needs: [preprocess_data, stage1_data_cleaning_electively_unvaccinated]
     outputs:
       moderately_sensitive:
           venn_electively_unvaccinated: output/venn_electively_unvaccinated.svg
+  

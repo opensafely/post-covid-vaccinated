@@ -35,7 +35,6 @@ if(population == "vaccinated"){
 if(population == "electively_unvaccinated"){
   input <- read_rds("output/venn_electively_unvaccinated.rds")
   input_stage1 <- read_rds("output/input_electively_unvaccinated_stage1.rds")
-  input_stage1 <- input_stage1[,1]
   input <- input %>% inner_join(input_stage1,by="patient_id")
 }
 
