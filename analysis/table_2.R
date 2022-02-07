@@ -78,29 +78,37 @@ survival_data <- survival_data %>%
 #is.Date(survival_data$cohort_end_date)
 
 #survival_data$event_date = survival_data$out_date_ami
-
+# comment: patient_id = 6672, 2100-12-31
 summary_stats <- function(population, survival_data, event_count, event_date_names, index)
 {
   # take ami as an example, 17 Jan 2022
   survival_data$event_date <- survival_data[,event_date_names[index]]
 
-  if(population == "vaccinated_delta"){
-    #14 days after the second vaccination
-    survival_data = survival_data %>% mutate(post_2vaccines_14days = as.Date(vax_date_covid_2)+14)
-    survival_data = survival_data %>% rowwise() %>% mutate(follow_up_start= min(max(cohort_start_date,post_2vaccines_14days,na.rm = TRUE), cohort_end_date, na.rm=TRUE),
-                                                           follow_up_end= min(event_date, death_date, cohort_end_date,na.rm = TRUE))
-    }else if(population=="electively_unvaccinated_delta"){
+  # if(population == "vaccinated_delta"){
+  #   #14 days after the second vaccination
+  #   survival_data = survival_data %>% mutate(post_2vaccines_14days = as.Date(vax_date_covid_2)+14)
+  #   survival_data = survival_data %>% rowwise() %>% mutate(follow_up_start= max(cohort_start_date,post_2vaccines_14days,na.rm = TRUE),
+  #                                                          follow_up_end= min(event_date, death_date, cohort_end_date,na.rm = TRUE))
+  #   }else if(population=="electively_unvaccinated_delta"){
+  #   survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
+  #   survival_data = survival_data %>% mutate(post_vax_eligible_12wks = as.Date(vax_date_eligible)+84)
+  #   survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_start = max(cohort_start_date,post_vax_eligible_12wks,na.rm = TRUE),
+  #                                follow_up_end = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
+  #   survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
+  # }
+  if(population=="vaccinated_delta"){
+    survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
+  }else if(project=="electively_unvaccinated_delta"){
     survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
-    survival_data = survival_data %>% mutate(post_vax_eligible_12wks = as.Date(vax_date_eligible)+84)
-    survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_start= min(max(cohort_start_date,post_vax_eligible_12wks,na.rm = TRUE), cohort_end_date, na.rm=TRUE),
-                                                            follow_up_end=min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
+    survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=  min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
     survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
   }
   # follow-up years
-  survival_data = survival_data %>% mutate(follow_up_period = as.numeric((as.Date(follow_up_end) - as.Date(follow_up_start))/365.2))
-  #number of person years follow up
-  pearson_years_follow_up  = round(sum(survival_data$follow_up_period, na.rm = TRUE),1)
-  
+  survival_data = survival_data %>% mutate(follow_up_period = as.numeric((as.Date(follow_up_end) - as.Date(index_date))/365.2))
+ # print(c(survival_data$follow_up_end, survival_data$follow_up_start))
+   #number of person years follow up
+  # pearson_years_follow_up  = round(sum(survival_data$follow_up_period, na.rm = TRUE),1)
+  print(survival_data$follow_up_period)
   # incidence rate for ami
   incidence_rate = round(as.numeric(event_count[index])/pearson_years_follow_up, 4)
   
