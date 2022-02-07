@@ -6,6 +6,12 @@ expectations:
 
 
 actions:
+  active_analyses:
+    run: r:latest analysis/active_analyses.R
+    outputs:
+      highly_sensitive:
+        active_analyses: output/active_analyses.rds
+
   vax_eligibility_inputs:
     run: r:latest analysis/vax_eligibility_inputs.R
     outputs:
@@ -37,65 +43,34 @@ actions:
     run: r:latest analysis/preprocess_data.R
     needs: [generate_study_population_index, generate_study_population_vaccinated, generate_study_population_electively_unvaccinated]
     outputs:
+      moderately_sensitive:
+        describe: output/describe_*.txt
       highly_sensitive:
-        cohort_vaccinated: output/input_vaccinated.rds
-        cohort_electively_unvaccinated: output/input_electively_unvaccinated.rds
-        venn_vaccinated: output/venn_vaccinated.rds
-        venn_electively_unvaccinated: output/venn_electively_unvaccinated.rds
+        cohort: output/input_*.rds
+        venn: output/venn_*.rds
 
-  stage1_data_cleaning_electively_unvaccinated:
-    run: r:latest analysis/Stage1_data_cleaning.R output/input_electively_unvaccinated.rds electively_unvaccinated
+
+  stage1_data_cleaning_both:
+    run: r:latest analysis/Stage1_data_cleaning.R both
     needs: [preprocess_data]
     outputs:
       moderately_sensitive:
-        refactoring: output/meta_data_factors_electively_unvaccinated.csv
-        QA_rules: output/QA_summary_electively_unvaccinated.csv
-        IE_criteria: output/Cohort_flow_electively_unvaccinated.csv
+        refactoring: output/meta_data_factors_*.csv
+        QA_rules: output/QA_summary_*.csv
+        IE_criteria: output/Cohort_flow_*.csv
       highly_sensitive:
-        cohort: output/input_electively_unvaccinated_stage1.rds
+        cohort: output/input_*_stage1.rds
 
-  stage1_data_cleaning_vaccinated:
-    run: r:latest analysis/Stage1_data_cleaning.R output/input_vaccinated.rds vaccinated
-    needs: [preprocess_data]
+  stage2_missing_table1_both:
+    run: r:latest analysis/Stage2_missing_table1.R both
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
-        refactoring: output/meta_data_factors_vaccinated.csv
-        QA_rules: output/QA_summary_vaccinated.csv
-        IE_criteria: output/Cohort_flow_vaccinated.csv
+        Missing_RangeChecks: output/Check_missing_range_*.csv
+        DateChecks: output/Check_dates_range_*.csv
+        Descriptive_Table: output/Table1_*.csv
       highly_sensitive:
         cohort: output/input_vaccinated_stage1.rds
-
-  # venn_diagram_vaccinated:
-  #   run: r:latest analysis/venn_diagram.R vaccinated
-  #   needs: [preprocess_data]
-  #   outputs:
-  #     moderately_sensitive:
-  #       acute_myocardial_infarction: output/vaccinated_f1_venn_ami.svg
-  #       ischaemic_stroke: output/vaccinated_f2_venn_stroke.svg
-  #       pulmonary_embolism: output/vaccinated_f3_venn_pe.svg
-  #       deep_vein_thrombosis: output/vaccinated_f4_venn_dvt.svg
-  #       transient_ischaemic_attack: output/vaccinated_f5_venn_tia.svg
-  #       subarachnoid_haemorrhage_and_haemorrhagic_stroke: output/vaccinated_f6_venn_stroke_sah_hs.svg
-  #       heart_failure: output/vaccinated_f7_venn_hf.svg
-  #       angina_pectoris: output/vaccinated_f8_venn_angina.svg
-  #       all_arterial_thrombotic_and_embolization_events: output/vaccinated_f9_venn_ate.svg
-  #       all_venous_thromboembolism_events: output/vaccinated_f10_venn_vte.svg 
-
-  # venn_diagram_electively_unvaccinated:
-  #   run: r:latest analysis/venn_diagram.R electively_unvaccinated
-  #   needs: [preprocess_data]
-  #   outputs:
-  #     moderately_sensitive:
-  #       acute_myocardial_infarction: output/electively_unvaccinated_f1_venn_ami.svg
-  #       ischaemic_stroke: output/electively_unvaccinated_f2_venn_stroke.svg
-  #       pulmonary_embolism: output/electively_unvaccinated_f3_venn_pe.svg
-  #       deep_vein_thrombosis: output/electively_unvaccinated_f4_venn_dvt.svg
-  #       transient_ischaemic_attack: output/electively_unvaccinated_f5_venn_tia.svg
-  #       subarachnoid_haemorrhage_and_haemorrhagic_stroke: output/electively_unvaccinated_f6_venn_stroke_sah_hs.svg
-  #       heart_failure: output/electively_unvaccinated_f7_venn_hf.svg
-  #       angina_pectoris: output/electively_unvaccinated_f8_venn_angina.svg
-  #       all_arterial_thrombotic_and_embolization_events: output/electively_unvaccinated_f9_venn_ate.svg
-  #       all_venous_thromboembolism_events: output/electively_unvaccinated_f10_venn_vte.svg
 
   venn_diagram_vaccinated:
     run: r:latest analysis/venn_diagram.R vaccinated
