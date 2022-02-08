@@ -640,7 +640,7 @@ def generate_common_variables(index_date_variable):
             returning="category",
             find_last_match_in_period=True,
         ),
-        return_expectations=helpers.generate_universal_expectations(5,False),
+        return_expectations=helpers.generate_universal_expectations(5,True),
     ),
 
     ## Deprivation

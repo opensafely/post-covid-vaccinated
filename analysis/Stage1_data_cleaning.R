@@ -51,14 +51,18 @@ library(stringr)
 
 # Get dataset for either the vaccinated or electively unvaccinated subcohort
 # Specify command arguments ----------------------------------------------------
-args = commandArgs(trailingOnly=TRUE)
 
-cohort_name = args[[1]] # either "vaccinated" or "electively_unvaccinated" or "both"
+args <- commandArgs(trailingOnly=TRUE)
 
+if(length(args)==0){
+  # use for interactive testing
+  cohort_name <- "vaccinated"
+} else {
+  cohort_name <- args[[1]]
+}
 
 stage1 <- function(cohort_name){
 
-  
     input <- read_rds(file.path("output", paste0("input_",cohort_name,".rds")))
                            
     # Define general start date and end date
@@ -136,29 +140,17 @@ stage1 <- function(cohort_name){
     levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==9 | levels(covars$cov_cat_deprivation)==10] <-"9-10 (least deprived)"
     covars$cov_cat_deprivation = relevel(covars$cov_cat_deprivation, ref = as.character(calculate_mode(covars$cov_cat_deprivation))) # added
     
-    # Rename/relevel ethnicity categories     #table(covars$cov_cat_ethnicity)
-    levels(covars$cov_cat_ethnicity) <- union(levels(covars$cov_cat_ethnicity), "Missing") # NOTE: No NA for ethnicity in this dummy data -> Add a missing category
-    covars$cov_cat_ethnicity <- replace(covars$cov_cat_ethnicity, is.na(covars$cov_cat_ethnicity),"Missing") # If NA, then replace by "Missing"
-    
-    levels(covars$cov_cat_ethnicity) <- c("White","Mixed","South Asian","Black African and Caribbean","Other","Missing") # Similar to the commented out 5 lines of code below
-    #levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "1"] <- "White"
-    #levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "2"] <- "Mixed"
-    #levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "3"] <- "South Asian"
-    #levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "4"] <- "Black African and Caribbean"
-    #levels(covars$cov_cat_ethnicity)[levels(covars$cov_cat_ethnicity) == "5"] <- "Chinese and other" 
-    covars$cov_cat_ethnicity = relevel(covars$cov_cat_ethnicity, ref = as.character(calculate_mode(covars$cov_cat_ethnicity)))
+    # Rename/relevel ethnicity categories taking White (1) as the reference rather than the mode (agreed following 03/02/2022 meeting)
+    levels(covars$cov_cat_ethnicity) <- list("Missing" = "0", "White" = "1", "Mixed" = "2", "South Asian" = "3", "Black" = "4", "Other" = "5")
+    covars$cov_cat_ethnicity <- relevel(covars$cov_cat_ethnicity, ref = "White")
     
     # Rename/relevel smoking status categories       #table(covars$cov_cat_smoking_status)
     covars$cov_cat_smoking_status <- replace(covars$cov_cat_smoking_status, is.na(covars$cov_cat_smoking_status),"M")
-    levels(covars$cov_cat_smoking_status) <- c("Ex-Smoker","Missing","Non-Smoker","Smoker") # Similar to the commented out 5 lines of code below
-    #levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "E"] <- "Ex-Smoker"
-    #levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "M"] <- "Missing"
-    #levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "N"] <- "Non-Smoker"
-    #levels(covars$cov_cat_smoking_status)[levels(covars$cov_cat_smoking_status) == "S"] <- "Smoker"
+    levels(covars$cov_cat_smoking_status) <- list("Ever smoker" = "E", "Missing" = "M", "Never smoker" = "N", "Current smoker" = "S")
     covars$cov_cat_smoking_status = relevel(covars$cov_cat_smoking_status, ref = as.character(calculate_mode(covars$cov_cat_smoking_status)))
 
     # Relevel region taking London as the reference rather than the mode (agreed following 03/02/2022 meeting)
-    covars$cov_cat_region = relevel(covars$cov_cat_region, ref = "London")
+    covars$cov_cat_region <- relevel(covars$cov_cat_region, ref = "London")
     #covars$cov_cat_region = relevel(covars$cov_cat_region, ref = as.character(calculate_mode(covars$cov_cat_region)))
     
     # A simple check if factor reference level has changed
