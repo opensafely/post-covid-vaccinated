@@ -23,8 +23,6 @@ if(length(args)==0){
   population <- args[[1]]
 }
 
-
-
 # read in data------------------------------------------------------------
 
 if(population == "vaccinated"){
@@ -47,75 +45,45 @@ input <- input[,variable_names]
 #------Testing Example with a Function ---------------------------------------
 # - outcome: ami
 
- index1 <- which(!is.na(input$tmp_out_date_ami_snomed))
- index2 <- which(!is.na(input$tmp_out_date_ami_hes))
- index3 <- which(!is.na(input$tmp_out_date_ami_death))
- 
- inter12 <- intersect(index1, index2)
- inter23 <- intersect(index2, index3)
- inter13 <- intersect(index1, index3)
- inter123 <- intersect(inter12, index3)
- len_inter12_only <- length(inter12) - length(inter123)
- len_inter23_only <- length(inter23) - length(inter123)
- len_inter13_only <- length(inter13) - length(inter123)
- len_src1_only <- length(index1) - length(inter12) - len_inter13_only
- len_src2_only <- length(index2) - length(inter12) - len_inter23_only
- len_src3_only <- length(index3) - length(inter13) - len_inter23_only
- 
- number_venn <- c(len_src1_only, len_src2_only, len_src3_only, len_inter12_only, len_inter13_only, len_inter23_only, length(inter123))
- number_venn
- which(number_venn <5)
+ # index1 <- which(!is.na(input$tmp_out_date_ami_snomed))
+ # index2 <- which(!is.na(input$tmp_out_date_ami_hes))
+ # index3 <- which(!is.na(input$tmp_out_date_ami_death))
+ # 
+ # inter12 <- intersect(index1, index2)
+ # inter23 <- intersect(index2, index3)
+ # inter13 <- intersect(index1, index3)
+ # inter123 <- intersect(inter12, index3)
+ # len_inter12_only <- length(inter12) - length(inter123)
+ # len_inter23_only <- length(inter23) - length(inter123)
+ # len_inter13_only <- length(inter13) - length(inter123)
+ # len_src1_only <- length(index1) - length(inter12) - len_inter13_only
+ # len_src2_only <- length(index2) - length(inter12) - len_inter23_only
+ # len_src3_only <- length(index3) - length(inter13) - len_inter23_only
+ # 
+ # number_venn <- c(len_src1_only, len_src2_only, len_src3_only, len_inter12_only, len_inter13_only, len_inter23_only, length(inter123))
+ # number_venn
+ # which(number_venn <5)
  # - Figure: has count and percentage---------------------------------------
- y <- list(index1,index2, index3)
- names(y) <- c("SNOMED", "Hospital Episodes", "Deaths")
+#  y <- list(index1,index2, index3)
+#  names(y) <- c("SNOMED", "Hospital Episodes", "Deaths")
+# 
+# svglite(file="output/venn_ami2.svg")
+# par(mfrow=c(2,1))
+#  g <- ggvenn(
+#    y,
+#    fill_color = c("thistle", "lightcyan", "lemonchiffon"),
+#    stroke_color = "white",
+#    text_size = 5,
+#    set_name_size = 5,
+#    fill_alpha = 0.9
+#  ) +  ggtitle("Acute Myocardial Infarction2") +
+#    theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold"))
+#  g
+#  dev.off()
 
-svglite(file="output/venn_ami2.svg")
-par(mfrow=c(2,1))
- g <- ggvenn(
-   y,
-   fill_color = c("thistle", "lightcyan", "lemonchiffon"),
-   stroke_color = "white",
-   text_size = 5,
-   set_name_size = 5,
-   fill_alpha = 0.9
- ) +  ggtitle("Acute Myocardial Infarction2") +
-   theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold"))
- g
- dev.off()
 
 
-
-#-----------------------------------------------------------------------------
-
-# -- write a function to create a venn diagram ------------------------------
-
-# Rules: three data sources in the order of "SNOMED", "Hospital Episode", "Deaths"
-# venn_digram <- function(outcome_names, figure_title)
-# {
-#   print(outcome_names)
-#   n_src = length(outcome_names)
-#   if(n_src ==3){
-#     index1 <- which(!is.na(input[,outcome_names[1]]))
-#     index2 <- which(!is.na(input[,outcome_names[2]]))
-#     index3 <- which(!is.na(input[,outcome_names[3]]))
-#     index = list(index1, index2, index3)
-#     names(index) <- c("SNOMED", "Hospital Episodes", "Deaths")
-#     mycol=c("thistle", "lightcyan", "lemonchiffon")
-#   }else{
-#     print("number of data sources != 3")
-#   }
-#   g <- ggvenn(
-#     index, 
-#     fill_color = mycol,
-#     stroke_color = "white",
-#     text_size = 5,
-#     set_name_size = 5, 
-#     fill_alpha = 0.9
-#   ) +  ggtitle(figure_title) +
-#     theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"))
-#   return(g)
-# }
-
+#-----current approach: full automation--------------------------------
 
 venn_digram <- function(outcome_names, figure_name, figure_title)
 {
@@ -144,6 +112,60 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
   print(g)
   dev.off()
 }
+
+
+outcome_full_names_sources <- tidyselect::vars_select(names(input), starts_with('tmp_out_date_', ignore.case = TRUE))
+outcome_names_sources <- gsub("tmp_out_date_","",outcome_full_names_sources) #delete the prefix
+outcome_names <- gsub("_snomed","",outcome_names_sources) 
+outcome_names <- gsub("_hes","",outcome_names) 
+outcome_names <- gsub("_death","",outcome_names) 
+
+outcome_names
+
+length(unique(outcome_names))
+
+unique_outcome_names <- unique(outcome_names)
+
+#--10 separate svg files, one for each outcome-----------------------------
+for (i in unique_outcome_names){
+  print(i)
+  index <- which(outcome_names == i)
+  venn_outcome <- outcome_full_names_sources[index]
+  if(length(venn_outcome)!=3){print("number of data sources > 3!")}
+  figure_name = figure_title <- paste0(population, "_", i)
+  venn_digram(venn_outcome,figure_name, figure_title)
+}
+
+
+# -- previous approach: semi-automation---------------------------
+#---write a function to create a venn diagram ------------------------------
+
+# Rules: three data sources in the order of "SNOMED", "Hospital Episode", "Deaths"
+# venn_digram <- function(outcome_names, figure_title)
+# {
+#   print(outcome_names)
+#   n_src = length(outcome_names)
+#   if(n_src ==3){
+#     index1 <- which(!is.na(input[,outcome_names[1]]))
+#     index2 <- which(!is.na(input[,outcome_names[2]]))
+#     index3 <- which(!is.na(input[,outcome_names[3]]))
+#     index = list(index1, index2, index3)
+#     names(index) <- c("SNOMED", "Hospital Episodes", "Deaths")
+#     mycol=c("thistle", "lightcyan", "lemonchiffon")
+#   }else{
+#     print("number of data sources != 3")
+#   }
+#   g <- ggvenn(
+#     index, 
+#     fill_color = mycol,
+#     stroke_color = "white",
+#     text_size = 5,
+#     set_name_size = 5, 
+#     fill_alpha = 0.9
+#   ) +  ggtitle(figure_title) +
+#     theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"))
+#   return(g)
+# }
 # #-Apply the relevant function to each outcome-----------------------------------
 # # Rules: three data sources in the order of "SNOMED", "Hospital Episode", "Deaths"
 # # outcome 1: ami
@@ -200,30 +222,6 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
 # dev.off()
 
 
-#----------Approach 2: automation----------------#
-# pitfall: lose figure titles
-
-outcome_full_names_sources <- tidyselect::vars_select(names(input), starts_with('tmp_out_date_', ignore.case = TRUE))
-outcome_names_sources <- gsub("tmp_out_date_","",outcome_full_names_sources) #delete the prefix
-outcome_names <- gsub("_snomed","",outcome_names_sources) 
-outcome_names <- gsub("_hes","",outcome_names) 
-outcome_names <- gsub("_death","",outcome_names) 
-
-outcome_names
-
-length(unique(outcome_names))
-
-unique_outcome_names <- unique(outcome_names)
-
-#--10 separate svg files, one for each outcome-----------------------------
-for (i in unique_outcome_names){
-  print(i)
-  index <- which(outcome_names == i)
-  venn_outcome <- outcome_full_names_sources[index]
-  if(length(venn_outcome)!=3){print("number of data sources > 3!")}
-  figure_name = figure_title <- paste0(population, "_", i)
-  venn_digram(venn_outcome,figure_name, figure_title)
-}
 
 #index <- which(outcome_names == unique_outcome_names[1])
 
@@ -242,5 +240,5 @@ for (i in unique_outcome_names){
 #   print(g)
 # }
 
-# approach two automation: one venn diagram in one svg file
-# approach one: 10 venn diagrams in one svg file
+# current approach automation: one venn diagram in one svg file
+# previous approach: 10 venn diagrams in one svg file
