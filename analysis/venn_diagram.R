@@ -44,32 +44,46 @@ if(population == "electively_unvaccinated"){
 variable_names <- tidyselect::vars_select(names(input), starts_with(c('tmp_out_date_','out_date'), ignore.case = TRUE))
 input <- input[,variable_names]
 
-# #------Testing Example with a Function ---------------------------------------
-# # - outcome: ami
-# 
-#  index1 <- which(!is.na(input$ami_snomed))
-#  index2 <- which(!is.na(input$ami_icd10_hes))
-#  index3 <- which(!is.na(input$ami_icd10_death))
-# 
-#  # - Figure: has count and percentage---------------------------------------
-#  y <- list(index1,index2, index3)
-#  names(y) <- c("SNOMED", "Hospital Episodes", "Deaths")
-# 
-# svglite(file="output/venn_ami2.svg")
-# par(mfrow=c(2,1))
-#  g <- ggvenn(
-#    y,
-#    fill_color = c("thistle", "lightcyan", "lemonchiffon"),
-#    stroke_color = "white",
-#    text_size = 5,
-#    set_name_size = 5,
-#    fill_alpha = 0.9
-#  ) +  ggtitle("Acute Myocardial Infarction2") +
-#    theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold"))
-#  g
-#  dev.off()
-#  
+#------Testing Example with a Function ---------------------------------------
+# - outcome: ami
+
+ index1 <- which(!is.na(input$tmp_out_date_ami_snomed))
+ index2 <- which(!is.na(input$tmp_out_date_ami_hes))
+ index3 <- which(!is.na(input$tmp_out_date_ami_death))
  
+ inter12 <- intersect(index1, index2)
+ inter23 <- intersect(index2, index3)
+ inter13 <- intersect(index1, index3)
+ inter123 <- intersect(inter12, index3)
+ len_inter12_only <- length(inter12) - length(inter123)
+ len_inter23_only <- length(inter23) - length(inter123)
+ len_inter13_only <- length(inter13) - length(inter123)
+ len_src1_only <- length(index1) - length(inter12) - len_inter13_only
+ len_src2_only <- length(index2) - length(inter12) - len_inter23_only
+ len_src3_only <- length(index3) - length(inter13) - len_inter23_only
+ 
+ number_venn <- c(len_src1_only, len_src2_only, len_src3_only, len_inter12_only, len_inter13_only, len_inter23_only, length(inter123))
+ number_venn
+ which(number_venn <5)
+ # - Figure: has count and percentage---------------------------------------
+ y <- list(index1,index2, index3)
+ names(y) <- c("SNOMED", "Hospital Episodes", "Deaths")
+
+svglite(file="output/venn_ami2.svg")
+par(mfrow=c(2,1))
+ g <- ggvenn(
+   y,
+   fill_color = c("thistle", "lightcyan", "lemonchiffon"),
+   stroke_color = "white",
+   text_size = 5,
+   set_name_size = 5,
+   fill_alpha = 0.9
+ ) +  ggtitle("Acute Myocardial Infarction2") +
+   theme(plot.title = element_text(hjust = 0.5, size = 20, face = "bold"))
+ g
+ dev.off()
+
+
 
 #-----------------------------------------------------------------------------
 
