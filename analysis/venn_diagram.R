@@ -28,9 +28,7 @@ if(length(args)==0){
 if(population == "vaccinated"){
    input <- read_rds("output/venn_vaccinated.rds")
    input_stage1 <- read_rds("output/input_vaccinated_stage1.rds")
-   # input_stage1 <- input_stage1[,1]
    input <- input %>% inner_join(input_stage1,by="patient_id")
-   # input2 <- merge(input, input_stage1, all = FALSE)
  }
 
 if(population == "electively_unvaccinated"){
@@ -85,6 +83,38 @@ input <- input[,variable_names]
 
 #-----current approach: full automation--------------------------------
 
+#-- function to check number < 5 -------------------------------------
+
+count_le5 <- function(outcome_names)
+{
+  print(outcome_names)
+  
+  #---"SNOMED", "Hospital Episodes", "Deaths"--------
+  index1 <- which(!is.na(input[,outcome_names[1]]))
+  index2 <- which(!is.na(input[,outcome_names[2]]))
+  index3 <- which(!is.na(input[,outcome_names[3]]))
+  
+  inter12 <- intersect(index1, index2)
+  inter23 <- intersect(index2, index3)
+  inter13 <- intersect(index1, index3)
+  inter123 <- intersect(inter12, index3)
+  len_inter12_only <- length(inter12) - length(inter123)
+  len_inter23_only <- length(inter23) - length(inter123)
+  len_inter13_only <- length(inter13) - length(inter123)
+  len_src1_only <- length(index1) - length(inter12) - len_inter13_only
+  len_src2_only <- length(index2) - length(inter12) - len_inter23_only
+  len_src3_only <- length(index3) - length(inter13) - len_inter23_only
+
+  number_venn <- c(len_src1_only, len_src2_only, len_src3_only, len_inter12_only, len_inter13_only, len_inter23_only, length(inter123))
+  #number_venn
+  low_count <- length(which(number_venn <5))
+  return(low_count)
+}
+
+outcome_names_ami <- c("tmp_out_date_ami_snomed","tmp_out_date_ami_hes","tmp_out_date_ami_death")
+count_le5(outcome_names_ami)
+#-- function to create venn diagram -----------------------------------
+
 venn_digram <- function(outcome_names, figure_name, figure_title)
 {
   print(outcome_names)
@@ -126,15 +156,22 @@ length(unique(outcome_names))
 
 unique_outcome_names <- unique(outcome_names)
 
+low_count <- rep("NA", length(unique_outcome_names))
+index_lc = 1
 #--10 separate svg files, one for each outcome-----------------------------
 for (i in unique_outcome_names){
   print(i)
   index <- which(outcome_names == i)
   venn_outcome <- outcome_full_names_sources[index]
+  print(venn_outcome)
   if(length(venn_outcome)!=3){print("number of data sources > 3!")}
   figure_name = figure_title <- paste0(population, "_", i)
   venn_digram(venn_outcome,figure_name, figure_title)
+  low_count[index_lc] <- count_le5(venn_outcome)
+  index_lc = index_lc +1
 }
+
+
 
 
 # -- previous approach: semi-automation---------------------------
