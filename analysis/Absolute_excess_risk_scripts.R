@@ -6,7 +6,14 @@ library(tidyverse)
 library(survival)
 
 # Specify data input
-input <- "input_vaccinated_stage1"                                                      # Option 2: input_electively_unvaccinated_stage1
+args <- commandArgs(trailingOnly=TRUE)
+
+if(length(args)==0){
+  # use for interactive testing
+  input <- "vaccinated"
+} else {
+  input <- args[[1]]
+}
 
 # Load data
 input_data <- readr::read_rds(paste0("output/",input,".rds"))
