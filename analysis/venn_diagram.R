@@ -137,5 +137,5 @@ low_count_df <- low_count_df %>% mutate(count_less_than_5 = if_else(count_less_t
 low_count_df
 
 names(low_count_df) <- c("any number < 5?", "outcome name")
-write.csv(low_count_df, file="output/venn_diagram_number_check.csv", row.names = F)
+write.csv(low_count_df, file= paste0("output/",population, "_venn_diagram_number_check.csv"), row.names = F)
 
