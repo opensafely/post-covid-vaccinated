@@ -78,6 +78,7 @@ actions:
     outputs:
       moderately_sensitive:
           venn_vaccinated: output/vaccinated_*.svg
+          number_check_vaccinated: output/vaccinated_*.csv
 
   venn_diagram_electively_unvaccinated:
     run: r:latest analysis/venn_diagram.R electively_unvaccinated
@@ -85,4 +86,5 @@ actions:
     outputs:
       moderately_sensitive:
           venn_electively_unvaccinated: output/electively_unvaccinated_*.svg
+          number_check_electively_unvaccinated: output/electively_unvaccinated_*.csv
   

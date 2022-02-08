@@ -41,9 +41,7 @@ if(population == "electively_unvaccinated"){
 variable_names <- tidyselect::vars_select(names(input), starts_with(c('tmp_out_date_','out_date'), ignore.case = TRUE))
 input <- input[,variable_names]
 
-#-----current approach: full automation-----------------------------------------
-
-#-- function to check number < 5 -----------------------------------------------
+#-- function to check number < 5 in the venn diagram ---------------------------
 
 count_le5 <- function(outcome_names)
 {
@@ -71,8 +69,7 @@ count_le5 <- function(outcome_names)
   return(low_count)
 }
 
-outcome_names_ami <- c("tmp_out_date_ami_snomed","tmp_out_date_ami_hes","tmp_out_date_ami_death")
-count_le5(outcome_names_ami)
+
 #-- function to create venn diagram --------------------------------------------
 
 venn_digram <- function(outcome_names, figure_name, figure_title)
