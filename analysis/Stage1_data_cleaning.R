@@ -80,83 +80,60 @@ stage1 <- function(cohort_name){
     # Create a data frame for all relevant variables
     covars <- input[,variable_names] #View(covars)
     
-    # Replace " " with "_"
-    covars$cov_cat_region <- gsub(" ", "_", covars$cov_cat_region)
+    # Handle missing values  
+    covars$cov_cat_smoking_status <- replace(covars$cov_cat_smoking_status, is.na(covars$cov_cat_smoking_status),"M")
     
     #-------------------------------------#
     # 1.a. Set factor variables as factor #
     #-------------------------------------#
-    # Get the names of variables which are factors
-    factor_names <- tidyselect::vars_select(names(input), starts_with(c('sub_bin','sub_cat','cov_bin','cov_cat','qa_bin','vax_cat','exp_cat'), ignore.case = TRUE))
     
-    # Set the variables that should be factor variables as factor
-    covars[,factor_names] <- lapply(covars[,factor_names] , factor)
+    # For binary factors, make FALSE the reference category
     
-    # Check the property of variables
-    #str(covars)
+    bin_factors <- colnames(covars)[grepl("_bin_",colnames(covars))]
+    covars[,bin_factors] <- lapply(covars[,bin_factors], function(x) factor(x, ordered = FALSE))
+    covars[,bin_factors] <- lapply(covars[,bin_factors], function(x) relevel(x, ref = "FALSE"))
     
-    # Sort factor level alphabetically
-    mk_factor_orderlevels <- function(covars, colname)
-    {
-      covars <- covars %>% mutate(
-        !!sym(colname) := factor(!!sym(colname), levels = str_sort(unique(covars[[colname]]), numeric = TRUE)))
-      return(covars)
-    }
+    # For categorical factors, specify references
     
-    for (colname in factor_names){
-      #print(colname)
-      covars <- mk_factor_orderlevels(covars, colname)
-    }
+    cat_factors <- colnames(covars)[grepl("_cat_",colnames(covars))]
+    covars[,cat_factors] <- lapply(covars[,cat_factors], function(x) factor(x, ordered = FALSE))
     
-    #-------------------------------------------------------------------------------------------------#
-    # 1.b. Set the group with the highest frequency as the reference group and rename some categories #
-    #-------------------------------------------------------------------------------------------------#
-    # Relevel
+    ## sub_cat_covid19_hospital
+    covars$sub_cat_covid19_hospital <- ordered(covars$sub_cat_covid19_hospital, levels = c("non_hospitalised","hospitalised","no_infection"))
+  
+    ## cov_cat_ethnicity
+    levels(covars$cov_cat_ethnicity) <- list("Missing" = "0", "White" = "1", "Mixed" = "2", "South Asian" = "3", "Black" = "4", "Other" = "5")
+    covars$cov_cat_ethnicity <- ordered(covars$cov_cat_ethnicity, levels = c("White","Mixed","South Asian","Black","Other","Missing"))
     
-    # Check the frequency for each factor level
-    #lapply(input[,factor_names], table)
-    
-    # Find mode in a factor variable
-    calculate_mode <- function(x) {
-      uniqx <- unique(na.omit(x))
-      uniqx[which.max(tabulate(match(x, uniqx)))]
-    }
-    
-    # For the following variables, the first level (reference level) is not the one with the highest frequency
-    # Set the most frequently occurred level as the reference for a factor variable
-    covars$sub_cat_covid19_hospital = relevel(covars$sub_cat_covid19_hospital, ref = as.character(calculate_mode(covars$sub_cat_covid19_hospital)))
-    covars$vax_cat_jcvi_group = relevel(covars$vax_cat_jcvi_group, ref = as.character(calculate_mode(covars$vax_cat_jcvi_group)))
-    if (cohort_name == "vaccinated") {
-      covars$vax_cat_product_1 = relevel(covars$vax_cat_product_1, ref = as.character(calculate_mode(covars$vax_cat_product_1)))
-      covars$vax_cat_product_2 = relevel(covars$vax_cat_product_2, ref = as.character(calculate_mode(covars$vax_cat_product_2)))
-      covars$vax_cat_product_3 = relevel(covars$vax_cat_product_3, ref = as.character(calculate_mode(covars$vax_cat_product_3)))
-    }
-    
-    # Combine groups in deprivation: First - most deprived; fifth -least deprived and relevel
+    ## cov_cat_deprivation
     levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==1 | levels(covars$cov_cat_deprivation)==2] <-"1-2 (most deprived)"
     levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==3 | levels(covars$cov_cat_deprivation)==4] <-"3-4"
     levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==5 | levels(covars$cov_cat_deprivation)==6] <-"5-6"
     levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==7 | levels(covars$cov_cat_deprivation)==8] <-"7-8"
     levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==9 | levels(covars$cov_cat_deprivation)==10] <-"9-10 (least deprived)"
-    covars$cov_cat_deprivation = relevel(covars$cov_cat_deprivation, ref = as.character(calculate_mode(covars$cov_cat_deprivation))) # added
-    
-    # Rename/relevel ethnicity categories taking White (1) as the reference rather than the mode (agreed following 03/02/2022 meeting)
-    levels(covars$cov_cat_ethnicity) <- list("Missing" = "0", "White" = "1", "Mixed" = "2", "South Asian" = "3", "Black" = "4", "Other" = "5")
-    covars$cov_cat_ethnicity <- relevel(covars$cov_cat_ethnicity, ref = "White")
-    
-    # Rename/relevel smoking status categories       #table(covars$cov_cat_smoking_status)
-    covars$cov_cat_smoking_status <- replace(covars$cov_cat_smoking_status, is.na(covars$cov_cat_smoking_status),"M")
-    levels(covars$cov_cat_smoking_status) <- list("Ever smoker" = "E", "Missing" = "M", "Never smoker" = "N", "Current smoker" = "S")
-    covars$cov_cat_smoking_status = relevel(covars$cov_cat_smoking_status, ref = as.character(calculate_mode(covars$cov_cat_smoking_status)))
-
-    # Relevel region taking London as the reference rather than the mode (agreed following 03/02/2022 meeting)
+    covars$cov_cat_deprivation <- ordered(covars$cov_cat_deprivation, levels = c("1-2 (most deprived)","3-4","5-6","7-8","9-10 (least deprived)"))
+      
+    ## cov_cat_region
     covars$cov_cat_region <- relevel(covars$cov_cat_region, ref = "London")
-    #covars$cov_cat_region = relevel(covars$cov_cat_region, ref = as.character(calculate_mode(covars$cov_cat_region)))
     
+    ## cov_cat_smoking_status
+    levels(covars$cov_cat_smoking_status) <- list("Ever smoker" = "E", "Missing" = "M", "Never smoker" = "N", "Current smoker" = "S")
+    covars$cov_cat_smoking_status <- ordered(covars$cov_cat_smoking_status, levels = c("Never smoker","Ever smoker","Current smoker","Missing"))
+    
+    ## cov_cat_sex
+    covars$cov_cat_sex <- relevel(covars$cov_cat_sex, ref = "F")
+    
+    ## vax_cat_jcvi_group
+    covars$vax_cat_jcvi_group <- ordered(covars$vax_cat_jcvi_group, levels = c("12","11","10","09","08","07","06","05","04","03","02","01","99"))
+    
+    ## vax_cat_product_*
+    vax_cat_product_factors <- colnames(covars)[grepl("vax_cat_product_",colnames(covars))]
+    covars[,vax_cat_product_factors] <- lapply(covars[,vax_cat_product_factors], function(x) ordered(x, levels = c("Pfizer","AstraZeneca","Moderna")))
+  
     # A simple check if factor reference level has changed
-    #lapply(covars[,c("cov_cat_ethnicity", "cov_cat_smoking_status", "cov_cat_region","cov_cat_deprivation","exp_cat_covid19_hospital","vax_cat_jcvi_group","vax_cat_product_1","vax_cat_product_2","vax_cat_product_3")], table)
+    #lapply(covars[,cat_factors], table)
     
-    meta_data_factors <- lapply(covars[,factor_names], table)
+    meta_data_factors <- lapply(covars[,c(bin_factors, cat_factors)], table)
     
     # write.csv is not feasible to output list with uneven length
     sink(file = file.path("output", paste0("meta_data_factors_",cohort_name, ".csv")))
