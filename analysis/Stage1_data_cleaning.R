@@ -131,7 +131,7 @@ stage1 <- function(cohort_name){
     covars[,vax_cat_product_factors] <- lapply(covars[,vax_cat_product_factors], function(x) ordered(x, levels = c("Pfizer","AstraZeneca","Moderna")))
   
     # A simple check if factor reference level has changed
-    #lapply(covars[,c("cov_cat_ethnicity", "cov_cat_smoking_status", "cov_cat_region","cov_cat_deprivation","exp_cat_covid19_hospital","vax_cat_jcvi_group","vax_cat_product_1","vax_cat_product_2","vax_cat_product_3")], table)
+    #lapply(covars[,cat_factors], table)
     
     meta_data_factors <- lapply(covars[,c(bin_factors, cat_factors)], table)
     
