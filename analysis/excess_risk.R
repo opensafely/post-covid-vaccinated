@@ -8,7 +8,6 @@ active <- readr::read_rds("output/active_analyses.rds")
 active <- active[active$active==TRUE,]
 active$event <- gsub("out_date_","",active$outcome_variable)
 active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL
-active$main <- "TRUE"
 
 active <- tidyr::pivot_longer(active, 
                               cols = setdiff(colnames(active),c("event","model","cohort")), 
