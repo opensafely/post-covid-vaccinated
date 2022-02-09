@@ -4,7 +4,7 @@
 
 excess_risk <- function(cohort, event, agegp, sex, ethnicity, prior_history, hospitalisation) {
   
-  #Import data (Outcome event = stroke- "all"subset)
+  #Import data 
   input1 <- readr::read_csv(paste0("output/Input1_AER_",cohort,".csv")) #1.person days
   input2 <- readr::read_csv(paste0("output/Input2_AER_",cohort,".csv")) #2.unexposed events, 3.total cases, 4.hr
   #rm(Input1_AER, Input2_AER)
