@@ -103,7 +103,7 @@ stage1 <- function(cohort_name){
   
     ## cov_cat_ethnicity
     levels(covars$cov_cat_ethnicity) <- list("Missing" = "0", "White" = "1", "Mixed" = "2", "South Asian" = "3", "Black" = "4", "Other" = "5")
-    covars$cov_cat_ethnicity <- relevel(covars$cov_cat_ethnicity, ref = "White")
+    covars$cov_cat_ethnicity <- ordered(covars$cov_cat_ethnicity, levels = c("White","Mixed","South Asian","Black","Other","Missing"))
     
     ## cov_cat_deprivation
     levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==1 | levels(covars$cov_cat_deprivation)==2] <-"1-2 (most deprived)"
