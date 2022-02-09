@@ -20,11 +20,6 @@
 ## Content: 
 ## 0. Load relevant libraries and read data/arguments
 ## 1. Prepare all variables (re-factoring, re-typing)
-##    1.a. Set factor variables as factor
-##    1.b. Set the group with the highest frequency as the reference group and rename some categories
-##    1.c. Check that continuous variables are defined as numeric variables
-##    1.d. Check and specify date format for date variables
-##    1.e. Apply changes in the input dataset
 ## 2. Apply QA rules
 ## 3. Apply exclusion/inclusion criteria
 ##    (Differentiate criteria for the two sub-cohorts)
