@@ -118,7 +118,7 @@ stage1 <- function(cohort_name){
   
     # A simple check if factor reference level has changed
     
-    meta_data_factors <- lapply(input[,c(bin_factors, cat_factors)], table)
+    meta_data_factors <- lapply(input[,c(cat_factors)], table)
     
     # NB: write.csv is not feasible to output list with uneven length
     sink(file = file.path("output", paste0("meta_data_factors_",cohort_name, ".csv")))
