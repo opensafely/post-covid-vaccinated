@@ -99,7 +99,7 @@ stage1 <- function(cohort_name){
     covars[,cat_factors] <- lapply(covars[,cat_factors], function(x) factor(x, ordered = FALSE))
     
     ## sub_cat_covid19_hospital
-    covars$sub_cat_covid19_hospital <- ordered(covars$sub_cat_covid19_hospital, levels = c("no_infection","non_hospitalised","hospitalised"))
+    covars$sub_cat_covid19_hospital <- ordered(covars$sub_cat_covid19_hospital, levels = c("non_hospitalised","hospitalised","no_infection"))
   
     ## cov_cat_ethnicity
     levels(covars$cov_cat_ethnicity) <- list("Missing" = "0", "White" = "1", "Mixed" = "2", "South Asian" = "3", "Black" = "4", "Other" = "5")
