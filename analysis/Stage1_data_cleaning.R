@@ -118,7 +118,7 @@ stage1 <- function(cohort_name){
     
     ## cov_cat_smoking_status
     levels(covars$cov_cat_smoking_status) <- list("Ever smoker" = "E", "Missing" = "M", "Never smoker" = "N", "Current smoker" = "S")
-    covars$cov_cat_smoking_status <- relevel(covars$cov_cat_smoking_status, ref = "Never smoker")
+    covars$cov_cat_smoking_status <- ordered(covars$cov_cat_smoking_status, levels = c("Never smoker","Ever smoker","Current smoker","Missing"))
     
     ## cov_cat_sex
     covars$cov_cat_sex <- relevel(covars$cov_cat_sex, ref = "F")
