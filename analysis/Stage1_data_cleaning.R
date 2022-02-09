@@ -128,7 +128,7 @@ stage1 <- function(cohort_name){
     
     ## vax_cat_product_*
     vax_cat_product_factors <- colnames(covars)[grepl("vax_cat_product_",colnames(covars))]
-    covars[,vax_cat_product_factors] <- lapply(covars[,vax_cat_product_factors], function(x) relevel(x, ref = "Pfizer"))
+    covars[,vax_cat_product_factors] <- lapply(covars[,vax_cat_product_factors], function(x) ordered(x, levels = c("Pfizer","AstraZeneca","Moderna")))
   
     # A simple check if factor reference level has changed
     #lapply(covars[,c("cov_cat_ethnicity", "cov_cat_smoking_status", "cov_cat_region","cov_cat_deprivation","exp_cat_covid19_hospital","vax_cat_jcvi_group","vax_cat_product_1","vax_cat_product_2","vax_cat_product_3")], table)
