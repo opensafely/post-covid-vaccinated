@@ -106,8 +106,8 @@ stage1 <- function(cohort_name){
     input$cov_cat_smoking_status <- ordered(input$cov_cat_smoking_status, levels = c("Never smoker","Ever smoker","Current smoker","Missing"))
     
     ## cov_cat_sex
-    levels(input$cov_cat_smoking_status) <- list("Female" = "F", "Male" = "M")
-    input$cov_cat_sex <- relevel(input$cov_cat_sex, ref = "F")
+    levels(input$cov_cat_sex) <- list("Female" = "F", "Male" = "M")
+    input$cov_cat_sex <- relevel(input$cov_cat_sex, ref = "Female")
     
     ## vax_cat_jcvi_group
     input$vax_cat_jcvi_group <- ordered(input$vax_cat_jcvi_group, levels = c("12","11","10","09","08","07","06","05","04","03","02","01","99"))
