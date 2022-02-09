@@ -74,101 +74,57 @@ stage1 <- function(cohort_name){
     # 1. Prepare all variables (re-factoring, re-typing) # 
     ######################################################
     
-    # Extract names of variables
-    variable_names <- tidyselect::vars_select(names(input), starts_with(c('sub_','cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE))
+    # Handle missing values
     
-    # Create a data frame for all relevant variables
-    covars <- input[,variable_names] #View(covars)
-    
-    # Handle missing values  
-    covars$cov_cat_smoking_status <- replace(covars$cov_cat_smoking_status, is.na(covars$cov_cat_smoking_status),"M")
-    
-    #-------------------------------------#
-    # 1.a. Set factor variables as factor #
-    #-------------------------------------#
-    
-    # For binary factors, make FALSE the reference category
-    
-    bin_factors <- colnames(covars)[grepl("_bin_",colnames(covars))]
-    covars[,bin_factors] <- lapply(covars[,bin_factors], function(x) factor(x, ordered = FALSE))
-    covars[,bin_factors] <- lapply(covars[,bin_factors], function(x) relevel(x, ref = "FALSE"))
+    input$cov_cat_smoking_status <- replace(input$cov_cat_smoking_status, is.na(input$cov_cat_smoking_status),"M")
     
     # For categorical factors, specify references
     
-    cat_factors <- colnames(covars)[grepl("_cat_",colnames(covars))]
-    covars[,cat_factors] <- lapply(covars[,cat_factors], function(x) factor(x, ordered = FALSE))
+    cat_factors <- colnames(input)[grepl("_cat_",colnames(input))]
+    input[,cat_factors] <- lapply(input[,cat_factors], function(x) factor(x, ordered = FALSE))
     
     ## sub_cat_covid19_hospital
-    covars$sub_cat_covid19_hospital <- ordered(covars$sub_cat_covid19_hospital, levels = c("non_hospitalised","hospitalised","no_infection"))
+    input$sub_cat_covid19_hospital <- ordered(input$sub_cat_covid19_hospital, levels = c("non_hospitalised","hospitalised","no_infection"))
   
     ## cov_cat_ethnicity
-    levels(covars$cov_cat_ethnicity) <- list("Missing" = "0", "White" = "1", "Mixed" = "2", "South Asian" = "3", "Black" = "4", "Other" = "5")
-    covars$cov_cat_ethnicity <- ordered(covars$cov_cat_ethnicity, levels = c("White","Mixed","South Asian","Black","Other","Missing"))
+    levels(input$cov_cat_ethnicity) <- list("Missing" = "0", "White" = "1", "Mixed" = "2", "South Asian" = "3", "Black" = "4", "Other" = "5")
+    input$cov_cat_ethnicity <- ordered(input$cov_cat_ethnicity, levels = c("White","Mixed","South Asian","Black","Other","Missing"))
     
     ## cov_cat_deprivation
-    levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==1 | levels(covars$cov_cat_deprivation)==2] <-"1-2 (most deprived)"
-    levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==3 | levels(covars$cov_cat_deprivation)==4] <-"3-4"
-    levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==5 | levels(covars$cov_cat_deprivation)==6] <-"5-6"
-    levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==7 | levels(covars$cov_cat_deprivation)==8] <-"7-8"
-    levels(covars$cov_cat_deprivation)[levels(covars$cov_cat_deprivation)==9 | levels(covars$cov_cat_deprivation)==10] <-"9-10 (least deprived)"
-    covars$cov_cat_deprivation <- ordered(covars$cov_cat_deprivation, levels = c("1-2 (most deprived)","3-4","5-6","7-8","9-10 (least deprived)"))
+    levels(input$cov_cat_deprivation)[levels(input$cov_cat_deprivation)==1 | levels(input$cov_cat_deprivation)==2] <-"1-2 (most deprived)"
+    levels(input$cov_cat_deprivation)[levels(input$cov_cat_deprivation)==3 | levels(input$cov_cat_deprivation)==4] <-"3-4"
+    levels(input$cov_cat_deprivation)[levels(input$cov_cat_deprivation)==5 | levels(input$cov_cat_deprivation)==6] <-"5-6"
+    levels(input$cov_cat_deprivation)[levels(input$cov_cat_deprivation)==7 | levels(input$cov_cat_deprivation)==8] <-"7-8"
+    levels(input$cov_cat_deprivation)[levels(input$cov_cat_deprivation)==9 | levels(input$cov_cat_deprivation)==10] <-"9-10 (least deprived)"
+    input$cov_cat_deprivation <- ordered(input$cov_cat_deprivation, levels = c("1-2 (most deprived)","3-4","5-6","7-8","9-10 (least deprived)"))
       
     ## cov_cat_region
-    covars$cov_cat_region <- relevel(covars$cov_cat_region, ref = "London")
+    input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
     
     ## cov_cat_smoking_status
-    levels(covars$cov_cat_smoking_status) <- list("Ever smoker" = "E", "Missing" = "M", "Never smoker" = "N", "Current smoker" = "S")
-    covars$cov_cat_smoking_status <- ordered(covars$cov_cat_smoking_status, levels = c("Never smoker","Ever smoker","Current smoker","Missing"))
+    levels(input$cov_cat_smoking_status) <- list("Ever smoker" = "E", "Missing" = "M", "Never smoker" = "N", "Current smoker" = "S")
+    input$cov_cat_smoking_status <- ordered(input$cov_cat_smoking_status, levels = c("Never smoker","Ever smoker","Current smoker","Missing"))
     
     ## cov_cat_sex
-    covars$cov_cat_sex <- relevel(covars$cov_cat_sex, ref = "F")
+    levels(input$cov_cat_smoking_status) <- list("Female" = "F", "Male" = "M")
+    input$cov_cat_sex <- relevel(input$cov_cat_sex, ref = "F")
     
     ## vax_cat_jcvi_group
-    covars$vax_cat_jcvi_group <- ordered(covars$vax_cat_jcvi_group, levels = c("12","11","10","09","08","07","06","05","04","03","02","01","99"))
+    input$vax_cat_jcvi_group <- ordered(input$vax_cat_jcvi_group, levels = c("12","11","10","09","08","07","06","05","04","03","02","01","99"))
     
     ## vax_cat_product_*
-    vax_cat_product_factors <- colnames(covars)[grepl("vax_cat_product_",colnames(covars))]
-    covars[,vax_cat_product_factors] <- lapply(covars[,vax_cat_product_factors], function(x) ordered(x, levels = c("Pfizer","AstraZeneca","Moderna")))
+    vax_cat_product_factors <- colnames(input)[grepl("vax_cat_product_",colnames(input))]
+    input[,vax_cat_product_factors] <- lapply(input[,vax_cat_product_factors], function(x) ordered(x, levels = c("Pfizer","AstraZeneca","Moderna")))
   
     # A simple check if factor reference level has changed
-    #lapply(covars[,cat_factors], table)
     
-    meta_data_factors <- lapply(covars[,c(bin_factors, cat_factors)], table)
+    meta_data_factors <- lapply(input[,c(bin_factors, cat_factors)], table)
     
-    # write.csv is not feasible to output list with uneven length
+    # NB: write.csv is not feasible to output list with uneven length
     sink(file = file.path("output", paste0("meta_data_factors_",cohort_name, ".csv")))
     print(meta_data_factors)
     sink()
-    
-    #----------------------------------------------------------------------#
-    # 1.c. Check that continuous variables are defined as numeric variable #
-    #----------------------------------------------------------------------#
-    # Notes: Age, number of GP consultations and year of birth are continuous variables
-    
-    # Checking if continuous variables are set up as numeric variable correctly
-    #is.numeric(input$cov_num_age)
-    #is.numeric(input$cov_num_consulation_rate)
-    #is.numeric(input$qa_num_birth_year)
-    #str(covars)
-    
-    #-------------------------------------------------------#
-    # 1.d. Check and specify date format for date variables #
-    #-------------------------------------------------------#
-    # Get the names of variables which are dates
-    date_names <- tidyselect::vars_select(names(input), starts_with(c('index_date','death_date','exp_date','out_date','vax_date'), ignore.case = TRUE))
-    
-    # Set the variables that should be date variables as dates
-    for (colname in date_names){
-      input[[colname]] <- as.Date(input[[colname]])
-    }
-    
-    #-----------------------------------------#
-    # 1.e. Apply changes in the input dataset #
-    #-----------------------------------------#
-    input[,variable_names] <- covars
-    #str(input)
-    
-    
+
     #####################
     # 2. Apply QA rules #
     #####################
