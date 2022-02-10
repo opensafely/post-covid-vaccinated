@@ -27,7 +27,6 @@ cohort_end_date <- as.Date("2021-12-14")
 
 #Used to split time since COVID exposure; when there are time periods with no events then
 #a reduced number of time periods is used
-#cuts_days_since_expo=c(28,365) 
 
 cuts_days_since_expo <- c(14, 28, 56, 84, 197) 
 cuts_days_since_expo_reduced <- c(28,197) 
