@@ -37,12 +37,7 @@ event_date_names <- c("out_date_ami",  "out_date_stroke_isch",
                    "out_date_pe",   "out_date_dvt",
                    "out_date_tia",  "out_date_stroke_sah_hs", 
                    "out_date_hf",   "out_date_angina",
-                   "out_date_ate",  "out_date_vte"
-)
-
-# some index_date was later than the study end date
-# View(input[which(input$index_date > "2021-12-14"),])
-
+                   "out_date_ate",  "out_date_vte")
 
 # automation
 event_names<- substr(event_date_names, start=10, stop=nchar(event_date_names))
@@ -74,7 +69,7 @@ vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_'
 # Create a data frame for survival data: to avoid carrying covariates in the calculation
 survival_data <- input[,vars_names] 
 
-# follow-up start date: input$index_date
+# cohort start date and end date
 survival_data <- survival_data %>% 
                      mutate(cohort_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
                             cohort_end_date = as.Date("2021-12-14", format = "%Y-%m-%d"))
@@ -90,21 +85,21 @@ summary_stats <- function(population, survival_data, event_count, event_date_nam
   # take ami as an example, 17 Jan 2022
   survival_data$event_date <- survival_data[,event_date_names[index]]
 
-  # if(population == "vaccinated_delta"){
+  # if(population == "vaccinated"){
   #   #14 days after the second vaccination
   #   survival_data = survival_data %>% mutate(post_2vaccines_14days = as.Date(vax_date_covid_2)+14)
   #   survival_data = survival_data %>% rowwise() %>% mutate(follow_up_start= max(cohort_start_date,post_2vaccines_14days,na.rm = TRUE),
   #                                                          follow_up_end= min(event_date, death_date, cohort_end_date,na.rm = TRUE))
-  #   }else if(population=="electively_unvaccinated_delta"){
+  #   }else if(population=="electively_unvaccinated"){
   #   survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
   #   survival_data = survival_data %>% mutate(post_vax_eligible_12wks = as.Date(vax_date_eligible)+84)
   #   survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_start = max(cohort_start_date,post_vax_eligible_12wks,na.rm = TRUE),
   #                                follow_up_end = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
   #   survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
   # }
-  if(population=="vaccinated_delta"){
+  if(population=="vaccinated"){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
-  }else if(project=="electively_unvaccinated_delta"){
+  }else if(project=="electively_unvaccinated"){
     survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=  min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
     survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
