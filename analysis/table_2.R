@@ -13,13 +13,19 @@
 
 library(readr); library(dplyr); library(data.table); library(lubridate)
 
-# If working on local PC with dummy data, uncomment the following two lines
-population = "vaccinated_delta" #commented out when using project yaml
-#population = "electively_unvaccinated_delta" #commented out when using project yaml
+args <- commandArgs(trailingOnly=TRUE)
+
+if(length(args)==0){
+  # use for interactive testing
+  population <- "vaccinated"
+  # population = "electively_unvaccinated"
+} else {
+  population <- args[[1]]
+}
 
 # read in data------------------------------------------------------------
 
-if(population == "vaccinated_delta"){
+if(population == "vaccinated"){
   input <- read_rds("output/input_vaccinated_stage1.rds")
 }
 
