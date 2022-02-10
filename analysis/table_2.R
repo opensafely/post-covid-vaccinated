@@ -33,6 +33,18 @@ if(population == "electively_unvaccinated"){
   input <- read_rds("output/input_electively_unvaccinated_stage1.rds")
 }
 
+event_dates <- tidyselect::vars_select(names(input), starts_with('out_date', ignore.case = TRUE))
+event_dates <- tidyselect::vars_select(event_dates, !contains('diabetes'))
+event_dates
+
+diabetes_dates <- tidyselect::vars_select(names(input), starts_with('out_date_diabetes_', ignore.case=TRUE))
+
+which(event_dates == diabetes_dates)
+
+event_dates <- filter(event_dates, !diabetes_dates)
+
+event_dates <- tidyselect::vars_select(names(input), starts_with('out_date', ignore.case = TRUE))
+
 event_date_names <- c("out_date_ami",  "out_date_stroke_isch", 
                    "out_date_pe",   "out_date_dvt",
                    "out_date_tia",  "out_date_stroke_sah_hs", 
