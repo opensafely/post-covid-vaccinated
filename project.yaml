@@ -2,8 +2,7 @@ version: '3.0'
 
 expectations:
 
-  population_size: 500000
-
+  population_size: 400000
 
 actions:
   active_analyses:
@@ -49,7 +48,6 @@ actions:
         cohort: output/input_*.rds
         venn: output/venn_*.rds
 
-
   stage1_data_cleaning_both:
     run: r:latest analysis/Stage1_data_cleaning.R both
     needs: [preprocess_data]
@@ -58,16 +56,5 @@ actions:
         refactoring: output/meta_data_factors_*.csv
         QA_rules: output/QA_summary_*.csv
         IE_criteria: output/Cohort_flow_*.csv
-
       highly_sensitive:
         cohort: output/input_*_stage1.rds
-
-  stage2_missing_table1_both:
-    run: r:latest analysis/Stage2_missing_table1.R both
-    needs: [stage1_data_cleaning_both]
-
-    outputs:
-      moderately_sensitive:
-        Missing_RangeChecks: output/Check_missing_range_*.csv
-        DateChecks: output/Check_dates_range_*.csv
-        Descriptive_Table: output/Table1_*.csv
