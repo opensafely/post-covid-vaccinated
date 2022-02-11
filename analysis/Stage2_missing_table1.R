@@ -66,7 +66,7 @@ stage2 <- function(cohort_name) {
     if (is.factor(input[,i])) {
       check_missing[check_missing$variable==i,]$N_missing <- nrow(input[input[,i]=="Missing",])
     } else {
-      check_missing[check_missing$variable==i,]$N_missing <- nrow(input[input[,i]=="Missing",])
+      check_missing[check_missing$variable==i,]$N_missing <- nrow(input[is.na(input[,i]),])
     }
   }
   
