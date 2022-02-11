@@ -4,7 +4,6 @@ expectations:
 
   population_size: 500000
 
-
 actions:
   active_analyses:
     run: r:latest analysis/active_analyses.R
@@ -58,7 +57,6 @@ actions:
         refactoring: output/meta_data_factors_*.csv
         QA_rules: output/QA_summary_*.csv
         IE_criteria: output/Cohort_flow_*.csv
-
       highly_sensitive:
         cohort: output/input_*_stage1.rds
 
