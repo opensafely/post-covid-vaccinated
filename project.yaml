@@ -48,7 +48,6 @@ actions:
         cohort: output/input_*.rds
         venn: output/venn_*.rds
 
-
   stage1_data_cleaning_both:
     run: r:latest analysis/Stage1_data_cleaning.R both
     needs: [preprocess_data]
