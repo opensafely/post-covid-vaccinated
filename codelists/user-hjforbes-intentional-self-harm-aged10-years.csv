@@ -1,6 +1,8 @@
 code,term
 130968006,Self-mutilation
 161474000,History of attempted suicide
+173544001,Poking own eyes
+174486004,Gouging own eyes
 219108005,"Suicide and selfinflicted poisoning by analgesics, antipyretics and anti-rheumatics"
 219122005,Self poisoning by corrosive or caustic substance
 219123000,Self poisoning caused by arsenic or its compounds
@@ -23,17 +25,22 @@ code,term
 222200007,"[X]Intentional self harm by rifle, shotgun and larger firearm discharge, occurrence at industrial and construction area"
 224945002,Self-incineration
 224946001,Self-electrocution
+224947005,Shooting self
 224948000,Throwing self in front of vehicle
 224949008,Throwing self in front of train
 224950008,Jumping from cliff
+225045006,Cutting own throat
 225046007,Jumping from bridge
 225047003,Jumping from building
+225048008,Jumping from height
+225049000,Hanging self
+225050000,Drowning self
 225051001,Self-suffocation
 225052008,Self-strangulation
 225053003,Self-asphyxiation
+23233009,Previous known suicide attempt
 240061000000104,Intentional drug overdose by drug paraphernalia
 240081000000108,Intentional drug overdose by tablets
-241769004,Organic solvents causing toxic effect
 242823008,Intentional non-opiate analgesic overdose
 242824002,Intentional paracetamol overdose
 242825001,Intentional aspirin overdose
@@ -51,10 +58,15 @@ code,term
 248062006,Self-injurious behavior
 248064007,Self-mutilation of hands
 248065008,Self-mutilation of penis
+248066009,Self-mutilation of eyes
 248067000,Self-mutilation of ears
+248068005,Self-inflicted skin problems
+248069002,Biting own hand
+248070001,Head-hitting
 248071002,Scratches self
 248072009,Biting self
 248073004,Cutting self
+248074005,Swallowing objects
 269725004,Suicide and selfinflicted injury
 269726003,Suicide and selfinflicted injury by suffocation by plastic bag
 269808005,Attempt suicide - car exhaust
@@ -64,15 +76,41 @@ code,term
 277131000,Intentional non-steroidal anti-inflammatory agent overdose
 281116008,Health of the Nation Outcome Scale item 2 - non-accidental self injury
 284690004,Self-mutilation of genitalia
+284691000,Enucleation of own eyes
+284693002,Self-inducing a prolapse
+284694008,Breaking own bones
+284695009,Pulling own teeth out
+284696005,Removing own nails
+284697001,Eating own flesh
+284699003,Stripping own skin
+284702005,Gouging own body parts
+284703000,Gouging own flesh
+284705007,Gouging own rectum
+284706008,Banging own head against object
+284707004,Banging own head against own body parts
+284708009,Biting own arm
+284709001,Biting own tongue
+284710006,Biting sides of own cheeks
+284741007,Swallowing substances
+284742000,Inserting foreign bodies into own orifices
 284743005,Throwing self onto floor
 284744004,Burning self
+284752001,Damaging own wounds
+284753006,Reopening scars
+284754000,Pulling out sutures
+284755004,Poking fingers into wound
 284756003,Hitting self
 284757007,Punching self
 284758002,Slapping self
 284759005,Stabbing self
+284760000,Picking own skin
+284761001,Rubbing own skin
 284763003,Nipping self
 284764009,Pinching self
+285137009,Biting own fingers
+285138004,Biting own toes
 285142001,Self-scalding
+285152002,Gouging own vagina
 287181000,Attempted suicide - hanging
 287182007,Attempted suicide - suffocation
 287183002,Attempted suicide - drowning
@@ -773,7 +811,6 @@ code,term
 296026003,Intentional chlormezanone overdose
 296030000,Intentional methyprylone overdose
 296034009,Intentional paraldehyde overdose
-296036006,Barbiturate overdose
 296039004,Intentional amylobarbitone overdose
 296043000,Intentional butabarbitone overdose
 296047004,Intentional cyclobarbitone overdose
@@ -1000,7 +1037,10 @@ code,term
 297097005,Intentional streptokinase overdose
 297101001,Intentional urokinase overdose
 297201008,Intentional overdose of tricyclic antidepressant
+307051006,Inserting objects into wound
+307578000,Cutting own wrists
 314550003,History of deliberate self harm
+36153001,First known suicide attempt
 385231000000108,"[X]Intentional self harm by drowning and submersion, occurrence at sports and athletics area"
 385441000000100,"[X]Intentional self harm by sharp object, occurrence at sports and athletics area"
 385451000000102,"[X]Intentional self harm by sharp object, occurrence on street and highway"
@@ -1049,6 +1089,7 @@ code,term
 422721000000107,"[X]Intentional self poisoning by and exposure to nonopioid analgesics, occurrence at school, other institution and public administrative area"
 426299001,Intentional X-ray contrast media poisoning
 426450003,Intentional chlorprothixene overdose
+428422006,Found hanging self
 431307001,Intentional poisoning caused by drug
 432991000000105,"[X]Intentional self harm by rifle, shotgun and larger firearm discharge, occurrence at other specified place"
 433281000000106,"[X]Intentional self harm by other and unspecified firearm discharge, occurrence at home"
@@ -1057,7 +1098,7 @@ code,term
 434241000000100,"[X]Intentional self harm by hanging, strangulation and suffocation, occurrence at home"
 434261000000104,"[X]Intentional self harm by handgun discharge, occurrence on farm"
 439011002,Self-administered intentional poisoning caused by analgesic
-44301001,Suicide
+43954004,Head-banging
 445021000000102,"[X]Intentional self harm by rifle, shotgun and larger firearm discharge, occurrence at unspecified place"
 445311000000106,"[X]Intentional self poisoning by and exposure to pesticides, occurrence at sports and athletics area"
 445341000000107,"[X]Intentional self poisoning by and exposure to pesticides, occurrence at other specified place"
@@ -1100,6 +1141,8 @@ code,term
 474461000000102,"[X]Intentional self poisoning by and exposure to nonopioid analgesics, occurrence in residential institution"
 48981002,Parasuicide
 518431000000101,Intentional overdose of prescription only medication
+53846008,Suicide attempt by adequate means
+55554002,Suicide attempt by inadequate means
 59274003,Intentional drug overdose
 681111000000102,Suicide and self inflicted poisoning by drug or medicine NOS
 684281000000100,Suicide and self inflicted injury NOS
@@ -1107,6 +1150,8 @@ code,term
 711539009,Intentional drug overdose by injectable substance
 715269009,Intentional disulfiram poisoning
 715302000,Intentional disulfiram overdose
+724845009,Compulsive scratching behavior
+724846005,Compulsive self-biting behavior
 82313006,Suicide attempt
 838521001,Intentional overdose of methylenedioxymethamphetamine
 838526006,Intentional poisoning caused by methylenedioxymethamphetamine

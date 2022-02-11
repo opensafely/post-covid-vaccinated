@@ -1,4 +1,6 @@
 code,term
+111763008,Poisoning caused by mixed sedative
+111766000,Poisoning caused by tranquilizer
 219328003,"Hanging, strangulation or suffocation of unknown intent"
 219334005,Injury of unknown intent by firearms and explosives
 219336007,Injury of unknown intent by shotgun
@@ -13,38 +15,41 @@ code,term
 222759003,"[X]Hanging, strangulation and suffocation undetermined intent"
 222793004,"[X]Rifle, shotgun and larger firearm discharge, undetermined intent"
 222804005,"[X]Other and unspecified firearm discharge, undetermined intent"
+241754000,Poisoning caused by sodium valproate
 269735005,Injury undetermined whether accidentally or purposely inflicted
-275385007,Poisoning caused by biological substance
-290805006,Lithium poisoning of undetermined intent
-290809000,Amitriptyline poisoning of undetermined intent
-290813007,Amoxapine poisoning of undetermined intent
-290817008,Butriptyline poisoning of undetermined intent
-290821001,Clomipramine poisoning of undetermined intent
-290825005,Desipramine poisoning of undetermined intent
-290829004,Dothiepin poisoning of undetermined intent
-290833006,Doxepin poisoning of undetermined intent
-290836003,Imipramine poisoning of undetermined intent
-290840007,Iprindole poisoning of undetermined intent
-290844003,Lofepramine poisoning of undetermined intent
-290848000,Nortriptyline poisoning of undetermined intent
-290852000,Protriptyline poisoning of undetermined intent
-290856002,Trimipramine poisoning of undetermined intent
-290859009,Tricyclic antidepressant poisoning of undetermined intent
-290863002,Phenelzine poisoning of undetermined intent
-290867001,Iproniazid poisoning of undetermined intent
-290871003,Isocarboxazid poisoning of undetermined intent
-290875007,Tranylcypromine poisoning of undetermined intent
-290879001,Moclobemide poisoning of undetermined intent
-290887000,Venlafaxine poisoning of undetermined intent
+290802009,Lithium poisoning
+290810005,Amoxapine poisoning
+290814001,Butriptyline poisoning
+290818003,Clomipramine poisoning
+290822008,Desipramine poisoning
+290826006,Dothiepin poisoning
+290830009,Doxepin poisoning
+290837007,Iprindole poisoning
+290841006,Lofepramine poisoning
+290845002,Nortriptyline poisoning
+290849008,Protriptyline poisoning
+290853005,Trimipramine poisoning
+290860004,Phenelzine poisoning
+290864008,Iproniazid poisoning
+290868006,Isocarboxazid poisoning
+290872005,Tranylcypromine poisoning
+290876008,Moclobemide poisoning
+290884007,Venlafaxine poisoning
+290888005,Selective serotonin re-uptake inhibitor poisoning
+290889002,Sertraline poisoning
+290893008,Paroxetine poisoning
+290897009,Nefazodone poisoning
+290901003,Citalopram poisoning
+290905007,Fluoxetine poisoning
+290910006,Fluvoxamine poisoning
 290914002,Tetracyclic antidepressant drug poisoning
 290915001,Maprotiline poisoning
-290918004,Maprotiline poisoning of undetermined intent
 290919007,Mianserin poisoning
-290922009,Mianserin poisoning of undetermined intent
 290923004,Trazodone poisoning
-290926007,Trazodone poisoning of undetermined intent
-290930005,Viloxazine poisoning of undetermined intent
-291125000,Sulpiride poisoning of undetermined intent
+290927003,Viloxazine poisoning
+291122002,Sulpiride poisoning
+291215004,Zuclopenthixol decanoate poisoning
+291219005,Zuclopenthixol poisoning
 295830007,Overdose of antidepressant drug
 295835002,Amitriptyline overdose
 295918002,Selective serotonin re-uptake inhibitor overdose
@@ -53,8 +58,8 @@ code,term
 55680006,Drug overdose
 65425009,Poisoning caused by imipramine
 676361000000101,Drug and medicament poisoning NOS
-75478009,Poisoning
+69434005,Tricyclic antidepressant poisoning
 78695006,Poisoning caused by amitriptyline
-7895008,Poisoning caused by drug AND/OR medicinal substance
 82276009,Poisoning caused by antidepressant
+85975005,Poisoning caused by psychodysleptic
 9291000,Poisoning caused by monoamine oxidase inhibitor

@@ -116,7 +116,7 @@ user/hjforbes/obsessive-compulsive-disorder-ocd/17792e81
 user/hjforbes/post-traumatic-stress-disorder/7e69bb4b
 user/hjforbes/diagnoses-eating-disorder/62a78820
 user/hjforbes/severe-mental-illness/2dd5e1c0
-user/hjforbes/intentional-self-harm-aged10-years/1ff013ac
-user/hjforbes/undetermined-intent-self-harm-aged15-years/06e0a077
+user/hjforbes/intentional-self-harm-aged10-years/18951e5c
+user/hjforbes/undetermined-intent-self-harm-aged15-years/4d66c4bc
 user/hjforbes/suicide-icd-10/3b53a18e
 user/hjforbes/opioid-dependency-clinical-diagnosis/46e554f5
