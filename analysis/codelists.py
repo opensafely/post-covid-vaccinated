@@ -469,11 +469,6 @@ all_vte_codes_icd10 = combine_codelists(
     pe_icd10
 )
 
-all_vte_codes_snomed_clinical = combine_codelists(
-    pe_snomed_clinical,
-    dvt_icvt_snomed_clinical
-)
-
 prostate_cancer_icd10 = codelist_from_csv(
     "codelists/user-RochelleKnight-prostate_cancer_snomed.csv",
     system="icd10",
@@ -771,6 +766,84 @@ diabetes_gestational_snomed_clinical = codelist_from_csv(
     "codelists/user-hjforbes-gestational-diabetes.csv",
     system="snomed",
     column="code",
+)
+
+# Other arterial embolism
+other_arterial_embolism_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-other_art_embol.csv",
+    system="snomed",
+    column="code",
+)
+
+# DVT
+dvt_dvt_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt_main.csv",
+    system="snomed",
+    column="code",
+)
+
+# ICVT
+dvt_icvt_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt_icvt.csv",
+    system="snomed",
+    column="code",
+)
+
+# Portal vein thrombosis
+portal_vein_thrombosis_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-pvt.csv",
+    system="snomed",
+    column="code",
+)
+
+# DVT in pregnancy
+dvt_pregnancy_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt-preg.csv",
+    system="snomed",
+    column="code",
+)
+
+# Other DVT
+other_dvt_snomed_clinical = codelist_from_csv(
+    "codelists/user-tomsrenin-dvt-other.csv",
+    system="snomed",
+    column="code",
+)
+
+# All DVT in SNOMED
+all_dvt_codes_snomed_clinical = combine_codelists(
+    dvt_dvt_snomed_clinical, 
+    dvt_pregnancy_snomed_clinical
+)
+
+# All DVT in ICD10
+all_dvt_codes_icd10 = combine_codelists(
+    dvt_dvt_icd10, 
+    dvt_pregnancy_icd10
+)
+
+# All VTE in SNOMED
+all_vte_codes_snomed_clinical = combine_codelists(
+    portal_vein_thrombosis_snomed_clinical, 
+    dvt_dvt_snomed_clinical, 
+    dvt_icvt_snomed_clinical, 
+    dvt_pregnancy_snomed_clinical, 
+    other_dvt_snomed_clinical, 
+    pe_snomed_clinical
+)
+
+# All ATE in SNOMED
+all_ate_codes_snomed_clinical = combine_codelists(
+    ami_snomed_clinical, 
+    other_arterial_embolism_snomed_clinical, 
+    stroke_isch_snomed_clinical
+)
+
+# All ATE in ICD10
+all_ate_codes_icd10 = combine_codelists(
+    ami_icd10, 
+    other_arterial_embolism_icd10, 
+    stroke_isch_icd10
 )
 
 # Depression 

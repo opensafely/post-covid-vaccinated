@@ -120,3 +120,9 @@ user/hjforbes/intentional-self-harm-aged10-years/18951e5c
 user/hjforbes/undetermined-intent-self-harm-aged15-years/4d66c4bc
 user/hjforbes/suicide-icd-10/3b53a18e
 user/hjforbes/opioid-dependency-clinical-diagnosis/46e554f5
+user/tomsrenin/dvt_main/1c76a027
+user/tomsrenin/dvt_icvt/03672cf2
+user/tomsrenin/pvt/51484687
+user/tomsrenin/dvt-preg/6a57b9bc
+user/tomsrenin/other_art_embol/3838d352
+user/tomsrenin/dvt-other/1f29601d

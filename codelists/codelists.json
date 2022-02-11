@@ -165,7 +165,7 @@
     "user-elsie_horne-dvt_icvt_snomed.csv": {
       "id": "user/elsie_horne/dvt_icvt_snomed/7e85f642",
       "url": "https://codelists.opensafely.org/codelist/user/elsie_horne/dvt_icvt_snomed/7e85f642/",
-      "downloaded_at": "2021-11-11 16:06:32.242499Z",
+      "downloaded_at": "2022-01-19 17:24:57.544777Z",
       "sha": "d5ad89193e307a0d8170cefa769a1253ab774e70"
     },
     "user-elsie_horne-dvt_pregnancy_icd10.csv": {
@@ -725,6 +725,42 @@
       "url": "https://codelists.opensafely.org/codelist/user/hjforbes/opioid-dependency-clinical-diagnosis/46e554f5/",
       "downloaded_at": "2022-01-11 10:56:59.664497Z",
       "sha": "67304f24e3cbffa04852eb4d86c456df75987590"
+    }
+    "user-tomsrenin-dvt_main.csv": {
+      "id": "user/tomsrenin/dvt_main/1c76a027",
+      "url": "https://codelists.opensafely.org/codelist/user/tomsrenin/dvt_main/1c76a027/",
+      "downloaded_at": "2022-01-19 16:58:02.442337Z",
+      "sha": "b4a6e2f5d708f146211e9478d218745c9de5d327"
+    },
+    "user-tomsrenin-dvt_icvt.csv": {
+      "id": "user/tomsrenin/dvt_icvt/03672cf2",
+      "url": "https://codelists.opensafely.org/codelist/user/tomsrenin/dvt_icvt/03672cf2/",
+      "downloaded_at": "2022-01-19 16:58:02.605379Z",
+      "sha": "71e9f95fda4718e9b06fa754aa0903381736924c"
+    },
+    "user-tomsrenin-pvt.csv": {
+      "id": "user/tomsrenin/pvt/51484687",
+      "url": "https://codelists.opensafely.org/codelist/user/tomsrenin/pvt/51484687/",
+      "downloaded_at": "2022-01-19 16:59:06.628533Z",
+      "sha": "1cc8fc446e9c757f979df44f63e0d4003e3bb0a5"
+    },
+    "user-tomsrenin-dvt-preg.csv": {
+      "id": "user/tomsrenin/dvt-preg/6a57b9bc",
+      "url": "https://codelists.opensafely.org/codelist/user/tomsrenin/dvt-preg/6a57b9bc/",
+      "downloaded_at": "2022-01-19 16:58:02.728169Z",
+      "sha": "abe3398410f2a4a195f9cedd6a07bf7139a24c11"
+    },
+    "user-tomsrenin-other_art_embol.csv": {
+      "id": "user/tomsrenin/other_art_embol/3838d352",
+      "url": "https://codelists.opensafely.org/codelist/user/tomsrenin/other_art_embol/3838d352/",
+      "downloaded_at": "2022-01-19 16:58:02.942759Z",
+      "sha": "ab665e36ad2bfd73aea38579fcaab2451f2aff46"
+    },
+    "user-tomsrenin-dvt-other.csv": {
+      "id": "user/tomsrenin/dvt-other/1f29601d",
+      "url": "https://codelists.opensafely.org/codelist/user/tomsrenin/dvt-other/1f29601d/",
+      "downloaded_at": "2022-01-19 16:58:03.199556Z",
+      "sha": "fcf9ebe14d0240fdc30ee45f7de1fe2503d85bd5"
     }
   }
 }
