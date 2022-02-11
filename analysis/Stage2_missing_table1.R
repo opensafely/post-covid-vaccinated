@@ -55,12 +55,6 @@ stage2 <- function(cohort_name){
   
   N <- nrow(input)
   
-  # Turn the missing category in smoking status and ethnicity variables into NA 
-  # Only for the purpose of generating the missing data table
-  
-  input$cov_cat_smoking_status[input$cov_cat_smoking_status == "Missing"] <- NA
-  input$cov_cat_ethnicity[input$cov_cat_ethnicity == "Missing"] <- NA
-  
   #-----------------------------------------------------------------------#
   # 1.a. Create a table with missing data information (N,%) for variables #
   #-----------------------------------------------------------------------#
@@ -69,8 +63,8 @@ stage2 <- function(cohort_name){
   covariate_names <- tidyselect::vars_select(names(input), starts_with(c('sub_','cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE))
   for (i in covariate_names){
     check_missing[nrow(check_missing)+1,1] <- i
-    check_missing[nrow(check_missing),2] <- nrow(input[is.na(input[,i]),])
-    check_missing[nrow(check_missing),3] <- 100*(nrow(input[is.na(input[,i]),])/N)
+    check_missing[nrow(check_missing),2] <- nrow(input[is.na(input[,i]) | input[,i]=="Missing",])
+    check_missing[nrow(check_missing),3] <- 100*(nrow(input[is.na(input[,i]) | input[,i]=="Missing",])/N)
   }
   
   #---------------------------------------------------------------#
