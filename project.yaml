@@ -65,7 +65,6 @@ actions:
   stage2_missing_table1_both:
     run: r:latest analysis/Stage2_missing_table1.R both
     needs: [stage1_data_cleaning_both]
-
     outputs:
       moderately_sensitive:
         Missing_RangeChecks: output/Check_missing_range_*.csv
