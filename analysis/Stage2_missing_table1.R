@@ -36,14 +36,14 @@ library(lubridate)
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  cohort_name <- "vaccinated" # interactive testing
+  cohort_name <- "electively_unvaccinated" # interactive testing
 } else {
   cohort_name <- args[[1]]
 }
 
 # Define stage2 function -------------------------------------------------------
 
-stage2 <- function(cohort_name){
+stage2 <- function(cohort_name) {
 
   # Load relevant data
   
@@ -59,13 +59,18 @@ stage2 <- function(cohort_name){
   # 1.a. Create a table with missing data information (N,%) for variables #
   #-----------------------------------------------------------------------#
 
-  check_missing <- data.frame(variable = character(), N_missing = character(), Perc_missing = character())
-  covariate_names <- tidyselect::vars_select(names(input), starts_with(c('sub_','cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE))
+  covariate_names <- tidyselect::vars_select(names(input), starts_with(c('sub_bin_','cov_','qa_','vax_cat','exp_cat'), ignore.case = TRUE))
+  check_missing <- data.frame(variable = as.vector(covariate_names), N_missing = NA)
+  
   for (i in covariate_names){
-    check_missing[nrow(check_missing)+1,1] <- i
-    check_missing[nrow(check_missing),2] <- nrow(input[is.na(input[,i]) | input[,i]=="Missing",])
-    check_missing[nrow(check_missing),3] <- 100*(nrow(input[is.na(input[,i]) | input[,i]=="Missing",])/N)
+    if (is.factor(input[,i])) {
+      check_missing[check_missing$variable==i,]$N_missing <- nrow(input[input[,i]=="Missing",])
+    } else {
+      check_missing[check_missing$variable==i,]$N_missing <- nrow(input[input[,i]=="Missing",])
+    }
   }
+  
+  check_missing$Perc_missing <- 100*(check_missing$N_missing/N)
   
   #---------------------------------------------------------------#
   # 1.b. Create a table with min and max for numerical covariates #
@@ -92,7 +97,7 @@ stage2 <- function(cohort_name){
   # 1.d. Create a table with min and max for date variables #
   #---------------------------------------------------------#
   
-  check_dates <- data.frame(variable = character(), Ealiest_date = character(), Latest_date = character())
+  check_dates <- data.frame(variable = character(), Earliest_date = character(), Latest_date = character())
   date_variables_names <- colnames(select_if(input, is.Date))
   input_date <- input[,date_variables_names]
   
