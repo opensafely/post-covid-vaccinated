@@ -327,36 +327,6 @@ liver_disease_icd10 = codelist_from_csv(
     column="code",
 )
 
-# diabetes_snomed_clinical = codelist_from_csv(
-#     "codelists/user-elsie_horne-diabetes_snomed.csv",
-#     system="snomed",
-#     column="code",
-# )
-
-# diabetes_icd10 = codelist_from_csv(
-#     "codelists/user-elsie_horne-diabetes_icd10.csv",
-#     system="icd10",
-#     column="code",
-# )
-
-# diabetes_drugs_dmd = codelist_from_csv(
-#     "codelists/user-elsie_horne-diabetes_drugs_dmd.csv",
-#     system="snomed",
-#     column="dmd_id",
-# )
-
-# depression_icd10 = codelist_from_csv(
-#     "codelists/user-elsie_horne-depression_icd10.csv",
-#     system="icd10",
-#     column="code",
-# )
-
-# depression_snomed_clinical = codelist_from_csv(
-#     "codelists/user-elsie_horne-depression_snomed.csv",
-#     system="snomed",
-#     column="code",
-# )
-
 antiplatelet_dmd = codelist_from_csv(
     "codelists/user-elsie_horne-antiplatelet_dmd.csv",
     system="snomed",
@@ -457,16 +427,6 @@ angina_icd10 = codelist_from_csv(
     "codelists/user-hjforbes-angina_hf_icd10.csv",
     system="icd10",
     column="code",
-)
-
-all_vte_codes_icd10 = combine_codelists(
-    portal_vein_thrombosis_icd10, 
-    dvt_dvt_icd10, 
-    dvt_icvt_icd10, 
-    dvt_pregnancy_icd10, 
-    other_dvt_icd10, 
-    icvt_pregnancy_icd10, 
-    pe_icd10
 )
 
 prostate_cancer_icd10 = codelist_from_csv(
@@ -830,6 +790,17 @@ all_vte_codes_snomed_clinical = combine_codelists(
     dvt_pregnancy_snomed_clinical, 
     other_dvt_snomed_clinical, 
     pe_snomed_clinical
+)
+
+# All VTE in ICD10
+all_vte_codes_icd10 = combine_codelists(
+    portal_vein_thrombosis_icd10, 
+    dvt_dvt_icd10, 
+    dvt_icvt_icd10, 
+    dvt_pregnancy_icd10, 
+    other_dvt_icd10, 
+    icvt_pregnancy_icd10, 
+    pe_icd10
 )
 
 # All ATE in SNOMED

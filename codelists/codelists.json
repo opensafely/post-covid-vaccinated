@@ -725,7 +725,7 @@
       "url": "https://codelists.opensafely.org/codelist/user/hjforbes/opioid-dependency-clinical-diagnosis/46e554f5/",
       "downloaded_at": "2022-01-11 10:56:59.664497Z",
       "sha": "67304f24e3cbffa04852eb4d86c456df75987590"
-    }
+    },
     "user-tomsrenin-dvt_main.csv": {
       "id": "user/tomsrenin/dvt_main/1c76a027",
       "url": "https://codelists.opensafely.org/codelist/user/tomsrenin/dvt_main/1c76a027/",
