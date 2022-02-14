@@ -9,7 +9,17 @@
 ## =============================================================================
 source(file.path(scripts_dir,"fit_model.R"))
 
-get_vacc_res <- function(event,stratify_by_subgroup,stratify_by,input,cuts_days_since_expo,cuts_days_since_expo_reduced){
+get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names){
+  #Reduce dataset to those who do NOT have a prior history of COVID unless running the subgroup
+  #analysis for this with a prior history
+  
+  if(subgroup != "covid_history" ){
+    input=input%>%filter(sub_bin_covid19_confirmed_history == FALSE)
+  }else {
+    input=input%>%filter(sub_bin_covid19_confirmed_history == TRUE)
+  }
+  
+  
   # read in event dates for outcome-of-interest
   outcomes <-input%>%dplyr::select(c("patient_id", 
                               paste0("out_date_", event)))
@@ -21,7 +31,7 @@ get_vacc_res <- function(event,stratify_by_subgroup,stratify_by,input,cuts_days_
   outcomes$name <- event
   
   # Select the relevant cohort columns required to stratify by subgroup if necessary
-  if(startsWith(strata,"prior_history")==T){
+  if(startsWith(subgroup,"prior_history")){
     survival_data <- input %>% dplyr::select(all_of(cohort_cols),all_of(stratify_by_subgroup))
   }else{
     survival_data <- input %>% dplyr::select(all_of(cohort_cols))
@@ -30,30 +40,20 @@ get_vacc_res <- function(event,stratify_by_subgroup,stratify_by,input,cuts_days_
   # Stratify to the relevant subgroup if either sex/ethnicity/prior history subgroup
   # Age subgroups are filtered in a later script; COVID pheno subgroup is filtered later in this script
   
-  if(stratify_by_subgroup!="cov_cat_ethnicity" & stratify_by_subgroup!="SEX" & strata !="prior_history_all"){
-    covar_names <- c(colnames(input)[grepl("cov_", colnames(input))],"patient_id")
-    covar_names = covar_names[!covar_names %in% c("cov_bin_diabetes_type1","cov_bin_diabetes_type2","cov_bin_diabetes_other","cov_bin_diabetes_gestational")]
-  }else if(stratify_by_subgroup=="cov_cat_ethnicity"| stratify_by_subgroup=="SEX"){
-    survival_data=survival_data%>%filter_at(stratify_by_subgroup,all_vars(.==stratify_by))
-    covar_names <- c(colnames(input)[grepl("cov_", colnames(input))],"patient_id")
-    covar_names <- covar_names[!covar_names==stratify_by_subgroup]
-    covar_names = covar_names[!covar_names %in% c("cov_bin_diabetes_type1","cov_bin_diabetes_type2","cov_bin_diabetes_other","cov_bin_diabetes_gestational")]
-  }else if(startsWith(strata,"prior_history")==TRUE){
-    survival_data=survival_data%>%filter_at(stratify_by_subgroup,all_vars(.==stratify_by))
-    survival_data=survival_data%>%dplyr::select(!stratify_by_subgroup)
-    covar_names <- c(colnames(input)[grepl("cov_", colnames(input))],"patient_id")
-    covar_names = covar_names[!covar_names %in% c("cov_bin_diabetes_type1","cov_bin_diabetes_type2","cov_bin_diabetes_other","cov_bin_diabetes_gestational")]
+  for(i in c("ethnicity","sex","prior_history")){
+    if(startsWith(subgroup,i)){
+      survival_data=survival_data%>%filter_at(stratify_by_subgroup,all_vars(.==stratify_by))
+    }
   }
- 
+  
   # join core data with outcomes
   survival_data <- survival_data %>% left_join(outcomes)
-  survival_data$event_date=as.Date(survival_data$event_date)
-  
+
   #add follow up start and end dates
   
-  if(project=="vaccinated_delta"){
+  if(cohort=="vaccinated"){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, DATE_OF_DEATH,cohort_end_date,na.rm = TRUE))
-  }else if(project=="electively_unvaccinated_delta"){
+  }else if(cohort=="electively_unvaccinated"){
     survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(vax_date_covid_1,event_date, DATE_OF_DEATH,cohort_end_date,na.rm = TRUE))
     survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
@@ -70,26 +70,27 @@ get_vacc_res <- function(event,stratify_by_subgroup,stratify_by,input,cuts_days_
   
   #Update COVID phenotypes after setting COVID exposure dates to NA that lie
   #outisde follow up
-  if(startsWith(strata,"covid_pheno")==T){
-    survival_data$expo_pheno=as.character(survival_data$expo_pheno)
-    survival_data=survival_data%>%rowwise()%>%mutate(expo_pheno =ifelse(is.na(expo_date), "no_infection",expo_pheno))
-    survival_data$expo_pheno=as.factor(survival_data$expo_pheno)
-  }
+  survival_data$expo_pheno=as.character(survival_data$expo_pheno)
+  survival_data=survival_data%>%rowwise()%>%mutate(expo_pheno =ifelse(is.na(expo_date), "no_infection",expo_pheno))
+  #survival_data$expo_pheno=as.factor(survival_data$expo_pheno)
+  
   
   #get COVID pheno specific dataset if necessary
-  if(startsWith(strata,"covid_pheno_")==T){
+  if(startsWith(subgroup,"covid_pheno")){
     survival_data <- get_pheno_specific_dataset(survival_data, pheno_of_interest=stratify_by)
   }
   
   #Adjust follow up end date for COVID phenotype dataset to censor at COVID exposure for the
   #phenotype that is not of interest
-  if(startsWith(strata,"covid_pheno_")==T){
+  if(startsWith(subgroup,"covid_pheno_")){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(follow_up_end, date_expo_censor,na.rm = TRUE))
   }
     
-  survival_data=survival_data%>%filter(follow_up_end>follow_up_start)
+  survival_data=survival_data%>%filter(follow_up_end>=follow_up_start)
   
-  res_vacc <- fit_model_reducedcovariates(event, stratify_by_subgroup, stratify_by, survival_data,covar_names,input)
+  total_covid_cases=nrow(survival_data %>% filter(is.na(expo_date)==F))
+    
+  res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
   return(res_vacc)
 }
   

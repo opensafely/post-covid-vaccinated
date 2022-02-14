@@ -6,63 +6,61 @@
 ## =============================================================================
 source(file.path(scripts_dir,"fit_get_data_surv_eventcountbasedtimecuts.R"))
 
-rm_lowvar_covars <- function(data_surv){
-  cov_bin <- colnames(data_surv)[grepl("cov_bin", colnames(data_surv))]
-  df <- data_surv %>% dplyr::select(c( "expo", "event", all_of(cov_bin))) %>% distinct() %>% filter((expo==1) & (event==1))
-  df <- df %>%  dplyr::select(!c("expo", "event", 
-                                 df %>%  dplyr::select_if(is.numeric) %>% names(),
-                                 #df %>%  dplyr::select(all_of(cat_cov)) %>% names()
-  ))
-  summary <- as.data.frame(summary(df,maxsum=50))
-  summary$Freq=gsub(".*:", "",summary$Freq)#Remove everything before:
-  summary$Freq <- as.numeric(summary$Freq)
-  return(as.character(summary$Var2[summary$Freq <=2]))
-}
 
-calculate_mode <- function(x) {
-  uniqx <- unique(na.omit(x))
-  uniqx[which.max(tabulate(match(x, uniqx)))]
-}
+#------------------FORMAT SURVIVAL DATASET AND RUN COX MODEL--------------------
 
-collapse_categorical_covars <- function(data_surv){
-  cov_cat <-colnames(data_surv)[grepl("cov_cat", colnames(data_surv))]
-  df <- data_surv %>% dplyr::select(c( "expo", "event", all_of(cov_cat))) %>% distinct() %>% filter((expo==1) & (event==1))
-  df <- df %>%  dplyr::select(!c("expo", "event", 
-                                 df %>%  dplyr::select_if(is.numeric) %>% names(),
-                                 #df %>%  dplyr::select_if(~n_distinct(.)==2) %>% names()
-  ))
-  summary <- as.data.frame(summary(df,maxsum=50))
-  summary$Freq=gsub(".*:", "",summary$Freq)#Remove everything before:
-  summary$Freq <- as.numeric(summary$Freq)
-  cat_cov_to_remove=unique(as.character(summary$Var2[summary$Freq <=2]))
-  if("cov_cat_deprivation" %in% cat_cov_to_remove){
-    data_surv=data_surv %>% mutate(cov_cat_deprivation= 
-                                     case_when(cov_cat_deprivation=="1"~"1",
-                                               cov_cat_deprivation=="2"~"1",
-                                               cov_cat_deprivation=="3"~"2",
-                                               cov_cat_deprivation=="4"~"3",
-                                               cov_cat_deprivation=="5"~"3"))
-    data_surv$cov_cat_deprivation=as.factor(data_surv$cov_cat_deprivation)
-    data_surv$cov_cat_deprivation = relevel(data_surv$cov_cat_deprivation, ref = as.character(calculate_mode(data_surv$cov_cat_deprivation)))
-    
-    
-    
-  }else if("cov_cat_smoking_status" %in% cat_cov_to_remove){
-    data_surv=data_surv %>% mutate(cov_cat_smoking_status=
-                                     case_when(cov_cat_smoking_status=="N"~"N",
-                                               cov_cat_smoking_status=="E"~"S",
-                                               cov_cat_smoking_status=="S"~"S",
-                                               cov_cat_smoking_status=="M"~"M"))
-    data_surv$cov_cat_smoking_status=as.factor(data_surv$cov_cat_smoking_status)
-    data_surv$cov_cat_smoking_status = relevel(data_surv$cov_cat_smoking_status, ref = as.character(calculate_mode(data_surv$cov_cat_smoking_status)))
+fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases){
+  list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event,subgroup, stratify_by_subgroup, stratify_by,mdl, survival_data,cuts_days_since_expo)
+  if(length(list_data_surv_noncase_ids_interval_names)==1){
+    analyses_not_run <<- list_data_surv_noncase_ids_interval_names[[1]]
+    return(fit_model_reducedcovariates)
   }
   
-  return(list(data_surv,cat_cov_to_remove))
+  data_surv <- list_data_surv_noncase_ids_interval_names[[1]]
+  noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
+  interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
+  ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
+  non_case_weight=list_data_surv_noncase_ids_interval_names[[5]]
+  less_than_400_events=list_data_surv_noncase_ids_interval_names[[6]]
+  if(less_than_400_events=="TRUE"){
+    analyses_not_run[nrow(analyses_not_run)+1,]<<-c(event,subgroup,cohort,mdl,"TRUE","TRUE","TRUE","FALSE")
+    return(fit_model_reducedcovariates)
+  }
+
+  if (ind_any_zeroeventperiod==TRUE){
+    list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event,subgroup, stratify_by_subgroup, stratify_by,mdl, cuts_days_since_expo=cuts_days_since_expo_reduced)
+    data_surv <- list_data_surv_noncase_ids_interval_names[[1]]
+    noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
+    interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
+    ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
+    non_case_weight=list_data_surv_noncase_ids_interval_names[[5]]
+  }
+  
+  #Select covariates if using model mdl_max_adj
+  if(mdl=="mdl_max_adj"){
+    covars=input%>%dplyr::select(all_of(covar_names))
+    covar_names = names(covars)[ names(covars) != "patient_id"]
+    data_surv <- data_surv %>% left_join(covars)
+  }
+  
+  #Add inverse probablity weights for non-cases
+  data_surv$cox_weights <- ifelse(data_surv$patient_id %in% noncase_ids, non_case_weight, 1)
+  
+  # Fit model and prep output csv
+  fit_model <- coxfit(data_surv, interval_names, covar_names, subgroup, mdl)
+  fit_model$subgroup <- subgroup
+  fit_model$event <- event
+  fit_model$cohort <- cohort
+  fit_model$model <- mdl
+  fit_model$total_covid_cases <- total_covid_cases
+  
+  write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",mdl, ".csv"), row.names = T)
+  
 }
 
 
 #------------------------ GET SURV FORMULA & COXPH() ---------------------------
-coxfit <- function(data_surv, interval_names, covar_names){
+coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   
   if(mdl == "mdl_max_adj"){
     covars_to_remove <- rm_lowvar_covars(data_surv)[!is.na((rm_lowvar_covars(data_surv)))]
@@ -93,24 +91,25 @@ coxfit <- function(data_surv, interval_names, covar_names){
       paste(covariates_excl_region_sex_age, collapse="+"), 
       "+ cluster(patient_id) + strat(region_name)")
   }
-  
+ 
   #If subgroup is not sex then add sex into formula
-  if ((startsWith(strata,"sex_"))==F & (!"SEX" %in% covariates_excl_region_sex_age)){
-    surv_formula <- paste(surv_formula, "SEX", sep="+")
+  if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
+    surv_formula <- paste(surv_formula, "sex", sep="+")
   }
   
   #If subgroup is not age then add in age spline otherwise use age and age_sq
-  if ((startsWith(strata,"agegp_"))==F){
+  if ((startsWith(subgroup,"agegp_"))==F){
     surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
-  }else if ((startsWith(strata,"agegp_"))==T){
+  }else if ((startsWith(subgroup,"agegp_"))==T){
     surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
   }
   
   # fit cox model
   dd <<- datadist(data_surv)
-  options(datadist="dd")
+  #options(datadist="dd")
+  options(datadist="dd", contrasts=c("contr.treatment", "contr.treatment"))
   fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
-  robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)##?for robust standard errors
+  robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
   
   
   # Results ----
@@ -136,55 +135,6 @@ coxfit <- function(data_surv, interval_names, covar_names){
   results=results%>%left_join(anova_fit_cox_model,by="covariate")
   
   return(results)
-}
-
-fit_model_reducedcovariates <- function(event, stratify_by_subgroup, stratify_by, survival_data,covar_names,input){
-  list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event, stratify_by_subgroup, stratify_by, survival_data,cuts_days_since_expo)
-  if(length(list_data_surv_noncase_ids_interval_names)==1){
-    analyses_not_run <<- list_data_surv_noncase_ids_interval_names[[1]]
-    return(fit_model_reducedcovariates)
-  }
-  
-  data_surv <- list_data_surv_noncase_ids_interval_names[[1]]
-  noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
-  interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
-  ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
-  non_case_weight=list_data_surv_noncase_ids_interval_names[[5]]
-  less_than_400_events=list_data_surv_noncase_ids_interval_names[[6]]
-  if(less_than_400_events=="TRUE"){
-    analyses_not_run[nrow(analyses_not_run)+1,]<<-c(event,stratify_by_subgroup,stratify_by,"TRUE","TRUE","TRUE","FALSE")
-    return(fit_model_reducedcovariates)
-  }
-
-  if (ind_any_zeroeventperiod==TRUE){
-    list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event, stratify_by_subgroup, stratify_by, survival_data,cuts_days_since_expo=cuts_days_since_expo_reduced)
-    data_surv <- list_data_surv_noncase_ids_interval_names[[1]]
-    noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
-    interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
-    ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
-    non_case_weight=list_data_surv_noncase_ids_interval_names[[5]]
-  }
-  
-  #Select covariates if using model mdl_max_adj
-  if(mdl=="mdl_max_adj"){
-    covars=input%>%dplyr::select(all_of(covar_names))
-    covar_names <- names(covars)[ names(covars) != "patient_id"]
-    data_surv <- data_surv %>% left_join(covars)
-  }
-  
-  #Add inverse probablity weights for non-cases
-  data_surv$cox_weights <- ifelse(data_surv$patient_id %in% noncase_ids, non_case_weight, 1)
-  
-  # Fit model and prep output csv
-  fit_model <- coxfit(data_surv, interval_names, covar_names)
-  fit_model$strata <- paste0(stratify_by_subgroup,"_",stratify_by)
-  fit_model$event <- event
-  fit_model$project <- project
-  fit_model$model <- mdl
-  fit_model$covid_history <- covid_history
-  
-  write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , save_name,"_",stratify_by, "_", event, "_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
-  
 }
 
 

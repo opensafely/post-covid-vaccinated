@@ -5,10 +5,18 @@
 ## Thanks to: Thomas Bolton, Venexia Walker and Angela Wood
 ## =============================================================================
 
-fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival_data, cuts_days_since_expo){
+fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,mdl, survival_data,cuts_days_since_expo){
 
   # filter for age group of interest ----
   survival_data$AGE_AT_COHORT_START <- as.numeric(survival_data$AGE_AT_COHORT_START)
+  
+  if(startsWith(subgroup,"agegp")){
+    agebreaks=agebreaks_strata
+    agelabels=agelabels_strata
+  }else{
+    agebreaks=agebreaks_all
+    agelabels=agelabels_all
+  }
   
   setDT(survival_data)[ , agegroup := cut(AGE_AT_COHORT_START, 
                                           breaks = agebreaks, 
@@ -16,7 +24,7 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
                                           labels = agelabels)]
 
   
-  if(startsWith(strata,"agegp_")){
+  if(startsWith(subgroup,"agegp_")){
     survival_data=survival_data %>% filter(agegroup== stratify_by)
   }
   
@@ -27,7 +35,7 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
   #Replace event dates that lie outside of follow up time with NA
   survival_data$event_date[survival_data$event_date<survival_data$follow_up_start | survival_data$event_date > survival_data$follow_up_end]=NA
   
-  if(startsWith(strata,"covid_pheno_")==T){
+  if(startsWith(subgroup,"covid_pheno_")){
   cases <- survival_data %>% filter((!is.na(event_date)) & 
                                      (
                                        ((event_date == follow_up_end) & (event_date>=follow_up_start)) & ((event_date < date_expo_censor) | is.na(date_expo_censor))
@@ -48,11 +56,10 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
   non_case_weight=(nrow(survival_data)-nrow(cases))/nrow(non_cases)
   survival_data <- rbind(cases,non_cases)
 
-  
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
   survival_data$days_to_end <- as.numeric(survival_data$follow_up_end-cohort_start_date)
   
-  if(startsWith(strata,"covid_pheno_")==T){
+  if(startsWith(subgroup,"covid_pheno_")){
     survival_data$days_to_end <- ifelse((!is.na(survival_data$date_expo_censor)) & (survival_data$follow_up_end == survival_data$date_expo_censor), survival_data$days_to_end, (survival_data$days_to_end +1 ))
   }else{
     survival_data$days_to_end <- survival_data$days_to_end +1 
@@ -69,7 +76,7 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
   #===============================================================================
   #   CACHE some features
   #-------------------------------------------------------------------------------  
-  df_sex <- survival_data %>% dplyr::select(patient_id, SEX)
+  df_sex <- survival_data %>% dplyr::select(patient_id, sex)
   df_age_region <- survival_data %>% dplyr::select(patient_id, AGE_AT_COHORT_START, region_name) %>% rename(age = AGE_AT_COHORT_START)
   df_age_region$age_sq <- df_age_region$age^2
   
@@ -81,7 +88,7 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
   any_exposed_events <- nrow(with_expo %>% filter(is.na(event_date)==F))>0
   
   if(any_exposures==T & any_exposed_events ==T ){
-    if(startsWith(strata,"covid_pheno_")==T){
+    if(startsWith(subgroup,"covid_pheno_")==T){
       with_expo <- with_expo %>% 
         dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH, date_expo_censor) %>%  
         mutate(event_status = if_else( (!is.na(event_date)) & 
@@ -151,7 +158,7 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
   any_no_expo <- nrow(with_expo)>0
   
   if(any_no_expo == T & any_exposures== T & any_exposed_events == T ){
-    if(startsWith(strata,"covid_pheno_")==T){
+    if(startsWith(subgroup,"covid_pheno_")==T){
       without_expo <- without_expo %>% 
         dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH, date_expo_censor) %>%  
         mutate(event = if_else( (!is.na(event_date)) & 
@@ -244,20 +251,13 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
     
     names(tbl_event_count) <- c("expo_week", "events_total")
     tbl_event_count$event=event
-    tbl_event_count$strata <- paste0(stratify_by_subgroup,"_",stratify_by)
-    tbl_event_count$project <- project
+    tbl_event_count$subgroup <- subgroup
+    tbl_event_count$cohort <- cohort
     tbl_event_count$model <- mdl
-    tbl_event_count$covid_history <- covid_history
     
     ind_any_zeroeventperiod <- any((tbl_event_count$events_total == 0) & (!identical(cuts_days_since_expo, c(28, 196))))
     
-    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
-    
-    #if (identical(cuts_days_since_expo, c(28, 196))){
-    #  write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_red_" , save_name, "_",stratify_by,"_",event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
-    #} else (
-    #  write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" , save_name,"_", stratify_by, "_", event,"_",project,"_",mdl,"_",covid_history, ".csv"), row.names = T)
-    #)
+    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",mdl,".csv"), row.names = T)
     
     
     #===============================================================================
@@ -269,7 +269,7 @@ fit_get_data_surv <- function(event, stratify_by_subgroup, stratify_by, survival
     return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_weight, less_than_400_events))
     
   }else{
-    analyses_not_run[nrow(analyses_not_run)+1,]<- c(event,stratify_by_subgroup,stratify_by,any_exposures,any_exposed_events,any_no_expo,"FALSE")
+    analyses_not_run[nrow(analyses_not_run)+1,]<- c(event,subgroup,cohort,mdl,any_exposures,any_exposed_events,any_no_expo,"FALSE")
     
     return(list(analyses_not_run))
   }
