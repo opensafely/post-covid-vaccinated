@@ -33,10 +33,21 @@ if(population == "electively_unvaccinated"){
   input <- read_rds("output/input_electively_unvaccinated_stage1.rds")
 }
 
+# record variable names for covariate, qa which are not used in calculating incidence rate
+vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
+
+# Create a data frame for survival data: to avoid carrying covariates in the calculation
+survival_data <- input[,vars_names] 
+
+# cohort start date and end date
+survival_data <- survival_data %>% 
+  mutate(cohort_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
+         cohort_end_date = as.Date("2021-12-14", format = "%Y-%m-%d"))
+
 # automation
 
 event_dates_names <- tidyselect::vars_select(names(input), starts_with('out_date', ignore.case = TRUE))
-event_dates_names <- tidyselect::vars_select(event_dates, !contains('diabetes'))
+event_dates_names <- tidyselect::vars_select(event_dates_names, !contains('diabetes'))
 event_dates_names
 
 event_names<- substr(event_date_names, start=10, stop=nchar(event_date_names))
@@ -50,28 +61,33 @@ table_2
 
 n_events <- rep(0,length(event_date_names))
 
+check_events <- function(outcome)
+{
+  # check if the outcome is outside the follow up period
+  checking <- which(outcome < "2021-06-01" | outcome > "2021-12-04")
+  number_outside_fp <- length(checking)
+  return(number_outside_fp)
+}
+
+outbound_events <- c(lapply(survival_data[,event_date_names], check_events))
+outbound_events <- cbind(event_names, outbound_events)
+names(outbound_events) <- c("outcome", "any outcome events outside the follow-up period?")
+
+write.csv(outbound_events, file= paste0("output/",population, "_table_2_checking.csv"), row.names = F)
+
 number_events <- function(outcome)
 {
-  count <- length(which(!is.na(outcome))) # do we need to check that the outcome is within the follow up period?
+  count <- length(which(!is.na(outcome))) 
   return(count)
 }
 
-n_events <- c(lapply(input[,event_date_names], number_events))
+n_events <- c(lapply(survival_data[,event_date_names], number_events))
 
 n_events
 
 table_2$event_count <- as.numeric(n_events)
 
-# record variable names for covariate, qa which are not used in calculating incidence rate
-vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
 
-# Create a data frame for survival data: to avoid carrying covariates in the calculation
-survival_data <- input[,vars_names] 
-
-# cohort start date and end date
-survival_data <- survival_data %>% 
-                     mutate(cohort_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
-                            cohort_end_date = as.Date("2021-12-14", format = "%Y-%m-%d"))
 
 #View(survival_data)
 
