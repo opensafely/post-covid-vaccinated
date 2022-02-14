@@ -33,7 +33,7 @@ event_name  = args[[1]] # "mdl_agesex", "mdl_max_adj"
 #To Test
 ########
 
-event_name="ami"
+#event_name="ate"
 
 #event="ate"
 #subgroup="prior_history_FALSE"

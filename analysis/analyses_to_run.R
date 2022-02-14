@@ -62,6 +62,7 @@ for(i in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
   
 }
 
+analyses_to_run$strata[analyses_to_run$strata=="South_Asian"]<- "South Asian"
 
 ## Separate into to dataframes as this will allow all the vaccinated/electively unvaccinated
 ## analyses to be run in one go to save haing to read in the data for each individual analysis
