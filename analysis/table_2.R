@@ -17,8 +17,8 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  # population <- "vaccinated"
-  population = "electively_unvaccinated"
+   population <- "vaccinated"
+  #population = "electively_unvaccinated"
 } else {
   population <- args[[1]]
 }
@@ -52,19 +52,19 @@ event_dates_names <- tidyselect::vars_select(names(input), starts_with('out_date
 event_dates_names <- tidyselect::vars_select(event_dates_names, !contains('diabetes'))
 event_dates_names
 
-event_names<- substr(event_date_names, start=10, stop=nchar(event_date_names))
+event_names<- substr(event_dates_names, start=10, stop=nchar(event_dates_names))
 event_names
 
 col_headings <- c("event", "event_count", "pearson_years_follow_up", "incidence_rate")
-table_2 <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_date_names)))
+table_2 <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
 colnames(table_2) <- col_headings
 table_2$event <- event_names
 table_2
 
 # comment: patient_id = 6672, 2100-12-31 - this indicates missing data
-summary_stats <- function(population, survival_data, event_date_names, index)
+summary_stats <- function(population, survival_data, event_dates_names, index)
 {
-  survival_data$event_date <- survival_data[,event_date_names[index]]
+  survival_data$event_date <- survival_data[,event_dates_names[index]]
   if(population=="vaccinated"){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
   }else if(population=="electively_unvaccinated"){
@@ -83,8 +83,8 @@ summary_stats <- function(population, survival_data, event_date_names, index)
   return(c(event_count, pearson_years_follow_up, incidence_rate))
 }
 
-for(i in 1:length(event_date_names)){
-  table_2[i,2:4] <- summary_stats(population, survival_data, event_date_names, i)
+for(i in 1:length(event_dates_names)){
+  table_2[i,2:4] <- summary_stats(population, survival_data, event_dates_names, i)
 }
 
 table_2
