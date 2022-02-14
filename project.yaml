@@ -64,3 +64,17 @@ actions:
         IE_criteria: output/Cohort_flow_vaccinated.csv
       highly_sensitive:
         cohort: output/input_vaccinated_stage1.rds
+  
+  stage4_table2_vaccinated:
+    run: r:latest analysis/table_2.R vaccinated
+    needs: [stage1_data_cleaning_vaccinated]
+    outputs: 
+      moderately_sensitive:
+        table2_vaccinated: output/table2_vaccinated.csv
+
+  stage4_table2_electively_unvaccinated:
+    run: r:latest analysis/table_2.R electively_unvaccinated
+    needs: [stage1_data_cleaning_electively_unvaccinated]
+    outputs: 
+      moderately_sensitive:
+        table2_electively_unvaccinated: output/table2_electively_unvaccinated.csv
