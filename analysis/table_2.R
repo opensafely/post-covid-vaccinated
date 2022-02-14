@@ -33,6 +33,8 @@ if(population == "electively_unvaccinated"){
   input <- read_rds("output/input_electively_unvaccinated_stage1.rds")
 }
 
+cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
+cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 # record variable names for covariate, qa which are not used in calculating incidence rate
 vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
 
@@ -41,8 +43,8 @@ survival_data <- input[,vars_names]
 
 # cohort start date and end date
 survival_data <- survival_data %>% 
-  mutate(cohort_start_date = as.Date("2021-06-01", format="%Y-%m-%d"),
-         cohort_end_date = as.Date("2021-12-14", format = "%Y-%m-%d"))
+  mutate(cohort_start_date = cohort_start,
+         cohort_end_date = cohort_end)
 
 # automation
 
@@ -64,14 +66,14 @@ n_events <- rep(0,length(event_date_names))
 check_events <- function(outcome)
 {
   # check if the outcome is outside the follow up period
-  checking <- which(outcome < "2021-06-01" | outcome > "2021-12-04")
+  checking <- which(outcome < "2021-06-01"| outcome > "2021-12-14")
   number_outside_fp <- length(checking)
   return(number_outside_fp)
 }
 
-outbound_events <- c(lapply(survival_data[,event_date_names], check_events))
-outbound_events <- cbind(event_names, outbound_events)
-names(outbound_events) <- c("outcome", "any outcome events outside the follow-up period?")
+num_outbound_events <- c(lapply(survival_data[,event_date_names], check_events))
+
+outbound_events <- cbind(event_names, num_outbound_events)
 
 write.csv(outbound_events, file= paste0("output/",population, "_table_2_checking.csv"), row.names = F)
 
