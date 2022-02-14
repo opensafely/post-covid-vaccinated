@@ -6,7 +6,6 @@
 
 # ---------------------- READ IN DATA ------------------------------------------
 # read in core analysis information
-
 input=read_rds(paste0("output/input_",cohort,"_stage1.rds"))
 
 #---------------------------SPECIFY MAIN PARAMETERS-----------------------------
