@@ -17,8 +17,8 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  population <- "vaccinated"
-  # population = "electively_unvaccinated"
+  # population <- "vaccinated"
+  population = "electively_unvaccinated"
 } else {
   population <- args[[1]]
 }
@@ -35,7 +35,8 @@ if(population == "electively_unvaccinated"){
 
 cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
-# record variable names for covariate, qa which are not used in calculating incidence rate
+
+# record variable names for covariate
 vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
 
 # Create a data frame for survival data: to avoid carrying covariates in the calculation
@@ -47,7 +48,6 @@ survival_data <- survival_data %>%
          cohort_end_date = cohort_end)
 
 # automation
-
 event_dates_names <- tidyselect::vars_select(names(input), starts_with('out_date', ignore.case = TRUE))
 event_dates_names <- tidyselect::vars_select(event_dates_names, !contains('diabetes'))
 event_dates_names
@@ -61,68 +61,30 @@ colnames(table_2) <- col_headings
 table_2$event <- event_names
 table_2
 
-n_events <- rep(0,length(event_date_names))
-
-check_events <- function(outcome)
-{
-  # check if the outcome is outside the follow up period
-  checking <- which(outcome < "2021-06-01"| outcome > "2021-12-14")
-  number_outside_fp <- length(checking)
-  return(number_outside_fp)
-}
-
-num_outbound_events <- c(lapply(survival_data[,event_date_names], check_events))
-
-outbound_events <- cbind(event_names, num_outbound_events)
-
-write.csv(outbound_events, file= paste0("output/",population, "_table_2_checking.csv"), row.names = F)
-
-number_events <- function(outcome)
-{
-  count <- length(which(!is.na(outcome))) 
-  return(count)
-}
-
-n_events <- c(lapply(survival_data[,event_date_names], number_events))
-
-n_events
-
-table_2$event_count <- as.numeric(n_events)
-
-
-
-#View(survival_data)
-
-#is.Date(survival_data$cohort_end_date)
-
 # comment: patient_id = 6672, 2100-12-31 - this indicates missing data
-summary_stats <- function(population, survival_data, event_count, event_date_names, index)
+summary_stats <- function(population, survival_data, event_date_names, index)
 {
   survival_data$event_date <- survival_data[,event_date_names[index]]
   if(population=="vaccinated"){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
-  }else if(project=="electively_unvaccinated"){
+  }else if(population=="electively_unvaccinated"){
     survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=  min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
     survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
   }
   # follow-up days
   survival_data = survival_data %>% mutate(follow_up_period = as.numeric((as.Date(follow_up_end) - as.Date(index_date))))
-  survival_data = survival_data %>% filter(follow_up_period >0 & follow_up_period < 197)
-  survival_data = survival_data %>% mutate(follow_up_years = follow_up_period / 365.2)
-  # print(c(survival_data$follow_up_end, survival_data$follow_up_start))
-  # number of person years follow up
-  
+  #hist(survival_data$follow_up_period)
+  survival_data = survival_data %>% filter(follow_up_period >0 & follow_up_period < 197) # filter out follow up period 
+  survival_data = survival_data %>% mutate(follow_up_years = follow_up_period / 365.2) # follow-up years
+  event_count <- length(which(survival_data$out_date_ami >= survival_data$index_date  & survival_data$out_date_ami <= survival_data$follow_up_end))
   pearson_years_follow_up  = round(sum(survival_data$follow_up_years, na.rm = TRUE),1)
-
-  # incidence rate for ami
-  incidence_rate = round(as.numeric(event_count[index])/pearson_years_follow_up, 4)
-  
-  return(c(pearson_years_follow_up, incidence_rate))
+  incidence_rate = round(event_count/pearson_years_follow_up, 4)
+  return(c(event_count, pearson_years_follow_up, incidence_rate))
 }
 
 for(i in 1:length(event_date_names)){
-  table_2[i,3:4] <- summary_stats(population, survival_data, table_2$event_count, event_date_names, i)
+  table_2[i,2:4] <- summary_stats(population, survival_data, event_date_names, i)
 }
 
 table_2
