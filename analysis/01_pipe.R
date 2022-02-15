@@ -27,13 +27,17 @@ library(readr)
 
 
 args = commandArgs(trailingOnly=TRUE)
-event_name  = args[[1]] # "mdl_agesex", "mdl_max_adj"
+
+length(args)
+if(length(args)==0){
+  event_name="ate"
+}else{
+  event_name  = args[[1]] 
+}
 
 ########
 #To Test
 ########
-
-#event_name="ate"
 
 #event="ate"
 #subgroup="prior_history_FALSE"
@@ -67,7 +71,7 @@ for(i in cohort_to_run){
              stratify_by_subgroup=ls_events_missing$stratify_by_subgroup,
              stratify_by=ls_events_missing$strata,
              mdl=ls_events_missing$mdl,
-             input, cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names)
+             input, cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,cohort)
   )
   
   
