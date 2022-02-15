@@ -234,7 +234,7 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   # Identify variables for those using study start as index --------------------
   
   index <- tmp[tmp$use_date=="index",]
-  index[,grepl("_vaccinated",colnames(index))] <- NULL
+  index[,grepl(paste0("_",j),colnames(index))] <- NULL
   colnames(index) <- gsub("_index","",colnames(index))
   index$index_date <- index$study_start_date
   index[,c("use_date")] <- NULL
@@ -243,7 +243,7 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   
   nonindex <- tmp[tmp$use_date=="nonindex",]
   nonindex[,grepl("_index",colnames(nonindex))] <- NULL
-  colnames(nonindex) <- gsub("_vaccinated","",colnames(nonindex))
+  colnames(nonindex) <- gsub(paste0("_",j),"",colnames(nonindex))
   nonindex$index_date <- nonindex$pat_start_date 
   nonindex[,c("use_date")] <- NULL
   

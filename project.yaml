@@ -4,7 +4,6 @@ expectations:
 
   population_size: 500000
 
-
 actions:
   active_analyses:
     run: r:latest analysis/active_analyses.R
@@ -50,7 +49,7 @@ actions:
         venn: output/venn_*.rds
 
 
-  stage1_data_cleaning:
+  stage1_data_cleaning_both:
     run: r:latest analysis/Stage1_data_cleaning.R both
     needs: [preprocess_data]
     outputs:
@@ -63,7 +62,7 @@ actions:
 
   stage2_missing_table1:
     run: r:latest analysis/Stage2_missing_table1.R both
-    needs: [stage1_data_cleaning]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         Missing_RangeChecks: output/Check_missing_range_*.csv
@@ -87,4 +86,3 @@ actions:
       moderately_sensitive:
           venn_electively_unvaccinated: output/electively_unvaccinated_*.svg
           number_check_electively_unvaccinated: output/electively_unvaccinated_*.csv
-  
