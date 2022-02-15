@@ -28,7 +28,6 @@ library(readr)
 
 args = commandArgs(trailingOnly=TRUE)
 
-length(args)
 if(length(args)==0){
   event_name="ate"
 }else{
