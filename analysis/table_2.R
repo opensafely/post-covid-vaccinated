@@ -77,7 +77,7 @@ summary_stats <- function(population, survival_data, event_dates_names, index)
   #hist(survival_data$follow_up_period)
   survival_data = survival_data %>% filter(follow_up_period >0 & follow_up_period < 197) # filter out follow up period 
   survival_data = survival_data %>% mutate(follow_up_years = follow_up_period / 365.2) # follow-up years
-  event_count <- length(which(survival_data$out_date_ami >= survival_data$index_date  & survival_data$out_date_ami <= survival_data$follow_up_end))
+  event_count <- length(which(survival_data$event_date >= survival_data$index_date  & survival_data$event_date<= survival_data$follow_up_end))
   pearson_years_follow_up  = round(sum(survival_data$follow_up_years, na.rm = TRUE),1)
   incidence_rate = round(event_count/pearson_years_follow_up, 4)
   return(c(event_count, pearson_years_follow_up, incidence_rate))

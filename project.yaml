@@ -33,7 +33,7 @@ actions:
       highly_sensitive:
         cohort: output/input_index.feather
 
-  preprocess_data:
+    preprocess_data:
     run: r:latest analysis/preprocess_data.R
     needs: [generate_study_population_index, generate_study_population_vaccinated, generate_study_population_electively_unvaccinated]
     outputs:
@@ -70,11 +70,11 @@ actions:
     needs: [stage1_data_cleaning_vaccinated]
     outputs: 
       moderately_sensitive:
-        table2_vaccinated: output/table2_vaccinated.csv
+        table2: output/table2_vaccinated.csv
 
   stage4_table2_electively_unvaccinated:
     run: r:latest analysis/table_2.R electively_unvaccinated
     needs: [stage1_data_cleaning_electively_unvaccinated]
     outputs: 
       moderately_sensitive:
-        table2_electively_unvaccinated: output/table2_electively_unvaccinated.csv
+        table2: output/table2_electively_unvaccinated.csv
