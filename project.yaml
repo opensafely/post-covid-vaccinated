@@ -38,7 +38,7 @@ actions:
       highly_sensitive:
         cohort: output/input_index.feather
 
-    preprocess_data:
+  preprocess_data:
     run: r:latest analysis/preprocess_data.R
     needs: [generate_study_population_index, generate_study_population_vaccinated, generate_study_population_electively_unvaccinated]
     outputs:
