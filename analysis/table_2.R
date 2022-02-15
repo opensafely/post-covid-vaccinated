@@ -49,7 +49,7 @@ survival_data <- survival_data %>%
 
 # automation
 event_dates_names <- tidyselect::vars_select(names(input), starts_with('out_date', ignore.case = TRUE))
-event_dates_names <- tidyselect::vars_select(event_dates_names, !contains('diabetes'))
+event_dates_names <- tidyselect::vars_select(event_dates_names, !contains(c('diabetes','depression', 'anxiety', 'harm', 'mental','eating','suicide','addiction')))
 event_dates_names
 
 event_names<- substr(event_dates_names, start=10, stop=nchar(event_dates_names))
