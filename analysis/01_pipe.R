@@ -70,7 +70,7 @@ for(i in cohort_to_run){
              stratify_by_subgroup=ls_events_missing$stratify_by_subgroup,
              stratify_by=ls_events_missing$strata,
              mdl=ls_events_missing$mdl,
-             input, cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,cohort)
+             input, cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names)
   )
   
   
