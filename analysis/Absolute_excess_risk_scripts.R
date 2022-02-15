@@ -167,7 +167,7 @@ excess_risk <- function(cohort, event, agegp, sex, ethnicity, prior_history, hos
 #1.column1 - 196 days
 #column2 - Cumulative AER(%)
 
-#Subgroups
+#Subgroups - 1. VACCINATED AND ELECTIVELY UNVACCINATED
 #2.AERp_ate_all
 
 #3.AERp_ate_male
