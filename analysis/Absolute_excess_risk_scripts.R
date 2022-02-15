@@ -5,7 +5,7 @@
 excess_risk <- function(cohort, event, agegp, sex, ethnicity, prior_history, hospitalisation) {
   
   #Import data 
-  input1 <- readr::read_csv(paste0("output/Input1_AER_",cohort,".csv")) #1.person days
+  input1 <- readr::read_csv(paste0("output/Input1_AER_",cohort,".csv")) #1.person days (RT - change to input1_aer.csv)
   input2 <- readr::read_csv(paste0("output/Input2_AER_",cohort,".csv")) #2.unexposed events, 3.total cases, 4.hr
   #rm(Input1_AER, Input2_AER)
   
@@ -159,6 +159,34 @@ excess_risk <- function(cohort, event, agegp, sex, ethnicity, prior_history, hos
                         AER_196 = lifetable[nrow(lifetable),]$AER * total_cases,
                         stringsAsFactors = FALSE)
   
-  return(results)
+  return(results) 
   
 }
+
+# RT - add return the life table for - 'ate' and 'vte' for plotting
+#1.column1 - 196 days
+#column2 - Cumulative AER(%)
+
+#Subgroups
+#2.AERp_ate_all
+
+#3.AERp_ate_male
+#4.AERp_ate_female 
+
+#5.AERp_ate_18_39
+#6.AERp_ate_40-59
+#7.AERp_ate_60-79
+#8.AERp_ate_80-110
+
+#9.AERp_ate_asian
+#10.AERp_ate_black
+#11.AERp_ate_white
+#12.AERp_ate_mixed
+#13.AERp_ate_others
+
+#14.AERp_ate_history
+#15.AERp_ate_no_history
+
+#16.AERp_ate_hospitalised
+#17.AERp_ate_not_hospitalised
+
