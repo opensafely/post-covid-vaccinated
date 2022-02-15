@@ -70,14 +70,14 @@ actions:
   
   stage4_table2_vaccinated:
     run: r:latest analysis/table_2.R vaccinated
-    needs: [stage1_data_cleaning_vaccinated]
+    needs: [stage1_data_cleaning_both]
     outputs: 
       moderately_sensitive:
         table2: output/table2_vaccinated.csv
 
   stage4_table2_electively_unvaccinated:
     run: r:latest analysis/table_2.R electively_unvaccinated
-    needs: [stage1_data_cleaning_electively_unvaccinated]
+    needs: [stage1_data_cleaning_both]
     outputs: 
       moderately_sensitive:
         table2: output/table2_electively_unvaccinated.csv
