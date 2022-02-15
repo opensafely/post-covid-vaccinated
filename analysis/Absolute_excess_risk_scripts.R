@@ -12,12 +12,8 @@ excess_risk <- function(cohort, event, agegp, sex, ethnicity, prior_history, hos
   # Step1: Extract the required variables
   #---------------------------------
   #1. Person days
-  fp_person_days <- input1[input1$event == event & 
-                             input1$agegp == agegp &
-                             input1$sex == sex & 
-                             input1$ethnicity == ethnicity &
-                             input1$prior_history == prior_history & 
-                             input1$hospitalisation == hospitalisation,]$person_days
+  fp_person_days <- input1[input1$event == event & input1$model == model &
+                             input1$cohort == cohort & input1$strata == strata,]$person_days
   
   #2.unexposed events
   unexposed_events <-  input2[input2$event == event & 
