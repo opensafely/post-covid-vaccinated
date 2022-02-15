@@ -18,7 +18,7 @@ args <- commandArgs(trailingOnly=TRUE)
 if(length(args)==0){
   # use for interactive testing
    population <- "vaccinated"
-  #population = "electively_unvaccinated"
+   #population = "electively_unvaccinated"
 } else {
   population <- args[[1]]
 }
@@ -61,7 +61,7 @@ colnames(table_2) <- col_headings
 table_2$event <- event_names
 table_2
 
-# comment: patient_id = 6672, 2100-12-31 - this indicates missing data
+# comment: patient_id = 6672, hist(survival_data$follow_up_period) - this indicates missing data
 summary_stats <- function(population, survival_data, event_dates_names, index)
 {
   survival_data$event_date <- survival_data[,event_dates_names[index]]
