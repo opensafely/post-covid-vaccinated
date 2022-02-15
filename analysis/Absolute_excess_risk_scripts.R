@@ -16,13 +16,10 @@ excess_risk <- function(cohort, event, agegp, sex, ethnicity, prior_history, hos
                              input1$cohort == cohort & input1$strata == strata,]$person_days
   
   #2.unexposed events
-  unexposed_events <-  input2[input2$event == event & 
-                                input2$agegp == agegp &
-                                input2$sex == sex & 
-                                input2$ethnicity == ethnicity &
-                                input2$prior_history == prior_history &
-                                input2$hospitalisation == hospitalisation & 
-                                input2$term == "0_14 days",]$unexposed_cvd_events
+  unexposed_events <-  subset(input2, input2$event == "ami" & input2$model == "mdl_max_adj" & 
+                                input2$cohort == "electively_unvaccinated" & input2$strata == "covid_history_false")
+  
+  unexposed_events <- as.numeric(unexposed_events$unexposed_events)
   
   #3.Total cases
   total_cases <-  input2[input2$event == event & 
