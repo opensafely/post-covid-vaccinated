@@ -52,7 +52,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   fit_model$event <- event
   fit_model$cohort <- cohort
   fit_model$model <- mdl
-  fit_model$total_covid_cases <- total_covid_cases
+  fit_model$total_covid19_cases <- total_covid_cases
   
   write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",mdl, ".csv"), row.names = T)
   

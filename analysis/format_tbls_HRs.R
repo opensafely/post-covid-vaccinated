@@ -132,7 +132,7 @@ if(length(results_done)>0){
   combined_hr_event_counts=df_hr%>%left_join(event_counts_to_left_join, by=c("term","event","subgroup","cohort","model"))
   
   combined_hr_event_counts=combined_hr_event_counts%>%select(term,estimate,conf.low,conf.high,std.error,robust.se,P,expo_week,events_total,
-                                                               event,subgroup,model,cohort,covariates_removed,cat_covars_collapsed,total_covid_cases)
+                                                               event,subgroup,model,cohort,covariates_removed,cat_covars_collapsed,total_covid19_cases)
   
   write.csv(combined_hr_event_counts,paste0(output_dir,"/compiled_HR_results_",event_name ,".csv") , row.names=F)
   

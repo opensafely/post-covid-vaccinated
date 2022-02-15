@@ -104,7 +104,7 @@ actions:
         compiled_event_counts: output/compiled_event_counts_pe.csv
         analyses_not_run: output/analyses_not_run_pe.csv
 
-  analysis_tia:
+  analysis_cox_tia:
     run: r:latest analysis/01_pipe.R tia
     needs: [active_analyses,stage1_data_cleaning_both]
     outputs:
