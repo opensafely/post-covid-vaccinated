@@ -115,13 +115,10 @@ excess_risk <- function(event, cohort, strata, model) {
   lifetable$AER <- lifetable$sc - lifetable$s
   
   # Return results
-  results <- data.frame(cohort = cohort,
-                        event = event,
-                        agegp = agegp,
-                        sex = sex,
-                        ethnicity = ethnicity,
-                        prior_history = prior_history,
-                        hospitalisation = hospitalisation,
+  results <- data.frame(event = event,
+                        cohort = cohort,
+                        strata = strata,
+                        model = model,
                         AER_196 = lifetable[nrow(lifetable),]$AER * total_cases,
                         stringsAsFactors = FALSE)
   
@@ -130,29 +127,30 @@ excess_risk <- function(event, cohort, strata, model) {
 }
 
 # RT - add return the life table for - 'ate' and 'vte' for plotting
+#Subgroups - 2. VACCINATED AND ELECTIVELY UNVACCINATED
+
 #1.column1 - 196 days
 #column2 - Cumulative AER(%)
 
-#Subgroups - 1. VACCINATED AND ELECTIVELY UNVACCINATED
-#2.AERp_ate_all
+              #2.AERp_ate_all
 
-#3.AERp_ate_male
-#4.AERp_ate_female 
+              #3.AERp_ate_male
+              #4.AERp_ate_female 
 
-#5.AERp_ate_18_39
-#6.AERp_ate_40-59
-#7.AERp_ate_60-79
-#8.AERp_ate_80-110
+              #5.AERp_ate_18_39
+              #6.AERp_ate_40-59
+              #7.AERp_ate_60-79
+              #8.AERp_ate_80-110
 
-#9.AERp_ate_asian
-#10.AERp_ate_black
-#11.AERp_ate_white
-#12.AERp_ate_mixed
-#13.AERp_ate_others
+              #9.AERp_ate_asian              ##additionals??
+              #10.AERp_ate_black
+              #11.AERp_ate_white
+              #12.AERp_ate_mixed
+              #13.AERp_ate_others
 
-#14.AERp_ate_history
-#15.AERp_ate_no_history
+              #14.AERp_ate_history
+              #15.AERp_ate_no_history
 
-#16.AERp_ate_hospitalised
-#17.AERp_ate_not_hospitalised
+              #16.AERp_ate_hospitalised
+              #17.AERp_ate_not_hospitalised
 
