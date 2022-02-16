@@ -28,67 +28,46 @@ excess_risk <- function(event, cohort, strata, model) {
   #4.locate the estimates
   #0-14 days
   hr_14 <- input2[input2$event == event & 
-                    input2$agegp == agegp &
-                    input2$sex == sex & 
-                    input2$ethnicity == ethnicity &
-                    input2$prior_history == prior_history &
-                    input2$hospitalisation == hospitalisation & 
-                    input2$term == "0_14 days",]$hr_fully_adjusted
-  
+                  input2$model == model & 
+                  input2$cohort == cohort & 
+                  input2$strata == strata & 
+                  input2$term == "0_14 days",]$hr
   #14-28 days
   hr_28 <- input2[input2$event == event & 
-                    input2$agegp == agegp &
-                    input2$sex == sex & 
-                    input2$ethnicity == ethnicity &
-                    input2$prior_history == prior_history &
-                    input2$hospitalisation == hospitalisation & 
-                    input2$term == "14_28 days",]$hr_fully_adjusted
-  
+                    input2$model == model & 
+                    input2$cohort == cohort & 
+                    input2$strata == strata & 
+                    input2$term == "14_28 days",]$hr
   #28-56 days
   hr_56 <- input2[input2$event == event & 
-                    input2$agegp == agegp &
-                    input2$sex == sex & 
-                    input2$ethnicity == ethnicity &
-                    input2$prior_history == prior_history &
-                    input2$hospitalisation == hospitalisation & 
-                    input2$term == "28_56 days",]$hr_fully_adjusted
-  
+                    input2$model == model & 
+                    input2$cohort == cohort & 
+                    input2$strata == strata & 
+                    input2$term == "28_56 days",]$hr
   #56-84 days
   hr_84 <- input2[input2$event == event & 
-                    input2$agegp == agegp &
-                    input2$sex == sex & 
-                    input2$ethnicity == ethnicity &
-                    input2$prior_history == prior_history &
-                    input2$hospitalisation == hospitalisation & 
-                    input2$term == "56_84 days",]$hr_fully_adjusted
-  
+                    input2$model == model & 
+                    input2$cohort == cohort & 
+                    input2$strata == strata & 
+                    input2$term == "56_84 days",]$hr
   #84-196 days
   hr_196 <- input2[input2$event == event & 
-                     input2$agegp == agegp &
-                     input2$sex == sex & 
-                     input2$ethnicity == ethnicity &
-                     input2$prior_history == prior_history &
-                     input2$hospitalisation == hospitalisation & 
-                     input2$term == "84_196 days",]$hr_fully_adjusted
-  
+                     input2$model == model & 
+                     input2$cohort == cohort & 
+                     input2$strata == strata & 
+                     input2$term == "84_196 days",]$hr
   #Alternative 0-28 days
   hr0_28 <- input2[input2$event == event & 
-                     input2$agegp == agegp &
-                     input2$sex == sex & 
-                     input2$ethnicity == ethnicity &
-                     input2$prior_history == prior_history &
-                     input2$hospitalisation == hospitalisation & 
-                     input2$term == "0_28 days",]$hr_fully_adjusted
-  
+                     input2$model == model & 
+                     input2$cohort == cohort & 
+                     input2$strata == strata & 
+                     input2$term == "0_28 days",]$hr
   #Alternative 28 - 196 days
-  hr28_196 <- input2[input2$event == event & 
-                       input2$agegp == agegp &
-                       input2$sex == sex & 
-                       input2$ethnicity == ethnicity &
-                       input2$prior_history == prior_history &
-                       input2$hospitalisation == hospitalisation & 
-                       input2$term == "28_196 days",]$hr_fully_adjusted
-  
+  hr28_196<- input2[input2$event == event & 
+                      input2$model == model & 
+                      input2$cohort == cohort & 
+                      input2$strata == strata & 
+                      input2$term == "28_196 days",]$hr
   #--------------------------------------------------------------------
   #Step2.Calculate the average daily CVD incidence   - in the unexposed
   #--------------------------------------------------------------------
