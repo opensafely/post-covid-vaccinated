@@ -2,6 +2,13 @@
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
+#Preprocess the AER input data
+
+
+
+
+
+
 excess_risk <- function(event, cohort, strata, model) {
   
   #Import data 
