@@ -35,76 +35,58 @@ excess_risk <- function(event, cohort, subgroup, model) {
   #---------------------------------
   #1. Person days
   fp_person_days <- input1[input1$event == event & input1$model == model &
-                             input1$cohort == cohort & input1$subgroup == subgroup,]$person_days
+                             input1$cohort == cohort & input1$subgroup == subgroup,]$person_days #RT/RK/VW -check L
   
   #2.unexposed events
-  unexposed_events <-  subset(input2, input1$event == event & input1$model == model &
-                                input1$cohort == cohort & input1$subgroup == subgroup)
-  unexposed_events <-  as.numeric(unexposed_events$unexposed_events)#Indexing didn't work, but reconsider after real table.
+  unexposed_events <-  input2[input2$event == event & input2$model == model & 
+                                input2$cohort == cohort & input2$subgroup == subgroup & 
+                                input2$expo_week== "pre expo",]$events_total
   
   #3.Total cases
-  total_cases <-  subset(input2, input1$event == event & input1$model == model &
-                           input1$cohort == cohort & input1$subgroup == subgroup)
-  total_cases <- as.numeric(total_cases$total_covid19_cases)
+  total_cases <-  input2[input2$event == event & input2$model == model & 
+                           input2$cohort == cohort & input2$subgroup == subgroup & 
+                           input2$expo_week== "pre expo",]$total_covid19_cases
   
   #4.locate the estimates
   #0-14 days
-  hr_14 <- input2[input2$event == event & 
-                  input2$model == model & 
-                  input2$cohort == cohort & 
-                  input2$subgroup == subgroup & 
-                  input2$term == "0_14 days",]$hr
+  hr_14 <- input2[input2$event == event & input2$model == model & 
+                    input2$cohort == cohort & input2$subgroup == subgroup & input2$term == "days0_14",]$estimate
   #14-28 days
-  hr_28 <- input2[input2$event == event & 
-                    input2$model == model & 
-                    input2$cohort == cohort & 
-                    input2$subgroup == subgroup & 
-                    input2$term == "14_28 days",]$hr
+  hr_28 <- input2[input2$event == event & input2$model == model & 
+                    input2$cohort == cohort & input2$subgroup == subgroup & input2$term == "days14_28",]$estimate
   #28-56 days
-  hr_56 <- input2[input2$event == event & 
-                    input2$model == model & 
-                    input2$cohort == cohort & 
-                    input2$subgroup == subgroup & 
-                    input2$term == "28_56 days",]$hr
+  hr_56 <- input2[input2$event == event & input2$model == model & 
+                    input2$cohort == cohort & input2$subgroup == subgroup & input2$term == "days28_56",]$estimate
   #56-84 days
-  hr_84 <- input2[input2$event == event & 
-                    input2$model == model & 
-                    input2$cohort == cohort & 
-                    input2$subgroup == subgroup & 
-                    input2$term == "56_84 days",]$hr
+  hr_84 <- input2[input2$event == event & input2$model == model & 
+                    input2$cohort == cohort & input2$subgroup == subgroup & input2$term == "days56_84",]$estimate
   #84-196 days
-  hr_196 <- input2[input2$event == event & 
-                     input2$model == model & 
-                     input2$cohort == cohort & 
-                     input2$subgroup == subgroup & 
-                     input2$term == "84_196 days",]$hr
+  hr_196 <- input2[input2$event == event & input2$model == model & 
+                     input2$cohort == cohort & input2$subgroup == subgroup & input2$term == "days84_197",]$estimate
   #Alternative 0-28 days
-  hr0_28 <- input2[input2$event == event & 
-                     input2$model == model & 
-                     input2$cohort == cohort & 
-                     input2$subgroup == subgroup & 
-                     input2$term == "0_28 days",]$hr
+  hr0_28 <- input2[input2$event == event & input2$model == model & 
+                     input2$cohort == cohort & input2$subgroup == subgroup & input2$term == "days0_28",]$estimate
   #Alternative 28 - 196 days
-  hr28_196<- input2[input2$event == event & 
-                      input2$model == model & 
-                      input2$cohort == cohort & 
-                      input2$subgroup == subgroup & 
-                      input2$term == "28_196 days",]$hr
+  hr28_196<- input2[input2$event == event & input2$model == model & 
+                      input2$cohort == cohort & input2$subgroup == subgroup & input2$term == "days28_196",]$estimate
   #--------------------------------------------------------------------
   #Step2.Calculate the average daily CVD incidence   - in the unexposed
   #--------------------------------------------------------------------
   #Number of new events / sum of person-time at risk
   
   incidence_rate <- unexposed_events/fp_person_days
-  
   #-------------------------------------------------------------
   #Step3. Make life table to calculate cumulative risk over time
   #-------------------------------------------------------------
   #Description:Use a life table approach to calculate age- and sex specific cumulative risks over time, - with and without COVID-19. 
-  lifetable <- data.frame(days = c(1:196),
-                          q = incidence_rate,
-                          stringsAsFactors = FALSE)
+  lifetable <- data.frame(c(1:196))
+  colnames(lifetable) <- c("days")
+  lifetable$event <- event
+  lifetable$model <- model
+  lifetable$cohort <- cohort
+  lifetable$subgroup <- subgroup 
   
+  lifetable$q <- incidence_rate 
   lifetable$'1-q' <- 1 - lifetable$q 
   lifetable$s <- cumprod(lifetable$`1-q`)
   
@@ -135,6 +117,11 @@ excess_risk <- function(event, cohort, subgroup, model) {
   
   #AER = Sc-S=difference in absolute risk
   lifetable$AER <- lifetable$sc - lifetable$s
+  #AER on day 196 
+  AER_196 <- lifetable[nrow(lifetable),]$AER * total_cases
+  print(AER_196) # 183.7275
+  # 184 excess 'events' happens 196 days after 7558 total covid19 'cases'.
+  
   
   # Return results
   results <- data.frame(event = event,
@@ -147,6 +134,29 @@ excess_risk <- function(event, cohort, subgroup, model) {
   return(results) 
   
 }
+
+##########################
+#plotting
+######life table##########
+#convert to AER%
+lifetable$AER_p <- lifetable$AER*100
+plot(lifetable$days, lifetable$AER_p)
+
+p_line<-ggplot(lifetable,
+               aes(x=days,
+                   y=AER_p,
+                   group=1)) +
+  #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
+  #              position=position_dodge(.9))+
+  geom_line(size=1.5)+
+  #geom_point()+
+  scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
+  scale_y_continuous(limits = c(0,4))+
+  labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
+       title = 'AMI')+
+  theme(plot.title = element_text(hjust = 0.5))
+
+p_line
 
 # RT - add return the life table for - 'ate' and 'vte' for plotting
 #Subgroups - 2. VACCINATED AND ELECTIVELY UNVACCINATED
