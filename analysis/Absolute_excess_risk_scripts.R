@@ -18,13 +18,11 @@ excess_risk <- function(cohort, event, agegp, sex, ethnicity, prior_history, hos
   #2.unexposed events
   unexposed_events <-  subset(input2, input1$event == event & input1$model == model &
                                 input1$cohort == cohort & input1$strata == strata)
-  
   unexposed_events <-  as.numeric(unexposed_events$unexposed_events)
   
   #3.Total cases
   total_cases <-  subset(input2, input1$event == event & input1$model == model &
                            input1$cohort == cohort & input1$strata == strata)
-  
   total_cases <- as.numeric(total_cases$total_covid19_cases)
   
   #4.locate the estimates
