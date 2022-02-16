@@ -2,10 +2,11 @@
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
-#Preprocess the AER input data
 library(purrr)
 library(data.table)
+library(tidyverse)
 
+#Import data
 hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
 hr_files=paste0("output/",hr_files)
 hr_file_paths <- purrr::pmap(list(hr_files),
@@ -15,12 +16,20 @@ hr_file_paths <- purrr::pmap(list(hr_files),
                       })
 df=rbindlist(hr_file_paths, fill=TRUE)
 
+#Preprocess the AER input data
+input2 <- subset(df, df$term == "days0_14" |
+                     df$term == "days14_28" |
+                     df$term == "days28_56" |
+                     df$term == "days56_84" |
+                     df$term == "days84_197"|
+                     df$term == "days0_28"|
+                     df$term == "days28_197") # RT/RK check
 
+input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
 
-
-excess_risk <- function(event, cohort, strata, model) {
+excess_risk <- function(event, cohort, subgroup, model) {
   
-  #Import data 
+   
   input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
   input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
   
@@ -29,16 +38,16 @@ excess_risk <- function(event, cohort, strata, model) {
   #---------------------------------
   #1. Person days
   fp_person_days <- input1[input1$event == event & input1$model == model &
-                             input1$cohort == cohort & input1$strata == strata,]$person_days
+                             input1$cohort == cohort & input1$subgroup == subgroup,]$person_days
   
   #2.unexposed events
   unexposed_events <-  subset(input2, input1$event == event & input1$model == model &
-                                input1$cohort == cohort & input1$strata == strata)
+                                input1$cohort == cohort & input1$subgroup == subgroup)
   unexposed_events <-  as.numeric(unexposed_events$unexposed_events)#Indexing didn't work, but reconsider after real table.
   
   #3.Total cases
   total_cases <-  subset(input2, input1$event == event & input1$model == model &
-                           input1$cohort == cohort & input1$strata == strata)
+                           input1$cohort == cohort & input1$subgroup == subgroup)
   total_cases <- as.numeric(total_cases$total_covid19_cases)
   
   #4.locate the estimates
@@ -46,43 +55,43 @@ excess_risk <- function(event, cohort, strata, model) {
   hr_14 <- input2[input2$event == event & 
                   input2$model == model & 
                   input2$cohort == cohort & 
-                  input2$strata == strata & 
+                  input2$subgroup == subgroup & 
                   input2$term == "0_14 days",]$hr
   #14-28 days
   hr_28 <- input2[input2$event == event & 
                     input2$model == model & 
                     input2$cohort == cohort & 
-                    input2$strata == strata & 
+                    input2$subgroup == subgroup & 
                     input2$term == "14_28 days",]$hr
   #28-56 days
   hr_56 <- input2[input2$event == event & 
                     input2$model == model & 
                     input2$cohort == cohort & 
-                    input2$strata == strata & 
+                    input2$subgroup == subgroup & 
                     input2$term == "28_56 days",]$hr
   #56-84 days
   hr_84 <- input2[input2$event == event & 
                     input2$model == model & 
                     input2$cohort == cohort & 
-                    input2$strata == strata & 
+                    input2$subgroup == subgroup & 
                     input2$term == "56_84 days",]$hr
   #84-196 days
   hr_196 <- input2[input2$event == event & 
                      input2$model == model & 
                      input2$cohort == cohort & 
-                     input2$strata == strata & 
+                     input2$subgroup == subgroup & 
                      input2$term == "84_196 days",]$hr
   #Alternative 0-28 days
   hr0_28 <- input2[input2$event == event & 
                      input2$model == model & 
                      input2$cohort == cohort & 
-                     input2$strata == strata & 
+                     input2$subgroup == subgroup & 
                      input2$term == "0_28 days",]$hr
   #Alternative 28 - 196 days
   hr28_196<- input2[input2$event == event & 
                       input2$model == model & 
                       input2$cohort == cohort & 
-                      input2$strata == strata & 
+                      input2$subgroup == subgroup & 
                       input2$term == "28_196 days",]$hr
   #--------------------------------------------------------------------
   #Step2.Calculate the average daily CVD incidence   - in the unexposed
@@ -133,7 +142,7 @@ excess_risk <- function(event, cohort, strata, model) {
   # Return results
   results <- data.frame(event = event,
                         cohort = cohort,
-                        strata = strata,
+                        subgroup = subgroup,
                         model = model,
                         AER_196 = lifetable[nrow(lifetable),]$AER * total_cases,
                         stringsAsFactors = FALSE)
