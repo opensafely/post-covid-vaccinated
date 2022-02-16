@@ -26,8 +26,7 @@ excess_risk <- function(event, cohort, subgroup, model) {
                      df$term == "days84_197"|
                      df$term == "days0_28"|
                      df$term == "days28_197") # RT/RK check
-  input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, 
-                              -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
+  input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   #input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
   #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
   
