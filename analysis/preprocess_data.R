@@ -225,9 +225,11 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   
   tmp$study_start_date <- as.Date(study_start)
   
-  tmp$pat_start_date <- ifelse(j=="vaccinated",
-                                as.Date(tmp$vax_date_covid_2)+14,
-                                as.Date(tmp$vax_date_eligible)+84)
+  if(j=="vaccinated"){
+    tmp$pat_start_date <- as.Date(tmp$vax_date_covid_2)+14
+  }else{
+    tmp$pat_start_date <- as.Date(tmp$vax_date_eligible)+84
+  }
   
   tmp$use_date <- ifelse(tmp$study_start_date>tmp$pat_start_date ,"index","nonindex")
   
