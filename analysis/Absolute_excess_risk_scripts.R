@@ -2,7 +2,7 @@
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
-excess_risk <- function(cohort, event, agegp, sex, ethnicity, prior_history, hospitalisation) {
+excess_risk <- function(event, cohort, strata, model) {
   
   #Import data 
   input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
