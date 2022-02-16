@@ -93,3 +93,4 @@ table_2
 str(table_2)
 
 write.csv(table_2, file= paste0("output/", "table2_", population, ".csv"), row.names = F)
+
