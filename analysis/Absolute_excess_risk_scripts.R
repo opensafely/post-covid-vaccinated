@@ -3,8 +3,17 @@
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
 #Preprocess the AER input data
+library(purrr)
+library(data.table)
 
-
+hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
+hr_files=paste0("output/",hr_files)
+hr_file_paths <- purrr::pmap(list(hr_files),
+                      function(fpath){
+                        df <- fread(fpath)
+                        return(df)
+                      })
+df=rbindlist(hr_file_paths, fill=TRUE)
 
 
 
