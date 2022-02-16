@@ -18,7 +18,7 @@ excess_risk <- function(cohort, event, agegp, sex, ethnicity, prior_history, hos
   #2.unexposed events
   unexposed_events <-  subset(input2, input1$event == event & input1$model == model &
                                 input1$cohort == cohort & input1$strata == strata)
-  unexposed_events <-  as.numeric(unexposed_events$unexposed_events)#Indexing doesn't work as expected in input2.
+  unexposed_events <-  as.numeric(unexposed_events$unexposed_events)#Indexing didn't work, but reconsider after real table.
   
   #3.Total cases
   total_cases <-  subset(input2, input1$event == event & input1$model == model &
