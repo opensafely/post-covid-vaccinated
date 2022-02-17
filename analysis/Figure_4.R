@@ -113,3 +113,14 @@ lifetable$qh <- lifetable$q*lifetable$h
 lifetable$'1-qh' <- 1 - lifetable$qh
 lifetable$sc <- cumprod(lifetable$`1-qh`)
 #-----------------------------------------
+#Step5. Calculate the Absolute excess risk
+#-----------------------------------------
+#Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
+#compared with no COVID-19 diagnosis. 
+
+#AER = Sc-S=difference in absolute risk
+lifetable$AER <- lifetable$sc - lifetable$s
+#AER on day 196 
+AER_196 <- lifetable[nrow(lifetable),]$AER * total_cases
+print(AER_196) # 358.4324
+# 358 excess 'events' happens 196 days after 20266 total covid19 'cases'.
