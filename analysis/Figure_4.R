@@ -19,3 +19,16 @@ hr_file_paths <- purrr::pmap(list(hr_files),
                              })
 df=rbindlist(hr_file_paths, fill=TRUE)
 
+#Preprocess the AER input data
+input2 <- subset(df, df$term == "days0_14" |
+                   df$term == "days14_28" |
+                   df$term == "days28_56" |
+                   df$term == "days56_84" |
+                   df$term == "days84_197"|
+                   df$term == "days0_28"|
+                   df$term == "days28_197") # RT/RK check
+input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
+
+#limit to ATE & VTE outcomes
+input2 <- subset(input2, input2$event == "ate" | input2$event == "vte")
+#---------------------------------
