@@ -71,4 +71,9 @@ hr0_28 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" &
 hr28_196<- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
                     input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days28_196",]$estimate
 
+#--------------------------------------------------------------------
+#Step2.Calculate the average daily CVD incidence   - in the unexposed
+#--------------------------------------------------------------------
+#Number of new events / sum of person-time at risk
 
+incidence_rate <- unexposed_events/fp_person_days
