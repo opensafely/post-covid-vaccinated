@@ -48,3 +48,27 @@ total_cases <-  input2[input2$event == "ate" & input2$model == "mdl_max_adj" &
                          input2$cohort == "vaccinated" & input2$subgroup == "main" & 
                          input2$expo_week== "pre expo",]$total_covid19_cases
 
+#4.locate the estimates
+#0-14 days
+hr_14 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
+                  input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days0_14",]$estimate
+#14-28 days
+hr_28 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
+                  input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days14_28",]$estimate
+#28-56 days
+hr_56 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
+                  input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days28_56",]$estimate
+#56-84 days
+hr_84 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
+                  input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days56_84",]$estimate
+#84-196 days
+hr_196 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
+                   input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days84_197",]$estimate
+#Alternative 0-28 days
+hr0_28 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
+                   input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days0_28",]$estimate
+#Alternative 28 - 196 days
+hr28_196<- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
+                    input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days28_196",]$estimate
+
+
