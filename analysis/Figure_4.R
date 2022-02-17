@@ -77,3 +77,18 @@ hr28_196<- input2[input2$event == "ate" & input2$model == "mdl_max_adj" &
 #Number of new events / sum of person-time at risk
 
 incidence_rate <- unexposed_events/fp_person_days
+
+#-------------------------------------------------------------
+#Step3. Make life table to calculate cumulative risk over time
+#-------------------------------------------------------------
+#Description:Use a life table approach to calculate age- and sex specific cumulative risks over time, - with and without COVID-19. 
+lifetable <- data.frame(c(1:196))
+colnames(lifetable) <- c("days")
+lifetable$event <- "ate"
+lifetable$model <- "mdl_max_adj"
+lifetable$cohort <- "vaccinated"
+lifetable$subgroup <- "main"
+
+lifetable$q <- incidence_rate 
+lifetable$'1-q' <- 1 - lifetable$q 
+lifetable$s <- cumprod(lifetable$`1-q`)
