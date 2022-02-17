@@ -32,3 +32,19 @@ input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -
 #limit to ATE & VTE outcomes
 input2 <- subset(input2, input2$event == "ate" | input2$event == "vte")
 #---------------------------------
+# Step1: Extract the required variables
+#---------------------------------
+#1. Person days
+fp_person_days <- input1[input1$event == "ate" & input1$model == "mdl_max_adj" &
+                           input1$cohort == "vaccinated" & input1$strata == "main",]$person_days#RT/RK/VW -check L
+
+#2.unexposed events
+unexposed_events <-  input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
+                              input2$cohort == "vaccinated" & input2$subgroup == "main" & 
+                              input2$expo_week== "pre expo",]$events_total
+
+#3.Total cases
+total_cases <-  input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
+                         input2$cohort == "vaccinated" & input2$subgroup == "main" & 
+                         input2$expo_week== "pre expo",]$total_covid19_cases
+
