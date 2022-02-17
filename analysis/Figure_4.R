@@ -92,3 +92,24 @@ lifetable$subgroup <- "main"
 lifetable$q <- incidence_rate 
 lifetable$'1-q' <- 1 - lifetable$q 
 lifetable$s <- cumprod(lifetable$`1-q`)
+
+#----------------------------------------
+#Step4. Calculate the daily CVD incidence
+#----------------------------------------
+#Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
+# for that day to derive the incidence on each day after COVID-19. 
+
+#assign the hr estimates
+lifetable$h <- ifelse(lifetable$days < 15, rep(hr_14),0)
+lifetable$h <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28),lifetable$h)
+lifetable$h <- ifelse(lifetable$days < 29 & is.na(lifetable$h), rep(hr0_28),lifetable$h)#alternative for 0-28 days
+
+lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56),lifetable$h)
+lifetable$h <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84),lifetable$h)
+lifetable$h <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196),lifetable$h)
+lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)#alternative for 28-196 days
+
+lifetable$qh <- lifetable$q*lifetable$h
+lifetable$'1-qh' <- 1 - lifetable$qh
+lifetable$sc <- cumprod(lifetable$`1-qh`)
+#-----------------------------------------
