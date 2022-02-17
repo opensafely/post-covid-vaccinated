@@ -124,3 +124,26 @@ lifetable$AER <- lifetable$sc - lifetable$s
 AER_196 <- lifetable[nrow(lifetable),]$AER * total_cases
 print(AER_196) # 358.4324
 # 358 excess 'events' happens 196 days after 20266 total covid19 'cases'.
+
+##########################
+#plotting
+######life table##########
+#convert to AER%
+lifetable$AER_p <- lifetable$AER*100
+plot(lifetable$days, lifetable$AER_p)
+
+p_line<-ggplot(lifetable,
+               aes(x=days,
+                   y=AER_p,
+                   group=1)) +
+  #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
+  #              position=position_dodge(.9))+
+  geom_line(size=1.5)+
+  #geom_point()+
+  scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
+  scale_y_continuous(limits = c(0,2))+
+  labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
+       title = 'AMI')+
+  theme(plot.title = element_text(hjust = 0.5))
+
+p_line
