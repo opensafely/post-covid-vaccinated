@@ -107,14 +107,15 @@ lifetable$h <- ifelse(lifetable$days < 29 & is.na(lifetable$h), rep(hr0_28),life
 lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56),lifetable$h)
 lifetable$h <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84),lifetable$h)
 lifetable$h <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196),lifetable$h)
-lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)#alternative for 28-196 days
+lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)
+#alternative for 28-196 days
 
 lifetable$qh <- lifetable$q*lifetable$h
 lifetable$'1-qh' <- 1 - lifetable$qh
 lifetable$sc <- cumprod(lifetable$`1-qh`)
-#-----------------------------------------
-#Step5. Calculate the Absolute excess risk
-#-----------------------------------------
+#-------------------------------------------
+#Step5. Calculate the Absolute excess risk--
+#-------------------------------------------
 #Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
 #compared with no COVID-19 diagnosis. 
 
@@ -124,6 +125,20 @@ lifetable$AER <- lifetable$sc - lifetable$s
 AER_196 <- lifetable[nrow(lifetable),]$AER * total_cases
 print(AER_196) # 358.4324
 # 358 excess 'events' happens 196 days after 20266 total covid19 'cases'.
+
+#Define empty results table
+Figure_4_table <- data.frame(days = numeric(),
+                             ate_aerp_main = numeric(),
+                             ate_aerp_male = numeric(),
+                             ate_aerp_female = numeric(),
+                             ate_aerp_18_39 = numeric(),
+                             ate_aerp_40_59 = numeric(),
+                             ate_aerp_60 = numeric(),
+                             ate_aerp_main = numeric(),
+                             stringsAsFactors = FALSE)
+
+table(input2$subgroup)
+
 
 ##########################
 #plotting
