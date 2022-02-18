@@ -30,24 +30,9 @@ if(length(args)==0){
 active_analyses <- read_rds("output/active_analyses.rds")
 
 # read in data------------------------------------------------------------
-
-# if(population == "vaccinated"){
-#    input <- read_rds("output/venn_vaccinated.rds")
-#    input_stage1 <- read_rds("output/input_vaccinated_stage1.rds")
-#    input <- input %>% inner_join(input_stage1,by="patient_id")
-#  }
-# 
-# if(population == "electively_unvaccinated"){
-#   input <- read_rds("output/venn_electively_unvaccinated.rds")
-#   input_stage1 <- read_rds("output/input_electively_unvaccinated_stage1.rds")
-#   input <- input %>% inner_join(input_stage1,by="patient_id")
-# }
-
 input <- read_rds(paste0("output/venn_",population,".rds"))
 input_stage1 <- read_rds(paste0("output/input_", population,"_stage1.rds"))
 input <- input %>% inner_join(input_stage1,by="patient_id")
-
-
 
 variable_names <- tidyselect::vars_select(names(input), starts_with(c('tmp_out_date_','out_date'), ignore.case = TRUE))
 input <- input[,variable_names]
@@ -111,7 +96,6 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
   dev.off()
 }
 
-
 # replace this line with the outcome variable name in the active analyses table
 #outcome_full_names_sources <- tidyselect::vars_select(names(input), starts_with('tmp_out_date_', ignore.case = TRUE))
 outcome_variable_names <- active_analyses$outcome_variable[active_analyses$active==T]
@@ -124,22 +108,15 @@ for(i in 1: length(outcome_variable_names))
                                    paste0("tmp_", outcome_variable_names[i], "_death"))
 }
 
-#outcome_full_names_sources2
-
-#outcome_full_names_sources <- outcome_full_names_sources2
-
 outcome_names_sources <- gsub("tmp_out_date_","",outcome_full_names_sources) #delete the prefix
 outcome_names <- gsub("_snomed","",outcome_names_sources) 
 outcome_names <- gsub("_hes","",outcome_names) 
 outcome_names <- gsub("_death","",outcome_names) 
 
-outcome_names
-
-length(unique(outcome_names))
-
 unique_outcome_names <- unique(outcome_names)
 
 count_less_than_5 <- rep("NA", length(unique_outcome_names))
+
 index_lc = 1
 
 #--10 separate svg files, one for each outcome----------------------------------
@@ -157,7 +134,6 @@ for (i in unique_outcome_names){
 
 low_count_df <- data.frame(count_less_than_5, unique_outcome_names)
 low_count_df <- low_count_df %>% mutate(count_less_than_5 = if_else(count_less_than_5 >0, "lower than 5", "No issue"))
-low_count_df
 
 names(low_count_df) <- c("any number < 5?", "outcome name")
 write.csv(low_count_df, file= paste0("output/",population, "_venn_diagram_number_check.csv"), row.names = F)
