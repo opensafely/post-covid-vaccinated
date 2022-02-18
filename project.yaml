@@ -75,19 +75,3 @@ actions:
       moderately_sensitive:
           venn_digram: output/venn_diagram_*.svg
           venn_diagram_number_check: output/venn_diagram_number_check_*.csv
-
-  # venn_diagram_vaccinated:
-  #   run: r:latest analysis/venn_diagram.R vaccinated
-  #   needs: [active_analyses, preprocess_data, stage1_data_cleaning_both]
-  #   outputs:
-  #     moderately_sensitive:
-  #         venn_vaccinated: output/vaccinated_*.svg
-  #         number_check_vaccinated: output/vaccinated_*.csv
-
-  # venn_diagram_electively_unvaccinated:
-  #   run: r:latest analysis/venn_diagram.R electively_unvaccinated
-  #   needs: [active_analyses, preprocess_data, stage1_data_cleaning_both]
-  #   outputs:
-  #     moderately_sensitive:
-  #         venn_electively_unvaccinated: output/electively_unvaccinated_*.svg
-  #         number_check_electively_unvaccinated: output/electively_unvaccinated_*.csv
