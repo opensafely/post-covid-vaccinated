@@ -26,6 +26,11 @@ if(length(args)==0){
 cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
+# indicate active analyses -----------------------------------------------
+
+active_analyses <- read_rds("output/active_analyses.rds")
+
+
 # read in data------------------------------------------------------------
 
 input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
@@ -42,11 +47,13 @@ survival_data <- survival_data %>%
          cohort_end_date = cohort_end)
 
 # automation
-event_dates_names <- tidyselect::vars_select(names(input), starts_with('out_date', ignore.case = TRUE))
-event_dates_names <- tidyselect::vars_select(event_dates_names, !contains(c('diabetes','depression', 'anxiety', 'harm', 'mental','eating','suicide','addiction')))
-event_dates_names
+# event_dates_names <- tidyselect::vars_select(names(input), starts_with('out_date', ignore.case = TRUE))
+# event_dates_names <- tidyselect::vars_select(event_dates_names, !contains(c('diabetes','depression', 'anxiety', 'harm', 'mental','eating','suicide','addiction')))
+# event_dates_names
 
-event_names<- substr(event_dates_names, start=10, stop=nchar(event_dates_names))
+event_names <- active_analyses$outcome_variable[which(active_analyses$active==T)]
+
+event_names<- event_names <- gsub("out_date_","",event_dates_names)
 event_names
 
 col_headings <- c("event", "event_count", "pearson_years_follow_up", "incidence_rate")
