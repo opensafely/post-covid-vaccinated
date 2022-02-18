@@ -14,7 +14,6 @@
 ## Output:   Venn diagrams in SVG files, venn_diagram_number_check.csv
 ## =============================================================================
 
-
 library(readr); library("ggvenn"); library("svglite"); library("gridExtra")
 
 args <- commandArgs(trailingOnly=TRUE)
@@ -27,7 +26,7 @@ if(length(args)==0){
   population <- args[[1]]
 }
 
-# indicate active analyses -----------------------------------------------
+# to prepare for extracting outcome variable names in the current analyses ---------------------------
 active_analyses <- read_rds("output/active_analyses.rds")
 
 venn_output <- function(population){
@@ -40,7 +39,6 @@ venn_output <- function(population){
   input <- input[,variable_names]
   
   #-- function to check number < 5 in the venn diagram ---------------------------
-  
   count_le5 <- function(outcome_names)
   {
     print(outcome_names)
@@ -67,9 +65,7 @@ venn_output <- function(population){
     return(low_count)
   }
   
-  
   #-- function to create venn diagram --------------------------------------------
-  
   venn_digram <- function(outcome_names, figure_name, figure_title)
   {
     print(outcome_names)
@@ -135,7 +131,7 @@ venn_output <- function(population){
   }
   
   low_count_df <- data.frame(count_less_than_5, unique_outcome_names)
-  low_count_df <- low_count_df %>% mutate(count_less_than_5 = if_else(count_less_than_5 >0, "lower than 5", "No issue"))
+  low_count_df <- low_count_df %>% mutate(count_less_than_5 = if_else(count_less_than_5>0, "lower than 5", "No issue"))
   
   names(low_count_df) <- c("any number < 5?", "outcome name")
   write.csv(low_count_df, file= paste0("output/","venn_diagram_number_check_", population,".csv"), row.names = F)
