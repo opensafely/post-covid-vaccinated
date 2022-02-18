@@ -70,7 +70,7 @@ actions:
 
   venn_diagram_vaccinated:
     run: r:latest analysis/venn_diagram.R vaccinated
-    needs: [preprocess_data, stage1_data_cleaning_both]
+    needs: [active_analyses, preprocess_data, stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
           venn_vaccinated: output/vaccinated_*.svg
@@ -78,7 +78,7 @@ actions:
 
   venn_diagram_electively_unvaccinated:
     run: r:latest analysis/venn_diagram.R electively_unvaccinated
-    needs: [preprocess_data, stage1_data_cleaning_both]
+    needs: [active_analyses, preprocess_data, stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
           venn_electively_unvaccinated: output/electively_unvaccinated_*.svg
