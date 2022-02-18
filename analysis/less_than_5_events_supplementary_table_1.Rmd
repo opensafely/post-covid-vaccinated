@@ -15,7 +15,7 @@ knitr::opts_knit$set(root.dir = gsub("/analysis","",getwd()))
 ## Supplementary Table 1
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-df=read_csv("output/HRs_less_than_5_supplementary_table_1.csv")
+df=read_csv("output/less_than_5_events_supplementary_table_1.csv")
 df %>%
     datatable(extensions = 'Buttons',
               options = list(dom = 'Blfrtip',
