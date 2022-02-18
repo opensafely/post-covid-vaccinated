@@ -19,24 +19,35 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  population <- "vaccinated"
+  #population <- "vaccinated"
+  pouplation <- "electively_unvaccinated"
 } else {
   population <- args[[1]]
 }
 
+# indicate active analyses -----------------------------------------------
+
+active_analyses <- read_rds("output/active_analyses.rds")
+
 # read in data------------------------------------------------------------
 
-if(population == "vaccinated"){
-   input <- read_rds("output/venn_vaccinated.rds")
-   input_stage1 <- read_rds("output/input_vaccinated_stage1.rds")
-   input <- input %>% inner_join(input_stage1,by="patient_id")
- }
+# if(population == "vaccinated"){
+#    input <- read_rds("output/venn_vaccinated.rds")
+#    input_stage1 <- read_rds("output/input_vaccinated_stage1.rds")
+#    input <- input %>% inner_join(input_stage1,by="patient_id")
+#  }
+# 
+# if(population == "electively_unvaccinated"){
+#   input <- read_rds("output/venn_electively_unvaccinated.rds")
+#   input_stage1 <- read_rds("output/input_electively_unvaccinated_stage1.rds")
+#   input <- input %>% inner_join(input_stage1,by="patient_id")
+# }
 
-if(population == "electively_unvaccinated"){
-  input <- read_rds("output/venn_electively_unvaccinated.rds")
-  input_stage1 <- read_rds("output/input_electively_unvaccinated_stage1.rds")
-  input <- input %>% inner_join(input_stage1,by="patient_id")
-}
+input <- read_rds(paste0("output/venn_",population,".rds"))
+input_stage1 <- read_rds(paste0("output/input_", population,"_stage1.rds"))
+input <- input %>% inner_join(input_stage1,by="patient_id")
+
+
 
 variable_names <- tidyselect::vars_select(names(input), starts_with(c('tmp_out_date_','out_date'), ignore.case = TRUE))
 input <- input[,variable_names]
@@ -101,7 +112,22 @@ venn_digram <- function(outcome_names, figure_name, figure_title)
 }
 
 
-outcome_full_names_sources <- tidyselect::vars_select(names(input), starts_with('tmp_out_date_', ignore.case = TRUE))
+# replace this line with the outcome variable name in the active analyses table
+#outcome_full_names_sources <- tidyselect::vars_select(names(input), starts_with('tmp_out_date_', ignore.case = TRUE))
+outcome_variable_names <- active_analyses$outcome_variable[active_analyses$active==T]
+outcome_full_names_sources <- NULL
+for(i in 1: length(outcome_variable_names))
+{
+  outcome_full_names_sources <- c(outcome_full_names_sources,
+                                   paste0("tmp_", outcome_variable_names[i], "_snomed"),
+                                   paste0("tmp_", outcome_variable_names[i], "_hes"),
+                                   paste0("tmp_", outcome_variable_names[i], "_death"))
+}
+
+#outcome_full_names_sources2
+
+#outcome_full_names_sources <- outcome_full_names_sources2
+
 outcome_names_sources <- gsub("tmp_out_date_","",outcome_full_names_sources) #delete the prefix
 outcome_names <- gsub("_snomed","",outcome_names_sources) 
 outcome_names <- gsub("_hes","",outcome_names) 
