@@ -2,6 +2,8 @@
 ## Purpose:  Create Table 2
 ## 
 ## Author:   Yinghui Wei
+##
+## Reviewer: Rochelle Knight
 ## 
 ## Date:     13 January 2022
 ##
@@ -47,22 +49,16 @@ survival_data <- survival_data %>%
          cohort_end_date = cohort_end)
 
 # automation
-# event_dates_names <- tidyselect::vars_select(names(input), starts_with('out_date', ignore.case = TRUE))
-# event_dates_names <- tidyselect::vars_select(event_dates_names, !contains(c('diabetes','depression', 'anxiety', 'harm', 'mental','eating','suicide','addiction')))
-# event_dates_names
-
 event_names <- active_analyses$outcome_variable[which(active_analyses$active==T)]
 
 event_names<- event_names <- gsub("out_date_","",event_dates_names)
 event_names
 
-col_headings <- c("event", "event_count", "pearson_years_follow_up", "incidence_rate")
+col_headings <- c("event", "event_count", "person_years_follow_up", "incidence_rate")
 table_2 <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
 colnames(table_2) <- col_headings
 table_2$event <- event_names
-table_2
 
-# comment: patient_id = 6672, hist(survival_data$follow_up_period) - this indicates missing data
 summary_stats <- function(population, survival_data, event_dates_names, index)
 {
   survival_data$event_date <- survival_data[,event_dates_names[index]]
@@ -74,9 +70,9 @@ summary_stats <- function(population, survival_data, event_dates_names, index)
     survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
   }
   # follow-up days
-  survival_data = survival_data %>% mutate(follow_up_period = as.numeric((as.Date(follow_up_end) - as.Date(index_date))))
-  #hist(survival_data$follow_up_period)
-  survival_data = survival_data %>% filter(follow_up_period >0 & follow_up_period < 197) # filter out follow up period 
+  survival_data = survival_data %>% mutate(follow_up_period = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1) 
+  #hist(survival_data$follow_up_period)  ## check if there are any negative follow-up periods
+  survival_data = survival_data %>% filter(follow_up_period >=0 & follow_up_period < 197) # filter out follow up period 
   survival_data = survival_data %>% mutate(follow_up_years = follow_up_period / 365.2) # follow-up years
   # check that the event dates are within the follow up period
   event_count <- length(which(survival_data$event_date >= survival_data$index_date  & survival_data$event_date<= survival_data$follow_up_end))
@@ -88,10 +84,6 @@ summary_stats <- function(population, survival_data, event_dates_names, index)
 for(i in 1:length(event_dates_names)){
   table_2[i,2:4] <- summary_stats(population, survival_data, event_dates_names, i)
 }
-
-table_2
-
-str(table_2)
 
 write.csv(table_2, file= paste0("output/", "table2_", population, ".csv"), row.names = F)
 
