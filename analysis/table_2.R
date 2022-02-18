@@ -28,13 +28,7 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 # read in data------------------------------------------------------------
 
-if(population == "vaccinated"){
-  input <- read_rds("output/input_vaccinated_stage1.rds")
-}
-
-if(population == "electively_unvaccinated"){
-  input <- read_rds("output/input_electively_unvaccinated_stage1.rds")
-}
+input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
 
 # record variable names for covariate
 vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
