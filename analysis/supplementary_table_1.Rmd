@@ -1,0 +1,27 @@
+---
+title: "Supplementary Table 1"
+output: html_document
+---
+Supplementary table 1: contains hazard ratios for all outcomes of interest for main, COVID phenotype and prior COVID history analysis.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(DT)
+library(readr)
+knitr::opts_knit$set(root.dir = gsub("/analysis","",getwd()))
+```
+
+## Supplementary Table 1
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df=read_csv("output/supplementary_table_1.csv")
+df %>%
+    datatable(extensions = 'Buttons',
+              options = list(dom = 'Blfrtip',
+                             buttons = c('copy', 'csv', 'excel', 'pdf', 'print' ),
+                             lengthMenu = list(c(50,-1),
+                                               c(50,"All"))))
+```
+
+

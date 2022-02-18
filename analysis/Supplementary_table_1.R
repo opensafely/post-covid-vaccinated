@@ -5,6 +5,7 @@ library(ggplot2)
 library(utils)
 library(data.table)
 library(purrr)
+library(markdown)
 
 
 #-----------------------Determine active outcome events-------------------------
@@ -107,12 +108,20 @@ combined_hr_counts$cohort <- factor(combined_hr_counts$cohort, levels = c("vacci
 
 combined_hr_counts <- combined_hr_counts[order(combined_hr_counts$outcome,combined_hr_counts$cohort, combined_hr_counts$tidy_subgroup,combined_hr_counts$type),]
 
+time_periods <- colnames(combined_hr_counts)[grepl("^days",colnames(combined_hr_counts))]
+df <- combined_hr_counts %>% 
+                          filter(type=="Event count") %>% 
+                          mutate_at(vars(time_periods), ~as.numeric(.)) %>% 
+                          filter_at(vars(time_periods), any_vars(.<5))
+
+
 # Save as .csv------------------------------------------------------------------
-write.csv(combined_hr_counts,paste0("output/supplementary_table_1.csv")) 
+write_csv(combined_hr_counts,paste0("output/supplementary_table_1.csv")) 
+write.csv(df,paste0("output/HRs_less_than_5_supplementary_table_1.csv"),row.names=F) 
 
+# Save a html of the results for easy reading in Level 4 server-----------------
 
-
-
-
+rmarkdown::render("analysis/supplementary_table_1.Rmd",output_file="supplementary_table_1",output_dir="output")
+rmarkdown::render("analysis/less_than_5_events_supplementary_table_1.Rmd",output_file="less_than_5_events_supplementary_table_1",output_dir="output")
 
 
