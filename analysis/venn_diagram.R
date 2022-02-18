@@ -128,7 +128,7 @@ for (i in unique_outcome_names){
   venn_outcome <- outcome_full_names_sources[index]
   print(venn_outcome)
   if(length(venn_outcome)!=3){print("number of data sources > 3!")}
-  figure_name = figure_title <- paste0(population, "_", i)
+  figure_name = figure_title <- paste0("venn_diagram_",population, "_", i)
   venn_digram(venn_outcome,figure_name, figure_title)
   count_less_than_5[index_lc] <- count_le5(venn_outcome)
   index_lc = index_lc +1
@@ -138,4 +138,4 @@ low_count_df <- data.frame(count_less_than_5, unique_outcome_names)
 low_count_df <- low_count_df %>% mutate(count_less_than_5 = if_else(count_less_than_5 >0, "lower than 5", "No issue"))
 
 names(low_count_df) <- c("any number < 5?", "outcome name")
-write.csv(low_count_df, file= paste0("output/",population, "_venn_diagram_number_check.csv"), row.names = F)
+write.csv(low_count_df, file= paste0("output/","venn_diagram_number_check_", population,".csv"), row.names = F)
