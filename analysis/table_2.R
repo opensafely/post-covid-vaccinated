@@ -49,7 +49,7 @@ survival_data <- survival_data %>%
          cohort_end_date = cohort_end)
 
 # automation
-event_names <- active_analyses$outcome_variable[which(active_analyses$active==T)]
+event_dates_names <- active_analyses$outcome_variable[which(active_analyses$active==T)]
 
 event_names<- event_names <- gsub("out_date_","",event_dates_names)
 event_names
