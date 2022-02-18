@@ -2,7 +2,9 @@
 ## Purpose:  Create venn diagrams
 ## 
 ## Author:   Yinghui Wei
-## 
+##
+## Reviewer: Renin Toms, Venexia Walker
+##
 ## Date:     6 December 2021; updated 10 January 2022; updated 27 January 2022
 ##
 ## Data:     Post covid vaccinated project study population
