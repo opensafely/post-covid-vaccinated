@@ -101,6 +101,6 @@ table_2_output <- function(population){
 if(population == "both"){
   table_2_output("electively_unvaccinated")
   table_2_output("vaccinated")
-} else{
+}else{
   table_2_output(population)
 }
