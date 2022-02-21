@@ -98,6 +98,7 @@ if(length(event_count_done)>0){
   
   df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
   write.csv(df_event_counts, paste0(output_dir,"/compiled_event_counts_", event_name, ".csv") , row.names=F)
+  rmarkdown::render("analysis/compiled_event_counts.Rmd",output_file=paste0("/compiled_event_counts_",event_name),output_dir="output")
   
 }else if(length(event_count_done)==0){
   no_event_counts=data.frame(matrix(nrow = 1,ncol = 1))
@@ -142,6 +143,7 @@ if(length(results_done)>0){
   no_results=data.frame(matrix(nrow = 1,ncol = 1))
   colnames(no_results)="no_results"
   write.csv(no_results,paste0(output_dir,"/compiled_HR_results_",event_name, ".csv") , row.names=F)
+  rmarkdown::render("analysis/compiled_HR_results.Rmd",output_file=paste0("/compiled_HR_results_",event_name),output_dir="output")
   
 }
 
