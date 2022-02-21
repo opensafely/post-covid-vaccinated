@@ -103,6 +103,7 @@ if(length(event_count_done)>0){
   no_event_counts=data.frame(matrix(nrow = 1,ncol = 1))
   colnames(no_event_counts)="no_results"
   write.csv(no_event_counts,paste0(output_dir,"/compiled_event_counts_",event_name, ".csv") , row.names=F)
+  rmarkdown::render("analysis/compiled_event_counts.Rmd",output_file=paste0("/compiled_event_counts_",event_name),output_dir="output")
 }  
 
 
@@ -135,6 +136,7 @@ if(length(results_done)>0){
                                                                event,subgroup,model,cohort,covariates_removed,cat_covars_collapsed,total_covid19_cases)
   
   write.csv(combined_hr_event_counts,paste0(output_dir,"/compiled_HR_results_",event_name ,".csv") , row.names=F)
+  rmarkdown::render("analysis/compiled_HR_results.Rmd",output_file=paste0("/compiled_HR_results_",event_name),output_dir="output")
   
 }else if(length(results_done)==0){
   no_results=data.frame(matrix(nrow = 1,ncol = 1))
