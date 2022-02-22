@@ -69,7 +69,7 @@ actions:
         Descriptive_Table: output/Table1_*.csv
   
   figure_2_covid_severity:
-    run: r:latest analysis/Figure_2_COVID-19_phenotype_plot.R
+    run: r:latest analysis/Figure_2_COVID-19_phenotype_plot.R both
     needs: [active_analyses,analysis_cox_ami,analysis_cox_stroke_isch,analysis_cox_dvt,analysis_cox_pe,analysis_cox_tia,analysis_cox_stroke_sah_hs,analysis_cox_hf,analysis_cox_angina,analysis_cox_ate,analysis_cox_vte]
     outputs:
       moderately_sensitive:
