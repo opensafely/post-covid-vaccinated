@@ -16,6 +16,8 @@ events$outcome_variable <- gsub("out_date_","",events$outcome_variable)
 #--------Load HR results-------------------
 hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
 
+hr_files=hr_files[endsWith(hr_files,".csv")]
+
 hr_files=paste0("output/",hr_files)
 
 hr_file_paths <- pmap(list(hr_files), 
