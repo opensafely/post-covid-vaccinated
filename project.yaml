@@ -64,3 +64,10 @@ actions:
         IE_criteria: output/Cohort_flow_vaccinated.csv
       highly_sensitive:
         cohort: output/input_vaccinated_stage1.rds
+  
+  figure_2_covid_severity:
+    run: r:latest analysis/Figure_2_COVID-19_phenotype_plot.R
+    needs: [active_analyses,analysis_cox_ami,analysis_cox_stroke_isch,analysis_cox_dvt,analysis_cox_pe,analysis_cox_tia,analysis_cox_stroke_sah_hs,analysis_cox_hf,analysis_cox_angina,analysis_cox_ate,analysis_cox_vte]
+    outputs:
+      moderately_sensitive:
+        figure_2: figure2_COVID_phenotype_*.png
