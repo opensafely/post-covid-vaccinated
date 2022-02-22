@@ -255,16 +255,3 @@ for(i in cohort){
     ggplot2::ggsave(paste0("output/figure_3_",j,"_",i, ".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
   }      
 }
-
-
-    
-
-
-
-
-
-
-
-
-
-
