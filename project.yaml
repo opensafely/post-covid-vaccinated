@@ -4,7 +4,6 @@ expectations:
 
   population_size: 500000
 
-
 actions:
   active_analyses:
     run: r:latest analysis/active_analyses.R
