@@ -67,3 +67,10 @@ actions:
         Missing_RangeChecks: output/Check_missing_range_*.csv
         DateChecks: output/Check_dates_range_*.csv
         Descriptive_Table: output/Table1_*.csv
+  
+  figure_3_subgroup:
+    run: r:latest analysis\Figure_3_subgroup_age_sex_ethnicity_prior_history_plot.R both
+    needs: [active_analyses,analysis_cox_ami,analysis_cox_stroke_isch,analysis_cox_dvt,analysis_cox_pe,analysis_cox_tia,analysis_cox_stroke_sah_hs,analysis_cox_hf,analysis_cox_angina,analysis_cox_ate,analysis_cox_vte]
+    outputs:
+      moderately_sensitive:
+        figure_3: output/figure_3_*.png
