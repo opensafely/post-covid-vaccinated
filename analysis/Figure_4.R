@@ -9,141 +9,120 @@ strata <- "main"
 fit <- "mdl_max_adj"
 
 figure4 <- function(outcome, group, strata, fit){
+  
   library(purrr)
   library(data.table)
   library(tidyverse)
   
-#Import data 
-input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
-#input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
-#input2- Import data
-hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
-hr_files=paste0("output/",hr_files)
-input2 <- purrr::pmap(list(hr_files),
-                      function(fpath){
-                        df <- fread(fpath)
-                        return(df)
-                      })
-input2=rbindlist(input2, fill=TRUE)
-
-#Preprocess the AER input data
-input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
-input2 <- input2 %>% filter(term == "days0_14" |
-                              term == "days14_28" |
-                              term == "days28_56" |
-                              term == "days56_84" |
-                              term == "days84_197"|
-                              term == "days0_28"|
-                              term == "days28_197") # RT/RK check
-#limit to ATE & VTE outcomes
-input2 <- input2 %>% filter(event=="ate" | event=="vte")
-
-# Identify subgroups
-subgroups <- input2$subgroup    
-
-# Loop the outcome
-for (subgroup in subgroups) {
+  #Import data 
+  input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
+  #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
+  #input2- Import data
+  hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
+  hr_files=paste0("output/",hr_files)
+  input2 <- purrr::pmap(list(hr_files),
+                        function(fpath){
+                          df <- fread(fpath)
+                          return(df)
+                        })
+  input2=rbindlist(input2, fill=TRUE)
   
-#---------------------------------
-# Step1: Extract the required variables
-#---------------------------------
-#set specifications
-specified <-  input1$event == "ate" & 
-              input1$model == "mdl_max_adj" &
-              input1$cohort == "vaccinated" & 
-              input1$strata == subgroup
-
-#1. Person days
-fp_person_days <- input1[specified,]$person_days#RT/RK/VW -check L
-
-#2.unexposed events
-unexposed_events <-  input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                              input2$cohort == "vaccinated" & input2$subgroup == subgroup & 
-                              input2$expo_week== "pre expo",]$events_total
-
-#3.Total cases
-total_cases <-  input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                         input2$cohort == "vaccinated" & input2$subgroup == subgroup & 
-                         input2$expo_week== "pre expo",]$total_covid19_cases
-
-#4.locate the estimates
-#0-14 days
-hr_14 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                  input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days0_14",]$estimate
-#14-28 days
-hr_28 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                  input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days14_28",]$estimate
-#28-56 days
-hr_56 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                  input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days28_56",]$estimate
-#56-84 days
-hr_84 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                  input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days56_84",]$estimate
-#84-196 days
-hr_196 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                   input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days84_197",]$estimate
-#Alternative 0-28 days
-hr0_28 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                   input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days0_28",]$estimate
-#Alternative 28 - 196 days
-hr28_196<- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                    input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days28_196",]$estimate
-
-#--------------------------------------------------------------------
-#Step2.Calculate the average daily CVD incidence   - in the unexposed
-#--------------------------------------------------------------------
-#Number of new events / sum of person-time at risk
-
-incidence_rate <- unexposed_events/fp_person_days
-
-#-------------------------------------------------------------
-#Step3. Make life table to calculate cumulative risk over time
-#-------------------------------------------------------------
-#Description:Use a life table approach to calculate age- and sex specific cumulative risks over time, - with and without COVID-19. 
-lifetable <- data.frame(c(1:196))
-colnames(lifetable) <- c("days")
-lifetable$event <- "ate"
-lifetable$model <- "mdl_max_adj"
-lifetable$cohort <- "vaccinated"
-lifetable$subgroup <- subgroup
-
-lifetable$q <- incidence_rate 
-lifetable$'1-q' <- 1 - lifetable$q 
-lifetable$s <- cumprod(lifetable$`1-q`)
-
-#----------------------------------------
-#Step4. Calculate the daily CVD incidence
-#----------------------------------------
-#Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
-# for that day to derive the incidence on each day after COVID-19. 
-
-#assign the hr estimates
-lifetable$h <- ifelse(lifetable$days < 15, rep(hr_14),0)
-lifetable$h <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28),lifetable$h)
-lifetable$h <- ifelse(lifetable$days < 29 & is.na(lifetable$h), rep(hr0_28),lifetable$h)#alternative for 0-28 days
-
-lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56),lifetable$h)
-lifetable$h <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84),lifetable$h)
-lifetable$h <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196),lifetable$h)
-lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)
-#alternative for 28-196 days
-
-lifetable$qh <- lifetable$q*lifetable$h
-lifetable$'1-qh' <- 1 - lifetable$qh
-lifetable$sc <- cumprod(lifetable$`1-qh`)
-#-------------------------------------------
-#Step5. Calculate the Absolute excess risk--
-#-------------------------------------------
-#Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
-#compared with no COVID-19 diagnosis. 
-
-#AER = Sc-S=difference in absolute risk
-lifetable$AER <- lifetable$sc - lifetable$s
-lifetable$AERp<-lifetable$AER*100
-
-#Define empty results table
-Figure_4<- data.frame(days = (1:196))
-Figure_4$AERp_main <- lifetable$AERp
+  #Preprocess the AER input data
+  input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
+  input2 <- input2 %>% filter(term == "days0_14" |
+                                term == "days14_28" |
+                                term == "days28_56" |
+                                term == "days56_84" |
+                                term == "days84_197"|
+                                term == "days0_28"|
+                                term == "days28_197") # RT/RK check
+  #---------------------------------
+  # Step1: Extract the required variables
+  #---------------------------------
+  #1. Person days
+  fp_person_days <- input1[input1$event == outcome & input1$model == fit  &
+                             input1$cohort == group & input1$strata == strata,]$person_days#RT/RK/VW -check L
+  #2.unexposed events
+  unexposed_events <- input2[input2$event == outcome & input2$model == fit  & 
+                               input2$cohort == group & input2$subgroup == strata & 
+                               input2$expo_week== "pre expo",]$events_total
+  #3.Total cases
+  total_cases <-  input2[input2$event == outcome & input2$model == fit  & 
+                           input2$cohort == group & input2$subgroup == strata & 
+                           input2$expo_week== "pre expo",]$total_covid19_cases
+  #4.locate the estimates
+  #0-14 days
+  hr_14 <- input2[input2$event == outcome  & input2$model == fit  & 
+                    input2$cohort == group & input2$subgroup == strata& input2$term == "days0_14",]$estimate
+  #14-28 days
+  hr_28 <- input2[input2$event == outcome & input2$model == fit  & 
+                    input2$cohort == group & input2$subgroup == strata& input2$term == "days14_28",]$estimate
+  #28-56 days
+  hr_56 <- input2[input2$event == outcome & input2$model == fit  & 
+                    input2$cohort == group & input2$subgroup == strata& input2$term == "days28_56",]$estimate
+  #56-84 days
+  hr_84 <- input2[input2$event == outcome & input2$model == fit  & 
+                    input2$cohort == group & input2$subgroup == strata& input2$term == "days56_84",]$estimate
+  #84-196 days
+  hr_196 <- input2[input2$event == outcome & input2$model == fit  & 
+                     input2$cohort == group & input2$subgroup == strata& input2$term == "days84_197",]$estimate
+  #Alternative 0-28 days
+  hr0_28 <- input2[input2$event == outcome  & input2$model == fit  & 
+                     input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$estimate
+  #Alternative 28 - 196 days
+  hr28_196<- input2[input2$event == outcome  & input2$model == fit  & 
+                      input2$cohort == group & input2$subgroup == strata& input2$term == "days28_196",]$estimate
+  #--------------------------------------------------------------------
+  #Step2.Calculate the average daily CVD incidence   - in the unexposed
+  #--------------------------------------------------------------------
+  #Number of new events / sum of person-time at risk
+  
+  incidence_rate <- unexposed_events/fp_person_days
+  
+  #-------------------------------------------------------------
+  #Step3. Make life table to calculate cumulative risk over time
+  #-------------------------------------------------------------
+  #Description:Use a life table approach to calculate age- and sex specific cumulative risks over time, - with and without COVID-19. 
+  lifetable <- data.frame(c(1:196))
+  colnames(lifetable) <- c("days")
+  lifetable$event <- outcome 
+  lifetable$model <- fit 
+  lifetable$cohort <- group
+  lifetable$subgroup <- strata
+  
+  lifetable$q <- incidence_rate 
+  lifetable$'1-q' <- 1 - lifetable$q 
+  lifetable$s <- cumprod(lifetable$`1-q`)
+  
+  #----------------------------------------
+  #Step4. Calculate the daily CVD incidence
+  #----------------------------------------
+  #Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
+  # for that day to derive the incidence on each day after COVID-19. 
+  
+  #assign the hr estimates
+  lifetable$h <- ifelse(lifetable$days < 15, rep(hr_14),0)
+  lifetable$h <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28),lifetable$h)
+  lifetable$h <- ifelse(lifetable$days < 29 & is.na(lifetable$h), rep(hr0_28),lifetable$h)#alternative for 0-28 days
+  
+  lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56),lifetable$h)
+  lifetable$h <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84),lifetable$h)
+  lifetable$h <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196),lifetable$h)
+  lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)
+  #alternative for 28-196 days
+  
+  lifetable$qh <- lifetable$q*lifetable$h
+  lifetable$'1-qh' <- 1 - lifetable$qh
+  lifetable$sc <- cumprod(lifetable$`1-qh`)
+  #-------------------------------------------
+  #Step5. Calculate the Absolute excess risk--
+  #-------------------------------------------
+  #Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
+  #compared with no COVID-19 diagnosis. 
+  
+  #AER = Sc-S=difference in absolute risk
+  lifetable$AER <- lifetable$sc - lifetable$s
+  lifetable$AERp <-lifetable$AER*100
 }
 
 
