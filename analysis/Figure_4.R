@@ -12,25 +12,24 @@ input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
 #Import data
 hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
 hr_files=paste0("output/",hr_files)
-hr_file_paths <- purrr::pmap(list(hr_files),
+input2 <- purrr::pmap(list(hr_files),
                              function(fpath){
                                df <- fread(fpath)
                                return(df)
                              })
-df=rbindlist(hr_file_paths, fill=TRUE)
+input2=rbindlist(input2, fill=TRUE)
 
 #Preprocess the AER input data
-input2 <- subset(df, df$term == "days0_14" |
-                   df$term == "days14_28" |
-                   df$term == "days28_56" |
-                   df$term == "days56_84" |
-                   df$term == "days84_197"|
-                   df$term == "days0_28"|
-                   df$term == "days28_197") # RT/RK check
 input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
-
+input2 <- input2 %>% filter(term == "days0_14" |
+                            term == "days14_28" |
+                            term == "days28_56" |
+                            term == "days56_84" |
+                            term == "days84_197"|
+                            term == "days0_28"|
+                            term == "days28_197") # RT/RK check
 #limit to ATE & VTE outcomes
-input2 <- subset(input2, input2$event == "ate" | input2$event == "vte")
+input2 <- input2 %>% filter(event=="ate" | event=="vte")
 #---------------------------------
 # Step1: Extract the required variables
 #---------------------------------
