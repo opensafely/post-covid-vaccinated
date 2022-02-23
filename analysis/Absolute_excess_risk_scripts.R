@@ -8,34 +8,34 @@ excess_risk <- function(event, cohort, subgroup, model) {
   library(data.table)
   library(tidyverse)
   
-  #Import data
+  #Import data 
+  input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
+  #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
+  #input2- Import data
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
   hr_files=paste0("output/",hr_files)
-  hr_file_paths <- purrr::pmap(list(hr_files),
-                               function(fpath){
-                                 df <- fread(fpath)
-                                 return(df)
-                               })
-  df=rbindlist(hr_file_paths, fill=TRUE)
+  input2 <- purrr::pmap(list(hr_files),
+                        function(fpath){
+                          df <- fread(fpath)
+                          return(df)
+                        })
+  input2=rbindlist(input2, fill=TRUE)
   
   #Preprocess the AER input data
-  input2 <- subset(df, df$term == "days0_14" |
-                     df$term == "days14_28" |
-                     df$term == "days28_56" |
-                     df$term == "days56_84" |
-                     df$term == "days84_197"|
-                     df$term == "days0_28"|
-                     df$term == "days28_197") # RT/RK check
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
-  #input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
-  #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
-  
-  #---------------------------------
+  input2 <- input2 %>% filter(term == "days0_14" |
+                                term == "days14_28" |
+                                term == "days28_56" |
+                                term == "days56_84" |
+                                term == "days84_197"|
+                                term == "days0_28"|
+                                term == "days28_197") # RT/RK check
+  #--------------------------------------
   # Step1: Extract the required variables
-  #---------------------------------
+  #--------------------------------------
   #1. Person days
   fp_person_days <- input1[input1$event == event & input1$model == model &
-                             input1$cohort == cohort & input1$subgroup == subgroup,]$person_days #RT/RK/VW -check L
+                             input1$cohort == cohort & input1$strata == subgroup,]$person_days #RT/RK/VW -check L
   
   #2.unexposed events
   unexposed_events <-  input2[input2$event == event & input2$model == model & 
@@ -186,3 +186,7 @@ p_line
               #16.AERp_ate_hospitalised
               #17.AERp_ate_not_hospitalised
 
+excess_risk(event <- "ate",
+            cohort <- "vaccinated",
+            subgroup <- "main",
+            model <- "mdl_max_adj")
