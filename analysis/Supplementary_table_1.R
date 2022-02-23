@@ -119,7 +119,7 @@ df <- combined_hr_counts %>%
 
 # Save as .csv------------------------------------------------------------------
 write_csv(combined_hr_counts,paste0("output/supplementary_table_1.csv")) 
-write_csv(df,paste0("output/less_than_5_events_supplementary_table_1.csv"),row.names=F) 
+write_csv(df,paste0("output/less_than_5_events_supplementary_table_1.csv")) 
 
 # Save a html of the results for easy reading in Level 4 server-----------------
 
