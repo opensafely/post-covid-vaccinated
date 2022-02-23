@@ -130,7 +130,7 @@ figure4 <- function(group, fit, outcome, strata){
 #group <- "vaccinated"
 #fit <- "mdl_max_adj"
 #outcome <- "vte"
-#strata <- "main"
+stratas <- c("main", "sex_Male")
 
 #output life tables
 #subgroups = 18
