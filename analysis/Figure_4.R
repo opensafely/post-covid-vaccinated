@@ -2,13 +2,12 @@
 #Branch:Figure4_graphical plotting of the estimated AER of ATE and VTE 
 #Scripts: Renin Toms
 
-
-outcome <- "vte"
 group <- "vaccinated"
-strata <- "main"
 fit <- "mdl_max_adj"
+outcome <- "vte"
+strata <- "main"
 
-figure4 <- function(outcome, group, strata, fit){
+figure4 <- function(group, fit, outcome, strata){
   
   library(purrr)
   library(data.table)
@@ -124,9 +123,29 @@ figure4 <- function(outcome, group, strata, fit){
   lifetable$AER <- lifetable$sc - lifetable$s
   lifetable$AERp <-lifetable$AER*100
   
-  write.csv(lifetable, paste0("output/lifetable_" , group, "_", strata, "_", outcome, "_", fit,".csv"), row.names = F)
+  write.csv(lifetable, paste0("output/lifetable_" , group, "_", fit, "_", outcome, "_", strata,".csv"), row.names = F)
   
 }
+
+group <- "vaccinated"
+fit <- "mdl_max_adj"
+outcome <- "vte"
+strata <- "main"
+
+#output life tables
+#model =2
+figure4("ate","vaccinated","main","mdl_max_adj")
+
+figure4("ate","vaccinated","main","mdl_agesex")
+
+#subgroups =2
+figure4("ate","vaccinated","main","mdl_max_adj")
+figure4("ate","vaccinated","main","mdl_agesex")
+
+
+figure4("ate","electively_unvaccinated","main","mdl_max_adj")
+
+figure4("vte","vaccinated","main","mdl_max_adj")
 
 
 
