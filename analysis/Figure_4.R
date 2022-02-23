@@ -123,6 +123,9 @@ figure4 <- function(outcome, group, strata, fit){
   #AER = Sc-S=difference in absolute risk
   lifetable$AER <- lifetable$sc - lifetable$s
   lifetable$AERp <-lifetable$AER*100
+  
+  write.csv(lifetable, paste0("output/lifetable_" , group, "_", strata, "_", outcome, "_", fit,".csv"), row.names = F)
+  
 }
 
 
