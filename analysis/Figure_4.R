@@ -2,15 +2,17 @@
 #Branch:Figure4_graphical plotting of the estimated AER of ATE and VTE 
 #Scripts: Renin Toms
 
-library(purrr)
-library(data.table)
-library(tidyverse)
 
 outcome <- "vte"
 group <- "vaccinated"
 strata <- "main"
 fit <- "mdl_max_adj"
 
+figure4 <- function(outcome, group, strata, fit){
+  library(purrr)
+  library(data.table)
+  library(tidyverse)
+  
 #Import data 
 input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
 #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
@@ -142,6 +144,10 @@ lifetable$AERp<-lifetable$AER*100
 #Define empty results table
 Figure_4<- data.frame(days = (1:196))
 Figure_4$AERp_main <- lifetable$AERp
+}
+
+
+
 ##########################
 #plotting
 ######life table##########
