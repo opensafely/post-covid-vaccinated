@@ -128,22 +128,16 @@ lifetable$AER <- lifetable$sc - lifetable$s
 lifetable$AERp<-lifetable$AER*100
 
 #Define empty results table
-Figure_4_table <- data.frame(c(1:196))
-          
-
-table(input2$subgroup)
-
-
+Figure_4<- data.frame(days = (1:196))
+Figure_4$AERp_main <- lifetable$AERp
 ##########################
 #plotting
 ######life table##########
-#convert to AER%
-lifetable$AER_p <- lifetable$AER*100
-plot(lifetable$days, lifetable$AER_p)
+plot(Figure_4$days, Figure_4$AERp_main)
 
-p_line<-ggplot(lifetable,
+p_line<-ggplot(Figure_4,
                aes(x=days,
-                   y=AER_p,
+                   y=AERp_main,
                    group=1)) +
   #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
   #              position=position_dodge(.9))+
@@ -152,7 +146,7 @@ p_line<-ggplot(lifetable,
   scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
   scale_y_continuous(limits = c(0,2))+
   labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
-       title = 'AMI')+
+       title = 'ATE')+
   theme(plot.title = element_text(hjust = 0.5))
 
 p_line
