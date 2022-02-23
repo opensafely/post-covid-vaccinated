@@ -127,14 +127,69 @@ figure4 <- function(group, fit, outcome, strata){
   
 }
 
-group <- "vaccinated"
-fit <- "mdl_max_adj"
-outcome <- "vte"
-strata <- "main"
+#group <- "vaccinated"
+#fit <- "mdl_max_adj"
+#outcome <- "vte"
+#strata <- "main"
 
 #output life tables
-#model =2
-figure4("ate","vaccinated","main","mdl_max_adj")
+#subgroups = 18
+figure4("vaccinated","mdl_max_adj","ate", "main")
+
+figure4("vaccinated","mdl_max_adj","ate", "sex_Male")
+figure4("vaccinated","mdl_max_adj","ate", "sex_Female")
+
+figure4("vaccinated","mdl_max_adj","ate", "agegp_18_39")
+figure4("vaccinated","mdl_max_adj","ate", "agegp_40_59")
+figure4("vaccinated","mdl_max_adj","ate", "agegp_60_79")
+figure4("vaccinated","mdl_max_adj","ate", "agegp_80_110")
+
+figure4("vaccinated","mdl_max_adj","ate", "ethnicity_South_Asian")
+figure4("vaccinated","mdl_max_adj","ate", "ethnicity_Black")
+figure4("vaccinated","mdl_max_adj","ate", "ethnicity_White")
+figure4("vaccinated","mdl_max_adj","ate", "ethnicity_Mixed")
+figure4("vaccinated","mdl_max_adj","ate", "ethnicity_Other")
+figure4("vaccinated","mdl_max_adj","ate", "ethnicity_Missing")
+
+figure4("vaccinated","mdl_max_adj","ate", "prior_history_FALSE")
+figure4("vaccinated","mdl_max_adj","ate", "prior_history_TRUE")
+
+figure4("vaccinated","mdl_max_adj","ate", "covid_pheno_hospitalised")
+figure4("vaccinated","mdl_max_adj","ate", "covid_pheno_non_hospitalised")
+
+figure4("vaccinated","mdl_max_adj","ate", "covid_history")
+
+#----------------------outcomes = 2
+figure4("vaccinated","mdl_max_adj","vte", "main")
+
+figure4("vaccinated","mdl_max_adj","vte", "sex_Male")
+figure4("vaccinated","mdl_max_adj","vte", "sex_Female")
+
+figure4("vaccinated","mdl_max_adj","vte", "agegp_18_39")
+figure4("vaccinated","mdl_max_adj","vte", "agegp_40_59")
+figure4("vaccinated","mdl_max_adj","vte", "agegp_60_79")
+figure4("vaccinated","mdl_max_adj","vte", "agegp_80_110")
+
+figure4("vaccinated","mdl_max_adj","vte", "ethnicity_South_Asian")
+figure4("vaccinated","mdl_max_adj","vte", "ethnicity_Black")
+figure4("vaccinated","mdl_max_adj","vte", "ethnicity_White")
+figure4("vaccinated","mdl_max_adj","vte", "ethnicity_Mixed")
+figure4("vaccinated","mdl_max_adj","vte", "ethnicity_Other")
+figure4("vaccinated","mdl_max_adj","vte", "ethnicity_Missing")
+
+figure4("vaccinated","mdl_max_adj","vte", "prior_history_FALSE")
+figure4("vaccinated","mdl_max_adj","vte", "prior_history_TRUE")
+
+figure4("vaccinated","mdl_max_adj","vte", "covid_pheno_hospitalised")
+figure4("vaccinated","mdl_max_adj","vte", "covid_pheno_non_hospitalised")
+
+figure4("vaccinated","mdl_max_adj","vte", "covid_history")
+
+
+
+
+
+table(input2$subgroup)
 
 figure4("ate","vaccinated","main","mdl_agesex")
 
