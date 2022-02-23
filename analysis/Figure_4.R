@@ -9,27 +9,34 @@ library(tidyverse)
 #Import data 
 input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
 #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
-#Import data
+#input2- Import data
 hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
 hr_files=paste0("output/",hr_files)
 input2 <- purrr::pmap(list(hr_files),
-                             function(fpath){
-                               df <- fread(fpath)
-                               return(df)
-                             })
+                      function(fpath){
+                        df <- fread(fpath)
+                        return(df)
+                      })
 input2=rbindlist(input2, fill=TRUE)
 
 #Preprocess the AER input data
 input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
 input2 <- input2 %>% filter(term == "days0_14" |
-                            term == "days14_28" |
-                            term == "days28_56" |
-                            term == "days56_84" |
-                            term == "days84_197"|
-                            term == "days0_28"|
-                            term == "days28_197") # RT/RK check
+                              term == "days14_28" |
+                              term == "days28_56" |
+                              term == "days56_84" |
+                              term == "days84_197"|
+                              term == "days0_28"|
+                              term == "days28_197") # RT/RK check
 #limit to ATE & VTE outcomes
 input2 <- input2 %>% filter(event=="ate" | event=="vte")
+
+# Identify subgroups
+subgroups <- input2$subgroup    
+
+# Loop the outcome
+for (subgroup in subgroups) {
+  
 #---------------------------------
 # Step1: Extract the required variables
 #---------------------------------
@@ -37,43 +44,43 @@ input2 <- input2 %>% filter(event=="ate" | event=="vte")
 specified <-  input1$event == "ate" & 
               input1$model == "mdl_max_adj" &
               input1$cohort == "vaccinated" & 
-              input1$strata == "main"
+              input1$strata == subgroup
 
 #1. Person days
 fp_person_days <- input1[specified,]$person_days#RT/RK/VW -check L
 
 #2.unexposed events
 unexposed_events <-  input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                              input2$cohort == "vaccinated" & input2$subgroup == "main" & 
+                              input2$cohort == "vaccinated" & input2$subgroup == subgroup & 
                               input2$expo_week== "pre expo",]$events_total
 
 #3.Total cases
 total_cases <-  input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                         input2$cohort == "vaccinated" & input2$subgroup == "main" & 
+                         input2$cohort == "vaccinated" & input2$subgroup == subgroup & 
                          input2$expo_week== "pre expo",]$total_covid19_cases
 
 #4.locate the estimates
 #0-14 days
 hr_14 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                  input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days0_14",]$estimate
+                  input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days0_14",]$estimate
 #14-28 days
 hr_28 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                  input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days14_28",]$estimate
+                  input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days14_28",]$estimate
 #28-56 days
 hr_56 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                  input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days28_56",]$estimate
+                  input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days28_56",]$estimate
 #56-84 days
 hr_84 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                  input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days56_84",]$estimate
+                  input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days56_84",]$estimate
 #84-196 days
 hr_196 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                   input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days84_197",]$estimate
+                   input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days84_197",]$estimate
 #Alternative 0-28 days
 hr0_28 <- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                   input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days0_28",]$estimate
+                   input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days0_28",]$estimate
 #Alternative 28 - 196 days
 hr28_196<- input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
-                    input2$cohort == "vaccinated" & input2$subgroup == "main"& input2$term == "days28_196",]$estimate
+                    input2$cohort == "vaccinated" & input2$subgroup == subgroup& input2$term == "days28_196",]$estimate
 
 #--------------------------------------------------------------------
 #Step2.Calculate the average daily CVD incidence   - in the unexposed
@@ -91,7 +98,7 @@ colnames(lifetable) <- c("days")
 lifetable$event <- "ate"
 lifetable$model <- "mdl_max_adj"
 lifetable$cohort <- "vaccinated"
-lifetable$subgroup <- "main"
+lifetable$subgroup <- subgroup
 
 lifetable$q <- incidence_rate 
 lifetable$'1-q' <- 1 - lifetable$q 
