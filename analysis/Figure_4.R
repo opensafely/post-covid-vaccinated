@@ -6,6 +6,11 @@ library(purrr)
 library(data.table)
 library(tidyverse)
 
+outcome <- "vte"
+group <- "vaccinated"
+strata <- "main"
+fit <- "mdl_max_adj"
+
 #Import data 
 input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
 #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
