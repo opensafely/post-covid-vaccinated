@@ -33,9 +33,14 @@ input2 <- input2 %>% filter(event=="ate" | event=="vte")
 #---------------------------------
 # Step1: Extract the required variables
 #---------------------------------
+#set specifications
+specified <-  input1$event == "ate" & 
+              input1$model == "mdl_max_adj" &
+              input1$cohort == "vaccinated" & 
+              input1$strata == "main"
+
 #1. Person days
-fp_person_days <- input1[input1$event == "ate" & input1$model == "mdl_max_adj" &
-                           input1$cohort == "vaccinated" & input1$strata == "main",]$person_days#RT/RK/VW -check L
+fp_person_days <- input1[specified,]$person_days#RT/RK/VW -check L
 
 #2.unexposed events
 unexposed_events <-  input2[input2$event == "ate" & input2$model == "mdl_max_adj" & 
@@ -120,21 +125,11 @@ lifetable$sc <- cumprod(lifetable$`1-qh`)
 
 #AER = Sc-S=difference in absolute risk
 lifetable$AER <- lifetable$sc - lifetable$s
-#AER on day 196 
-AER_196 <- lifetable[nrow(lifetable),]$AER * total_cases
-print(AER_196) # 358.4324
-# 358 excess 'events' happens 196 days after 20266 total covid19 'cases'.
+lifetable$AERp<-lifetable$AER*100
 
 #Define empty results table
-Figure_4_table <- data.frame(days = numeric(),
-                             ate_aerp_main = numeric(),
-                             ate_aerp_male = numeric(),
-                             ate_aerp_female = numeric(),
-                             ate_aerp_18_39 = numeric(),
-                             ate_aerp_40_59 = numeric(),
-                             ate_aerp_60 = numeric(),
-                             ate_aerp_main = numeric(),
-                             stringsAsFactors = FALSE)
+Figure_4_table <- data.frame(c(1:196))
+          
 
 table(input2$subgroup)
 
