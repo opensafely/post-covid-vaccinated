@@ -4,19 +4,8 @@ library(tidyverse)
 library(ggplot2)
 library(data.table)
 
-args = commandArgs(trailingOnly=TRUE)
 
-if(length(args)==0){
-  cohort="vaccinated"
-}else{
-  cohort = args[[1]]#both, vaccinated, electively_unvaccinated
-}
-
-
-if(cohort=="both"){
-  cohort=c("vaccinated","electively_unvaccinated")
-}
-
+cohort <- c("vaccinated","electively_unvaccinated")
 
 #-----------------------Determine active outcome events-------------------------
 active_analyses <- read_rds("output/active_analyses.rds")
@@ -38,6 +27,7 @@ combined_hr <- rbindlist(hr_file_paths, fill=TRUE)
 #-------------------------Filter to active outcomes-----------------------------
 
 combined_hr <- combined_hr %>% filter(event %in% events$outcome_variable)
+combined_hr <- combined_hr %>% filter(!event %in% c("ate","vte"))
 combined_hr <- combined_hr %>% filter(subgroup %in% c("covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
 combined_hr <- combined_hr %>% filter(model == "mdl_max_adj")
 
@@ -45,53 +35,22 @@ combined_hr <- combined_hr %>% filter(model == "mdl_max_adj")
 
 combined_hr <- combined_hr %>% filter(str_detect(term, "^days"))
 
-# Select all time period names and remove all the numbers to find the time cut points for this project
+# Specify time points to plot HRs at -------------------------------------------
 
-term=unique(combined_hr$term)
-cuts=c()
-for(i in 1:length(term)){
-  time_period=sub("days","",term[i])
-  cuts=append(cuts,as.numeric(sub('\\_.*', '', time_period)))
-  cuts=append(cuts,as.numeric(gsub(".*_", "",time_period)))
-}
-cuts=unique(cuts) 
-cuts=sort(cuts, decreasing = F)
-
-# Create a character vector of all the time period terms in increasing order with the reduced time periods at the end
-term=as.character()
-for(i in 1:(length(cuts)-1)){
-  term=append(term,as.character(paste0("days",cuts[i],"_",cuts[i+1])))
-}
-term=append(term,as.character("days0_28"))
-term=append(term,as.character(paste0("days28_",cuts[length(cuts)])))
-
-# Find the mid point in weeks of the time periods
-time=c()
-for(i in 1:(length(cuts)-2)){
-  time=append(time,(cuts[i+1]+cuts[i])/14)
-}
-
-#Have to -1 from the highest time point as have to +1 because cox model takes as
-#[a,b) and need to include the final day eg [84,197) to include day 196 but only interest in
-#days 0 to 196, not 0 to 197
-time=append(time,((cuts[length(cuts)]-1)+cuts[length(cuts)-1])/14)
-
-#For time period 0_28 in reduced time periods - currently always used but can be updated if we change this
-time=append(time,2) 
-
-# For time period 28 to final day
-time=append(time,((cuts[length(cuts)]-1)+28)/14)
-
-
-term_to_time <- data.frame(term = term,
-                           time = time)
-
+term_to_time <- data.frame(term = c("days0_14", "days14_28", "days28_56", "days56_84", "days84_197", 
+                                    "days0_28","days28_197"),
+                           time = c(1,3,6,10,20,
+                                    2,16))
 combined_hr <- merge(combined_hr, term_to_time, by = c("term"), all.x = TRUE)
 
-# Rename strata to 'nice' format------------------------------------------------
+# Rename subgroup to 'nice' format------------------------------------------------
 
 combined_hr$subgroup <- ifelse(combined_hr$subgroup=="covid_pheno_non_hospitalised","Non-hospitalised COVID-19",combined_hr$subgroup)
 combined_hr$subgroup <- ifelse(combined_hr$subgroup=="covid_pheno_hospitalised","Hospitalised COVID-19",combined_hr$subgroup)
+
+# Make event names 'nice' ------------------------------------------------------
+
+combined_hr <- combined_hr %>% left_join(events, by = c("event"="outcome_variable"))
 
 # Specify line colours----------------------------------------------------------
 
@@ -99,9 +58,6 @@ combined_hr$colour <- ""
 combined_hr$colour <- ifelse(combined_hr$subgroup=="Non-hospitalised COVID-19","#fb9a99",combined_hr$colour)
 combined_hr$colour <- ifelse(combined_hr$subgroup=="Hospitalised COVID-19","#e31a1c",combined_hr$colour)
 
-# Make event names 'nice' ------------------------------------------------------
-
-combined_hr <- combined_hr %>% left_join(events, by = c("event"="outcome_variable"))
 
 # Create figure-----------------------------------------------------------------
 
