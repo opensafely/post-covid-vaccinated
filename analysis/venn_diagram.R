@@ -21,7 +21,7 @@ args <- commandArgs(trailingOnly=TRUE)
 if(length(args)==0){
   # use for interactive testing
   #population <- "vaccinated"
-  pouplation <- "electively_unvaccinated"
+  population <- "electively_unvaccinated"
 } else {
   population <- args[[1]]
 }
