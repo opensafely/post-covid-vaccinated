@@ -122,8 +122,8 @@ actions:
         compiled_hrs_html: output/compiled_HR_results_tia.html
         compiled_event_counts_html: output/compiled_event_counts_tia.html
         analyses_not_run: output/analyses_not_run_tia.csv
-         compiled_hrs_csv: output/compiled_HR_results_tia.csv
-         compiled_event_counts_csv: output/compiled_event_counts_tia.csv
+        compiled_hrs_csv: output/compiled_HR_results_tia.csv
+        compiled_event_counts_csv: output/compiled_event_counts_tia.csv
 
 
   analysis_cox_stroke_sah_hs:
