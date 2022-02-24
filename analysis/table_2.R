@@ -5,7 +5,7 @@
 ##
 ## Reviewer: Rochelle Knight
 ## 
-## Date:     13 January 2022
+## Date:     13 January 2022; updated 24 Feb 2022
 ##
 ## Data:     Post covid vaccinated project study population
 ##
@@ -32,12 +32,16 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 active_analyses <- read_rds("output/active_analyses.rds")
 
-table_2_output <- function(population){
+table_2_output <- function(population, covid_history){
   # read in data------------------------------------------------------------
   
   input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
-  input <- filter(input, sub_bin_covid19_confirmed_history==F)
-  
+  if(covid_history == "without_covid_history"){
+    input <- filter(input, sub_bin_covid19_confirmed_history==F)
+  }
+  if(covid_history == "with_covid_history"){
+    input <- filter(input, sub_bin_covid19_confirmed_history==T)
+  }
   # record variable names for covariate
   vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
   vars_names <- c(vars_names, "sub_cat_covid19_hospital", "exp_date_covid19_confirmed")
@@ -71,23 +75,21 @@ table_2_output <- function(population){
       survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=  min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
       survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
     }
-    # exposure date
-    # survival_data$expo_date <- as.Date(ifelse((!is.na(survival_data$event_date)) & 
-    #                                             (survival_data$exp_date_covid19_confirmed < survival_data$event_date), 
-    #                                              survival_data$exp_date_covid19_confirmed, NA), origin='1970-01-01')
-    
+
     # follow-up days
     survival_data = survival_data %>% mutate(follow_up_period = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1) 
     #hist(survival_data$follow_up_period)  ## check if there are any negative follow-up periods
     survival_data = survival_data %>% filter(follow_up_period >=0 & follow_up_period < 197) # filter out follow up period 
     survival_data = survival_data %>% mutate(follow_up_years = follow_up_period / 365.2) # follow-up years
-    # check that the event dates are within the follow up period
+    # event count for subgroup of individuals who have been infected within the follow-up period
     event_count_post_infection <- length(which(survival_data$event_date   >= survival_data$index_date &
                                                  survival_data$event_date >= survival_data$exp_date_covid19_confirmed & 
                                                  survival_data$event_date <= survival_data$follow_up_end))
+    # event count for subgroup of individuals who have not been infected within the follow-up period
     event_count_before_infection <- length(which(survival_data$event_date >= survival_data$index_date &
                                                  survival_data$event_date <  survival_data$exp_date_covid19_confirmed & 
                                                  survival_data$event_date <= survival_data$follow_up_end))
+    # event count for subgroup of individuals who have been infected within the follow-up period but with event occurred before infection
     event_count_no_infection <- length(which(survival_data$event_date   >= survival_data$index_date & 
                                              is.na(survival_data$exp_date_covid19_confirmed) == T &
                                              survival_data$event_date <= survival_data$follow_up_end))
@@ -115,16 +117,19 @@ table_2_output <- function(population){
   table_2[which(table_2$non_hospitalised_sub_event_count <5),c(5,7)] = c("<5", "NA")
   table_2[which(table_2$hospitalised_sub_event_count <5),c(8,10)] = c("<5", "NA")
   table_2[which(table_2$total_event_count <5),c(11,13)] = c("<5", "NA")
-  write.csv(table_2, file= paste0("output/", "table2_", population, ".csv"), row.names = F)
+  write.csv(table_2, file= paste0("output/", "table2_", population, "_",covid_history, ".csv"), row.names = F)
 }
 
 # Run function using specified commandArgs
 
 if(population == "both"){
-  table_2_output("electively_unvaccinated")
-  table_2_output("vaccinated")
+  table_2_output("vaccinated", "with_covid_history")
+  table_2_output("vaccinated", "without_covid_history")
+  table_2_output("electively_unvaccinated", "with_covid_history")
+  table_2_output("electively_unvaccinated", "without_covid_history")
 }else{
-  table_2_output(population)
+  table_2_output(population, "with_covid_history")
+  table_2_output(population, "without_covid_history")
 }
 
 
