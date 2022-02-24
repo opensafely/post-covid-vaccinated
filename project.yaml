@@ -74,3 +74,12 @@ actions:
     outputs: 
       moderately_sensitive:
         table2: output/table2_*.csv
+
+  venn_both:
+    run: r:latest analysis/venn_diagram.R both
+    needs: [active_analyses, preprocess_data, stage1_data_cleaning_both]
+    outputs:
+      moderately_sensitive:
+          venn_digram: output/venn_diagram_*.svg
+          venn_diagram_number_check: output/venn_diagram_number_check_*.csv
+
