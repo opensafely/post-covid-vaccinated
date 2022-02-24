@@ -87,7 +87,8 @@ table_2_output <- function(population){
     event_count_before_infection <- length(which(survival_data$event_date >= survival_data$index_date &
                                                  survival_data$event_date <  survival_data$exp_date_covid19_confirmed & 
                                                  survival_data$event_date <= survival_data$follow_up_end))
-    event_count_no_infection <- length(which(survival_data$event_date   >= survival_data$index_date &
+    event_count_no_infection <- length(which(survival_data$event_date   >= survival_data$index_date & 
+                                             is.na(survival_data$exp_date_covid19_confirmed) == T &
                                              survival_data$event_date <= survival_data$follow_up_end))
     event_count_no_infection = event_count_no_infection + event_count_before_infection
     person_years_follow_up  = round(sum(survival_data$follow_up_years, na.rm = TRUE),1)
@@ -105,7 +106,6 @@ table_2_output <- function(population){
   names(table_2)[2:4] <- c("no_infection_sub_event_count", "no_infection_sub_person_yrs_fp", "no_infection_sub_incidence_rate")
   names(table_2)[5:7] <- c("non_hospitalised_sub_event_count", "non_hospitalised_sub_person_yrs_fp", "non_hospitalised_sub_incidence_rate")
   names(table_2)[8:10] <- c("hospitalised_sub_event_count", "hospitalised_sub_person_yrs_fp", "hospitalised_sub_incidence_rate")
-  
   write.csv(table_2, file= paste0("output/", "table2_", population, ".csv"), row.names = F)
 }
 
