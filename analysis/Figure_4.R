@@ -18,6 +18,7 @@ figure4 <- function(group, fit, outcome, strata){
   #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
   #input2- Import data
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
+  hr_files=hr_files[endsWith(hr_files,".csv")]
   hr_files=paste0("output/",hr_files)
   input2 <- purrr::pmap(list(hr_files),
                         function(fpath){
@@ -49,6 +50,9 @@ figure4 <- function(group, fit, outcome, strata){
   total_cases <-  input2[input2$event == outcome & input2$model == fit  & 
                            input2$cohort == group & input2$subgroup == strata & 
                            input2$expo_week== "pre expo",]$total_covid19_cases
+  
+  
+  table(input2$subgroup)
   #4.locate the estimates
   #0-14 days
   hr_14 <- input2[input2$event == outcome  & input2$model == fit  & 
@@ -70,7 +74,7 @@ figure4 <- function(group, fit, outcome, strata){
                      input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$estimate
   #Alternative 28 - 196 days
   hr28_196<- input2[input2$event == outcome  & input2$model == fit  & 
-                      input2$cohort == group & input2$subgroup == strata& input2$term == "days28_196",]$estimate
+                      input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$estimate
   #--------------------------------------------------------------------
   #Step2.Calculate the average daily CVD incidence   - in the unexposed
   #--------------------------------------------------------------------
@@ -130,11 +134,19 @@ figure4 <- function(group, fit, outcome, strata){
 #group <- "vaccinated"
 #fit <- "mdl_max_adj"
 #outcome <- "vte"
-stratas <- c("main", "sex_Male")
+stratas <- c("main", 
+             "sex_Male", "sex_Female" )
+             "agegp_18_39", "agegp_40_59", "agegp_60_79", "agegp_80_110",
+             "ethnicity_South_Asian", "ethnicity_Black", "ethnicity_White", "ethnicity_Mixed","ethnicity_Other", "ethnicity_Missing",
+             "prior_history_FALSE", "prior_history_TRUE", "covid_pheno_hospitalised", "covid_pheno_non_hospitalised",
+             "covid_history")
+
+
+for (strata in stratas) { figure4("vaccinated","mdl_max_adj","ate", strata)}
 
 #output life tables
 #subgroups = 18
-figure4("vaccinated","mdl_max_adj","ate", "main")
+figure4("vaccinated","mdl_max_adj","ate", stratas)
 
 figure4("vaccinated","mdl_max_adj","ate", "sex_Male")
 figure4("vaccinated","mdl_max_adj","ate", "sex_Female")
