@@ -5,7 +5,7 @@
 group <- "vaccinated"
 fit <- "mdl_max_adj"
 outcome <- "vte"
-strata <- "main"
+strata <- "sex_Male"
 
 figure4 <- function(group, fit, outcome, strata){
   
@@ -35,13 +35,15 @@ figure4 <- function(group, fit, outcome, strata){
                                 term == "days56_84" |
                                 term == "days84_197"|
                                 term == "days0_28"|
-                                term == "days28_197") # RT/RK check
+                                term == "days28_197")
+  input1$strata[input1$strata =="sex_M"] <- "sex_Male"
+  input1$strata[input1$strata =="sex_F"] <- "sex_Female"
   #---------------------------------
   # Step1: Extract the required variables
   #---------------------------------
   #1. Person days
   fp_person_days <- input1[input1$event == outcome & input1$model == fit  &
-                             input1$cohort == group & input1$strata == strata,]$person_days#RT/RK/VW -check L
+                             input1$cohort == group & input1$strata == strata,]$person_days
   #2.unexposed events
   unexposed_events <- input2[input2$event == outcome & input2$model == fit  & 
                                input2$cohort == group & input2$subgroup == strata & 
@@ -50,9 +52,6 @@ figure4 <- function(group, fit, outcome, strata){
   total_cases <-  input2[input2$event == outcome & input2$model == fit  & 
                            input2$cohort == group & input2$subgroup == strata & 
                            input2$expo_week== "pre expo",]$total_covid19_cases
-  
-  
-  table(input2$subgroup)
   #4.locate the estimates
   #0-14 days
   hr_14 <- input2[input2$event == outcome  & input2$model == fit  & 
@@ -124,18 +123,19 @@ figure4 <- function(group, fit, outcome, strata){
   #compared with no COVID-19 diagnosis. 
   
   #AER = Sc-S=difference in absolute risk
-  lifetable$AER <- lifetable$sc - lifetable$s
+  lifetable$AER <- lifetable$sc - lifetable$s # RT- reverse when real data
   lifetable$AERp <-lifetable$AER*100
   
   write.csv(lifetable, paste0("output/lifetable_" , group, "_", fit, "_", outcome, "_", strata,".csv"), row.names = F)
   
 }
+#------------------RUN the function-------------------------------------------------------------------------------------
 
 #group <- "vaccinated"
 #fit <- "mdl_max_adj"
 #outcome <- "vte"
 stratas <- c("main", 
-             "sex_Male", "sex_Female" )
+             "sex_Male"), "sex_Female",
              "agegp_18_39", "agegp_40_59", "agegp_60_79", "agegp_80_110",
              "ethnicity_South_Asian", "ethnicity_Black", "ethnicity_White", "ethnicity_Mixed","ethnicity_Other", "ethnicity_Missing",
              "prior_history_FALSE", "prior_history_TRUE", "covid_pheno_hospitalised", "covid_pheno_non_hospitalised",
