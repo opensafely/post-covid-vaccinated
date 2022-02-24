@@ -21,7 +21,7 @@ if(length(args)==0){
   # use for interactive testing
   population <- "vaccinated"
   #population = "electively_unvaccinated"
-} else {
+}else{
   population <- args[[1]]
 }
 
@@ -89,10 +89,11 @@ table_2_output <- function(population, covid_history){
     event_count_before_infection <- length(which(survival_data$event_date >= survival_data$index_date &
                                                  survival_data$event_date <  survival_data$exp_date_covid19_confirmed & 
                                                  survival_data$event_date <= survival_data$follow_up_end))
-    # event count for subgroup of individuals who have been infected within the follow-up period but with event occurred before infection
+    # event count contribution from subgroup of individuals who have been infected within the follow-up period but with event occurred before infection
     event_count_no_infection <- length(which(survival_data$event_date   >= survival_data$index_date & 
                                              is.na(survival_data$exp_date_covid19_confirmed) == T &
                                              survival_data$event_date <= survival_data$follow_up_end))
+    # event count for no covid infection group
     event_count_no_infection = event_count_no_infection + event_count_before_infection
     person_years_follow_up  = round(sum(survival_data$follow_up_years, na.rm = TRUE),1)
     event_count = ifelse(infection_subgroup == "no_infection", event_count_no_infection, event_count_post_infection)
@@ -113,6 +114,7 @@ table_2_output <- function(population, covid_history){
     names(table_2)[8:10] <- c("hospitalised_sub_event_count", "hospitalised_sub_person_yrs_fp", "hospitalised_sub_incidence_rate")
     names(table_2)[11:13] <- c("total_event_count", "total_person_yrs", "overall_incidence_rate")
   }
+  # low number check and suppression to "NA" if event count lower than 5
   table_2[which(table_2$no_infection_sub_event_count <5), c(2,4)] = c("<5", "NA")
   table_2[which(table_2$non_hospitalised_sub_event_count <5),c(5,7)] = c("<5", "NA")
   table_2[which(table_2$hospitalised_sub_event_count <5),c(8,10)] = c("<5", "NA")
