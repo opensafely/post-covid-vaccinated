@@ -36,6 +36,7 @@ table_2_output <- function(population){
   # read in data------------------------------------------------------------
   
   input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
+  input <- filter(input, sub_bin_covid19_confirmed_history==F)
   
   # record variable names for covariate
   vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
@@ -102,10 +103,14 @@ table_2_output <- function(population){
     table_2[i,2:4] <- summary_stats(population, "no_infection", survival_data[survival_data$sub_cat_covid19_hospital=="no_infection",], event_dates_names, i)
     table_2[i,5:7] <- summary_stats(population, "non_hospitalised",survival_data[survival_data$sub_cat_covid19_hospital=="non_hospitalised",], event_dates_names, i)
     table_2[i,8:10] <- summary_stats(population, "hospitalised", survival_data[survival_data$sub_cat_covid19_hospital=="hospitalised",], event_dates_names, i)
+    table_2$total_event_count <- table_2[,2] + table_2[,5] + table_2[,8]
+    table_2$total_person_yrs <-  table_2[,3] + table_2[,6] + table_2[,9]
+    table_2$overall_incidence_rate <- round(table_2$total_event_count/table_2$total_person_yrs,2)
+    names(table_2)[2:4] <- c("no_infection_sub_event_count", "no_infection_sub_person_yrs_fp", "no_infection_sub_incidence_rate")
+    names(table_2)[5:7] <- c("non_hospitalised_sub_event_count", "non_hospitalised_sub_person_yrs_fp", "non_hospitalised_sub_incidence_rate")
+    names(table_2)[8:10] <- c("hospitalised_sub_event_count", "hospitalised_sub_person_yrs_fp", "hospitalised_sub_incidence_rate")
+    names(table_2)[11:13] <- c("total_event_count", "total_person_yrs", "overall_incidence_rate")
   }
-  names(table_2)[2:4] <- c("no_infection_sub_event_count", "no_infection_sub_person_yrs_fp", "no_infection_sub_incidence_rate")
-  names(table_2)[5:7] <- c("non_hospitalised_sub_event_count", "non_hospitalised_sub_person_yrs_fp", "non_hospitalised_sub_incidence_rate")
-  names(table_2)[8:10] <- c("hospitalised_sub_event_count", "hospitalised_sub_person_yrs_fp", "hospitalised_sub_incidence_rate")
   write.csv(table_2, file= paste0("output/", "table2_", population, ".csv"), row.names = F)
 }
 
