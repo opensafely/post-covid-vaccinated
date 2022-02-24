@@ -111,6 +111,10 @@ table_2_output <- function(population){
     names(table_2)[8:10] <- c("hospitalised_sub_event_count", "hospitalised_sub_person_yrs_fp", "hospitalised_sub_incidence_rate")
     names(table_2)[11:13] <- c("total_event_count", "total_person_yrs", "overall_incidence_rate")
   }
+  table_2[which(table_2$no_infection_sub_event_count <5), c(2,4)] = c("<5", "NA")
+  table_2[which(table_2$non_hospitalised_sub_event_count <5),c(5,7)] = c("<5", "NA")
+  table_2[which(table_2$hospitalised_sub_event_count <5),c(8,10)] = c("<5", "NA")
+  table_2[which(table_2$total_event_count <5),c(11,13)] = c("<5", "NA")
   write.csv(table_2, file= paste0("output/", "table2_", population, ".csv"), row.names = F)
 }
 
