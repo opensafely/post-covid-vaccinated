@@ -79,7 +79,7 @@ table_2_output <- function(population, covid_history){
     # follow-up days
     survival_data = survival_data %>% mutate(follow_up_period = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1) 
     #hist(survival_data$follow_up_period)  ## check if there are any negative follow-up periods
-    survival_data = survival_data %>% filter(follow_up_period >=0 & follow_up_period < 197) # filter out follow up period 
+    survival_data = survival_data %>% filter(follow_up_period >=1 & follow_up_period <= 197) # filter out follow up period 
     survival_data = survival_data %>% mutate(follow_up_years = follow_up_period / 365.2) # follow-up years
     # event count for subgroup of individuals who have been infected within the follow-up period
     event_count_post_infection <- length(which(survival_data$event_date   >= survival_data$index_date &
