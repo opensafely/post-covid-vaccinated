@@ -58,7 +58,7 @@ table_2_output <- function(population, covid_history){
   event_dates_names <- active_analyses$outcome_variable[which(active_analyses$active==T)]
   
   event_names<- event_names <- gsub("out_date_","",event_dates_names)
-  event_names
+  #event_names
   
   col_headings <- c("event", "event_count", "person_years_follow_up", "incidence_rate")
   table_2 <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
@@ -90,10 +90,7 @@ table_2_output <- function(population, covid_history){
                                     survival_data$event_date >= survival_data$exp_date_covid19_confirmed & 
                                     survival_data$event_date <= survival_data$follow_up_end))
      }
-    # event count for no covid infection group
-    #event_count_no_infection = event_count_no_infection + event_count_before_infection
     person_years_follow_up  = round(sum(survival_data$follow_up_years, na.rm = TRUE),1)
-    #event_count = ifelse(infection_subgroup == "no_infection", event_count_no_infection, event_count_post_infection)
     incidence_rate = round(event_count/person_years_follow_up, 4)
     return(c(event_count,person_years_follow_up, incidence_rate))
     }
