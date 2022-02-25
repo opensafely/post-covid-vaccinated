@@ -81,25 +81,24 @@ table_2_output <- function(population, covid_history){
     #hist(survival_data$follow_up_period)  ## check if there are any negative follow-up periods
     survival_data = survival_data %>% filter(follow_up_period >=1 & follow_up_period <= 197) # filter out follow up period 
     survival_data = survival_data %>% mutate(follow_up_years = follow_up_period / 365.2) # follow-up years
-if(infection_subgroup == "no_infection"){
+    if(infection_subgroup == "no_infection"){
       event_count <- length(which((survival_data$event_date >= survival_data$index_date & survival_data$event_date <= survival_data$follow_up_end) &
                                    (survival_data$event_date < survival_data$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
                                  ))
-  }else{
+     }else{
       event_count <- length(which(survival_data$event_date   >= survival_data$index_date &
                                     survival_data$event_date >= survival_data$exp_date_covid19_confirmed & 
                                     survival_data$event_date <= survival_data$follow_up_end))
-  }
+     }
     # event count for no covid infection group
     event_count_no_infection = event_count_no_infection + event_count_before_infection
     person_years_follow_up  = round(sum(survival_data$follow_up_years, na.rm = TRUE),1)
     event_count = ifelse(infection_subgroup == "no_infection", event_count_no_infection, event_count_post_infection)
     incidence_rate = round(event_count/person_years_follow_up, 4)
     return(c(event_count,person_years_follow_up, incidence_rate))
-  }
+    }
   
   for(i in 1:length(event_dates_names)){
-   # table_2[i,2:4] <- summary_stats(population, survival_data, event_dates_names, i)
     table_2[i,2:4] <- summary_stats(population, "no_infection", survival_data, event_dates_names, i)
     table_2[i,5:7] <- summary_stats(population, "non_hospitalised",survival_data[survival_data$sub_cat_covid19_hospital=="non_hospitalised",], event_dates_names, i)
     table_2[i,8:10] <- summary_stats(population, "hospitalised", survival_data[survival_data$sub_cat_covid19_hospital=="hospitalised",], event_dates_names, i)
