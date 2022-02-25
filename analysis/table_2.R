@@ -103,7 +103,7 @@ table_2_output <- function(population, covid_history){
   
   for(i in 1:length(event_dates_names)){
    # table_2[i,2:4] <- summary_stats(population, survival_data, event_dates_names, i)
-    table_2[i,2:4] <- summary_stats(population, "no_infection", survival_data[survival_data$sub_cat_covid19_hospital=="no_infection",], event_dates_names, i)
+    table_2[i,2:4] <- summary_stats(population, "no_infection", survival_data, event_dates_names, i)
     table_2[i,5:7] <- summary_stats(population, "non_hospitalised",survival_data[survival_data$sub_cat_covid19_hospital=="non_hospitalised",], event_dates_names, i)
     table_2[i,8:10] <- summary_stats(population, "hospitalised", survival_data[survival_data$sub_cat_covid19_hospital=="hospitalised",], event_dates_names, i)
     table_2$total_event_count <- table_2[,2] + table_2[,5] + table_2[,8]
