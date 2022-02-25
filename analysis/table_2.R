@@ -81,18 +81,15 @@ table_2_output <- function(population, covid_history){
     #hist(survival_data$follow_up_period)  ## check if there are any negative follow-up periods
     survival_data = survival_data %>% filter(follow_up_period >=1 & follow_up_period <= 197) # filter out follow up period 
     survival_data = survival_data %>% mutate(follow_up_years = follow_up_period / 365.2) # follow-up years
-    # event count for subgroup of individuals who have been infected within the follow-up period
-    event_count_post_infection <- length(which(survival_data$event_date   >= survival_data$index_date &
-                                                 survival_data$event_date >= survival_data$exp_date_covid19_confirmed & 
-                                                 survival_data$event_date <= survival_data$follow_up_end))
-    # event count for subgroup of individuals who have not been infected within the follow-up period
-    event_count_before_infection <- length(which(survival_data$event_date >= survival_data$index_date &
-                                                 survival_data$event_date <  survival_data$exp_date_covid19_confirmed & 
-                                                 survival_data$event_date <= survival_data$follow_up_end))
-    # event count contribution from subgroup of individuals who have been infected within the follow-up period but with event occurred before infection
-    event_count_no_infection <- length(which(survival_data$event_date   >= survival_data$index_date & 
-                                             is.na(survival_data$exp_date_covid19_confirmed) == T &
-                                             survival_data$event_date <= survival_data$follow_up_end))
+if(infection_subgroup == "no_infection"){
+      event_count <- length(which((survival_data$event_date >= survival_data$index_date & survival_data$event_date <= survival_data$follow_up_end) &
+                                   (survival_data$event_date < survival_data$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
+                                 ))
+  }else{
+      event_count <- length(which(survival_data$event_date   >= survival_data$index_date &
+                                    survival_data$event_date >= survival_data$exp_date_covid19_confirmed & 
+                                    survival_data$event_date <= survival_data$follow_up_end))
+  }
     # event count for no covid infection group
     event_count_no_infection = event_count_no_infection + event_count_before_infection
     person_years_follow_up  = round(sum(survival_data$follow_up_years, na.rm = TRUE),1)
