@@ -14,7 +14,7 @@
 ##
 ## Output:   Four CSV files for table 2:
 #            vaccinated and electively unvaccinated populations; 
-##           without COVID history; with COVID history
+##           without COVID history (main text); with COVID history (suppl materials)
 ## =============================================================================
 
 library(readr); library(dplyr); library(data.table); library(lubridate)
