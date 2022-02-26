@@ -96,26 +96,30 @@ table_2_output <- function(population, covid_history){
      }
     person_years_follow_up  = round(sum(survival_data$follow_up_years, na.rm = TRUE),1)
     incidence_rate = round(event_count/person_years_follow_up, 4)
-    return(c(event_count,person_years_follow_up, incidence_rate))
+    incidence_rate_lower = incidence_rate - 1.96 * sqrt(event_count/person_years_follow_up^2)
+    incidence_rate_upper = incidence_rate + 1.96 * sqrt(event_count/person_years_follow_up^2)
+    return(c(event_count,person_years_follow_up, incidence_rate, incidence_rate_lower, incidence_rate_upper))
     }
   
   for(i in 1:length(event_dates_names)){
-    table_2[i,2:4] <- summary_stats(population, "no_infection", survival_data, event_dates_names, i)
-    table_2[i,5:7] <- summary_stats(population, "non_hospitalised",survival_data[survival_data$sub_cat_covid19_hospital=="non_hospitalised",], event_dates_names, i)
-    table_2[i,8:10] <- summary_stats(population, "hospitalised", survival_data[survival_data$sub_cat_covid19_hospital=="hospitalised",], event_dates_names, i)
-    table_2$total_event_count <- table_2[,2] + table_2[,5] + table_2[,8]
-    table_2$total_person_yrs <-  table_2[,3] + table_2[,6] + table_2[,9]
+    table_2[i,2:6] <- summary_stats(population, "no_infection", survival_data, event_dates_names, i)
+    table_2[i,7:11] <- summary_stats(population, "non_hospitalised",survival_data[survival_data$sub_cat_covid19_hospital=="non_hospitalised",], event_dates_names, i)
+    table_2[i,12:16] <- summary_stats(population, "hospitalised", survival_data[survival_data$sub_cat_covid19_hospital=="hospitalised",], event_dates_names, i)
+    table_2$total_event_count <- table_2[,2] + table_2[,7] + table_2[,12]
+    table_2$total_person_yrs <-  table_2[,3] + table_2[,8] + table_2[,13]
     table_2$overall_incidence_rate <- round(table_2$total_event_count/table_2$total_person_yrs,2)
-    names(table_2)[2:4] <- c("no_infection_sub_event_count", "no_infection_sub_person_yrs_fp", "no_infection_sub_incidence_rate")
-    names(table_2)[5:7] <- c("non_hospitalised_sub_event_count", "non_hospitalised_sub_person_yrs_fp", "non_hospitalised_sub_incidence_rate")
-    names(table_2)[8:10] <- c("hospitalised_sub_event_count", "hospitalised_sub_person_yrs_fp", "hospitalised_sub_incidence_rate")
-    names(table_2)[11:13] <- c("total_event_count", "total_person_yrs", "overall_incidence_rate")
+    table_2$overall_incidence_rate_lower <- table_2$overall_incidence_rate - 1.96*sqrt(table_2$total_event_count/table_2$total_person_yrs^2)
+    table_2$overall_incidence_rate_upper <- table_2$overall_incidence_rate + 1.96*sqrt(table_2$total_event_count/table_2$total_person_yrs^2)
+    names(table_2)[2:6] <- c("no_infection_sub_event_count", "no_infection_sub_person_yrs_fp", "no_infection_sub_incidence_rate", "no_infection_sub_incidence_rate_lower", "no_infection_sub_incidence_rate_upper")
+    names(table_2)[7:11] <- c("non_hospitalised_sub_event_count", "non_hospitalised_sub_person_yrs_fp", "non_hospitalised_sub_incidence_rate", "non_hospitalised_sub_incidence_rate_lower","non_hospitalised_sub_incidence_rate_upper")
+    names(table_2)[12:16] <- c("hospitalised_sub_event_count", "hospitalised_sub_person_yrs_fp", "hospitalised_sub_incidence_rate", "hospitalised_sub_incidence_rate_lower", "hospitalised_sub_incidence_rate_upper")
+    names(table_2)[17:21] <- c("total_event_count", "total_person_yrs", "overall_incidence_rate", "overall_incidence_rate_lower", "overall_incidence_rate_upper")
   }
   # low number check and suppression to "NA" if event count lower than 5
   table_2[which(table_2$no_infection_sub_event_count <5), c(2,4)] = c("<5", "NA")
-  table_2[which(table_2$non_hospitalised_sub_event_count <5),c(5,7)] = c("<5", "NA")
-  table_2[which(table_2$hospitalised_sub_event_count <5),c(8,10)] = c("<5", "NA")
-  table_2[which(table_2$total_event_count <5),c(11,13)] = c("<5", "NA")
+  table_2[which(table_2$non_hospitalised_sub_event_count <5),c(7,8)] = c("<5", "NA")
+  table_2[which(table_2$hospitalised_sub_event_count <5),c(12,13)] = c("<5", "NA")
+  table_2[which(table_2$total_event_count <5),c(17,18)] = c("<5", "NA")
   write.csv(table_2, file= paste0("output/", "table2_", population, "_",covid_history, ".csv"), row.names = F)
 }
 
