@@ -107,7 +107,7 @@ table_2_output <- function(population, covid_history){
     table_2[i,12:16] <- summary_stats(population, "hospitalised", survival_data[survival_data$sub_cat_covid19_hospital=="hospitalised",], event_dates_names, i)
     table_2$total_event_count <- table_2[,2] + table_2[,7] + table_2[,12]
     table_2$total_person_yrs <-  table_2[,3] + table_2[,8] + table_2[,13]
-    table_2$overall_incidence_rate <- round(table_2$total_event_count/table_2$total_person_yrs,2)
+    table_2$overall_incidence_rate <- round(table_2$total_event_count/table_2$total_person_yrs,4)
     table_2$overall_incidence_rate_lower <- table_2$overall_incidence_rate - 1.96*sqrt(table_2$total_event_count/table_2$total_person_yrs^2)
     table_2$overall_incidence_rate_upper <- table_2$overall_incidence_rate + 1.96*sqrt(table_2$total_event_count/table_2$total_person_yrs^2)
     names(table_2)[2:6] <- c("no_infection_sub_event_count", "no_infection_sub_person_yrs_fp", "no_infection_sub_incidence_rate", "no_infection_sub_incidence_rate_lower", "no_infection_sub_incidence_rate_upper")
