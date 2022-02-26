@@ -11,6 +11,10 @@
 ##
 ## Content:  Number of outcome events;
 ##           person years of follow up and rates of events, for each outcome
+##
+## Output:   Four CSV files for table 2:
+#            vaccinated and electively unvaccinated populations; 
+##           without COVID history; with COVID history
 ## =============================================================================
 
 library(readr); library(dplyr); library(data.table); library(lubridate)
