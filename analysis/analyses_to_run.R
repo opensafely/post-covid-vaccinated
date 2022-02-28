@@ -11,7 +11,6 @@ active_analyses <- read_rds("output/active_analyses.rds")
 active_analyses <- active_analyses %>%dplyr::filter(outcome_variable==paste0("out_date_",event_name) & active == "TRUE")
 
 ## Select covariates of interest 
-
 covar_names<-str_split(active_analyses$covariates, ";")[[1]]
 covar_names<-append(covar_names,"patient_id")
 covar_names<-covar_names[!covar_names %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
@@ -65,7 +64,7 @@ for(i in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
 analyses_to_run$strata[analyses_to_run$strata=="South_Asian"]<- "South Asian"
 
 ## Separate into to dataframes as this will allow all the vaccinated/electively unvaccinated
-## analyses to be run in one go to save haing to read in the data for each individual analysis
+## analyses to be run in one go to save having to read in the data for each individual analysis
 ## i.e can read it in once and run all the vaccinated analyses in one go
 
 for(i in cohort_to_run){
