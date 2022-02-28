@@ -1,11 +1,11 @@
 ## =============================================================================
-## 1.Creates the base survival data that includes the event date for the outcoem of interest
+## 1.Creates the base survival data that includes the event date for the outcome of interest
 ## 2.Stratify to relevant subgroup if necessary
 ## 3.Sets the names of the covariates that need to be included if performing a subgroup analysis
 ## 4.If running COVID pheno subgroup will get pheno-specific dataset
 ## 5.Add follow up start and end dates
 ##
-## Author: Samantha Ip
+## Based on scripts by Samantha Ip
 ## =============================================================================
 source(file.path(scripts_dir,"fit_model.R"))
 
@@ -38,7 +38,7 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
   }
   
   # Stratify to the relevant subgroup if either sex/ethnicity/prior history subgroup
-  # Age subgroups are filtered in a later script; COVID pheno subgroup is filtered later in this script
+  # COVID pheno subgroup is filtered later in this script
   
   for(i in c("ethnicity","sex","prior_history")){
     if(startsWith(subgroup,i)){
@@ -46,10 +46,31 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
     }
   }
   
+  # Filter for age group of interest ----
+  survival_data$AGE_AT_COHORT_START <- as.numeric(survival_data$AGE_AT_COHORT_START)
+  
+  if(startsWith(subgroup,"agegp")){
+    agebreaks=agebreaks_strata
+    agelabels=agelabels_strata
+  }else{
+    agebreaks=agebreaks_all
+    agelabels=agelabels_all
+  }
+  
+  setDT(survival_data)[ , agegroup := cut(AGE_AT_COHORT_START, 
+                                          breaks = agebreaks, 
+                                          right = FALSE, 
+                                          labels = agelabels)]
+  
+  
+  if(startsWith(subgroup,"agegp_")){
+    survival_data=survival_data %>% filter(agegroup== stratify_by)
+  }
+  
   # join core data with outcomes
   survival_data <- survival_data %>% left_join(outcomes)
 
-  #add follow up start and end dates
+  # add follow up end dates
   
   if(cohort=="vaccinated"){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, DATE_OF_DEATH,cohort_end_date,na.rm = TRUE))
@@ -72,8 +93,7 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
   #outisde follow up
   survival_data$expo_pheno=as.character(survival_data$expo_pheno)
   survival_data=survival_data%>%rowwise()%>%mutate(expo_pheno =ifelse(is.na(expo_date), "no_infection",expo_pheno))
-  #survival_data$expo_pheno=as.factor(survival_data$expo_pheno)
-  
+
   
   #get COVID pheno specific dataset if necessary
   if(startsWith(subgroup,"covid_pheno")){
@@ -88,7 +108,7 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
     
   survival_data=survival_data%>%filter(follow_up_end>=follow_up_start)
   
-  total_covid_cases=nrow(survival_data %>% filter(is.na(expo_date)==F))
+  total_covid_cases=nrow(survival_data %>% filter(!is.na(expo_date)))
     
   res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
   return(res_vacc)
