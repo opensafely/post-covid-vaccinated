@@ -120,7 +120,7 @@ actions_list <- splice(
   #comment("Generate dummy data for study_definition - unvaccinated"),
   action(
     name = "generate_study_population_electively_unvaccinated",
-    run = "cohortextractor:latest generate_cohort --study-definition study_definitionn_electively_unvaccinated --output-format feather",
+    run = "cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated --output-format feather",
     needs = list("vax_eligibility_inputs"),
     highly_sensitive = list(
       cohort = glue("output/input_electively_unvaccinated.feather")
@@ -130,7 +130,7 @@ actions_list <- splice(
   #comment("Generate dummy data for study_definition - vaccinated"),
   action(
     name = "generate_study_population_vaccinated",
-    run = "cohortextractor:latest generate_cohort --study-definition study_definitionn_vaccinated --output-format feather",
+    run = "cohortextractor:latest generate_cohort --study-definition study_definition_vaccinated --output-format feather",
     highly_sensitive = list(
       cohort = glue("output/input_vaccinated.feather")
     )
@@ -139,7 +139,7 @@ actions_list <- splice(
   #comment("Generate dummy data for study_definition - index"),
   action(
     name = "generate_study_population_index",
-    run = "cohortextractor:latest generate_cohort --study-definition study_definitionn_index --output-format feather",
+    run = "cohortextractor:latest generate_cohort --study-definition study_definition_index --output-format feather",
     highly_sensitive = list(
       cohort = glue("output/input_index.feather")
     )
