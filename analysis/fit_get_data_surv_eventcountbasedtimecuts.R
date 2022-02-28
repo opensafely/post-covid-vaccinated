@@ -32,7 +32,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     non_cases=non_cases
   }
   non_case_weight=(nrow(survival_data)-nrow(cases))/nrow(non_cases)
-  survival_data <- rbind(cases,non_cases)
+  survival_data <- bind_rows(cases,non_cases)
 
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
   survival_data$days_to_end <- as.numeric(survival_data$follow_up_end-cohort_start_date)
