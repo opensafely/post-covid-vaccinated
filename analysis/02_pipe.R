@@ -11,7 +11,7 @@ input=read_rds(paste0("output/input_",cohort,"_stage1.rds"))
 #---------------------------SPECIFY MAIN PARAMETERS-----------------------------
 # specify study parameters
 #For all analysis aside from age stratifed, analysis is performed across all ages 
-agebreaks_all <- c(0, 110)
+agebreaks_all <- c(0, 111)
 agelabels_all <- c("all")
 
 #Age breaks and labels for age sub group analysis
@@ -22,7 +22,7 @@ cohort_start_date <- as.Date("2021-06-01")
 cohort_end_date <- as.Date("2021-12-14")
 
 #Used to split time since COVID exposure; when there are time periods with no events then
-#a reduced number of time periods is used
+#a reduced number of time periods is used (need 197 instead of 196 as time periods are split using [ , ) 
 
 cuts_days_since_expo <- c(14, 28, 56, 84, 197) 
 cuts_days_since_expo_reduced <- c(28,197) 
