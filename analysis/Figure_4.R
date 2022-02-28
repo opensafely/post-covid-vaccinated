@@ -28,7 +28,7 @@ figure4 <- function(group, fit, outcome, strata){
   input2=rbindlist(input2, fill=TRUE)
   
   #Preprocess the AER input data
-  input2 <- input2 %>% select(-conf.low, -conf.high, -std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
+  input2 <- input2 %>% select(-std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
                                 term == "days28_56" |
@@ -55,7 +55,7 @@ figure4 <- function(group, fit, outcome, strata){
   #4.locate the estimates
   #0-14 days
   hr_14 <- input2[input2$event == outcome  & input2$model == fit  & 
-                    input2$cohort == group & input2$subgroup == strata& input2$term == "days0_14",]$estimate
+                    input2$cohort == group & input2$subgroup == strata & input2$term == "days0_14",]$estimate
   #14-28 days
   hr_28 <- input2[input2$event == outcome & input2$model == fit  & 
                     input2$cohort == group & input2$subgroup == strata& input2$term == "days14_28",]$estimate
