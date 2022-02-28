@@ -17,7 +17,8 @@ actions:
   generate_study_population_electively_unvaccinated:
     run: cohortextractor:latest generate_cohort --study-definition study_definitionn_electively_unvaccinated
       --output-format feather
-    needs: vax_eligibility_inputs
+    needs:
+    - vax_eligibility_inputs
     outputs:
       highly_sensitive:
         cohort: output/input_electively_unvaccinated.feather
@@ -51,7 +52,8 @@ actions:
 
   stage1_data_cleaning_both:
     run: r:latest analysis/Stage1_data_cleaning.R both
-    needs: preprocess_data
+    needs:
+    - preprocess_data
     outputs:
       moderately_sensitive:
         refactoring: output/meta_data_factors_*.csv
@@ -62,7 +64,8 @@ actions:
 
   stage2_missing_table1_both:
     run: r:latest analysis/Stage2_missing_table1.R both
-    needs: stage1_data_cleaning_both
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
         Missing_RangeChecks: output/Check_missing_range_*.csv
@@ -71,7 +74,8 @@ actions:
 
   stage4_table2_both:
     run: r:latest analysis/table_2.R both
-    needs: stage1_data_cleaning_both
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
         table2: output/table2_*.csv

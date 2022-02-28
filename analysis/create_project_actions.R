@@ -121,7 +121,7 @@ actions_list <- splice(
   action(
     name = "generate_study_population_electively_unvaccinated",
     run = "cohortextractor:latest generate_cohort --study-definition study_definitionn_electively_unvaccinated --output-format feather",
-    needs = glue("vax_eligibility_inputs"),
+    needs = list("vax_eligibility_inputs"),
     highly_sensitive = list(
       cohort = glue("output/input_electively_unvaccinated.feather")
     )
@@ -163,7 +163,7 @@ actions_list <- splice(
   action(
     name = "stage1_data_cleaning_both",
     run = "r:latest analysis/Stage1_data_cleaning.R both",
-    needs = glue("preprocess_data"),
+    needs = list("preprocess_data"),
     moderately_sensitive = list(
       refactoring = glue("output/meta_data_factors_*.csv"),
       QA_rules = glue("output/QA_summary_*.csv"),
@@ -178,7 +178,7 @@ actions_list <- splice(
   action(
     name = "stage2_missing_table1_both",
     run = "r:latest analysis/Stage2_missing_table1.R both",
-    needs = glue("stage1_data_cleaning_both"),
+    needs = list("stage1_data_cleaning_both"),
     moderately_sensitive = list(
       Missing_RangeChecks = glue("output/Check_missing_range_*.csv"),
       DateChecks = glue("output/Check_dates_range_*.csv"),
@@ -193,7 +193,7 @@ actions_list <- splice(
   action(
     name = "stage4_table2_both",
     run = "r:latest analysis/table_2.R both",
-    needs = glue("stage1_data_cleaning_both"),
+    needs = list("stage1_data_cleaning_both"),
     moderately_sensitive = list(
       table2 = glue("output/table2_*.csv")
     )
