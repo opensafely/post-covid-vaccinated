@@ -5,7 +5,7 @@
 group <- "vaccinated"
 fit <- "mdl_max_adj"
 outcome <- "ate"
-strata <- "sex_Female"
+strata <- "sex_Male"
 
 figure4_tbl <- function(group, fit, outcome, strata){
   
@@ -38,6 +38,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
                                 term == "days28_197")
   input1$strata[input1$strata =="sex_M"] <- "sex_Male"
   input1$strata[input1$strata =="sex_F"] <- "sex_Female"
+ table(input2$subgroup)
   #---------------------------------
   # Step1: Extract the required variables
   #---------------------------------
@@ -226,19 +227,34 @@ figure4_tbl <- function(group, fit, outcome, strata){
   
   lifetables$subgroup <-factor(lifetables$subgroup,levels = c('sex_Male','sex_Female'))
   
-  p_line<-ggplot(lifetables, aes(x=days, y=AERp)) +
-    #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
-    #              position=position_dodge(.9))+
-    geom_line(color = "blue",size = 1)+
-    geom_ribbon(aes(ymin = AERp.low, ymax = AERp.high, fill = 1),  alpha=0.1, linetype="dashed", color="grey")+
-    #geom_point()+
-    #scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
-    #scale_y_continuous(limits = c(-6,6))+ 
-    labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',title = paste0( "Delta", "_", group, "_", strata, "_", fit, "_", outcome))+
-    theme(plot.title = element_text(hjust = 0.5)
-    + facet_grid(AERp ~ subgroup))
+  p_line<-ggplot(lifetables, aes(x=days, y=AERp, colour = subgroup)) +
+    geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
+    scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
+    scale_x_continuous(breaks = c(0,10,20,30,40,50),limits = c(0,50))+
+    labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',title = 'Arterial') +
+    #theme(plot.title = element_text(hjust = 0.5)+
+     #theme(legend.key.size = unit(1.2,'cm'), legend.key = element_blank())+
+      #labs(color='Subgroup',linetype='Subgroup'))
   
   p_line
+  
+  p_line<-ggplot(plot_ethnicity,
+                 aes(x=x_days_since_covid_converted,
+                     y=AER_percent,
+                     colour=subgroup)) +
+    geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
+    scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
+    scale_x_continuous(breaks = c(0,10,20,30,40,50),limits = c(0,50))+
+    #scale_y_continuous(limits = c(0,2))+
+    labs(x='Weeks since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
+         title = 'Arterial')+
+    theme(plot.title = element_text(hjust = 0.5))+
+    #theme_hc()+
+    theme(legend.key.size = unit(1.2,'cm'), legend.key = element_blank())+
+    labs(color='Subgroup',linetype='Subgroup')
+  
+  p_line
+  
   
   }
   
