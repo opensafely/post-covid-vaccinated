@@ -7,28 +7,6 @@
 
 fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,mdl, survival_data,cuts_days_since_expo){
 
-  # filter for age group of interest ----
-  survival_data$AGE_AT_COHORT_START <- as.numeric(survival_data$AGE_AT_COHORT_START)
-  
-  if(startsWith(subgroup,"agegp")){
-    agebreaks=agebreaks_strata
-    agelabels=agelabels_strata
-  }else{
-    agebreaks=agebreaks_all
-    agelabels=agelabels_all
-  }
-  
-  setDT(survival_data)[ , agegroup := cut(AGE_AT_COHORT_START, 
-                                          breaks = agebreaks, 
-                                          right = FALSE, 
-                                          labels = agelabels)]
-
-  
-  if(startsWith(subgroup,"agegp_")){
-    survival_data=survival_data %>% filter(agegroup== stratify_by)
-  }
-  
-  
   #------------------ RANDOM SAMPLE NON-CASES for IP WEIGHING ------------------
   set.seed(137)
   
@@ -48,9 +26,9 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   }
   
   non_cases <- survival_data %>% filter(!patient_id %in% cases$patient_id)
-  if(nrow(cases)*10<=nrow(non_cases)){
-    non_cases <- sample_n(non_cases,nrow(cases)*10,replace=F)
-  }else if (nrow(cases)*10>nrow(non_cases)){
+  if(nrow(cases)*10<nrow(non_cases)){
+    non_cases <- non_cases[sample(1:nrow(non_cases), nrow(cases)*10,replace=FALSE), ]
+  }else if (nrow(cases)*10>=nrow(non_cases)){
     non_cases=non_cases
   }
   non_case_weight=(nrow(survival_data)-nrow(cases))/nrow(non_cases)
@@ -62,16 +40,16 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   if(startsWith(subgroup,"covid_pheno_")){
     survival_data$days_to_end <- ifelse((!is.na(survival_data$date_expo_censor)) & (survival_data$follow_up_end == survival_data$date_expo_censor), survival_data$days_to_end, (survival_data$days_to_end +1 ))
   }else{
-    survival_data$days_to_end <- survival_data$days_to_end +1 
+    survival_data$days_to_end <- (survival_data$days_to_end +1) 
   }
   
   noncase_ids <- unique(non_cases$patient_id)
   
   # ......................................
   # Need to add 0.001 when days_to_end==0
-  if (length(survival_data$days_to_end[survival_data$days_to_end==survival_data$days_to_start])>0){
-    survival_data$days_to_end <- ifelse(survival_data$days_to_end==survival_data$days_to_start, survival_data$days_to_end + 0.001, survival_data$days_to_end) 
-  }
+  #if (length(survival_data$days_to_end[survival_data$days_to_end==survival_data$days_to_start])>0){
+  #  survival_data$days_to_end <- ifelse(survival_data$days_to_end==survival_data$days_to_start, survival_data$days_to_end + 0.001, survival_data$days_to_end) 
+  #}
  
   #===============================================================================
   #   CACHE some features
