@@ -67,6 +67,13 @@ actions:
         Missing_RangeChecks: output/Check_missing_range_*.csv
         DateChecks: output/Check_dates_range_*.csv
         Descriptive_Table: output/Table1_*.csv
+  
+  stage4_table2_both:
+    run: r:latest analysis/table_2.R both
+    needs: [active_analyses, stage1_data_cleaning_both]
+    outputs: 
+      moderately_sensitive:
+        table2: output/table2_*.csv
 
   venn_both:
     run: r:latest analysis/venn_diagram.R both
@@ -75,3 +82,4 @@ actions:
       moderately_sensitive:
           venn_digram: output/venn_diagram_*.svg
           venn_diagram_number_check: output/venn_diagram_number_check_*.csv
+
