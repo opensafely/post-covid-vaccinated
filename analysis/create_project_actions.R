@@ -106,6 +106,13 @@ apply_model_function <- function(outcome){
 ##########################################################
 actions_list <- splice(
 
+  comment("# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #",
+          "DO NOT EDIT project.yaml DIRECTLY",
+          "This file is created by create_project_actions.R",
+          "Edit and run create_project_actions.R to update the project.yaml",
+          "# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #"
+  ),
+  
   #comment("Generate vaccination eligibility information"),
   action(
     name = glue("vax_eligibility_inputs"),
