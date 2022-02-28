@@ -4,10 +4,10 @@
 
 group <- "vaccinated"
 fit <- "mdl_max_adj"
-outcome <- "vte"
-strata <- "sex_Male"
+outcome <- "ate"
+strata <- "sex_Female"
 
-figure4 <- function(group, fit, outcome, strata){
+figure4_tbl <- function(group, fit, outcome, strata){
   
   library(purrr)
   library(data.table)
@@ -209,31 +209,38 @@ figure4 <- function(group, fit, outcome, strata){
   ##########################
   #Step7.  Output2 the plotting
   ######life table##########
+  figure4_plot <- (group, fit, outcome, strata) {
+    
   library(magrittr)
   library(dplyr)
   library(ggplot2)
   
-  plot(lifetable$days, lifetable$AERp)
+  #Gather the CSV.s
+  hr_files=list.files(path = "output", pattern = "lifetable_*")
+  hr_files=hr_files[endsWith(hr_files,".csv")]
+  hr_files=paste0("output/",hr_files)
+  lifetables <- purrr::pmap(list(hr_files),
+                        function(fpath){ df <- fread(fpath)
+                          return(df)})
+  lifetables=rbindlist(lifetables, fill=TRUE)
   
-  p_line<-ggplot(lifetable,
-                 aes(x=days,
-                     y=AERp,
-                     group=1)) +
+  lifetables$subgroup <-factor(lifetables$subgroup,levels = c('sex_Male','sex_Female'))
+  
+  p_line<-ggplot(lifetables, aes(x=days, y=AERp)) +
     #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
     #              position=position_dodge(.9))+
-    geom_line(size=1) + geom_line(col='blue')+
-    geom_ribbon(aes(ymin = AERp.low, ymax = AERp.high, fill = 1), 
-                alpha=0.1, 
-                linetype="dashed",
-                color="grey")
+    geom_line(color = "blue",size = 1)+
+    geom_ribbon(aes(ymin = AERp.low, ymax = AERp.high, fill = 1),  alpha=0.1, linetype="dashed", color="grey")+
     #geom_point()+
-    scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
-    scale_y_continuous(limits = c(-1,1))+
-    labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
-         title = 'ATE')+
-    theme(plot.title = element_text(hjust = 0.5))
+    #scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
+    #scale_y_continuous(limits = c(-6,6))+ 
+    labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',title = paste0( "Delta", "_", group, "_", strata, "_", fit, "_", outcome))+
+    theme(plot.title = element_text(hjust = 0.5)
+    + facet_grid(AERp ~ subgroup))
   
   p_line
+  
+  }
   
   
 }
