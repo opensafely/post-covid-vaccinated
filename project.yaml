@@ -64,7 +64,7 @@ actions:
   
   stage4_table2_both:
     run: r:latest analysis/table_2.R both
-    needs: [active_analyses, stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs: 
       moderately_sensitive:
         table2: output/table2_*.csv
