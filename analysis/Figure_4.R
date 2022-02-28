@@ -71,6 +71,43 @@ figure4 <- function(group, fit, outcome, strata){
   #Alternative 0-28 days
   hr0_28 <- input2[input2$event == outcome  & input2$model == fit  & 
                      input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$estimate
+  
+  #5.locate CI of the estimates
+  #0-14 days
+  hr_14_low <- input2[input2$event == outcome  & input2$model == fit  & 
+                          input2$cohort == group & input2$subgroup == strata& input2$term == "days0_14",]$conf.low
+  hr_14_high <- input2[input2$event == outcome  & input2$model == fit  & 
+                           input2$cohort == group & input2$subgroup == strata& input2$term == "days0_14",]$conf.high
+  #14-28 days
+  hr_28_low <- input2[input2$event == outcome & input2$model == fit  & 
+                          input2$cohort == group & input2$subgroup == strata& input2$term == "days14_28",]$conf.low
+  hr_28_high <- input2[input2$event == outcome & input2$model == fit  & 
+                           input2$cohort == group & input2$subgroup == strata& input2$term == "days14_28",]$conf.high
+  #28-56 days
+  hr_56_low <- input2[input2$event == outcome & input2$model == fit  & 
+                          input2$cohort == group & input2$subgroup == strata& input2$term == "days28_56",]$conf.low
+  hr_56_high <- input2[input2$event == outcome & input2$model == fit  & 
+                           input2$cohort == group & input2$subgroup == strata& input2$term == "days28_56",]$conf.high
+  #56-84 days
+  hr_84_low <- input2[input2$event == outcome & input2$model == fit  & 
+                          input2$cohort == group & input2$subgroup == strata& input2$term == "days56_84",]$conf.low
+  hr_84_high <- input2[input2$event == outcome & input2$model == fit  & 
+                           input2$cohort == group & input2$subgroup == strata& input2$term == "days56_84",]$conf.high
+  #84-196 days
+  hr_196_low <- input2[input2$event == outcome & input2$model == fit  & 
+                           input2$cohort == group & input2$subgroup == strata& input2$term == "days84_197",]$conf.low
+  hr_196_high <- input2[input2$event == outcome & input2$model == fit  & 
+                            input2$cohort == group & input2$subgroup == strata& input2$term == "days84_197",]$conf.high
+  #Alternative 0-28 days
+  hr0_28_low <- input2[input2$event == outcome  & input2$model == fit  & 
+                           input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$conf.low
+  hr0_28_high <- input2[input2$event == outcome  & input2$model == fit  & 
+                            input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$conf.high
+  #Alternative 28 - 196 days
+  hr28_196_low <- input2[input2$event == outcome  & input2$model == fit  & 
+                             input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$conf.low
+  hr28_196_high <- input2[input2$event == outcome  & input2$model == fit  & 
+                              input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$conf.high
   #Alternative 28 - 196 days
   hr28_196<- input2[input2$event == outcome  & input2$model == fit  & 
                       input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$estimate
@@ -102,7 +139,7 @@ figure4 <- function(group, fit, outcome, strata){
   #Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
   # for that day to derive the incidence on each day after COVID-19. 
   
-  #assign the hr estimates
+  #1.assign the hr estimates
   lifetable$h <- ifelse(lifetable$days < 15, rep(hr_14),0)
   lifetable$h <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28),lifetable$h)
   lifetable$h <- ifelse(lifetable$days < 29 & is.na(lifetable$h), rep(hr0_28),lifetable$h)#alternative for 0-28 days
@@ -112,6 +149,29 @@ figure4 <- function(group, fit, outcome, strata){
   lifetable$h <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196),lifetable$h)
   lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)
   #alternative for 28-196 days
+  
+  #2.assign the CI low
+  lifetable$h.low <- ifelse(lifetable$days < 15, rep(hr_14_low),0)
+  lifetable$h.low <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28_low),lifetable$h.low)
+  lifetable$h.low <- ifelse(lifetable$days < 29 & is.na(lifetable$h.low), rep(hr0_28_low),lifetable$h.low)#alternative for 0-28 days
+  
+  lifetable$h.low <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56_low),lifetable$h.low)
+  lifetable$h.low <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84_low),lifetable$h.low)
+  lifetable$h.low <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196_low),lifetable$h.low)
+  lifetable$h.low <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h.low), rep(hr28_196_low),lifetable$h.low)#alternative for 28-196 days
+  
+  #2.assign the CI high
+  lifetable$h.high <- ifelse(lifetable$days < 15, rep(hr_14_high),0)
+  lifetable$h.high <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28_high),lifetable$h.high)
+  lifetable$h.high <- ifelse(lifetable$days < 29 & is.na(lifetable$h.high), rep(hr0_28_high),lifetable$h.high)#alternative for 0-28 days
+  
+  lifetable$h.high <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56_high),lifetable$h.high)
+  lifetable$h.high <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84_high),lifetable$h.high)
+  lifetable$h.high <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196_high),lifetable$h.high)
+  lifetable$h.high <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h.high), rep(hr28_196_high),lifetable$h.high)#alternative for 28-196 days
+  
+  
+  
   
   lifetable$qh <- lifetable$q*lifetable$h
   lifetable$'1-qh' <- 1 - lifetable$qh
