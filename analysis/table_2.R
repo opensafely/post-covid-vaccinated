@@ -34,7 +34,7 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 # indicate active analyses -----------------------------------------------
 
-active_analyses <- read_rds("output/active_analyses.rds")
+active_analyses <- read_rds("lib/active_analyses.rds")
 
 table_2_output <- function(population, covid_history){
   # read in data------------------------------------------------------------
