@@ -32,10 +32,10 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 active_analyses <- read_rds("output/active_analyses.rds")
 
-#person_days_output <- function(population, covid_history){
   # read in data------------------------------------------------------------
   
   input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
+  input <- filter(input, sub_bin_covid19_confirmed_history==T) # they should all have covid history?
   # if(covid_history == "without_covid_history"){
   #   input <- filter(input, sub_bin_covid19_confirmed_history==F)
   # }
@@ -43,10 +43,13 @@ active_analyses <- read_rds("output/active_analyses.rds")
   #   input <- filter(input, sub_bin_covid19_confirmed_history==T)
   # }
   # record variable names for covariate
-  vars_names <- tidyselect::vars_select(names(input), !starts_with(c('sub_','cov_','qa_','vax_cat'), ignore.case = TRUE))
-  vars_names <- c(vars_names, "sub_cat_covid19_hospital", "sub_bin_covid19_confirmed_history")
+  input <- input %>% mutate(sub_bin_sex = cov_cat_sex, sub_num_age = cov_num_age, 
+                          sub_cov_ethnicity = cov_cat_ethnicity)
+  vars_names <- tidyselect::vars_select(names(input), !starts_with(c('cov_','qa_','vax_cat'), ignore.case = TRUE))
+
+  # variable sub_bin_ate, does this a variable indicate whether indivdiuals have a prior history of ate?
   strata_names <- tidyselect::vars_select(names(active_analyses), !contains(c('active','outcome','outcome_variable','covariates','prior_history_var', 'model', 'cohort'), ignore.case = TRUE))
-  
+
   # Create a data frame for survival data: to avoid carrying covariates in the calculation
   survival_data <- input[,vars_names] 
   
@@ -60,13 +63,12 @@ active_analyses <- read_rds("output/active_analyses.rds")
   
   event_names<- event_names <- gsub("out_date_","",event_dates_names)
   #event_names
-  
+  strata <- "covid_history"
   col_headings <- c("event", "cohort", "strata", "person_days")
   table_person_days <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
   colnames(table_person_days) <- col_headings
   table_person_days$event <- event_names
-  # test with one strata
-  #strata = "sub_bin_covid19_confirmed_history"
+
   person_days <- function(population, survival_data, event_dates_names, index)
   {
     survival_data$event_date <- survival_data[,event_dates_names[index]]
@@ -80,66 +82,17 @@ active_analyses <- read_rds("output/active_analyses.rds")
     
     # follow-up days
     survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1) 
-    #hist(survival_data$follow_up_period)  ## check if there are any negative follow-up periods
     survival_data = survival_data %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period 
-    #survival_data = survival_data %>% mutate(follow_up_years = follow_up_period / 365.2) # follow-up years
-    # if(infection_subgroup == "no_infection"){
-    #   event_count <- length(which((survival_data$event_date >= survival_data$index_date & survival_data$event_date <= survival_data$follow_up_end) &
-    #                                 (survival_data$event_date < survival_data$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
-    #   ))
-    # }else{
-    #   event_count <- length(which(survival_data$event_date   >= survival_data$index_date &
-    #                                 survival_data$event_date >= survival_data$exp_date_covid19_confirmed & 
-    #                                 survival_data$event_date <= survival_data$follow_up_end))
-    # }
-    #person_years_follow_up  = round(sum(survival_data$follow_up_years, na.rm = TRUE),1)
     person_days_unexposed_total  = round(sum(survival_data$person_days_unexposed, na.rm = TRUE),1)
-    #survival_data %>% group_by(noquote(strata) %>% summarise(person_days_unexposed_total = sum(person_days_unexposed))
     x <- survival_data %>% group_by(sub_bin_covid19_confirmed_history) %>% summarise(person_days_unexposed_total = sum(person_days_unexposed))
-    #x[,2]
-    #incidence_rate = round(event_count/person_years_follow_up, 4)
-    #incidence_rate_lower = incidence_rate - 1.96 * sqrt(event_count/person_years_follow_up^2)
-    #incidence_rate_upper = incidence_rate + 1.96 * sqrt(event_count/person_years_follow_up^2)
-    #return(c(event_count,person_years_follow_up, incidence_rate, incidence_rate_lower, incidence_rate_upper))
     len <- length(x[,2])
     print(len)
-    data <- cbind(rep(event_dates_names[index],len), rep(population,len), rep(strata,len), x[,2])
-    names(data) <- col_headings
+    outcome_name <- gsub("out_date_", "", event_dates_names[index])
+    data <- cbind(rep(outcome_name,len), rep(population,len), rep(strata,len), x[,2])
+    #names(data) <- col_headings
+    survival_data %>% group_by(sub_bin_sex) %>% summarise(person_days_unexposed_total = sum(person_days_unexposed))
     print(data)
     return(data)
   }
 
-   table_person_days <-person_days(population,survival_data,event_dates_names, 1) 
-#   for(i in 1:length(event_dates_names)){
-#     table_2[i,2:6] <- summary_stats(population, "no_infection", survival_data, event_dates_names, i)
-#     table_2[i,7:11] <- summary_stats(population, "non_hospitalised",survival_data[survival_data$sub_cat_covid19_hospital=="non_hospitalised",], event_dates_names, i)
-#     table_2[i,12:16] <- summary_stats(population, "hospitalised", survival_data[survival_data$sub_cat_covid19_hospital=="hospitalised",], event_dates_names, i)
-#     table_2$total_event_count <- table_2[,2] + table_2[,7] + table_2[,12]
-#     table_2$total_person_yrs <-  table_2[,3] + table_2[,8] + table_2[,13]
-#     table_2$overall_incidence_rate <- round(table_2$total_event_count/table_2$total_person_yrs,4)
-#     table_2$overall_incidence_rate_lower <- table_2$overall_incidence_rate - 1.96*sqrt(table_2$total_event_count/table_2$total_person_yrs^2)
-#     table_2$overall_incidence_rate_upper <- table_2$overall_incidence_rate + 1.96*sqrt(table_2$total_event_count/table_2$total_person_yrs^2)
-#     names(table_2)[2:6] <- c("no_infection_sub_event_count", "no_infection_sub_person_yrs_fp", "no_infection_sub_incidence_rate", "no_infection_sub_incidence_rate_lower", "no_infection_sub_incidence_rate_upper")
-#     names(table_2)[7:11] <- c("non_hospitalised_sub_event_count", "non_hospitalised_sub_person_yrs_fp", "non_hospitalised_sub_incidence_rate", "non_hospitalised_sub_incidence_rate_lower","non_hospitalised_sub_incidence_rate_upper")
-#     names(table_2)[12:16] <- c("hospitalised_sub_event_count", "hospitalised_sub_person_yrs_fp", "hospitalised_sub_incidence_rate", "hospitalised_sub_incidence_rate_lower", "hospitalised_sub_incidence_rate_upper")
-#     names(table_2)[17:21] <- c("total_event_count", "total_person_yrs", "overall_incidence_rate", "overall_incidence_rate_lower", "overall_incidence_rate_upper")
-#   }
-#   # low number check and suppression to "NA" if event count lower than 5
-#   table_2[which(table_2$no_infection_sub_event_count <5), c(2,4)] = c("<5", "NA")
-#   table_2[which(table_2$non_hospitalised_sub_event_count <5),c(7,8)] = c("<5", "NA")
-#   table_2[which(table_2$hospitalised_sub_event_count <5),c(12,13)] = c("<5", "NA")
-#   table_2[which(table_2$total_event_count <5),c(17,18)] = c("<5", "NA")
-#   write.csv(table_2, file= paste0("output/", "table2_", population, "_",covid_history, ".csv"), row.names = F)
-#}
-
-# # Run function using specified commandArgs
-# 
-# if(population == "both"){
-#   table_2_output("vaccinated", "with_covid_history")
-#   table_2_output("vaccinated", "without_covid_history")
-#   table_2_output("electively_unvaccinated", "with_covid_history")
-#   table_2_output("electively_unvaccinated", "without_covid_history")
-# }else{
-#   table_2_output(population, "with_covid_history")
-#   table_2_output(population, "without_covid_history")
-# }
+  table_person_days <-person_days(population,survival_data,event_dates_names, 1) 
