@@ -160,7 +160,7 @@ figure4 <- function(group, fit, outcome, strata){
   lifetable$h.low <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196_low),lifetable$h.low)
   lifetable$h.low <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h.low), rep(hr28_196_low),lifetable$h.low)#alternative for 28-196 days
   
-  #2.assign the CI high
+  #3.assign the CI high
   lifetable$h.high <- ifelse(lifetable$days < 15, rep(hr_14_high),0)
   lifetable$h.high <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28_high),lifetable$h.high)
   lifetable$h.high <- ifelse(lifetable$days < 29 & is.na(lifetable$h.high), rep(hr0_28_high),lifetable$h.high)#alternative for 0-28 days
@@ -170,23 +170,71 @@ figure4 <- function(group, fit, outcome, strata){
   lifetable$h.high <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196_high),lifetable$h.high)
   lifetable$h.high <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h.high), rep(hr28_196_high),lifetable$h.high)#alternative for 28-196 days
   
-  
-  
-  
+  #4.assign qh
   lifetable$qh <- lifetable$q*lifetable$h
+  lifetable$qh.low <- lifetable$q*lifetable$h.low
+  lifetable$qh.high <- lifetable$q*lifetable$h.high
+  
+  #5.assign 1-qh
   lifetable$'1-qh' <- 1 - lifetable$qh
+  lifetable$'1-qh.low' <- 1 - lifetable$qh.low
+  lifetable$'1-qh.high' <- 1 - lifetable$qh.high
+  
+  #6.assign sc
   lifetable$sc <- cumprod(lifetable$`1-qh`)
+  lifetable$sc.low <- cumprod(lifetable$`1-qh.low`)
+  lifetable$sc.high <- cumprod(lifetable$`1-qh.high`)
   #-------------------------------------------
   #Step5. Calculate the Absolute excess risk--
   #-------------------------------------------
   #Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
   #compared with no COVID-19 diagnosis. 
   
-  #AER = Sc-S=difference in absolute risk
-  lifetable$AER <- lifetable$sc - lifetable$s # RT- reverse when real data
-  lifetable$AERp <-lifetable$AER*100
+  #AER =difference in absolute risk
+  lifetable$'s-sc' <- lifetable$s - lifetable$sc # RT- reverse with real data
+  lifetable$'s-sc.low' <- lifetable$s - lifetable$sc.low
+  lifetable$'s-sc.high' <- lifetable$s - lifetable$sc.high
   
+  #AER%
+  lifetable$AERp <-lifetable$'s-sc'*100
+  lifetable$AERp.low <-lifetable$'s-sc.low'*100
+  lifetable$AERp.high <-lifetable$'s-sc.high'*100
+  
+  #-------------------------------------------
+  #Step6. Output1 the csv
+  #-------------------------------------------
+
   write.csv(lifetable, paste0("output/lifetable_" , group, "_", fit, "_", outcome, "_", strata,".csv"), row.names = F)
+  
+  ##########################
+  #Step7.  Output2 the plotting
+  ######life table##########
+  library(magrittr)
+  library(dplyr)
+  library(ggplot2)
+  
+  plot(lifetable$days, lifetable$AERp)
+  
+  p_line<-ggplot(lifetable,
+                 aes(x=days,
+                     y=AERp,
+                     group=1)) +
+    #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
+    #              position=position_dodge(.9))+
+    geom_line(size=1) + geom_line(col='blue')+
+    geom_ribbon(aes(ymin = AERp.low, ymax = AERp.high, fill = 1), 
+                alpha=0.1, 
+                linetype="dashed",
+                color="grey")
+    #geom_point()+
+    scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
+    scale_y_continuous(limits = c(-1,1))+
+    labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
+         title = 'ATE')+
+    theme(plot.title = element_text(hjust = 0.5))
+  
+  p_line
+  
   
 }
 #------------------RUN the function-------------------------------------------------------------------------------------
@@ -194,15 +242,15 @@ figure4 <- function(group, fit, outcome, strata){
 #group <- "vaccinated"
 #fit <- "mdl_max_adj"
 #outcome <- "vte"
-stratas <- c("main", 
-             "sex_Male"), "sex_Female",
+#stratas <- c("main", 
+             "sex_Male", "sex_Female",
              "agegp_18_39", "agegp_40_59", "agegp_60_79", "agegp_80_110",
              "ethnicity_South_Asian", "ethnicity_Black", "ethnicity_White", "ethnicity_Mixed","ethnicity_Other", "ethnicity_Missing",
              "prior_history_FALSE", "prior_history_TRUE", "covid_pheno_hospitalised", "covid_pheno_non_hospitalised",
              "covid_history")
+figure4(group, fit, outcome, strata)
 
-
-for (strata in stratas) { figure4("vaccinated","mdl_max_adj","ate", strata)}
+for (strata in stratas) { figure4("vaccinated","mdl_max_adj","ate", sex_Male)}
 
 #output life tables
 #subgroups = 18
