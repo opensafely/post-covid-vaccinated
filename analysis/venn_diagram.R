@@ -38,7 +38,7 @@ venn_output <- function(population){
   variable_names <- tidyselect::vars_select(names(input), starts_with(c('tmp_out_date_','out_date'), ignore.case = TRUE))
   input <- input[,variable_names]
   
-  #-- function to check number < 5 in the venn diagram ---------------------------
+  #-- function to check number <= 5 in the venn diagram ---------------------------
   count_le5_function <- function(outcome_names)
   {
     print(outcome_names)
