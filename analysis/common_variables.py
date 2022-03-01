@@ -1302,9 +1302,9 @@ def generate_common_variables(index_date_variable):
         return_expectations={"incidence": 0.01},
     ),
      ### HES
-    cov_bin_depression_icd10=patients.with_these_clinical_events(
-        depression_icd10,
+    cov_bin_depression_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=depression_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
@@ -1322,9 +1322,9 @@ def generate_common_variables(index_date_variable):
         return_expectations={"incidence": 0.01},
     ),
      ### HES
-    cov_bin_anxiety_icd10=patients.with_these_clinical_events(
-        anxiety_icd10,
+    cov_bin_anxiety_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=anxiety_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),    
@@ -1374,9 +1374,9 @@ def generate_common_variables(index_date_variable):
         return_expectations={"incidence": 0.01},
     ),
      ### HES
-    cov_bin_self_harm_10plus_icd10=patients.with_these_clinical_events(
-        self_harm_intent_icd10,
+    cov_bin_self_harm_10plus_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=self_harm_intent_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
@@ -1397,12 +1397,9 @@ def generate_common_variables(index_date_variable):
         return_expectations={"incidence": 0.01},
     ),
      ### HES
-    cov_bin_self_harm_15plus_icd10=patients.with_these_clinical_events(
-        combine_codelists(
-            self_harm_intent_icd10,
-            self_harm_undet_intent_icd10,
-        ),
+    cov_bin_self_harm_15plus_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=self_harm_undet_intent_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
@@ -1428,65 +1425,65 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Alcohol misuse 
-    cov_bin_alcohol_misuse=patients.with_these_clinical_events(
-        alcohol_misuse_icd10,
+    cov_bin_alcohol_misuse=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=alcohol_misuse_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
 
     ## Bipolar and other mood disorders
-    cov_bin_bipolar_mood=patients.with_these_clinical_events(
-        bipolar_other_mood_icd10,
+    cov_bin_bipolar_mood=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=bipolar_other_mood_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
 
     ## Drug misuse
-    cov_bin_drug_misuse=patients.with_these_clinical_events(
-        drug_misuse_icd10,
+    cov_bin_drug_misuse=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=drug_misuse_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
 
     ## Mixed depression and anxiety
-     cov_bin_depression_anxiety=patients.with_these_clinical_events(
-        mixed_depression_anxiety_icd10,
+     cov_bin_depression_anxiety=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=mixed_depression_anxiety_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
 
     ## Other psychotic disorders
-     cov_bin_psychotic_disorders=patients.with_these_clinical_events(
-        psychotic_disorders_other_icd10,
+     cov_bin_psychotic_disorders=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=psychotic_disorders_other_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
 
      ## Other mental health conditions
-     cov_bin_other_mental_health=patients.with_these_clinical_events(
-        mental_health_other_icd10,
+     cov_bin_other_mental_health=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=mental_health_other_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
 
      ## PTSD
-     cov_bin_ptsd=patients.with_these_clinical_events(
-        ptsd_icd10,
+     cov_bin_ptsd=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=ptsd_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
 
      ## Schizophrenia
-     cov_bin_schizophrenia=patients.with_these_clinical_events(
-        schizophrenia_icd10,
+     cov_bin_schizophrenia=patients.admitted_to_hospital(
         returning='binary_flag',
+        with_these_diagnoses=schizophrenia_icd10,
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
