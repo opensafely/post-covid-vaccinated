@@ -14,7 +14,7 @@ The protocol is available [here](https://uob.sharepoint.com/:w:/r/teams/grp-ehr/
     * If you are interested in how we defined our variables, we use three study definition scripts for variables specific to our vaccinated cohort [study definition vaccinated](analysis/study_definition_vaccinated.py), variables specific to our electively unvaccinated cohort [study definition electively unvaccinated](analysis/study_definition_electively_unvaccinated.py) and to define common variables and index_date [study definition index](analysis/study_definition_index.py); this is written in `python`. The resulting  extracted data is combined to create our final data extracts in [preprocess](analysis/preprocess_data.R).
     * This directory also contains all the R scripts that process, describe, and analyse the extracted data.
 
-* The `lib/` directory contains preliminary (pre data extract) scripts, useful functions, and dummy data.
+* The `lib/` directory contains a list of active analyses.
 
 * The `project.yaml` defines run-order and dependencies for all the analysis scripts. This file should not be edited directly. To make changes to the yaml, edit and run the `create_project_actions.R` script (available in the `analysis/` directory) which generates all the actions of the `project.yaml`.
 
