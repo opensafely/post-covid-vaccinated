@@ -14,7 +14,7 @@
 
 # adapted from table 2
 # comment number of rows need to be revised in "data" and "output"
-library(readr); library(dplyr); library(data.table); library(lubridate)
+library(readr); library(dplyr); library(data.table); library(lubridate);library(stringr)
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -46,7 +46,20 @@ active_analyses <- read_rds("output/active_analyses.rds")
   # record variable names for covariate
   #input <- input %>% mutate(sub_bin_sex = cov_cat_sex, sub_num_age = cov_num_age, 
   #                        sub_cat_ethnicity = cov_cat_ethnicity)
-  # need to create age group
+
+  # Define age groups
+  
+  input$cov_cat_age_group <- ""
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=18 & input$cov_num_age<=29, "18-29", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=30 & input$cov_num_age<=39, "30-39", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=49, "40-49", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=50 & input$cov_num_age<=59, "50-59", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=60 & input$cov_num_age<=69, "60-69", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=70 & input$cov_num_age<=79, "70-79", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=80 & input$cov_num_age<=89, "80-89", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=90, "90+", input$cov_cat_age_group)
+  
+  # need to add age subgroup
   input <- input %>% mutate(sub_bin_sex = cov_cat_sex,
                             sub_cat_ethnicity = cov_cat_ethnicity)
   vars_names <- tidyselect::vars_select(names(input), !starts_with(c('cov_','qa_','vax_cat'), ignore.case = TRUE))
