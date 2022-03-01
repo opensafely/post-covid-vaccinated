@@ -27,7 +27,7 @@ if(length(args)==0){
 }
 
 # to prepare for extracting outcome variable names in the current analyses ---------------------------
-active_analyses <- read_rds("output/active_analyses.rds")
+active_analyses <- read_rds("lib/active_analyses.rds")
 
 venn_output <- function(population){
   # read in data------------------------------------------------------------
