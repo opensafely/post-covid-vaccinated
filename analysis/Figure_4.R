@@ -212,8 +212,12 @@ active <- tidyr::separate_rows(active, model, sep = ";")
 active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort)
 active <- tidyr::separate_rows(active, cohort, sep = ";")
 
+active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
 
-
+active$group <- gsub("_.*","",active$strata)
+active$group <- ifelse(active$group=="covid" & grepl("covid_history",active$strata), "covid_history", active$group)
+active$group <- ifelse(active$group=="covid" & grepl("covid_pheno",active$strata), "covid_pheno", active$group)
+active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$strata), "prior_history", active$group)
 
 #group <- "vaccinated"
 #fit <- "mdl_max_adj"
@@ -224,7 +228,10 @@ active <- tidyr::separate_rows(active, cohort, sep = ";")
              "ethnicity_South_Asian", "ethnicity_Black", "ethnicity_White", "ethnicity_Mixed","ethnicity_Other", "ethnicity_Missing",
              "prior_history_FALSE", "prior_history_TRUE", "covid_pheno_hospitalised", "covid_pheno_non_hospitalised",
              "covid_history")
-figure4(group, fit, outcome, strata)
+#Call the figure4 table function
+figure4_tables(group, fit, outcome, strata)
+
+#run for active analysis
 
 for (strata in stratas) { figure4("vaccinated","mdl_max_adj","ate", sex_Male)}
 
