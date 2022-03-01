@@ -67,11 +67,14 @@ active_analyses <- read_rds("output/active_analyses.rds")
   event_names<- event_names <- gsub("out_date_","",event_dates_names)
   #event_names
   
-  strata <- "covid_history"
+  #define data frame for output table
   col_headings <- c("event", "cohort", "strata", "person_days")
   table_person_days <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
   colnames(table_person_days) <- col_headings
   table_person_days$event <- event_names
+  
+
+
 
   person_days <- function(population, survival_data, event_dates_names, sub_grp_names, index)
   {
@@ -87,17 +90,27 @@ active_analyses <- read_rds("output/active_analyses.rds")
     survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1) 
     survival_data = survival_data %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period 
     person_days_unexposed_total  = round(sum(survival_data$person_days_unexposed, na.rm = TRUE),1)
-    # for(i in sub_grp_names)
-    # {
-    #   print(i)
-    #   x <-survival_data %>% group_by(i) %>% summarise(person_days_unexposed_total = sum(person_days_unexposed))
-    #   print(x)
-    # }
+
     outcome_name <- gsub("out_date_", "", event_dates_names[index])
-    x <- survival_data %>% group_by(sub_bin_covid19_confirmed_history) %>% summarise(person_days_unexposed_total = sum(person_days_unexposed))
-    len <- length(x[,2])
-    print(len)
+    #x <- survival_data %>% group_by(sub_bin_covid19_confirmed_history) %>% summarise(person_days_unexposed_total = sum(person_days_unexposed))
+   
+    #data <- cbind(rep(outcome_name,len), rep(population,len), rep(strata,len), x[,2])
+    
+    #len <- length(x[,2])
+    x <- tapply(survival_data$person_days_unexposed, survival_data[,current], FUN=sum)
+    #print(x)
+    len = length(x)
+    #len
+    index_data = 1
+    start = index_data
+    end = index_data + len - 1
+    # column 4 is person days
+    data$person_days[start:end] <- as.vector(x)
     strata <- NULL
+    # define data frame for output table for each outcome
+    data <- data.frame(matrix(ncol=length(col_headings), nrow=12))
+    colnames(data) <- col_headings
+    index_data = 1
     for(i in 1:length(sub_grp_names)){
       strata[i] <- str_sub(sub_grp_names[i], 9) # remove the first nine characters
       current <- sub_grp_names[i]
@@ -105,20 +118,23 @@ active_analyses <- read_rds("output/active_analyses.rds")
       level_names <- names(table(survival_data[,current]))
       x <- tapply(survival_data$person_days_unexposed, survival_data[,current], FUN=sum)
       print(x)
+      strata_level <- NULL # initialization
       for(j in level_names){
-        print(paste0(strata[i], "_",j))
+        strata_level[j] <- paste0(strata[i], "_",j)
       }
+      len = length(x)
+      start = index_data
+      end = index_data + len - 1
+      # column 4 is person days
+      data$person_days[start:end] <- as.vector(x)
+      data$strata[start:end] <- strata_level
+      data$event[start:end] <- outcome_name
+      data$cohort[start:end] <- population
+      index_data = end+1
     }
-    data <- cbind(rep(outcome_name,len), rep(population,len), rep(strata,len), x[,2])
-    names(data) <- col_headings
-    x <- survival_data %>% group_by(sub_bin_sex) %>% summarise(person_days_unexposed_total = sum(person_days_unexposed))
-    len <- dim(x)[1]
-    strata = gsub("sub_bin_", "", "sub_bin_sex")
-    data2 <- cbind(rep(outcome_name,len), rep(population,len), rep(noquote(strata),len), x[,2])
-    names(data2) <- col_headings
-    rbind(data,data2)
     print(data)
     return(data)
   }
 
-  table_person_days <-person_days(population,survival_data,event_dates_names, 1) 
+
+person_days(population, survival_data, event_dates_names, sub_grp_names, 1)
