@@ -886,3 +886,87 @@ addiction_snomed_clinical = codelist_from_csv(
     system="snomed",
     column="code",
 )
+
+# Alcohol misuse ICD10
+alcohol_misuse_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-alcohol_misuse_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Anxiety ICD10
+anxiety_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-anxiety_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Bipolar and other mood disorders ICD10
+bipolar_other_mood_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-bipolar_and_mood_disorders_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Depression ICD10
+depression_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-depression_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Drug misuse ICD10
+drug_misuse_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-drug_misuse_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Other mental health ICD10
+mental_health_other_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-other_mental_health_conditions_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Mixed depression and anxiety ICD10
+mixed_depression_anxiety_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-mixed_depression_and_anxiety_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Other Psychotic disorders ICD10
+psychotic_disorders_other_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-other-psychotic_disorders_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# PTSD ICD10
+ptsd_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-ptsd_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Schizophrenia ICD10
+schizophrenia_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-schizophrenia_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Self harm intentional 10 years ICD10
+self_harm_intent_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-self_harm_intentional_10_years_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Self harm undetermined intent 15 years 
+self_harm_undet_intent_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-self_harm_undetermined_intent_15_years_icd10.csv",
+    system="icd10",
+    column="code",
+)

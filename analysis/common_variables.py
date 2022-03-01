@@ -1294,19 +1294,43 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Depression 
-    cov_bin_depression=patients.with_these_clinical_events(
+     ### Primary care
+    cov_bin_depression_snomed=patients.with_these_clinical_events(
         depression_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
+     ### HES
+    cov_bin_depression_icd10=patients.with_these_clinical_events(
+        depression_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+     ### Combined
+    cov_bin_depression=patients.maximum_of(
+        "cov_bin_depression_snomed", "cov_bin_depression_icd10",
+    ),   
 
     ## Anxiety - general
+     ### Primary care
     cov_bin_anxiety_general=patients.with_these_clinical_events(
         anxiety_general_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
+    ),
+     ### HES
+    cov_bin_anxiety_icd10=patients.with_these_clinical_events(
+        anxiety_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),    
+     ### Combined
+    cov_bin_anxiety=patients.maximum_of(
+        "cov_bin_anxiety_general", "cov_bin_anxiety_icd10",
     ),
 
     ## Anxiety - obsessive compulsive disorder
@@ -1342,15 +1366,28 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Self harm - aged >= 10 years
-    cov_bin_self_harm_10plus=patients.with_these_clinical_events(
+     ### Primary care
+    cov_bin_self_harm_10plus_snomed=patients.with_these_clinical_events(
         self_harm_10plus_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
     ),
+     ### HES
+    cov_bin_self_harm_10plus_icd10=patients.with_these_clinical_events(
+        self_harm_intent_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+     ### Combined
+    cov_bin_self_harm_10plus=patients.maximum_of(
+        "cov_bin_self_harm_10plus_snomed", "cov_bin_self_harm_10plus_icd10",
+    ),
 
-     ## Self harm - aged >= 15 years
-    cov_bin_self_harm_15plus=patients.with_these_clinical_events(
+    ## Self harm - aged >= 15 years
+     ### Primary care
+    cov_bin_self_harm_15plus_snomed=patients.with_these_clinical_events(
         combine_codelists(
             self_harm_10plus_snomed_clinical,
             self_harm_15plus_snomed_clinical,
@@ -1358,6 +1395,20 @@ def generate_common_variables(index_date_variable):
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},
+    ),
+     ### HES
+    cov_bin_self_harm_15plus_icd10=patients.with_these_clinical_events(
+        combine_codelists(
+            self_harm_intent_icd10,
+            self_harm_undet_intent_icd10,
+        ),
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+     ### Combined
+    cov_bin_self_harm_15plus=patients.maximum_of(
+        "cov_bin_self_harm_15plus_snomed", "cov_bin_self_harm_15plus_icd10",
     ),
 
     ## Suicide
@@ -1371,6 +1422,70 @@ def generate_common_variables(index_date_variable):
     ## Addiction
     cov_bin_addiction=patients.with_these_clinical_events(
         addiction_snomed_clinical,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+    ## Alcohol misuse 
+    cov_bin_alcohol_misuse=patients.with_these_clinical_events(
+        alcohol_misuse_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+    ## Bipolar and other mood disorders
+    cov_bin_bipolar_mood=patients.with_these_clinical_events(
+        bipolar_other_mood_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+    ## Drug misuse
+    cov_bin_drug_misuse=patients.with_these_clinical_events(
+        drug_misuse_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+    ## Mixed depression and anxiety
+     cov_bin_depression_anxiety=patients.with_these_clinical_events(
+        mixed_depression_anxiety_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+    ## Other psychotic disorders
+     cov_bin_psychotic_disorders=patients.with_these_clinical_events(
+        psychotic_disorders_other_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+     ## Other mental health conditions
+     cov_bin_other_mental_health=patients.with_these_clinical_events(
+        mental_health_other_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+     ## PTSD
+     cov_bin_ptsd=patients.with_these_clinical_events(
+        ptsd_icd10,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.01},
+    ),
+
+     ## Schizophrenia
+     cov_bin_schizophrenia=patients.with_these_clinical_events(
+        schizophrenia_icd10,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.01},

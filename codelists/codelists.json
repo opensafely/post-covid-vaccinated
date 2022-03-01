@@ -761,6 +761,78 @@
       "url": "https://codelists.opensafely.org/codelist/user/tomsrenin/dvt-other/1f29601d/",
       "downloaded_at": "2022-01-19 16:58:03.199556Z",
       "sha": "fcf9ebe14d0240fdc30ee45f7de1fe2503d85bd5"
+    },
+    "user-kurttaylor-alcohol_misuse_icd10.csv": {
+      "id": "user/kurttaylor/alcohol_misuse_icd10/18f3c3a5",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/alcohol_misuse_icd10/18f3c3a5/",
+      "downloaded_at": "2022-03-01 15:21:59.451947Z",
+      "sha": "b06dfc78aa1b66bc58a5499362607e2c9414274f"
+    },
+    "user-kurttaylor-anxiety_icd10.csv": {
+      "id": "user/kurttaylor/anxiety_icd10/7fe4506f",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/anxiety_icd10/7fe4506f/",
+      "downloaded_at": "2022-03-01 15:21:59.591830Z",
+      "sha": "5dd69df8574630099bcce4ef8c8ec9d922c6c303"
+    },
+    "user-kurttaylor-bipolar_and_mood_disorders_icd10.csv": {
+      "id": "user/kurttaylor/bipolar_and_mood_disorders_icd10/66d4dd3a",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/bipolar_and_mood_disorders_icd10/66d4dd3a/",
+      "downloaded_at": "2022-03-01 15:21:59.736474Z",
+      "sha": "8aad947d0f8a0496d5996b7469641526e669c37c"
+    },
+    "user-kurttaylor-depression_icd10.csv": {
+      "id": "user/kurttaylor/depression_icd10/4dc56a05",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/depression_icd10/4dc56a05/",
+      "downloaded_at": "2022-03-01 15:21:59.839989Z",
+      "sha": "ae1ab7bb89c1636e7f582b9cb2a164221b1b1f46"
+    },
+    "user-kurttaylor-drug_misuse_icd10.csv": {
+      "id": "user/kurttaylor/drug_misuse_icd10/34b5f6d0",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/drug_misuse_icd10/34b5f6d0/",
+      "downloaded_at": "2022-03-01 15:21:59.943902Z",
+      "sha": "015293bed3dd0672ad27a32d8120cc716c75b2cf"
+    },
+    "user-kurttaylor-mixed_depression_and_anxiety_icd10.csv": {
+      "id": "user/kurttaylor/mixed_depression_and_anxiety_icd10/2971066",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/mixed_depression_and_anxiety_icd10/2971066/",
+      "downloaded_at": "2022-03-01 15:22:00.070405Z",
+      "sha": "6767f5bc5c8b6113ee5e7be2e8dcdc4cf41b1360"
+    },
+    "user-kurttaylor-other-psychotic_disorders_icd10.csv": {
+      "id": "user/kurttaylor/other-psychotic_disorders_icd10/69879d30",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/other-psychotic_disorders_icd10/69879d30/",
+      "downloaded_at": "2022-03-01 15:22:00.236686Z",
+      "sha": "31f303bbe7399676e9b2c56fc93db68ca8be1366"
+    },
+    "user-kurttaylor-other_mental_health_conditions_icd10.csv": {
+      "id": "user/kurttaylor/other_mental_health_conditions_icd10/1ba6839b",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/other_mental_health_conditions_icd10/1ba6839b/",
+      "downloaded_at": "2022-03-01 15:22:00.434743Z",
+      "sha": "976d1949afd039a5ce27ddcfad02c5beb13c9120"
+    },
+    "user-kurttaylor-ptsd_icd10.csv": {
+      "id": "user/kurttaylor/ptsd_icd10/507829fb",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/ptsd_icd10/507829fb/",
+      "downloaded_at": "2022-03-01 15:22:00.634753Z",
+      "sha": "3a98bc088ef4ce696ab6b5c7d4c0e891469b855f"
+    },
+    "user-kurttaylor-schizophrenia_icd10.csv": {
+      "id": "user/kurttaylor/schizophrenia_icd10/3768b6c6",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/schizophrenia_icd10/3768b6c6/",
+      "downloaded_at": "2022-03-01 15:22:00.791846Z",
+      "sha": "532c3cc57b47d2854a36bba221be2e3ed1372e0f"
+    },
+    "user-kurttaylor-self_harm_intentional_10_years_icd10.csv": {
+      "id": "user/kurttaylor/self_harm_intentional_10_years_icd10/1e594391",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/self_harm_intentional_10_years_icd10/1e594391/",
+      "downloaded_at": "2022-03-01 15:22:00.938889Z",
+      "sha": "3b51af8285b5b0499a48c31f9dd96910007acc80"
+    },
+    "user-kurttaylor-self_harm_undetermined_intent_15_years_icd10.csv": {
+      "id": "user/kurttaylor/self_harm_undetermined_intent_15_years_icd10/0549d05c",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/self_harm_undetermined_intent_15_years_icd10/0549d05c/",
+      "downloaded_at": "2022-03-01 15:22:01.103837Z",
+      "sha": "63966cb50c187d90c928792cdc6aada73d665ee3"
     }
   }
 }
