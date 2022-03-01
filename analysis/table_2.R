@@ -115,11 +115,11 @@ table_2_output <- function(population, covid_history){
     names(table_2)[12:16] <- c("hospitalised_sub_event_count", "hospitalised_sub_person_yrs_fp", "hospitalised_sub_incidence_rate", "hospitalised_sub_incidence_rate_lower", "hospitalised_sub_incidence_rate_upper")
     names(table_2)[17:21] <- c("total_event_count", "total_person_yrs", "overall_incidence_rate", "overall_incidence_rate_lower", "overall_incidence_rate_upper")
   }
-  # low number check and suppression to "NA" if event count lower than 5
-  table_2[which(table_2$no_infection_sub_event_count <5), c(2,4)] = c("<5", "NA")
-  table_2[which(table_2$non_hospitalised_sub_event_count <5),c(7,8)] = c("<5", "NA")
-  table_2[which(table_2$hospitalised_sub_event_count <5),c(12,13)] = c("<5", "NA")
-  table_2[which(table_2$total_event_count <5),c(17,18)] = c("<5", "NA")
+  # low number check and suppression to "NA" if event count lower than or equal to 5
+  table_2[which(table_2$no_infection_sub_event_count <= 5), c(2,4,5,6)] = c("<=5", "NA")
+  table_2[which(table_2$non_hospitalised_sub_event_count <= 5),c(7,9,10,11)] = c("<=5", "NA")
+  table_2[which(table_2$hospitalised_sub_event_count <= 5),c(12,14,15,16)] = c("<=5", "NA")
+  table_2[which(table_2$total_event_count <= 5),c(17,19,20,21)] = c("<=5", "NA")
   write.csv(table_2, file= paste0("output/", "table2_", population, "_",covid_history, ".csv"), row.names = F)
 }
 
