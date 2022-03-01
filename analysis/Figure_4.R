@@ -194,6 +194,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
   
 }
 #------------------RUN the function-------------------------------------------------------------------------------------
+
 active <- readr::read_rds("lib/active_analyses.rds")
 
 active <- active[active$active==TRUE,]
@@ -212,12 +213,22 @@ active <- tidyr::separate_rows(active, model, sep = ";")
 active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort)
 active <- tidyr::separate_rows(active, cohort, sep = ";")
 
-active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
-
 active$group <- gsub("_.*","",active$strata)
 active$group <- ifelse(active$group=="covid" & grepl("covid_history",active$strata), "covid_history", active$group)
 active$group <- ifelse(active$group=="covid" & grepl("covid_pheno",active$strata), "covid_pheno", active$group)
 active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$strata), "prior_history", active$group)
+active <- unique(active[,c("event","model","cohort","group")])
+
+active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
+
+for (i in 1:nrow(active)) {
+
+  files <- list.files(path = "output/lifetable_", pattern("lifetable_"))
+  files <- files[grepl(active$group[i])]
+  
+  figure4(active$cohort[i],active$model[i],active$event[i],active$group[i])
+  
+}
 
 #group <- "vaccinated"
 #fit <- "mdl_max_adj"
