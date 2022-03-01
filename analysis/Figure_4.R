@@ -194,6 +194,26 @@ figure4_tbl <- function(group, fit, outcome, strata){
   
 }
 #------------------RUN the function-------------------------------------------------------------------------------------
+active <- readr::read_rds("lib/active_analyses.rds")
+
+active <- active[active$active==TRUE,]
+active$event <- gsub("out_date_","",active$outcome_variable)
+active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL
+
+active <- tidyr::pivot_longer(active, 
+                              cols = setdiff(colnames(active),c("event","model","cohort")), 
+                              names_to = "strata")
+
+active <- active[active$value==TRUE, c("event","model","cohort","strata")]
+
+active$model <- ifelse(active$model=="all","mdl_agesex;mdl_max_adj",active$model)
+active <- tidyr::separate_rows(active, model, sep = ";")
+
+active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort)
+active <- tidyr::separate_rows(active, cohort, sep = ";")
+
+
+
 
 #group <- "vaccinated"
 #fit <- "mdl_max_adj"
