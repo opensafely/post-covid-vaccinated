@@ -28,7 +28,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
   input2=rbindlist(input2, fill=TRUE)
   
   #Preprocess the AER input data
-  input2 <- input2 %>% select(-std.error, -robust.se, -P, -covariates_removed, -cat_covars_collapsed)
+  input2 <- input2 %>% select(-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
                                 term == "days28_56" |
@@ -158,8 +158,8 @@ figure4_tbl <- function(group, fit, outcome, strata){
   library(magrittr)
   library(dplyr)
   library(ggplot2)
-  
-  #Gather the CSV.s
+    
+    #Gather the CSV.s
   hr_files=list.files(path = "output", pattern = "lifetable_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
   hr_files=paste0("output/",hr_files)
@@ -168,36 +168,26 @@ figure4_tbl <- function(group, fit, outcome, strata){
                           return(df)})
   lifetables=rbindlist(lifetables, fill=TRUE)
   
+  
   lifetables$subgroup <-factor(lifetables$subgroup,levels = c('sex_Male','sex_Female'))
   
-  p_line<-ggplot(lifetable, aes(x=days, y=AERp)) +
-    geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
-    scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
-    scale_x_continuous(breaks = c(0,10,20,30,40,50),limits = c(0,50))+
-    labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',title = 'Arterial') +
-    #theme(plot.title = element_text(hjust = 0.5)+
-     #theme(legend.key.size = unit(1.2,'cm'), legend.key = element_blank())+
-      #labs(color='Subgroup',linetype='Subgroup'))
+  p_line<-ggplot(lifetable,
+                 aes(x=days,
+                     y=AERp,
+                     group=1)) +
+    #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
+    #              position=position_dodge(.9))+
+    geom_line(size=1, col = 'red')+
+    geom_ribbon(aes(ymin = CIp.low, ymax = CIp.high), alpha = 0.1)+
+    #geom_point()+
+    scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200),limits = c(0,200))+
+    scale_y_continuous(breaks = c(-2. -1.5, -1, -0.5, 0, .5, 1, 1.5, 2))+
+    labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
+         title = 'Arterial Thrombotic Events')+
+    theme(plot.title = element_text(hjust = 0.5))
   
   p_line
-  
-  p_line<-ggplot(plot_ethnicity,
-                 aes(x=x_days_since_covid_converted,
-                     y=AER_percent,
-                     colour=subgroup)) +
-    geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
-    scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
-    scale_x_continuous(breaks = c(0,10,20,30,40,50),limits = c(0,50))+
-    #scale_y_continuous(limits = c(0,2))+
-    labs(x='Weeks since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
-         title = 'Arterial')+
-    theme(plot.title = element_text(hjust = 0.5))+
-    #theme_hc()+
-    theme(legend.key.size = unit(1.2,'cm'), legend.key = element_blank())+
-    labs(color='Subgroup',linetype='Subgroup')
-  
-  p_line
-  
+  #RT - to add plot saving file location 
   
   }
   
