@@ -223,15 +223,18 @@ active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$stra
 #fit <- "mdl_max_adj"
 #outcome <- "vte"
 #stratas <- c("main", 
-             "sex_Male", "sex_Female",
-             "agegp_18_39", "agegp_40_59", "agegp_60_79", "agegp_80_110",
-             "ethnicity_South_Asian", "ethnicity_Black", "ethnicity_White", "ethnicity_Mixed","ethnicity_Other", "ethnicity_Missing",
-             "prior_history_FALSE", "prior_history_TRUE", "covid_pheno_hospitalised", "covid_pheno_non_hospitalised",
-             "covid_history")
+             #"sex_Male", "sex_Female",
+             #"agegp_18_39", "agegp_40_59", "agegp_60_79", "agegp_80_110",
+            # "ethnicity_South_Asian", "ethnicity_Black", "ethnicity_White", "ethnicity_Mixed","ethnicity_Other", "ethnicity_Missing",
+            # "prior_history_FALSE", "prior_history_TRUE", "covid_pheno_hospitalised", "covid_pheno_non_hospitalised",
+             #"covid_history")
+
 #Call the figure4 table function
 figure4_tables(group, fit, outcome, strata)
 
 #run for active analysis
+
+figure4(group, fit, outcome, strata)
 
 for (strata in stratas) { figure4("vaccinated","mdl_max_adj","ate", sex_Male)}
 
