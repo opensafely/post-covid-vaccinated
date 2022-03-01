@@ -104,6 +104,7 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
   #phenotype that is not of interest
   if(startsWith(subgroup,"covid_pheno_")){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(follow_up_end, date_expo_censor,na.rm = TRUE))
+    survival_data <- survival_data %>% filter((follow_up_start != date_expo_censor)|is.na(date_expo_censor))
   }
     
   survival_data=survival_data%>%filter(follow_up_end>=follow_up_start)
