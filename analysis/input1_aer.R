@@ -13,6 +13,7 @@
 ## =============================================================================
 
 # adapted from table 2
+# comment number of rows need to be revised in "data" and "output"
 library(readr); library(dplyr); library(data.table); library(lubridate)
 
 args <- commandArgs(trailingOnly=TRUE)
@@ -73,9 +74,6 @@ active_analyses <- read_rds("output/active_analyses.rds")
   colnames(table_person_days) <- col_headings
   table_person_days$event <- event_names
   
-
-
-
   person_days <- function(population, survival_data, event_dates_names, sub_grp_names, index)
   {
     survival_data$event_date <- survival_data[,event_dates_names[index]]
@@ -90,25 +88,9 @@ active_analyses <- read_rds("output/active_analyses.rds")
     survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1) 
     survival_data = survival_data %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period 
     person_days_unexposed_total  = round(sum(survival_data$person_days_unexposed, na.rm = TRUE),1)
-
     outcome_name <- gsub("out_date_", "", event_dates_names[index])
-    #x <- survival_data %>% group_by(sub_bin_covid19_confirmed_history) %>% summarise(person_days_unexposed_total = sum(person_days_unexposed))
-   
-    #data <- cbind(rep(outcome_name,len), rep(population,len), rep(strata,len), x[,2])
-    
-    #len <- length(x[,2])
-    x <- tapply(survival_data$person_days_unexposed, survival_data[,current], FUN=sum)
-    #print(x)
-    len = length(x)
-    #len
-    index_data = 1
-    start = index_data
-    end = index_data + len - 1
-    # column 4 is person days
-    data$person_days[start:end] <- as.vector(x)
     strata <- NULL
-    # define data frame for output table for each outcome
-    data <- data.frame(matrix(ncol=length(col_headings), nrow=12))
+    data <- data.frame(matrix(ncol=length(col_headings), nrow=12)) # define data frame for output table for each outcome
     colnames(data) <- col_headings
     index_data = 1
     for(i in 1:length(sub_grp_names)){
@@ -117,7 +99,7 @@ active_analyses <- read_rds("output/active_analyses.rds")
       print(current)
       level_names <- names(table(survival_data[,current]))
       x <- tapply(survival_data$person_days_unexposed, survival_data[,current], FUN=sum)
-      print(x)
+     # print(x)
       strata_level <- NULL # initialization
       for(j in level_names){
         strata_level[j] <- paste0(strata[i], "_",j)
@@ -136,5 +118,14 @@ active_analyses <- read_rds("output/active_analyses.rds")
     return(data)
   }
 
-
-person_days(population, survival_data, event_dates_names, sub_grp_names, 1)
+  #output <- person_days(population, survival_data, event_dates_names, sub_grp_names, 1)
+  output <- data.frame(matrix(ncol=length(col_headings), nrow=120)) 
+  index_output = 1
+  for(i in 1:length(event_dates_names)){
+    start = index_output
+    end = index_output + 11
+    output[start:end, ] <- person_days(population, survival_data, event_dates_names, sub_grp_names, i) 
+    index_output = end+1
+  }
+  names(output) <- col_headings
+  write.csv(output, file= paste0("output/", "table2_suppl_", population, ".csv"), row.names = F)
