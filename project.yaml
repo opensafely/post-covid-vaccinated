@@ -79,7 +79,7 @@ actions:
         
   analysis_cox_ami:
     run: r:latest analysis/01_pipe.R ami
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_ami.html
@@ -90,7 +90,7 @@ actions:
   
   analysis_cox_stroke_isch:
     run: r:latest analysis/01_pipe.R stroke_isch
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_stroke_isch.html
@@ -102,7 +102,7 @@ actions:
   
   analysis_cox_dvt:
     run: r:latest analysis/01_pipe.R dvt
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs: output/compiled_HR_results_dvt.html
@@ -113,7 +113,7 @@ actions:
 
   analysis_cox_pe:
     run: r:latest analysis/01_pipe.R pe
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_pe.html
@@ -124,7 +124,7 @@ actions:
 
   analysis_cox_tia:
     run: r:latest analysis/01_pipe.R tia
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_tia.html
@@ -136,7 +136,7 @@ actions:
 
   analysis_cox_stroke_sah_hs:
     run: r:latest analysis/01_pipe.R stroke_sah_hs
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_stroke_sah_hs.html
@@ -147,7 +147,7 @@ actions:
 
   analysis_cox_hf:
     run: r:latest analysis/01_pipe.R hf
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_hf.html
@@ -158,7 +158,7 @@ actions:
 
   analysis_cox_angina:
     run: r:latest analysis/01_pipe.R angina
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_angina.html
@@ -167,10 +167,9 @@ actions:
         compiled_hrs_csv: output/compiled_HR_results_angina.csv
         compiled_event_counts_csv: output/compiled_event_counts_angina.csv
 
-
   analysis_cox_ate:
     run: r:latest analysis/01_pipe.R ate
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_ate.html
@@ -179,10 +178,9 @@ actions:
         compiled_hrs_csv: output/compiled_HR_results_ate.csv
         compiled_event_counts_csv: output/compiled_event_counts_ate.csv
 
-
   analysis_cox_vte:
     run: r:latest analysis/01_pipe.R vte
-    needs: [active_analyses,stage1_data_cleaning_both]
+    needs: [stage1_data_cleaning_both]
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_vte.html
