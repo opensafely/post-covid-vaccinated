@@ -193,7 +193,9 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     # ============================= EVENTS COUNT =================================
     which_days_since_covid <- function(row_data_surv, interval_names){
       days_cols <- row_data_surv %>% dplyr::select(all_of(interval_names))
-      row_data_surv$expo_days <- names(days_cols)[which(days_cols == 1)]
+      expo_day_period <- names(days_cols)[which(days_cols == 1)]
+      row_data_surv$expo_days <- ifelse(length(expo_day_period)==0, NA,expo_day_period )
+      #row_data_surv$expo_days <- names(days_cols)[which(days_cols == 1)]
       row_data_surv$expo_days <- ifelse(is.na(row_data_surv$expo_days),"pre expo", row_data_surv$expo_days)
       return(row_data_surv)
     }

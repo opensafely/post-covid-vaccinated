@@ -51,7 +51,7 @@ scripts_dir <- "analysis"
 
 # Source relevant files --------------------------------------------------------
 source(file.path(scripts_dir,"analyses_to_run.R"))
-#i="vaccinated"
+
 for(i in cohort_to_run){
   cohort<-i
   source(file.path(scripts_dir,"02_pipe.R")) # Prepare dataset for model
