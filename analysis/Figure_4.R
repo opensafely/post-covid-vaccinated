@@ -38,7 +38,6 @@ figure4_tbl <- function(group, fit, outcome, strata){
                                 term == "days28_197")
   input1$strata[input1$strata =="sex_M"] <- "sex_Male"
   input1$strata[input1$strata =="sex_F"] <- "sex_Female"
- table(input2$subgroup)
   #---------------------------------
   # Step1: Extract the required variables
   #---------------------------------
@@ -72,46 +71,6 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #Alternative 0-28 days
   hr0_28 <- input2[input2$event == outcome  & input2$model == fit  & 
                      input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$estimate
-  
-  #5.locate CI of the estimates
-  #0-14 days
-  hr_14_low <- input2[input2$event == outcome  & input2$model == fit  & 
-                          input2$cohort == group & input2$subgroup == strata& input2$term == "days0_14",]$conf.low
-  hr_14_high <- input2[input2$event == outcome  & input2$model == fit  & 
-                           input2$cohort == group & input2$subgroup == strata& input2$term == "days0_14",]$conf.high
-  #14-28 days
-  hr_28_low <- input2[input2$event == outcome & input2$model == fit  & 
-                          input2$cohort == group & input2$subgroup == strata& input2$term == "days14_28",]$conf.low
-  hr_28_high <- input2[input2$event == outcome & input2$model == fit  & 
-                           input2$cohort == group & input2$subgroup == strata& input2$term == "days14_28",]$conf.high
-  #28-56 days
-  hr_56_low <- input2[input2$event == outcome & input2$model == fit  & 
-                          input2$cohort == group & input2$subgroup == strata& input2$term == "days28_56",]$conf.low
-  hr_56_high <- input2[input2$event == outcome & input2$model == fit  & 
-                           input2$cohort == group & input2$subgroup == strata& input2$term == "days28_56",]$conf.high
-  #56-84 days
-  hr_84_low <- input2[input2$event == outcome & input2$model == fit  & 
-                          input2$cohort == group & input2$subgroup == strata& input2$term == "days56_84",]$conf.low
-  hr_84_high <- input2[input2$event == outcome & input2$model == fit  & 
-                           input2$cohort == group & input2$subgroup == strata& input2$term == "days56_84",]$conf.high
-  #84-196 days
-  hr_196_low <- input2[input2$event == outcome & input2$model == fit  & 
-                           input2$cohort == group & input2$subgroup == strata& input2$term == "days84_197",]$conf.low
-  hr_196_high <- input2[input2$event == outcome & input2$model == fit  & 
-                            input2$cohort == group & input2$subgroup == strata& input2$term == "days84_197",]$conf.high
-  #Alternative 0-28 days
-  hr0_28_low <- input2[input2$event == outcome  & input2$model == fit  & 
-                           input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$conf.low
-  hr0_28_high <- input2[input2$event == outcome  & input2$model == fit  & 
-                            input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$conf.high
-  #Alternative 28 - 196 days
-  hr28_196_low <- input2[input2$event == outcome  & input2$model == fit  & 
-                             input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$conf.low
-  hr28_196_high <- input2[input2$event == outcome  & input2$model == fit  & 
-                              input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$conf.high
-  #Alternative 28 - 196 days
-  hr28_196<- input2[input2$event == outcome  & input2$model == fit  & 
-                      input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$estimate
   #--------------------------------------------------------------------
   #Step2.Calculate the average daily CVD incidence   - in the unexposed
   #--------------------------------------------------------------------
@@ -151,56 +110,40 @@ figure4_tbl <- function(group, fit, outcome, strata){
   lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)
   #alternative for 28-196 days
   
-  #2.assign the CI low
-  lifetable$h.low <- ifelse(lifetable$days < 15, rep(hr_14_low),0)
-  lifetable$h.low <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28_low),lifetable$h.low)
-  lifetable$h.low <- ifelse(lifetable$days < 29 & is.na(lifetable$h.low), rep(hr0_28_low),lifetable$h.low)#alternative for 0-28 days
-  
-  lifetable$h.low <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56_low),lifetable$h.low)
-  lifetable$h.low <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84_low),lifetable$h.low)
-  lifetable$h.low <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196_low),lifetable$h.low)
-  lifetable$h.low <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h.low), rep(hr28_196_low),lifetable$h.low)#alternative for 28-196 days
-  
-  #3.assign the CI high
-  lifetable$h.high <- ifelse(lifetable$days < 15, rep(hr_14_high),0)
-  lifetable$h.high <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28_high),lifetable$h.high)
-  lifetable$h.high <- ifelse(lifetable$days < 29 & is.na(lifetable$h.high), rep(hr0_28_high),lifetable$h.high)#alternative for 0-28 days
-  
-  lifetable$h.high <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56_high),lifetable$h.high)
-  lifetable$h.high <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84_high),lifetable$h.high)
-  lifetable$h.high <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196_high),lifetable$h.high)
-  lifetable$h.high <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h.high), rep(hr28_196_high),lifetable$h.high)#alternative for 28-196 days
-  
-  #4.assign qh
+  #2.assign qh
   lifetable$qh <- lifetable$q*lifetable$h
-  lifetable$qh.low <- lifetable$q*lifetable$h.low
-  lifetable$qh.high <- lifetable$q*lifetable$h.high
   
-  #5.assign 1-qh
+  #3.assign 1-qh
   lifetable$'1-qh' <- 1 - lifetable$qh
-  lifetable$'1-qh.low' <- 1 - lifetable$qh.low
-  lifetable$'1-qh.high' <- 1 - lifetable$qh.high
   
-  #6.assign sc
+  #4.assign sc
   lifetable$sc <- cumprod(lifetable$`1-qh`)
-  lifetable$sc.low <- cumprod(lifetable$`1-qh.low`)
-  lifetable$sc.high <- cumprod(lifetable$`1-qh.high`)
+
   #-------------------------------------------
   #Step5. Calculate the Absolute excess risk--
   #-------------------------------------------
   #Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
   #compared with no COVID-19 diagnosis. 
   
-  #AER =difference in absolute risk
-  lifetable$'s-sc' <- lifetable$s - lifetable$sc # RT- reverse with real data
-  lifetable$'s-sc.low' <- lifetable$s - lifetable$sc.low
-  lifetable$'s-sc.high' <- lifetable$s - lifetable$sc.high
+  #1.AER =difference in absolute risk
+  lifetable$'s-sc' <- lifetable$s - lifetable$sc
   
-  #AER%
+  #2.CI of the AER
+  #Confidence Interval = Attributable risk +/- 1.96 x Square Root of [p x q (1/n1+ 1/n2)]
+  #Where, p = qh, q = 1-qh, n1= unexposed person days, n2 = exposed person days
+  #https://fhop.ucsf.edu/sites/fhop.ucsf.edu/files/wysiwyg/pg_apxIIIB.pdf
+  #reconfirm - RT
+  lifetable$CI <- 1.96*lifetable$qh*lifetable$'1-qh'*(1/fp_person_days + 1/fp_person_days)
+  
+  #3.AER%
   lifetable$AERp <-lifetable$'s-sc'*100
-  lifetable$AERp.low <-lifetable$'s-sc.low'*100
-  lifetable$AERp.high <-lifetable$'s-sc.high'*100
   
+  #CI of AER%
+  #95% CI = ARP +/- ARP x (C.I. range from the attributable risk / the attributable risk)
+  #Where, ARP=AERp, CI range= CI, attributable risk = s-sc
+  lifetable$CIp <- lifetable$AERp*(lifetable$CI / lifetable$`s-sc`)
+  lifetable$CIp.low <- lifetable$AERp - lifetable$CIp
+  lifetable$CIp.high <- lifetable$AERp + lifetable$CIp
   #-------------------------------------------
   #Step6. Output1 the csv
   #-------------------------------------------
@@ -227,7 +170,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
   
   lifetables$subgroup <-factor(lifetables$subgroup,levels = c('sex_Male','sex_Female'))
   
-  p_line<-ggplot(lifetables, aes(x=days, y=AERp, colour = subgroup)) +
+  p_line<-ggplot(lifetable, aes(x=days, y=AERp)) +
     geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
     scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
     scale_x_continuous(breaks = c(0,10,20,30,40,50),limits = c(0,50))+
