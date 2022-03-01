@@ -86,8 +86,8 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     # ......................................
     # CHUNK UP FOLLOW-UP PERIOD by CHANGE OF STATE OF EXPOSURE
-    
-    with_expo$day_to_expo <- as.numeric(with_expo$expo_date - as.Date(cohort_start_date))
+   
+    with_expo$day_to_expo <- as.numeric(with_expo$expo_date - cohort_start_date)
     
     d1 <- with_expo %>% dplyr::select(patient_id, expo_date, event_date, DATE_OF_DEATH)
     d2 <- with_expo %>% dplyr::select(patient_id, days_to_start, day_to_expo, days_to_end, event_status)
@@ -110,7 +110,6 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
                                     episode="days_cat"
     )
     
-    
     with_expo_postexpo <- with_expo_postexpo %>% mutate(tstart=tstart+t0, tstop=tstop+t0) %>% dplyr::select(-c(t0,t))
     
     # ................... CONCAT BACK PRE-COVID TIME...................
@@ -127,8 +126,6 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   }
   
   
-  
-
   #===============================================================================
   #-   WITHOUT COVID
   #-------------------------------------------------------------------------------
@@ -156,7 +153,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     # ......................................
     
     without_expo$tstart<- without_expo$days_to_start
-    without_expo$tstop <- ifelse(without_expo$days_to_end ==0,  without_expo$days_to_end + 0.001, without_expo$days_to_end)
+    without_expo$tstop <- without_expo$days_to_end
     without_expo$expo<- c(0)
     without_expo$days_cat <- c(0)
     
@@ -174,7 +171,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     #===============================================================================
     #   PIVOT WIDE for WEEKS_SINCE_COVID
     #-------------------------------------------------------------------------------
-    #data_surv$days_to_expo <- as.numeric(data_surv$expo_date - as.Date(cohort_start_date)  ) #do I need this??
+    #data_surv$days_to_expo <- as.numeric(data_surv$expo_date - as.Date(cohort_start_date))
     
     interval_names <- mapply(function(x, y) ifelse(x == y, paste0("days", x), paste0("days", x, "_", y)), 
                              lag(cuts_days_since_expo, default = 0), 
@@ -200,7 +197,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
       row_data_surv$expo_days <- ifelse(is.na(row_data_surv$expo_days),"pre expo", row_data_surv$expo_days)
       return(row_data_surv)
     }
-    
+  
     get_tbl_event_count <- function(data_surv, interval_names){
       df_events <- data_surv %>% filter(event==1)
       ls_data_surv <- split(df_events, 1:nrow(df_events))
