@@ -131,7 +131,7 @@ venn_output <- function(population){
   }
   
   low_count_df <- data.frame(count_le5, unique_outcome_names)
-  low_count_df <- low_count_df %>% mutate(count_le5 = if_else(count_le5>0, "lower than 5", "No issue"))
+  low_count_df <- low_count_df %>% mutate(count_le5 = if_else(count_le5>0, "<= 5", "No issue"))
   
   names(low_count_df) <- c("any number <= 5?", "outcome name")
   write.csv(low_count_df, file= paste0("output/","venn_diagram_number_check_", population,".csv"), row.names = F)
