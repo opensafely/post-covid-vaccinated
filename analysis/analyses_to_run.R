@@ -7,7 +7,7 @@
 
 ## Read in active analyses table and filter to relevant outcome
 
-active_analyses <- read_rds("output/active_analyses.rds")
+active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses <- active_analyses %>%dplyr::filter(outcome_variable==paste0("out_date_",event_name) & active == "TRUE")
 
 ## Select covariates of interest 
