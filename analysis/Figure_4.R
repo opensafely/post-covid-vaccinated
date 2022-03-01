@@ -5,7 +5,9 @@
 group <- "vaccinated"
 fit <- "mdl_max_adj"
 outcome <- "ate"
-strata <- "sex_Male"
+strata <- "sex_Female"
+
+summary(active)
 
 figure4_tbl <- function(group, fit, outcome, strata){
   
@@ -28,7 +30,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
   input2=rbindlist(input2, fill=TRUE)
   
   #Preprocess the AER input data
-  input2 <- input2 %>% select(-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
+  input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
                                 term == "days28_56" |
@@ -92,7 +94,6 @@ figure4_tbl <- function(group, fit, outcome, strata){
   lifetable$q <- incidence_rate 
   lifetable$'1-q' <- 1 - lifetable$q 
   lifetable$s <- cumprod(lifetable$`1-q`)
-  
   #----------------------------------------
   #Step4. Calculate the daily CVD incidence
   #----------------------------------------
@@ -148,19 +149,21 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #Step6. Output1 the csv
   #-------------------------------------------
 
-  write.csv(lifetable, paste0("output/lifetable_" , group, "_", fit, "_", outcome, "_", strata,".csv"), row.names = F)
+  write.csv(lifetable, paste0("output/lifetable_delta_" , group, "_", fit, "_", outcome, "_", strata,".csv"), row.names = F)
+  
+  }
   
   ##########################
-  #Step7.  Output2 the plotting
+  #Output2 - plotting
   ######life table##########
-  figure4_plot <- (group, fit, outcome, strata) {
+   figure4_plot <- function(group, fit, outcome, strata) {
     
   library(magrittr)
   library(dplyr)
   library(ggplot2)
     
-    #Gather the CSV.s
-  hr_files=list.files(path = "output", pattern = "lifetable_*")
+  #Gather the lifetable CSV.s
+  hr_files=list.files(path = "output", pattern = "lifetable_delta_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
   hr_files=paste0("output/",hr_files)
   lifetables <- purrr::pmap(list(hr_files),
@@ -194,9 +197,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
   
 }
 #------------------RUN the function-------------------------------------------------------------------------------------
-
 active <- readr::read_rds("lib/active_analyses.rds")
-
 active <- active[active$active==TRUE,]
 active$event <- gsub("out_date_","",active$outcome_variable)
 active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL
@@ -220,13 +221,23 @@ active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$stra
 active <- unique(active[,c("event","model","cohort","group")])
 
 active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
+colnames(active)[colnames(active) == 'group'] <- 'strata'
+colnames(active)[colnames(active) == 'cohort'] <- 'group'
+colnames(active)[colnames(active) == 'model'] <- 'fit'
+colnames(active)[colnames(active) == 'event'] <- 'outcome'
+
+group <- "vaccinated"
+fit <- "mdl_max_adj"
+outcome <- "ate"
+strata <- "sex_Female"
+
 
 for (i in 1:nrow(active)) {
 
-  files <- list.files(path = "output/lifetable_", pattern("lifetable_"))
+  files <- list.files(path = "output", pattern = "lifetable_*")
   files <- files[grepl(active$group[i])]
   
-  figure4(active$cohort[i],active$model[i],active$event[i],active$group[i])
+  figure4_tbl(active$cohort[i],active$model[i],active$event[i],active$group[i])
   
 }
 
