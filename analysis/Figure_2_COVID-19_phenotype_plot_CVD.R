@@ -8,7 +8,7 @@ library(data.table)
 cohort <- c("vaccinated","electively_unvaccinated")
 
 #-----------------------Determine active outcome events-------------------------
-active_analyses <- read_rds("output/active_analyses.rds")
+active_analyses <- read_rds("lib/active_analyses.rds")
 events <- active_analyses %>% filter(active=="TRUE")%>%select(outcome,outcome_variable)
 events$outcome_variable <- gsub("out_date_","",events$outcome_variable)
 
@@ -58,9 +58,8 @@ combined_hr$colour <- ""
 combined_hr$colour <- ifelse(combined_hr$subgroup=="Non-hospitalised COVID-19","#fb9a99",combined_hr$colour)
 combined_hr$colour <- ifelse(combined_hr$subgroup=="Hospitalised COVID-19","#e31a1c",combined_hr$colour)
 
-
 # Create figure-----------------------------------------------------------------
-
+i="electively_unvaccinated"
 for(i in cohort){
   
   # Filter to cohort of interest
@@ -72,17 +71,15 @@ for(i in cohort){
   
   outcome_names=unique(df$event)
   events_to_plot=c()
-  for(outcome in outcome_names){
-    tmp=df%>%filter(event==outcome)
-    number_of_subgroups=length(unique(df$subgroup))
+  for(j in outcome_names){
+    tmp=df%>%filter(event==j)
+    number_of_subgroups=length(unique(tmp$subgroup))
     if(number_of_subgroups==2){
-      events_to_plot=append(events_to_plot,outcome)
-    }else{
-      not_plot=append(not_plot,outcome)
+      events_to_plot=append(events_to_plot,j)
     }
   }
   
-  df=df%>%filter(event %in%events_to_plot)
+  df=df%>%filter(event %in% events_to_plot)
   
   # Factor variables for ordering-------------------------------------------------
   
