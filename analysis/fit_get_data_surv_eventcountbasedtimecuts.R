@@ -232,7 +232,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     tbl_event_count$cohort <- cohort
     tbl_event_count$model <- mdl
     
-    ind_any_zeroeventperiod <- any((tbl_event_count$events_total == 0) & (!identical(cuts_days_since_expo, c(28, 196))))
+    ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 196))))
     
     write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",mdl,".csv"), row.names = T)
     
