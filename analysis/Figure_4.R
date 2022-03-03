@@ -2,13 +2,15 @@
 #Branch:Figure4_graphical plotting of the estimated AER of ATE and VTE 
 #Scripts: Renin Toms
 
-group <- "vaccinated"
-fit <- "mdl_max_adj"
-outcome <- "ate"
-strata <- "sex_Female"
+#group <- "vaccinated"
+#fit <- "mdl_max_adj"
+#outcome <- "ate"
+#strata <- "sex_Female"
 
-summary(active)
-
+#******************************************************
+#I. Create the function to out put the figure 4_tables
+#******************************************************
+#*
 figure4_tbl <- function(group, fit, outcome, strata){
   
   library(purrr)
@@ -29,7 +31,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
                         })
   input2=rbindlist(input2, fill=TRUE)
   
-  #Preprocess the AER input data
+  #Preprocess the input data
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
@@ -40,6 +42,17 @@ figure4_tbl <- function(group, fit, outcome, strata){
                                 term == "days28_197")
   input1$strata[input1$strata =="sex_M"] <- "sex_Male"
   input1$strata[input1$strata =="sex_F"] <- "sex_Female"
+  
+  input1$strata[input1$strata =="ethnicity_1"] <- "ethnicity_White"
+  input1$strata[input1$strata =="ethnicity_2"] <- "ethnicity_Black"
+  input1$strata[input1$strata =="ethnicity_3"] <- "ethnicity_South_Asian"
+  input1$strata[input1$strata =="ethnicity_4"] <- "ethnicity_Mixed"
+  input1$strata[input1$strata =="ethnicity_5"] <- "ethnicity_Other"
+  input1$strata[input1$strata =="ethnicity_6"] <- "ethnicity_Missing"
+  
+  input1$strata[input1$strata =="prior_history_true"] <- "prior_history_TRUE"
+  input1$strata[input1$strata =="prior_history_false"] <- "prior_history_FALSE"
+  
   #---------------------------------
   # Step1: Extract the required variables
   #---------------------------------
@@ -73,6 +86,9 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #Alternative 0-28 days
   hr0_28 <- input2[input2$event == outcome  & input2$model == fit  & 
                      input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$estimate
+  #Alternative 28_196 days
+  hr28_196 <- input2[input2$event == outcome  & input2$model == fit  & 
+                       input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$estimate
   #--------------------------------------------------------------------
   #Step2.Calculate the average daily CVD incidence   - in the unexposed
   #--------------------------------------------------------------------
@@ -119,7 +135,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
   
   #4.assign sc
   lifetable$sc <- cumprod(lifetable$`1-qh`)
-
+  
   #-------------------------------------------
   #Step5. Calculate the Absolute excess risk--
   #-------------------------------------------
@@ -148,14 +164,94 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #-------------------------------------------
   #Step6. Output1 the csv
   #-------------------------------------------
-
+  
   write.csv(lifetable, paste0("output/lifetable_delta_" , group, "_", fit, "_", outcome, "_", strata,".csv"), row.names = F)
   
-  }
+  #-------------------------------------------
+  #Step7. clear the environment
+  #-------------------------------------------
   
-  ##########################
-  #Output2 - plotting
-  ######life table##########
+  rm(list = ls())
+  
+}
+
+#***************************************************************************************
+#II. Run the function now----------------------FOR the active analyses------------------
+#***************************************************************************************
+#1. Define the active analyses
+active <- readr::read_rds("lib/active_analyses.rds")
+active <- active[active$active==TRUE,]
+active$event <- gsub("out_date_","",active$outcome_variable)
+active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL
+
+active <- tidyr::pivot_longer(active, 
+                              cols = setdiff(colnames(active),c("event","model","cohort")), 
+                              names_to = "strata")
+
+active <- active[active$value==TRUE, c("event","model","cohort","strata")]
+
+active$model <- ifelse(active$model=="all","mdl_agesex;mdl_max_adj",active$model)
+active <- tidyr::separate_rows(active, model, sep = ";")
+
+active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort)
+active <- tidyr::separate_rows(active, cohort, sep = ";")
+
+#active$group <- gsub("_.*","",active$strata)
+#active$group <- ifelse(active$group=="covid" & grepl("covid_history",active$strata), "covid_history", active$group)
+#active$group <- ifelse(active$group=="covid" & grepl("covid_pheno",active$strata), "covid_pheno", active$group)
+#active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$strata), "prior_history", active$group)
+#active <- unique(active[,c("event","model","cohort","group")])
+
+#Preprocess to right outcomes, names and order
+#select outcomes
+active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
+
+#align the column names
+colnames(active)[colnames(active) == 'group'] <- 'strata'
+colnames(active)[colnames(active) == 'cohort'] <- 'group'
+colnames(active)[colnames(active) == 'model'] <- 'fit'
+colnames(active)[colnames(active) == 'event'] <- 'outcome'
+
+#order the column names
+active <- active %>% select(-outcome,-fit, everything())
+active <- active %>% select(-strata,-outcome, everything())
+active <- active %>% select(-strata, everything())
+active <- active %>% select(-strata, everything())
+
+#remove non existing HR rows
+active <- active[-32,]
+active <- active[-66,]
+active <- active[-66,]
+
+#For loop the active analysis list to the figure4 table function
+
+for (i in 1:nrow(active)) {
+  
+  #1.run the function
+  figure4_tbl(active$group[i],active$fit[i],active$outcome[i],active$strata[i])
+  
+  #2.compile the results
+  lt_files=list.files(path = "output", pattern = "lifetable_delta_*")
+  lt_files=lt_files[endsWith(lt_files,".csv")]
+  lt_files=paste0("output/",lt_files)
+  f4_compiled_lifetables <- purrr::pmap(list(lt_files),
+                                        function(fpath){
+                                          df <- fread(fpath)
+                                          return(df)
+                                        })
+  f4_compiled_lifetables=rbindlist(f4_compiled_lifetables, fill=TRUE)
+  
+  #3.output the csv
+  write.csv(f4_compiled_lifetables, paste0("output/Figure4_compiled_lifetables.csv"), row.names = F)
+}
+
+#4.Delete un using file if exists
+if (file.exists(lt_files)) { file.remove(lt_files)}
+69*196
+
+#******************************START FROM HERE 
+#III. Figure4 - plotting
+#******************************
    figure4_plot <- function(group, fit, outcome, strata) {
     
   library(magrittr)
