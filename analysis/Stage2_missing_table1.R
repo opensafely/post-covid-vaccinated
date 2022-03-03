@@ -43,11 +43,18 @@ if(length(args)==0){
 
 # Define stage2 function -------------------------------------------------------
 
-stage2 <- function(cohort_name) {
+stage2 <- function(cohort_name, covid_history) {
 
   # Load relevant data
-  
   input <- readr::read_rds(file.path("output", paste0("input_",cohort_name,"_stage1.rds")))
+  
+  # Select data depending on covid history
+  if(covid_history == "without_covid_history"){
+    input <- filter(input, sub_bin_covid19_confirmed_history==F)
+  }
+  if(covid_history == "with_covid_history"){
+    input <- filter(input, sub_bin_covid19_confirmed_history==T)
+  }
   
   ################################
   # 1. Output missing data table #
@@ -91,7 +98,7 @@ stage2 <- function(cohort_name) {
   #---------------------------------------------------------------------------#
   
   check_both <- merge(x=check_missing, y=check_range, by = "variable",all.x=TRUE)
-  write.csv(check_both, file = file.path("output", paste0("Check_missing_range_",cohort_name, ".csv")) , row.names=F)
+  write.csv(check_both, file = file.path("output", paste0("Check_missing_range_",cohort_name, "_",covid_history, ".csv")) , row.names=F)
   
   #---------------------------------------------------------#
   # 1.d. Create a table with min and max for date variables #
@@ -108,7 +115,7 @@ stage2 <- function(cohort_name) {
     check_dates[nrow(check_dates),3] <- paste0("",max(na.omit(date_var)))
   }
 
-  write.csv(check_dates, file = file.path("output", paste0("Check_dates_range_",cohort_name, ".csv")) , row.names=F)
+  write.csv(check_dates, file = file.path("output", paste0("Check_dates_range_",cohort_name, "_",covid_history, ".csv")) , row.names=F)
   
   #####################
   # 2. Output table 1 #
@@ -252,15 +259,19 @@ stage2 <- function(cohort_name) {
   
   # Save table 1
   
-  write.csv(table1, file = file.path("output", paste0("Table1_",cohort_name, ".csv")) , row.names=F)
+  write.csv(table1, file = file.path("output", paste0("Table1_",cohort_name, "_",covid_history, ".csv")) , row.names=F)
   
 }
 
 # Run function using specified commandArgs
 
-if (cohort_name == "both") {
-  stage2("electively_unvaccinated")
-  stage2("vaccinated")
-} else{
-  stage2(cohort_name)
+
+if(cohort_name == "both"){
+  stage2("vaccinated", "with_covid_history")
+  stage2("vaccinated", "without_covid_history")
+  stage2("electively_unvaccinated", "with_covid_history")
+  stage2("electively_unvaccinated", "without_covid_history")
+}else{
+  stage2(cohort_name, "with_covid_history")
+  stage2(cohort_name, "without_covid_history")
 }
