@@ -430,7 +430,7 @@ angina_icd10 = codelist_from_csv(
 )
 
 prostate_cancer_icd10 = codelist_from_csv(
-    "codelists/user-RochelleKnight-prostate_cancer_snomed.csv",
+    "codelists/user-RochelleKnight-prostate_cancer_icd10.csv",
     system="icd10",
     column="code",
 )
