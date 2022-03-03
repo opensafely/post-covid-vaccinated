@@ -84,11 +84,7 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_stroke_sah_hs.html
-        compiled_event_counts_html: output/compiled_event_counts_stroke_sah_hs.html
-        analyses_not_run: output/analyses_not_run_stroke_sah_hs.csv
-        compiled_hrs_csv: output/compiled_HR_results_stroke_sah_hs.csv
-        compiled_event_counts_csv: output/compiled_event_counts_stroke_sah_hs.csv
+        table2: output/table2_*.csv
 
   stage4_venn_diagram_both:
     run: r:latest analysis/venn_diagram.R both
