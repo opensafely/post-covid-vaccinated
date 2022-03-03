@@ -1,3 +1,7 @@
+# Create output directory ------------------------------------------------------
+
+fs::dir_create(here::here("lib"))
+
 # Create empty data frame ------------------------------------------------------
 
 df <- data.frame(active = logical(),
@@ -119,4 +123,4 @@ for (i in 1:length(outcomes)) {
 
 # Save active analyses list ----------------------------------------------------
 
-saveRDS(df, file = "output/active_analyses.rds")
+saveRDS(df, file = "lib/active_analyses.rds")

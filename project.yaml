@@ -2,14 +2,15 @@ version: '3.0'
 
 expectations:
 
-  population_size: 500000
+  population_size: 400000
 
 actions:
-  active_analyses:
-    run: r:latest analysis/active_analyses.R
-    outputs:
-      highly_sensitive:
-        active_analyses: output/active_analyses.rds
+
+  ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+  ## DO NOT EDIT project.yaml DIRECTLY 
+  ## This file is created by create_project_actions.R 
+  ## Edit and run create_project_actions.R to update the project.yaml 
+  ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
   vax_eligibility_inputs:
     run: r:latest analysis/vax_eligibility_inputs.R
@@ -20,27 +21,34 @@ actions:
         vax_eligible_dates: output/vax_eligible_dates.csv
 
   generate_study_population_electively_unvaccinated:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated --output-format feather
-    needs: [vax_eligibility_inputs] 
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated
+      --output-format feather
+    needs:
+    - vax_eligibility_inputs
     outputs:
       highly_sensitive:
         cohort: output/input_electively_unvaccinated.feather
 
   generate_study_population_vaccinated:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_vaccinated --output-format feather
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_vaccinated
+      --output-format feather
     outputs:
       highly_sensitive:
         cohort: output/input_vaccinated.feather
 
   generate_study_population_index:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_index --output-format feather
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_index
+      --output-format feather
     outputs:
       highly_sensitive:
         cohort: output/input_index.feather
 
   preprocess_data:
     run: r:latest analysis/preprocess_data.R
-    needs: [generate_study_population_index, generate_study_population_vaccinated, generate_study_population_electively_unvaccinated]
+    needs:
+    - generate_study_population_index
+    - generate_study_population_vaccinated
+    - generate_study_population_electively_unvaccinated
     outputs:
       moderately_sensitive:
         describe: output/describe_*.txt
@@ -50,7 +58,8 @@ actions:
 
   stage1_data_cleaning_both:
     run: r:latest analysis/Stage1_data_cleaning.R both
-    needs: [preprocess_data]
+    needs:
+    - preprocess_data
     outputs:
       moderately_sensitive:
         refactoring: output/meta_data_factors_*.csv
@@ -61,10 +70,29 @@ actions:
 
   stage2_missing_table1_both:
     run: r:latest analysis/Stage2_missing_table1.R both
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
         Missing_RangeChecks: output/Check_missing_range_*.csv
         DateChecks: output/Check_dates_range_*.csv
         Descriptive_Table: output/Table1_*.csv
-  
+
+  stage4_table2_both:
+    run: r:latest analysis/table_2.R both
+    needs:
+    - stage1_data_cleaning_both
+    outputs:
+      moderately_sensitive:
+        table2: output/table2_*.csv
+
+  stage4_venn_diagram_both:
+    run: r:latest analysis/venn_diagram.R both
+    needs:
+    - preprocess_data
+    - stage1_data_cleaning_both
+    outputs:
+      moderately_sensitive:
+        venn_diagram: output/venn_diagram_*.svg
+        venn_diagram_number_check: output/venn_diagram_number_check_*.csv
+
