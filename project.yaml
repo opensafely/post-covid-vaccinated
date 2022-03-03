@@ -5,6 +5,13 @@ expectations:
   population_size: 400000
 
 actions:
+
+  ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+  ## DO NOT EDIT project.yaml DIRECTLY 
+  ## This file is created by create_project_actions.R 
+  ## Edit and run create_project_actions.R to update the project.yaml 
+  ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
   vax_eligibility_inputs:
     run: r:latest analysis/vax_eligibility_inputs.R
     outputs:
@@ -14,27 +21,34 @@ actions:
         vax_eligible_dates: output/vax_eligible_dates.csv
 
   generate_study_population_electively_unvaccinated:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated --output-format feather
-    needs: [vax_eligibility_inputs] 
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated
+      --output-format feather
+    needs:
+    - vax_eligibility_inputs
     outputs:
       highly_sensitive:
         cohort: output/input_electively_unvaccinated.feather
 
   generate_study_population_vaccinated:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_vaccinated --output-format feather
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_vaccinated
+      --output-format feather
     outputs:
       highly_sensitive:
         cohort: output/input_vaccinated.feather
 
   generate_study_population_index:
-    run: cohortextractor:latest generate_cohort --study-definition study_definition_index --output-format feather
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_index
+      --output-format feather
     outputs:
       highly_sensitive:
         cohort: output/input_index.feather
 
   preprocess_data:
     run: r:latest analysis/preprocess_data.R
-    needs: [generate_study_population_index, generate_study_population_vaccinated, generate_study_population_electively_unvaccinated]
+    needs:
+    - generate_study_population_index
+    - generate_study_population_vaccinated
+    - generate_study_population_electively_unvaccinated
     outputs:
       moderately_sensitive:
         describe: output/describe_*.txt
@@ -44,7 +58,8 @@ actions:
 
   stage1_data_cleaning_both:
     run: r:latest analysis/Stage1_data_cleaning.R both
-    needs: [preprocess_data]
+    needs:
+    - preprocess_data
     outputs:
       moderately_sensitive:
         refactoring: output/meta_data_factors_*.csv
@@ -55,73 +70,18 @@ actions:
 
   stage2_missing_table1_both:
     run: r:latest analysis/Stage2_missing_table1.R both
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
         Missing_RangeChecks: output/Check_missing_range_*.csv
         DateChecks: output/Check_dates_range_*.csv
         Descriptive_Table: output/Table1_*.csv
-        
-  analysis_cox_ami:
-    run: r:latest analysis/01_pipe.R ami
-    needs: [stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_ami.html
-        compiled_event_counts_html: output/compiled_event_counts_ami.html
-        analyses_not_run: output/analyses_not_run_ami.csv
-        compiled_hrs_csv: output/compiled_HR_results_ami.csv
-        compiled_event_counts_csv: output/compiled_event_counts_ami.csv
-  
-  analysis_cox_stroke_isch:
-    run: r:latest analysis/01_pipe.R stroke_isch
-    needs: [stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_stroke_isch.html
-        compiled_event_counts_html: output/compiled_event_counts_stroke_isch.html
-        analyses_not_run: output/analyses_not_run_stroke_isch.csv
-        compiled_hrs_csv: output/compiled_HR_results_stroke_isch.csv
-        compiled_event_counts_csv: output/compiled_event_counts_stroke_isch.csv
 
-  
-  analysis_cox_dvt:
-    run: r:latest analysis/01_pipe.R dvt
-    needs: [stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-        compiled_hrs: output/compiled_HR_results_dvt.html
-        compiled_event_counts: output/compiled_event_counts_dvt.html
-        analyses_not_run: output/analyses_not_run_dvt.csv
-        compiled_hrs_csv: output/compiled_HR_results_dvt.csv
-        compiled_event_counts_csv: output/compiled_event_counts_dvt.csv
-
-  analysis_cox_pe:
-    run: r:latest analysis/01_pipe.R pe
-    needs: [stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_pe.html
-        compiled_event_counts_html: output/compiled_event_counts_pe.html
-        analyses_not_run: output/analyses_not_run_pe.csv
-        compiled_hrs_csv: output/compiled_HR_results_pe.csv
-        compiled_event_counts_csv: output/compiled_event_counts_pe.csv
-
-  analysis_cox_tia:
-    run: r:latest analysis/01_pipe.R tia
-    needs: [stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_tia.html
-        compiled_event_counts_html: output/compiled_event_counts_tia.html
-        analyses_not_run: output/analyses_not_run_tia.csv
-        compiled_hrs_csv: output/compiled_HR_results_tia.csv
-        compiled_event_counts_csv: output/compiled_event_counts_tia.csv
-
-
-  analysis_cox_stroke_sah_hs:
-    run: r:latest analysis/01_pipe.R stroke_sah_hs
-    needs: [stage1_data_cleaning_both]
+  stage4_table2_both:
+    run: r:latest analysis/table_2.R both
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
         compiled_hrs_html: output/compiled_HR_results_stroke_sah_hs.html
@@ -130,46 +90,12 @@ actions:
         compiled_hrs_csv: output/compiled_HR_results_stroke_sah_hs.csv
         compiled_event_counts_csv: output/compiled_event_counts_stroke_sah_hs.csv
 
-  analysis_cox_hf:
-    run: r:latest analysis/01_pipe.R hf
-    needs: [stage1_data_cleaning_both]
+  stage4_venn_diagram_both:
+    run: r:latest analysis/venn_diagram.R both
+    needs:
+    - preprocess_data
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_hf.html
-        compiled_event_counts_html: output/compiled_event_counts_hf.html
-        analyses_not_run: output/analyses_not_run_hf.csv
-        compiled_hrs_csv: output/compiled_HR_results_hf.csv
-        compiled_event_counts_csv: output/compiled_event_counts_hf.csv
-
-  analysis_cox_angina:
-    run: r:latest analysis/01_pipe.R angina
-    needs: [stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_angina.html
-        compiled_event_counts_html: output/compiled_event_counts_angina.html
-        analyses_not_run: output/analyses_not_run_angina.csv
-        compiled_hrs_csv: output/compiled_HR_results_angina.csv
-        compiled_event_counts_csv: output/compiled_event_counts_angina.csv
-
-  analysis_cox_ate:
-    run: r:latest analysis/01_pipe.R ate
-    needs: [stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_ate.html
-        compiled_event_counts_html: output/compiled_event_counts_ate.html
-        analyses_not_run: output/analyses_not_run_ate.csv
-        compiled_hrs_csv: output/compiled_HR_results_ate.csv
-        compiled_event_counts_csv: output/compiled_event_counts_ate.csv
-
-  analysis_cox_vte:
-    run: r:latest analysis/01_pipe.R vte
-    needs: [stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_vte.html
-        compiled_event_counts_html: output/compiled_event_counts_vte.html
-        analyses_not_run: output/analyses_not_run_vte.csv
-        compiled_hrs_csv: output/compiled_HR_results_vte.csv
-        compiled_event_counts_csv: output/compiled_event_counts_vte.csv
+        venn_diagram: output/venn_diagram_*.svg
+        venn_diagram_number_check: output/venn_diagram_number_check_*.csv
