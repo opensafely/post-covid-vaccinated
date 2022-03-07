@@ -84,41 +84,6 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
   # record variable names for covariate
   #input <- input %>% mutate(sub_bin_sex = cov_cat_sex, sub_num_age = cov_num_age, 
   #                        sub_cat_ethnicity = cov_cat_ethnicity)
-
-  # # Define age groups
-  # 
-  # #For all analysis aside from age stratifed, analysis is performed across all ages 
-  # agebreaks_all <- c(0, 111)
-  # agelabels_all <- c("all")
-  # 
-  # #Age breaks and labels for age sub group analysis
-  # agebreaks_strata <- c(0, 40, 60, 80, 111)
-  # agelabels_strata <- c("18_39", "40_59", "60_79", "80_110")
-  # 
-  # #subgroup = "agegp"
-  # 
-  # if(startsWith(subgroup,"agegp")){
-  #   agebreaks=agebreaks_strata
-  #   agelabels=agelabels_strata
-  # }else{
-  #   agebreaks=agebreaks_all
-  #   agelabels=agelabels_all
-  # }
-  # 
-  # setDT(input)[ , agegroup := cut(cov_num_age, 
-  #                                         breaks = agebreaks, 
-  #                                         right = FALSE, 
-  #                                         labels = agelabels)]
-  # 
-  # 
-  # # rename variables to indicate them as subgroups
-  # setnames(input, 
-  #          old = c("cov_cat_sex", 
-  #                  "agegroup", 
-  #                  "cov_cat_ethnicity"), 
-  #          new = c("sub_bin_sex", 
-  #                  "sub_cat_age",
-  #                  "sub_cat_ethnicity"))
   
   # Define age groups
   
@@ -138,28 +103,129 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
                    "sub_cat_ethnicity"))
 
   outcome_names <- tidyselect::vars_select(names(input), starts_with(c("out_"), ignore.case=TRUE))
-  outcome_names_not_active <- outcome_names[!outcome_names %in% event_names]
+  outcome_names_not_active <- outcome_names[!outcome_names %in% event_dates_names]
   
   vars_names <- tidyselect::vars_select(names(input), !starts_with(c('cov_','qa_','vax_cat'), ignore.case = TRUE))
   vars_names <- vars_names[!vars_names %in% outcome_names_not_active]
-  # variable sub_bin_ate, does this a variable indicate whether indivdiuals have a prior history of ate?
-  # strata_names <- tidyselect::vars_select(names(active_analyses), !contains(c('active','outcome','outcome_variable','covariates','prior_history_var', 'model', 'cohort'), ignore.case = TRUE))
   sub_grp_names <- tidyselect::vars_select(names(input), starts_with(c('sub_'), ignore.case = TRUE))
-  #sub_grp_names <- sub_grp_names[which(sub_grp_names!="sub_bin_ate")]
-  # Create a data frame for survival data: to avoid carrying covariates in the calculation
-  survival_data <- input[,vars_names] 
+
+  survival_data <- input[,vars_names]
+  
+  # for(i in sub_grp_names){
+  #   survival_data[,i] <- as.factor(survival_data[,i])
+  #   print(nlevels(survival_data[,i])
+  # }
+  total_levels = 0
+  for(i in sub_grp_names){
+    survival_data[,i] <- as.factor(survival_data[,i])
+    print(i)
+   total_levels = total_levels + nlevels(survival_data[,i])
+  }
   
   # cohort start date and end date
   survival_data <- survival_data %>% 
     mutate(cohort_start_date = cohort_start,
            cohort_end_date = cohort_end)
   
+  # #define data frame for output table
+  # col_headings <- c("event", "cohort", "strata", "person_days")
+  # table_person_days <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
+  # colnames(table_person_days) <- col_headings
+  # table_person_days$event <- event_names
+  
+  # person_days <- function(population, survival_data, event_dates_names, sub_grp_names, index)
+  # {
+  #   survival_data$event_date <- survival_data[,event_dates_names[index]]
+  #   if(population=="vaccinated"){
+  #     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
+  #     # <- survival_data %>% rowwise() %>% mutate(follow_up_end_exposed=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
+  #   }else if(population=="electively_unvaccinated"){
+  #     survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
+  #     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
+  #     #survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_exposed = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
+  #     survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
+  #   }
+  #   # follow-up days
+  #   survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1) 
+  #   survival_data = survival_data %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period 
+  #   person_days_unexposed_total  = round(sum(survival_data$person_days_unexposed, na.rm = TRUE),1)
+  #   outcome_name <- gsub("out_date_", "", event_dates_names[index])
+  #  
+  #   strata <- col_names
+  #   strata <- strata[!strata %in% c("model", "cohort", "prior_history_var")]
+  #   index_active_strata <- which(active_analyses[index, strata]==T)
+  #   active_strata <- strata[index_active_strata]
+  #   
+  #   for(i in 1:length(active_strata)){
+  #   temp = which(table_2_extension$strata==strata[i] & table_2_extension$event_names == outcome_name & table_2_extension$cohort == population)
+  #   if(strata[i]=="main")
+  #   {
+  #     # sub-population covid history == F
+  #     table_2_extension$unexposed_person_days[temp] = round(sum(survival_data$person_days_unexposed[survival_data$sub_bin_covid19_confirmed_history==F], na.rm = TRUE),1)
+  #   }
+  #   if(strata[i]=="covid_history"){
+  #     #sub-population covid history == T
+  #     table_2_extension$unexposed_person_days[temp] = round(sum(survival_data$person_days_unexposed[survival_data$sub_bin_covid19_confirmed_history==T], na.rm = TRUE),1)
+  #   }
+  #   if(strata[i]=="covid_pheno_hospitalised"){
+  #     survival_data_subset <- survival_data[survival_data$sub_cat_covid19_hospital=="hospitalised",]
+  #   }
+  #   }
+  #   
+  #   
+  #   strata <- NULL
+  #   data <- data.frame(matrix(ncol=length(col_headings), nrow=12)) # define data frame for output table for each outcome
+  #   colnames(data) <- col_headings
+  #   index_data = 1
+  #   for(i in 1:length(sub_grp_names)){
+  #     strata[i] <- str_sub(sub_grp_names[i], 9) # remove the first nine characters
+  #     current <- sub_grp_names[i]
+  #     print(current)
+  #     level_names <- names(table(survival_data[,current]))
+  #     x <- tapply(survival_data$person_days_unexposed, survival_data[,current], FUN=sum)
+  #     # print(x)
+  #     strata_level <- NULL # initialization
+  #     for(j in level_names){
+  #       strata_level[j] <- paste0(strata[i], "_",j)
+  #     }
+  #     len = length(x)
+  #     start = index_data
+  #     end = index_data + len - 1
+  #     # column 4 is person days
+  #     data$person_days[start:end] <- as.vector(x)
+  #     data$strata[start:end] <- strata_level
+  #     data$event[start:end] <- outcome_name
+  #     data$cohort[start:end] <- population
+  #     index_data = end+1
+  #   }
+  #   print(data)
+  #   return(data)
+  # }
+  # 
+  # #output <- person_days(population, survival_data, event_dates_names, sub_grp_names, 1)
+  # output <- data.frame(matrix(ncol=length(col_headings), nrow=120)) 
+  # index_output = 1
+  # for(i in 1:length(event_dates_names)){
+  #   start = index_output
+  #   end = index_output + 11
+  #   output[start:end, ] <- person_days(population, survival_data, event_dates_names, sub_grp_names, i) 
+  #   index_output = end+1
+  # }
+  # names(output) <- col_headings
+  # write.csv(output, file= paste0("output/", "table2_suppl_", population, ".csv"), row.names = F)
+  # 
+  # 
+  # 
+  
+  
+
+
   #define data frame for output table
   col_headings <- c("event", "cohort", "strata", "person_days")
   table_person_days <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
   colnames(table_person_days) <- col_headings
   table_person_days$event <- event_names
-  
+
   person_days <- function(population, survival_data, event_dates_names, sub_grp_names, index)
   {
     survival_data$event_date <- survival_data[,event_dates_names[index]]
@@ -171,21 +237,21 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
       survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
     }
     # follow-up days
-    survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1) 
-    survival_data = survival_data %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period 
+    survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
+    survival_data = survival_data %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
     person_days_unexposed_total  = round(sum(survival_data$person_days_unexposed, na.rm = TRUE),1)
     outcome_name <- gsub("out_date_", "", event_dates_names[index])
     strata <- NULL
-    data <- data.frame(matrix(ncol=length(col_headings), nrow=12)) # define data frame for output table for each outcome
+    data <- data.frame(matrix(ncol=length(col_headings), nrow=total_levels)) # define data frame for output table for each outcome
     colnames(data) <- col_headings
     index_data = 1
     for(i in 1:length(sub_grp_names)){
-      strata[i] <- str_sub(sub_grp_names[i], 9) # remove the first nine characters
-      current <- sub_grp_names[i]
+      #strata[i] <- str_sub(sub_grp_names[i], 9) # remove the first nine characters
+      current <- strata[i] <- sub_grp_names[i]
       print(current)
       level_names <- names(table(survival_data[,current]))
       x <- tapply(survival_data$person_days_unexposed, survival_data[,current], FUN=sum)
-     # print(x)
+      # print(x)
       strata_level <- NULL # initialization
       for(j in level_names){
         strata_level[j] <- paste0(strata[i], "_",j)
@@ -205,12 +271,12 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
   }
 
   #output <- person_days(population, survival_data, event_dates_names, sub_grp_names, 1)
-  output <- data.frame(matrix(ncol=length(col_headings), nrow=120)) 
+  output <- data.frame(matrix(ncol=length(col_headings), nrow=10*total_levels))
   index_output = 1
   for(i in 1:length(event_dates_names)){
     start = index_output
-    end = index_output + 11
-    output[start:end, ] <- person_days(population, survival_data, event_dates_names, sub_grp_names, i) 
+    end = index_output + total_levels-1
+    output[start:end, ] <- person_days(population, survival_data, event_dates_names, sub_grp_names, i)
     index_output = end+1
   }
   names(output) <- col_headings
