@@ -47,7 +47,6 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
   }
   
   # Filter for age group of interest ----
-  survival_data$AGE_AT_COHORT_START <- as.numeric(survival_data$AGE_AT_COHORT_START)
   
   if(startsWith(subgroup,"agegp")){
     agebreaks=agebreaks_strata
