@@ -113,15 +113,15 @@ for (i in subgroup){
       tmp <- tmp %>% 
              mutate(events_total = replace(events_total, events_total <=5, "[Redacted]"))
       tmp$events_total <- as.character(tmp$events_total)
-      tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]"), "Redacted", tmp$redacted_results)
+      tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]", na.rm = T), "Redacted results", "No redacted results")
       supressed_df_event_counts <- rbind(supressed_df_event_counts,tmp)
       
     }
   }
 }
 
-supressed_df_event_counts$redacted_results <- factor(supressed_df_event_counts$redacted_results, levels = c("Redacted",
-                                                                                                            "NA"))
+supressed_df_event_counts$redacted_results <- factor(supressed_df_event_counts$redacted_results, levels = c("Redacted results",
+                                                                                                            "No redacted results"))
 supressed_df_event_counts <- supressed_df_event_counts[order(supressed_df_event_counts$redacted_results),]
 
 write.csv(supressed_df_event_counts, paste0(output_dir,"/suppressed_compiled_event_counts_", event_name, ".csv") , row.names=F)
@@ -171,14 +171,14 @@ for (i in subgroup){
       tmp <- tmp %>% mutate(across(where(is.numeric), as.character))
       redacted_counts <- tmp[which(tmp$events_total == "[Redacted]"),expo_week]
       tmp[which(tmp$term %in% redacted_counts),2:7] = "[Redacted]"
-      tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]"), "Redacted", tmp$redacted_results)
+      tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]", na.rm = T), "Redacted results", "No redacted results")
       supressed_combined_hr_event_counts <- rbind(supressed_combined_hr_event_counts,tmp)
     }
   }
 }
 
-supressed_combined_hr_event_counts$redacted_results <- factor(supressed_combined_hr_event_counts$redacted_results, levels = c("Redacted",
-                                                                                                            "NA"))
+supressed_combined_hr_event_counts$redacted_results <- factor(supressed_combined_hr_event_counts$redacted_results, levels = c("Redacted results",
+                                                                                                            "No redacted results"))
 supressed_combined_hr_event_counts <- supressed_combined_hr_event_counts[order(supressed_combined_hr_event_counts$redacted_results),]
 
 write.csv(supressed_combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name ,".csv") , row.names=F)
