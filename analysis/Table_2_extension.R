@@ -123,14 +123,10 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
   # Define age groups
   
   input$cov_cat_age_group <- ""
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=18 & input$cov_num_age<=29, "18-29", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=30 & input$cov_num_age<=39, "30-39", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=49, "40-49", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=50 & input$cov_num_age<=59, "50-59", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=60 & input$cov_num_age<=69, "60-69", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=70 & input$cov_num_age<=79, "70-79", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=80 & input$cov_num_age<=89, "80-89", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=90, "90+", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=18 & input$cov_num_age<=39, "18-39", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=59, "30-59", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=60 & input$cov_num_age<=79, "60-79", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=80, "80_110", input$cov_cat_age_group)
   
   # rename variables to indicate them as subgroups
   setnames(input,
