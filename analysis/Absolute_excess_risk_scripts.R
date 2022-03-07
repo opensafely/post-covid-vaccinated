@@ -3,13 +3,13 @@
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
 #use only to check the function
-#group <- "vaccinated" 
-#fit <- "mdl_max_adj"
-#outcome <- "vte" 
-#strata <- "prior_history_FALSE"
+outcome <- "vte" 
+group <- "vaccinated" 
+strata <- "prior_history_FALSE"
+fit <- "mdl_max_adj"
 
 #Create the function
-excess_risk <- function(event, cohort, subgroup, model) {
+excess_risk <- function(outcome, group, strata, fit) {
   
   #Call the library
   library(purrr)
@@ -189,7 +189,7 @@ active <- tidyr::separate_rows(active, cohort, sep = ";")
 #active <- unique(active[,c("event","model","cohort","group")])
 
 #Preprocess to right outcomes, names and order
-active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
+#active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
 
 colnames(active)[colnames(active) == 'group'] <- 'strata'
 colnames(active)[colnames(active) == 'cohort'] <- 'group'
@@ -201,9 +201,9 @@ active <- active %>% select(-strata,-outcome, everything())
 active <- active %>% select(-strata, everything())
 active <- active %>% select(-strata, everything())
 
-active <- active[-32,]
-active <- active[-66,]
-active <- active[-66,]
+#active <- active[-32,]
+#active <- active[-66,]
+#active <- active[-66,]
 
 #group <- "vaccinated" # cohort
 #fit <- "mdl_max_adj" #model
