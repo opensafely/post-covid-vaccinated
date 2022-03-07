@@ -9,16 +9,13 @@ excess_risk <- function(event, model, cohort, strata) {
   #---------------------------------
   
   # Load data
-  
   input1 <- readr::read_csv(paste0("output/example_input1.csv")) #1.person days
   input2 <- readr::read_csv(paste0("output/example_input2.csv")) #2.unexposed events, 3.total cases, 4.hr
 
   # Make single input table
-  
   df <- merge(input1, input2, by = c("event","model","cohort","strata"))
   
   # Restrict to relevant data
-  
   df <- df[df$event==event & 
                    df$model == model &
                    df$cohort == cohort &
@@ -27,7 +24,6 @@ excess_risk <- function(event, model, cohort, strata) {
   #---------------------------------
   # Step1: Convert table to days
   #---------------------------------
-  
   df$term <- gsub("days","",df$term)
   
   df <- tidyr::separate(data = df, 
