@@ -149,20 +149,20 @@ excess_risk <- function(outcome, group, strata, fit) {
   
 
   # Return results
-  AER_all_results <- data.frame(event = outcome,
+  results <- data.frame(event = outcome,
                         cohort = group,
                         subgroup = strata,
                         model = fit,
                         AER_196 = lifetable[nrow(lifetable),]$'s-sc' * total_cases,
                         stringsAsFactors = FALSE)
   
-  return(AER_all_results) 
+  return(results) 
   
   
 }
 
 #---------------------------------------------------------
-#Step6. Run the function now---FOR the active analyses----
+#Step6. Run the function---FOR the active analyses----
 #--------------------------------------------------------
 #1. Define the active analyses
 active <- readr::read_rds("lib/active_analyses.rds")
@@ -196,23 +196,9 @@ colnames(active)[colnames(active) == 'cohort'] <- 'group'
 colnames(active)[colnames(active) == 'model'] <- 'fit'
 colnames(active)[colnames(active) == 'event'] <- 'outcome'
 
-active <- active %>% select(-outcome,-fit, everything())
-active <- active %>% select(-strata,-outcome, everything())
-active <- active %>% select(-strata, everything())
-active <- active %>% select(-strata, everything())
+active <- active %>% select(-fit, everything())
 
-#active <- active[-32,]
-#active <- active[-66,]
-#active <- active[-66,]
-
-#group <- "vaccinated" # cohort
-#fit <- "mdl_max_adj" #model
-#outcome <- "ate" # event
-#strata <- "sex_Female" # subgroup
-
-#table(active$strata)
-#table(input2$subgroup)
-
+#2. Loop to input the active analyses --- into the function.
 
 
 for (i in 1:nrow(active)) {
@@ -220,19 +206,11 @@ for (i in 1:nrow(active)) {
   #files <- list.files(path = "output", pattern = "lifetable_*")
   #files <- files[grepl(active$strata[i])]
   
-  figure4_tbl(active$group[i],active$fit[i],active$outcome[i],active$strata[i])
-  
-  #input2- Import data
-  lt_files=list.files(path = "output", pattern = "lifetable_delta_*")
-  lt_files=lt_files[endsWith(lt_files,".csv")]
-  lt_files=paste0("output/",lt_files)
-  f4_compiled_lifetables <- purrr::pmap(list(lt_files),
-                                        function(fpath){
-                                          df <- fread(fpath)
-                                          return(df)
-                                        })
-  f4_compiled_lifetables=rbindlist(f4_compiled_lifetables, fill=TRUE)
-  write.csv(f4_compiled_lifetables, paste0("output/Figure4_compiled_lifetables.csv"), row.names = F)
+  excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])
+  AER_all_results <- results
+  AER_all_results <- rbind(AER_all_results, results)
+  rm(results)
+  #write.csv(f4_compiled_lifetables, paste0("output/Figure4_compiled_lifetables.csv"), row.names = F)
 }
 
 #Delete file if it exists
