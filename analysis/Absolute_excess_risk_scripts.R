@@ -3,10 +3,10 @@
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
 #use only to check the function
-outcome <- "vte" 
-group <- "vaccinated" 
-strata <- "prior_history_FALSE"
-fit <- "mdl_max_adj"
+#outcome <- "ate" 
+#group <- "vaccinated" 
+#strata <- "prior_history_FALSE"
+#fit <- "mdl_max_adj"
 
 #Create the function
 excess_risk <- function(outcome, group, strata, fit) {
@@ -147,25 +147,39 @@ excess_risk <- function(outcome, group, strata, fit) {
   print(AER_196) # 183.7275
   # 184 excess 'events' happens 196 days after 7558 total covid19 'cases'.
   
-
-  # Return results
-  results <- data.frame(event = outcome,
-                        cohort = group,
-                        subgroup = strata,
-                        model = fit,
-                        AER_196 = lifetable[nrow(lifetable),]$'s-sc' * total_cases,
-                        stringsAsFactors = FALSE)
+  results <- data.frame(event=outcome,
+                        cohort=group,
+                        subgroup=strata,
+                        model=fit,
+                        AER_196=AER_196)
   
-  return(results) 
+  write.csv(results, paste0("output/AER_" , group, "_", fit, "_", strata, "_", outcome,".csv"), row.names = F) 
+  
+  return(print(results)) 
+  
+  
   
   
 }
+
+#excess_risk("vte","vaccinated","prior_history_FALSE", "mdl_max_adj")
+
+#outcome <- "ate" 
+#group <- "vaccinated" 
+#strata <- "prior_history_FALSE"
+#fit <- "mdl_max_adj"
+
+#AER_vaccinated_mdl_max_adj_prior_history_FALSE_ate.csv
+
+
+#results
 
 #---------------------------------------------------------
 #Step6. Run the function---FOR the active analyses----
 #--------------------------------------------------------
 #1. Define the active analyses
-active <- readr::read_rds("lib/active_analyses.rds")
+#active <- readr::read_rds("lib/active_analyses.rds")
+active <- active_analyses
 active <- active[active$active==TRUE,]
 active$event <- gsub("out_date_","",active$outcome_variable)
 active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL
@@ -197,13 +211,20 @@ colnames(active)[colnames(active) == 'model'] <- 'fit'
 colnames(active)[colnames(active) == 'event'] <- 'outcome'
 
 active <- active %>% select(-fit, everything())
-
-#active <- active[-190,]
-active <- active[-190,]
-active <- active[-191,]
-
+active <- active %>% filter(!strata == "ethnicity_Missing")
 
 #2. Loop to input the active analyses --- into the function.
+
+#active_test <- subset(active, active$strata == "sex_Female" & active$outcome == "vte")
+
+#Define empty results table
+#excess_risk_results_all <- data.frame(outcome = character(),
+  #                                group = character(),
+  #                                strata = character(),
+   #                               fit = character(),
+   #                               AER_196 = numeric(),
+    #                              stringsAsFactors = FALSE)
+
 
 
 for (i in 1:nrow(active)) {
@@ -212,32 +233,24 @@ for (i in 1:nrow(active)) {
   #files <- files[grepl(active$strata[i])]
   
   excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])
+ 
   
-  #write.csv(f4_compiled_lifetables, paste0("output/Figure4_compiled_lifetables.csv"), row.names = F)
 }
 
+#input2- Import data
+AER_files=list.files(path = "output", pattern = "AER_*")
+AER_files=AER_files[endsWith(AER_files,".csv")]
+AER_files=paste0("output/",AER_files)
+AER_compiled_results <- purrr::pmap(list(AER_files),
+                                    function(fpath){
+                                      df <- fread(fpath)
+                                      return(df)
+                                    })
+AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
+write.csv(AER_compiled_results, "output/AER_compiled_results.csv", row.names = F)
+
+
+
 #Delete file if it exists
-if (file.exists(lt_files)) { file.remove(lt_files)}
-
-69*196
-
-
-
-
-
-
-
-
-
-
-
-
-
-#-------------------------------------------
-#Step7. Output1 the csv
-#-------------------------------------------
-
-write.csv(AER_all_results, ("output/AER_all_results.csv"), row.names = F)
-
-
+if (file.exists(AER_files)) { file.remove(AER_files)}
 
