@@ -138,3 +138,12 @@ user/kurttaylor/ptsd_icd10/507829fb
 user/kurttaylor/schizophrenia_icd10/3768b6c6
 user/kurttaylor/self_harm_intentional_10_years_icd10/1e594391
 user/kurttaylor/self_harm_undetermined_intent_15_years_icd10/0549d05c
+user/kurttaylor/ocd_icd10/157a5020
+user/kurttaylor/eating_disorder_icd10/2e89c355
+opensafely/selective-serotonin-reuptake-inhibitors/564e95c3
+opensafely/second-generation-antipsychotics-excluding-long-acting-injections/6c7c3c11
+opensafely/prochlorperazine-dmd/058baf47
+opensafely/monoamine-oxidase-inhibitors-dmd/2b785e16
+opensafely/other-antidepressants-dmd/795977ab
+opensafely/tricyclic-and-related-antidepressants-dmd/1268eae1
+user/kurttaylor/opioid_misuse_icd10/39b36876

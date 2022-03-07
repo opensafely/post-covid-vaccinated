@@ -817,6 +817,8 @@ all_ate_codes_icd10 = combine_codelists(
     stroke_isch_icd10
 )
 
+# MENTAL HEALTH RELATED CODE LISTS ------------------------------------------
+
 # Depression 
 depression_snomed_clinical = codelist_from_csv(
     "codelists/user-hjforbes-depression-symptoms-and-diagnoses.csv",
@@ -874,9 +876,9 @@ self_harm_15plus_snomed_clinical = codelist_from_csv(
 )
 
 # Suicide
-suicide_snomed_clinical = codelist_from_csv(
+suicide_icd10 = codelist_from_csv(
     "codelists/user-hjforbes-suicide-icd-10.csv",
-    system="snomed",
+    system="icd10",
     column="code",
 )
 
@@ -885,6 +887,14 @@ addiction_snomed_clinical = codelist_from_csv(
     "codelists/user-hjforbes-opioid-dependency-clinical-diagnosis.csv",
     system="snomed",
     column="code",
+)
+
+# Opioid misuse ICD10
+
+opioid_misuse_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-opioid_misuse_icd10.csv",
+    system = "icd10", 
+    column = "code",
 )
 
 # Alcohol misuse ICD10
@@ -969,4 +979,123 @@ self_harm_undet_intent_icd10 = codelist_from_csv(
     "codelists/user-kurttaylor-self_harm_undetermined_intent_15_years_icd10.csv",
     system="icd10",
     column="code",
+)
+
+# Self harm undetermined intent 15 years - combined
+
+self_harm_15_10_combined_icd = combine_codelists(
+    self_harm_intent_icd10,
+    self_harm_undet_intent_icd10
+)
+
+# OCD ICD10
+ocd_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-ocd_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Eating Disorder ICD10
+eating_disorder_icd10 = codelist_from_csv(
+    "codelists/user-kurttaylor-eating_disorder_icd10.csv",
+    system="icd10",
+    column="code",
+)
+
+# Combined serious mental illness HES
+
+serious_mental_illness_icd10 = combine_codelists(
+    bipolar_other_mood_icd10,
+    psychotic_disorders_other_icd10,
+    schizophrenia_icd10
+)
+
+# SSRI prescription 
+ssri_depression_prescription = codelist_from_csv(
+    "codelists/opensafely-selective-serotonin-reuptake-inhibitors.csv",
+    system="snomed",
+    column="code",
+)
+
+# Depression prescriptions - SNRI 
+
+
+# Depression prescriptions - NASSAs
+
+
+# Depression prescriptions - TCA 
+tca_depression_prescription = codelist_from_csv(
+    "codelists/opensafely-tricyclic-and-related-antidepressants-dmd.csv",
+    system="snomed",
+    column="dmd_id",
+)
+
+# Depression prescriptions - SARIs 
+
+
+# Depression prescriptions - MAOIs 
+maoi_depression_prescription = codelist_from_csv(
+    "codelists/opensafely-monoamine-oxidase-inhibitors-dmd.csv",
+    system="snomed",
+    column="dmd_id",
+)
+# Depression prescriptions - Others  
+other_depression_prescription = codelist_from_csv(
+    "codelists/opensafely-other-antidepressants-dmd.csv",
+    system="snomed",
+    column="dmd_id",
+)
+
+# Combined depression prescriptions
+# Combine: SSRI, SNRI, NASSA, TCA, SARI, MAOI, Other
+# all_depression_prescriptions = combine_codelists(
+#     ssri_depression_prescription, 
+#     snri_depression_prescription,
+#     nassa_depression_prescription,
+#     tca_depression_prescription,
+#     sari_depression_prescription,
+#     maoi_depression_prescription,
+#     other_depression_prescription
+# )
+
+# Anxiolytics 
+anxiolytic_prescription = codelist_from_csv(
+    "local_codelists/uom-anxiolytics-snomed.csv", 
+    system="snomed", 
+    column="SNOMEDID"
+)
+
+# 2nd gen antipsychotics prescription
+second_gen_antipsychotics = codelist_from_csv(
+    "codelists/opensafely-second-generation-antipsychotics-excluding-long-acting-injections.csv",
+    system="snomed",
+    column="dmd_id",
+)
+
+# Prochlorperazine prescription
+prochlorperazine = codelist_from_csv(
+    "codelists/opensafely-prochlorperazine-dmd.csv",
+    system="snomed",
+    column="dmd_id",
+)
+
+# Combined serious mental illness prescriptions
+all_mental_illness_prescriptions = combine_codelists(
+    second_gen_antipsychotics,
+    prochlorperazine
+)
+
+# Combined anxiety covariate primary care
+
+anxiety_combined_snomed_cov = combine_codelists(
+    anxiety_general_snomed_clinical,
+    anxiety_ocd_snomed_clinical,
+    anxiety_ptsd_snomed_clinical
+)
+
+# Combined anxiety covariate HES
+
+anxiety_combined_hes_cov = combine_codelists(
+    anxiety_icd10,
+    ocd_icd10
 )

@@ -1,0 +1,873 @@
+SNOMEDID,DMD_description
+321241004,Alprazolam 250microgram tablets
+4658311000001107,Alprazolam 250microgram tablets
+321242006,Alprazolam 500microgram tablets
+4659211000001109,Alprazolam 500microgram tablets
+321246009,Bromazepam 3mg tablets
+18503811000001106,Bromazepam 3mg tablets
+18503911000001101,Bromazepam 3mg tablets (Special Order)
+18504011000001103,Bromazepam 3mg tablets (Special Order)
+13838811000001107,Buspar 10mg tablets (DE Pharmaceuticals)
+13839311000001109,Buspar 10mg tablets (DE Pharmaceuticals)
+18548011000001100,Buspar 10mg tablets (DE Pharmaceuticals)
+5526311000001105,Buspar 10mg tablets (Dowelhurst Ltd)
+5526511000001104,Buspar 10mg tablets (Dowelhurst Ltd)
+5526811000001101,Buspar 10mg tablets (Dowelhurst Ltd)
+737211000001100,Buspar 10mg tablets (IXL Pharma Ltd)
+1933411000001103,Buspar 10mg tablets (IXL Pharma Ltd)
+5107911000001107,Buspar 10mg tablets (IXL Pharma Ltd)
+16143211000001101,Buspar 10mg tablets (Lexon (UK) Ltd)
+16143311000001109,Buspar 10mg tablets (Lexon (UK) Ltd)
+16143411000001102,Buspar 10mg tablets (Lexon (UK) Ltd)
+16350511000001104,Buspar 10mg tablets (Mawdsley-Brooks & Company Ltd)
+16350711000001109,Buspar 10mg tablets (Mawdsley-Brooks & Company Ltd)
+16350911000001106,Buspar 10mg tablets (Mawdsley-Brooks & Company Ltd)
+14300511000001104,Buspar 10mg tablets (Sigma Pharmaceuticals Plc)
+14301111000001102,Buspar 10mg tablets (Sigma Pharmaceuticals Plc)
+5339011000001101,Buspar 10mg tablets (Waymade Healthcare Plc)
+5339111000001100,Buspar 10mg tablets (Waymade Healthcare Plc)
+10838611000001109,Buspar 10mg tablets (Waymade Healthcare Plc)
+14753711000001105,Buspar 10mg tablets (Waymade Healthcare Plc)
+5526911000001106,Buspar 5mg tablets (Dowelhurst Ltd)
+5527011000001105,Buspar 5mg tablets (Dowelhurst Ltd)
+365311000001106,Buspar 5mg tablets (IXL Pharma Ltd)
+1932411000001107,Buspar 5mg tablets (IXL Pharma Ltd)
+16143011000001106,Buspar 5mg tablets (Lexon (UK) Ltd)
+16143111000001107,Buspar 5mg tablets (Lexon (UK) Ltd)
+16349311000001104,Buspar 5mg tablets (Mawdsley-Brooks & Company Ltd)
+16349511000001105,Buspar 5mg tablets (Mawdsley-Brooks & Company Ltd)
+16349711000001100,Buspar 5mg tablets (Mawdsley-Brooks & Company Ltd)
+14301511000001106,Buspar 5mg tablets (Sigma Pharmaceuticals Plc)
+14301811000001109,Buspar 5mg tablets (Sigma Pharmaceuticals Plc)
+5339411000001105,Buspar 5mg tablets (Waymade Healthcare Plc)
+5339511000001109,Buspar 5mg tablets (Waymade Healthcare Plc)
+14754011000001105,Buspar 5mg tablets (Waymade Healthcare Plc)
+972911000001101,Buspirone 10mg tablets
+1040411000001101,Buspirone 10mg tablets
+5107411000001104,Buspirone 10mg tablets
+10838511000001105,Buspirone 10mg tablets
+39734311000001106,Buspirone 10mg tablets
+302511000001105,Buspirone 10mg tablets (A A H Pharmaceuticals Ltd)
+1933211000001102,Buspirone 10mg tablets (A A H Pharmaceuticals Ltd)
+67611000001106,Buspirone 10mg tablets (Accord Healthcare Ltd)
+1933311000001105,Buspirone 10mg tablets (Accord Healthcare Ltd)
+32709711000001108,Buspirone 10mg tablets (Alissa Healthcare Research Ltd)
+32709811000001100,Buspirone 10mg tablets (Alissa Healthcare Research Ltd)
+292211000001101,Buspirone 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+1933811000001101,Buspirone 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+19817111000001109,Buspirone 10mg tablets (Almus Pharmaceuticals Ltd)
+19817211000001103,Buspirone 10mg tablets (Almus Pharmaceuticals Ltd)
+22624311000001105,Buspirone 10mg tablets (DE Pharmaceuticals)
+22624411000001103,Buspirone 10mg tablets (DE Pharmaceuticals)
+13188711000001102,Buspirone 10mg tablets (Dowelhurst Ltd)
+13188811000001105,Buspirone 10mg tablets (Dowelhurst Ltd)
+737311000001108,Buspirone 10mg tablets (Kent Pharma (UK) Ltd)
+1933711000001109,Buspirone 10mg tablets (Kent Pharma (UK) Ltd)
+30005911000001102,Buspirone 10mg tablets (Mawdsley-Brooks & Company Ltd)
+30006011000001105,Buspirone 10mg tablets (Mawdsley-Brooks & Company Ltd)
+38813111000001101,Buspirone 10mg tablets (Medihealth (Northern) Ltd)
+38813211000001107,Buspirone 10mg tablets (Medihealth (Northern) Ltd)
+16627711000001104,Buspirone 10mg tablets (Mylan)
+16627911000001102,Buspirone 10mg tablets (Mylan)
+22204411000001106,Buspirone 10mg tablets (Phoenix Healthcare Distribution Ltd)
+22204511000001105,Buspirone 10mg tablets (Phoenix Healthcare Distribution Ltd)
+15062011000001102,Buspirone 10mg tablets (Sigma Pharmaceuticals Plc)
+15062111000001101,Buspirone 10mg tablets (Sigma Pharmaceuticals Plc)
+34819211000001108,Buspirone 10mg tablets (Teva UK Ltd)
+34819311000001100,Buspirone 10mg tablets (Teva UK Ltd)
+21807311000001102,Buspirone 10mg tablets (Waymade Healthcare Plc)
+21807511000001108,Buspirone 10mg tablets (Waymade Healthcare Plc)
+1102211000001102,Buspirone 5mg tablets
+1195011000001104,Buspirone 5mg tablets
+5339211000001106,Buspirone 5mg tablets
+39734411000001104,Buspirone 5mg tablets
+741811000001105,Buspirone 5mg tablets (A A H Pharmaceuticals Ltd)
+1932011000001103,Buspirone 5mg tablets (A A H Pharmaceuticals Ltd)
+741511000001107,Buspirone 5mg tablets (Accord Healthcare Ltd)
+1932211000001108,Buspirone 5mg tablets (Accord Healthcare Ltd)
+32707711000001100,Buspirone 5mg tablets (Alissa Healthcare Research Ltd)
+32709611000001104,Buspirone 5mg tablets (Alissa Healthcare Research Ltd)
+261111000001104,Buspirone 5mg tablets (Alliance Healthcare (Distribution) Ltd)
+1933011000001107,Buspirone 5mg tablets (Alliance Healthcare (Distribution) Ltd)
+19817311000001106,Buspirone 5mg tablets (Almus Pharmaceuticals Ltd)
+19817411000001104,Buspirone 5mg tablets (Almus Pharmaceuticals Ltd)
+22624511000001104,Buspirone 5mg tablets (DE Pharmaceuticals)
+22624611000001100,Buspirone 5mg tablets (DE Pharmaceuticals)
+13189111000001105,Buspirone 5mg tablets (Dowelhurst Ltd)
+13189211000001104,Buspirone 5mg tablets (Dowelhurst Ltd)
+444511000001100,Buspirone 5mg tablets (Kent Pharma (UK) Ltd)
+1932711000001101,Buspirone 5mg tablets (Kent Pharma (UK) Ltd)
+30004911000001101,Buspirone 5mg tablets (Mawdsley-Brooks & Company Ltd)
+30005011000001101,Buspirone 5mg tablets (Mawdsley-Brooks & Company Ltd)
+38813311000001104,Buspirone 5mg tablets (Medihealth (Northern) Ltd)
+38813411000001106,Buspirone 5mg tablets (Medihealth (Northern) Ltd)
+16630211000001109,Buspirone 5mg tablets (Mylan)
+16630311000001101,Buspirone 5mg tablets (Mylan)
+22204211000001107,Buspirone 5mg tablets (Phoenix Healthcare Distribution Ltd)
+22204311000001104,Buspirone 5mg tablets (Phoenix Healthcare Distribution Ltd)
+17896011000001100,Buspirone 5mg tablets (Sigma Pharmaceuticals Plc)
+17896111000001104,Buspirone 5mg tablets (Sigma Pharmaceuticals Plc)
+15062211000001107,Buspirone 5mg tablets (Sigma Pharmaceuticals Plc)
+15062311000001104,Buspirone 5mg tablets (Sigma Pharmaceuticals Plc)
+34564611000001106,Buspirone 5mg tablets (Teva UK Ltd)
+34564711000001102,Buspirone 5mg tablets (Teva UK Ltd)
+21806311000001100,Buspirone 5mg tablets (Waymade Healthcare Plc)
+21806511000001106,Buspirone 5mg tablets (Waymade Healthcare Plc)
+8298911000001102,Buspirone 5mg/5ml oral solution
+8304411000001106,Buspirone 5mg/5ml oral solution
+8299111000001107,Buspirone 5mg/5ml oral solution (Special Order)
+8299411000001102,Buspirone 5mg/5ml oral solution (Special Order)
+8299811000001100,Buspirone 5mg/5ml oral suspension
+8304311000001104,Buspirone 5mg/5ml oral suspension
+8300111000001105,Buspirone 5mg/5ml oral suspension (Special Order)
+8300211000001104,Buspirone 5mg/5ml oral suspension (Special Order)
+37227411000001107,Buspirone 7.5mg tablets
+37236111000001102,Buspirone 7.5mg tablets
+37227511000001106,Buspirone 7.5mg tablets (Strides Pharma UK Ltd)
+37227611000001105,Buspirone 7.5mg tablets (Strides Pharma UK Ltd)
+321248005,Chlordiazepoxide 10mg capsules
+1038211000001103,Chlordiazepoxide 10mg capsules
+1102811000001101,Chlordiazepoxide 10mg capsules
+28878111000001100,Chlordiazepoxide 10mg capsules
+610411000001101,Chlordiazepoxide 10mg capsules (A A H Pharmaceuticals Ltd)
+2303311000001105,Chlordiazepoxide 10mg capsules (A A H Pharmaceuticals Ltd)
+8425211000001106,Chlordiazepoxide 10mg capsules (A A H Pharmaceuticals Ltd)
+28962611000001106,Chlordiazepoxide 10mg capsules (A A H Pharmaceuticals Ltd)
+805211000001104,Chlordiazepoxide 10mg capsules (Actavis UK Ltd)
+2303811000001101,Chlordiazepoxide 10mg capsules (Actavis UK Ltd)
+679411000001104,Chlordiazepoxide 10mg capsules (Alliance Healthcare (Distribution) Ltd)
+2305111000001109,Chlordiazepoxide 10mg capsules (Alliance Healthcare (Distribution) Ltd)
+2305311000001106,Chlordiazepoxide 10mg capsules (Alliance Healthcare (Distribution) Ltd)
+28878211000001106,Chlordiazepoxide 10mg capsules (Alliance Healthcare (Distribution) Ltd)
+28923211000001108,Chlordiazepoxide 10mg capsules (Crescent Pharma Ltd)
+28923311000001100,Chlordiazepoxide 10mg capsules (Crescent Pharma Ltd)
+23815311000001100,Chlordiazepoxide 10mg capsules (DE Pharmaceuticals)
+23815511000001106,Chlordiazepoxide 10mg capsules (DE Pharmaceuticals)
+30029711000001106,Chlordiazepoxide 10mg capsules (DE Pharmaceuticals)
+13214911000001108,Chlordiazepoxide 10mg capsules (Dowelhurst Ltd)
+13215011000001108,Chlordiazepoxide 10mg capsules (Dowelhurst Ltd)
+11013611000001101,Chlordiazepoxide 10mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+11014111000001106,Chlordiazepoxide 10mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+11014311000001108,Chlordiazepoxide 10mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+688011000001105,Chlordiazepoxide 10mg capsules (Kent Pharma (UK) Ltd)
+2304511000001101,Chlordiazepoxide 10mg capsules (Kent Pharma (UK) Ltd)
+4324411000001100,Chlordiazepoxide 10mg capsules (Kent Pharma (UK) Ltd)
+28992511000001109,Chlordiazepoxide 10mg capsules (Kent Pharma (UK) Ltd)
+30013111000001104,Chlordiazepoxide 10mg capsules (Mawdsley-Brooks & Company Ltd)
+30013311000001102,Chlordiazepoxide 10mg capsules (Mawdsley-Brooks & Company Ltd)
+38829611000001104,Chlordiazepoxide 10mg capsules (Medihealth (Northern) Ltd)
+38829811000001100,Chlordiazepoxide 10mg capsules (Medihealth (Northern) Ltd)
+17855311000001101,Chlordiazepoxide 10mg capsules (Phoenix Healthcare Distribution Ltd)
+17855411000001108,Chlordiazepoxide 10mg capsules (Phoenix Healthcare Distribution Ltd)
+17855511000001107,Chlordiazepoxide 10mg capsules (Phoenix Healthcare Distribution Ltd)
+3696311000001101,Chlordiazepoxide 10mg capsules (Ranbaxy (UK) Ltd)
+3696411000001108,Chlordiazepoxide 10mg capsules (Ranbaxy (UK) Ltd)
+3696511000001107,Chlordiazepoxide 10mg capsules (Ranbaxy (UK) Ltd)
+7487911000001108,Chlordiazepoxide 10mg capsules (Sandoz Ltd)
+7488011000001105,Chlordiazepoxide 10mg capsules (Sandoz Ltd)
+15075111000001100,Chlordiazepoxide 10mg capsules (Sigma Pharmaceuticals Plc)
+15075211000001106,Chlordiazepoxide 10mg capsules (Sigma Pharmaceuticals Plc)
+29785511000001109,Chlordiazepoxide 10mg capsules (Sigma Pharmaceuticals Plc)
+21836311000001106,Chlordiazepoxide 10mg capsules (Waymade Healthcare Plc)
+21836411000001104,Chlordiazepoxide 10mg capsules (Waymade Healthcare Plc)
+321250002,Chlordiazepoxide 10mg tablets
+1045411000001108,Chlordiazepoxide 10mg tablets
+1103311000001100,Chlordiazepoxide 10mg tablets
+8425711000001104,Chlordiazepoxide 10mg tablets (A A H Pharmaceuticals Ltd)
+8425811000001107,Chlordiazepoxide 10mg tablets (A A H Pharmaceuticals Ltd)
+8425911000001102,Chlordiazepoxide 10mg tablets (A A H Pharmaceuticals Ltd)
+33311000001100,Chlordiazepoxide 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+2455011000001106,Chlordiazepoxide 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+2455111000001107,Chlordiazepoxide 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+23817311000001108,Chlordiazepoxide 10mg tablets (DE Pharmaceuticals)
+23817511000001102,Chlordiazepoxide 10mg tablets (DE Pharmaceuticals)
+11014911000001109,Chlordiazepoxide 10mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+11015111000001105,Chlordiazepoxide 10mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+17855811000001105,Chlordiazepoxide 10mg tablets (Phoenix Healthcare Distribution Ltd)
+17855911000001100,Chlordiazepoxide 10mg tablets (Phoenix Healthcare Distribution Ltd)
+21837211000001101,Chlordiazepoxide 10mg tablets (Waymade Healthcare Plc)
+21837411000001102,Chlordiazepoxide 10mg tablets (Waymade Healthcare Plc)
+21837511000001103,Chlordiazepoxide 10mg tablets (Waymade Healthcare Plc)
+12403811000001105,Chlordiazepoxide 10mg/5ml oral solution
+12423511000001100,Chlordiazepoxide 10mg/5ml oral solution
+12404111000001101,Chlordiazepoxide 10mg/5ml oral solution (Special Order)
+12404411000001106,Chlordiazepoxide 10mg/5ml oral solution (Special Order)
+12402411000001104,Chlordiazepoxide 10mg/5ml oral suspension
+12423611000001101,Chlordiazepoxide 10mg/5ml oral suspension
+12402811000001102,Chlordiazepoxide 10mg/5ml oral suspension (Special Order)
+12402911000001107,Chlordiazepoxide 10mg/5ml oral suspension (Special Order)
+16133611000001103,Chlordiazepoxide 2.5mg/5ml oral solution
+16174011000001109,Chlordiazepoxide 2.5mg/5ml oral solution
+16133911000001109,Chlordiazepoxide 2.5mg/5ml oral solution (Special Order)
+16134011000001107,Chlordiazepoxide 2.5mg/5ml oral solution (Special Order)
+16134411000001103,Chlordiazepoxide 2.5mg/5ml oral suspension
+16174111000001105,Chlordiazepoxide 2.5mg/5ml oral suspension
+20159111000001103,Chlordiazepoxide 2.5mg/5ml oral suspension
+16134611000001100,Chlordiazepoxide 2.5mg/5ml oral suspension (Special Order)
+16134711000001109,Chlordiazepoxide 2.5mg/5ml oral suspension (Special Order)
+20159211000001109,Chlordiazepoxide 2.5mg/5ml oral suspension (Special Order)
+12406611000001100,Chlordiazepoxide 4mg/5ml oral solution
+12423711000001105,Chlordiazepoxide 4mg/5ml oral solution
+12406911000001106,Chlordiazepoxide 4mg/5ml oral solution (Special Order)
+12407111000001106,Chlordiazepoxide 4mg/5ml oral solution (Special Order)
+12405411000001107,Chlordiazepoxide 4mg/5ml oral suspension
+12423811000001102,Chlordiazepoxide 4mg/5ml oral suspension
+12405811000001109,Chlordiazepoxide 4mg/5ml oral suspension (Special Order)
+12406111000001108,Chlordiazepoxide 4mg/5ml oral suspension (Special Order)
+321247000,Chlordiazepoxide 5mg capsules
+1170511000001109,Chlordiazepoxide 5mg capsules
+1324911000001101,Chlordiazepoxide 5mg capsules
+28877911000001103,Chlordiazepoxide 5mg capsules
+299111000001103,Chlordiazepoxide 5mg capsules (A A H Pharmaceuticals Ltd)
+2306111000001103,Chlordiazepoxide 5mg capsules (A A H Pharmaceuticals Ltd)
+8425111000001100,Chlordiazepoxide 5mg capsules (A A H Pharmaceuticals Ltd)
+28962511000001107,Chlordiazepoxide 5mg capsules (A A H Pharmaceuticals Ltd)
+620311000001103,Chlordiazepoxide 5mg capsules (Actavis UK Ltd)
+2306411000001108,Chlordiazepoxide 5mg capsules (Actavis UK Ltd)
+202211000001104,Chlordiazepoxide 5mg capsules (Alliance Healthcare (Distribution) Ltd)
+2307211000001106,Chlordiazepoxide 5mg capsules (Alliance Healthcare (Distribution) Ltd)
+2307411000001105,Chlordiazepoxide 5mg capsules (Alliance Healthcare (Distribution) Ltd)
+28878011000001101,Chlordiazepoxide 5mg capsules (Alliance Healthcare (Distribution) Ltd)
+28923011000001103,Chlordiazepoxide 5mg capsules (Crescent Pharma Ltd)
+28923111000001102,Chlordiazepoxide 5mg capsules (Crescent Pharma Ltd)
+23816311000001105,Chlordiazepoxide 5mg capsules (DE Pharmaceuticals)
+23816711000001109,Chlordiazepoxide 5mg capsules (DE Pharmaceuticals)
+30029511000001101,Chlordiazepoxide 5mg capsules (DE Pharmaceuticals)
+13215111000001109,Chlordiazepoxide 5mg capsules (Dowelhurst Ltd)
+13215211000001103,Chlordiazepoxide 5mg capsules (Dowelhurst Ltd)
+11012911000001100,Chlordiazepoxide 5mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+11013111000001109,Chlordiazepoxide 5mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+11013311000001106,Chlordiazepoxide 5mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+47111000001109,Chlordiazepoxide 5mg capsules (Kent Pharma (UK) Ltd)
+2307111000001100,Chlordiazepoxide 5mg capsules (Kent Pharma (UK) Ltd)
+4324311000001107,Chlordiazepoxide 5mg capsules (Kent Pharma (UK) Ltd)
+28992411000001105,Chlordiazepoxide 5mg capsules (Kent Pharma (UK) Ltd)
+38829911000001105,Chlordiazepoxide 5mg capsules (Medihealth (Northern) Ltd)
+38830011000001100,Chlordiazepoxide 5mg capsules (Medihealth (Northern) Ltd)
+17855011000001104,Chlordiazepoxide 5mg capsules (Phoenix Healthcare Distribution Ltd)
+17855111000001103,Chlordiazepoxide 5mg capsules (Phoenix Healthcare Distribution Ltd)
+17855211000001109,Chlordiazepoxide 5mg capsules (Phoenix Healthcare Distribution Ltd)
+3696011000001104,Chlordiazepoxide 5mg capsules (Ranbaxy (UK) Ltd)
+3696111000001103,Chlordiazepoxide 5mg capsules (Ranbaxy (UK) Ltd)
+3696211000001109,Chlordiazepoxide 5mg capsules (Ranbaxy (UK) Ltd)
+7487311000001107,Chlordiazepoxide 5mg capsules (Sandoz Ltd)
+7487611000001102,Chlordiazepoxide 5mg capsules (Sandoz Ltd)
+15075311000001103,Chlordiazepoxide 5mg capsules (Sigma Pharmaceuticals Plc)
+15075411000001105,Chlordiazepoxide 5mg capsules (Sigma Pharmaceuticals Plc)
+29785611000001108,Chlordiazepoxide 5mg capsules (Sigma Pharmaceuticals Plc)
+21834311000001100,Chlordiazepoxide 5mg capsules (Waymade Healthcare Plc)
+21834411000001107,Chlordiazepoxide 5mg capsules (Waymade Healthcare Plc)
+321249002,Chlordiazepoxide 5mg tablets
+1074811000001108,Chlordiazepoxide 5mg tablets
+1181611000001107,Chlordiazepoxide 5mg tablets
+8425311000001103,Chlordiazepoxide 5mg tablets (A A H Pharmaceuticals Ltd)
+8425511000001109,Chlordiazepoxide 5mg tablets (A A H Pharmaceuticals Ltd)
+8425611000001108,Chlordiazepoxide 5mg tablets (A A H Pharmaceuticals Ltd)
+257511000001107,Chlordiazepoxide 5mg tablets (Alliance Healthcare (Distribution) Ltd)
+2455811000001100,Chlordiazepoxide 5mg tablets (Alliance Healthcare (Distribution) Ltd)
+2456011000001102,Chlordiazepoxide 5mg tablets (Alliance Healthcare (Distribution) Ltd)
+11014511000001102,Chlordiazepoxide 5mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+11014611000001103,Chlordiazepoxide 5mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+28879611000001104,Chlordiazepoxide 5mg tablets (Ennogen Healthcare Ltd)
+28879711000001108,Chlordiazepoxide 5mg tablets (Ennogen Healthcare Ltd)
+17855611000001106,Chlordiazepoxide 5mg tablets (Phoenix Healthcare Distribution Ltd)
+17855711000001102,Chlordiazepoxide 5mg tablets (Phoenix Healthcare Distribution Ltd)
+21836511000001100,Chlordiazepoxide 5mg tablets (Waymade Healthcare Plc)
+21836711000001105,Chlordiazepoxide 5mg tablets (Waymade Healthcare Plc)
+8337211000001109,Chlordiazepoxide 5mg/5ml oral suspension
+8358211000001107,Chlordiazepoxide 5mg/5ml oral suspension
+8337411000001108,Chlordiazepoxide 5mg/5ml oral suspension (Special Order)
+8337711000001102,Chlordiazepoxide 5mg/5ml oral suspension (Special Order)
+23317711000001109,Chlordiazepoxide 7.5mg/5ml oral suspension
+23317811000001101,Chlordiazepoxide 7.5mg/5ml oral suspension
+23317911000001106,Chlordiazepoxide 7.5mg/5ml oral suspension
+23318011000001108,Chlordiazepoxide 7.5mg/5ml oral suspension (Special Order)
+23318111000001109,Chlordiazepoxide 7.5mg/5ml oral suspension (Special Order)
+23318211000001103,Chlordiazepoxide 7.5mg/5ml oral suspension (Special Order)
+321198003,Diazepam 10mg tablets
+1132211000001105,Diazepam 10mg tablets
+1289511000001106,Diazepam 10mg tablets
+9106611000001109,Diazepam 10mg tablets
+734911000001103,Diazepam 10mg tablets (A A H Pharmaceuticals Ltd)
+1420011000001103,Diazepam 10mg tablets (A A H Pharmaceuticals Ltd)
+1420311000001100,Diazepam 10mg tablets (A A H Pharmaceuticals Ltd)
+486211000001103,Diazepam 10mg tablets (Accord Healthcare Ltd)
+1420811000001109,Diazepam 10mg tablets (Accord Healthcare Ltd)
+433011000001105,Diazepam 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+1443411000001102,Diazepam 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+1443511000001103,Diazepam 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+9790811000001104,Diazepam 10mg tablets (Almus Pharmaceuticals Ltd)
+9790911000001109,Diazepam 10mg tablets (Almus Pharmaceuticals Ltd)
+10400711000001100,Diazepam 10mg tablets (Arrow Generics Ltd)
+10400811000001108,Diazepam 10mg tablets (Arrow Generics Ltd)
+10400911000001103,Diazepam 10mg tablets (Arrow Generics Ltd)
+28922211000001102,Diazepam 10mg tablets (Crescent Pharma Ltd)
+28922311000001105,Diazepam 10mg tablets (Crescent Pharma Ltd)
+23861111000001100,Diazepam 10mg tablets (DE Pharmaceuticals)
+23861311000001103,Diazepam 10mg tablets (DE Pharmaceuticals)
+11020311000001105,Diazepam 10mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+11020411000001103,Diazepam 10mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+230211000001106,Diazepam 10mg tablets (IVAX Pharmaceuticals UK Ltd)
+1422111000001103,Diazepam 10mg tablets (IVAX Pharmaceuticals UK Ltd)
+305211000001102,Diazepam 10mg tablets (Kent Pharma (UK) Ltd)
+1422711000001102,Diazepam 10mg tablets (Kent Pharma (UK) Ltd)
+1423411000001104,Diazepam 10mg tablets (Kent Pharma (UK) Ltd)
+37057611000001101,Diazepam 10mg tablets (Mawdsley-Brooks & Company Ltd)
+37057711000001105,Diazepam 10mg tablets (Mawdsley-Brooks & Company Ltd)
+38867711000001106,Diazepam 10mg tablets (Medihealth (Northern) Ltd)
+38868011000001105,Diazepam 10mg tablets (Medihealth (Northern) Ltd)
+878511000001104,Diazepam 10mg tablets (Mylan)
+1422611000001106,Diazepam 10mg tablets (Mylan)
+18107511000001108,Diazepam 10mg tablets (Phoenix Healthcare Distribution Ltd)
+18107611000001107,Diazepam 10mg tablets (Phoenix Healthcare Distribution Ltd)
+253911000001109,Diazepam 10mg tablets (Ranbaxy (UK) Ltd)
+1442711000001100,Diazepam 10mg tablets (Ranbaxy (UK) Ltd)
+1443211000001101,Diazepam 10mg tablets (Ranbaxy (UK) Ltd)
+29804111000001100,Diazepam 10mg tablets (Sigma Pharmaceuticals Plc)
+29804211000001106,Diazepam 10mg tablets (Sigma Pharmaceuticals Plc)
+17197311000001106,Diazepam 10mg tablets (Sovereign Medical Ltd)
+17197411000001104,Diazepam 10mg tablets (Sovereign Medical Ltd)
+17197511000001100,Diazepam 10mg tablets (Sovereign Medical Ltd)
+366511000001107,Diazepam 10mg tablets (Teva UK Ltd)
+1421811000001101,Diazepam 10mg tablets (Teva UK Ltd)
+21925811000001103,Diazepam 10mg tablets (Waymade Healthcare Plc)
+21925911000001108,Diazepam 10mg tablets (Waymade Healthcare Plc)
+23591311000001100,Diazepam 10mg tablets (Waymade Healthcare Plc)
+13938311000001108,Diazepam 10mg tablets (Wockhardt UK Ltd)
+13938411000001101,Diazepam 10mg tablets (Wockhardt UK Ltd)
+16431111000001106,Diazepam 10mg tablets (Wockhardt UK Ltd)
+8781011000001102,Diazepam 10mg/5ml oral solution
+8792711000001108,Diazepam 10mg/5ml oral solution
+20443911000001100,Diazepam 10mg/5ml oral solution
+22327611000001100,Diazepam 10mg/5ml oral solution
+22328211000001103,Diazepam 10mg/5ml oral solution (AM Distributions (Yorkshire) Ltd)
+22328311000001106,Diazepam 10mg/5ml oral solution (AM Distributions (Yorkshire) Ltd)
+8781111000001101,Diazepam 10mg/5ml oral solution (Special Order)
+8781311000001104,Diazepam 10mg/5ml oral solution (Special Order)
+20444411000001106,Diazepam 10mg/5ml oral solution (Special Order)
+13883611000001105,Diazepam 10mg/5ml oral suspension
+13893211000001109,Diazepam 10mg/5ml oral suspension
+21310311000001103,Diazepam 10mg/5ml oral suspension
+13883811000001109,Diazepam 10mg/5ml oral suspension (Special Order)
+13884011000001101,Diazepam 10mg/5ml oral suspension (Special Order)
+21310411000001105,Diazepam 10mg/5ml oral suspension (Special Order)
+22371211000001108,Diazepam 15mg/5ml oral solution
+22371311000001100,Diazepam 15mg/5ml oral solution
+22374911000001101,Diazepam 15mg/5ml oral solution
+22371411000001107,Diazepam 15mg/5ml oral solution (Special Order)
+22371511000001106,Diazepam 15mg/5ml oral solution (Special Order)
+22371611000001105,Diazepam 15mg/5ml oral solution (Special Order)
+8781411000001106,Diazepam 1mg/5ml oral solution
+8792811000001100,Diazepam 1mg/5ml oral solution
+8781511000001105,Diazepam 1mg/5ml oral solution (Special Order)
+8781611000001109,Diazepam 1mg/5ml oral solution (Special Order)
+8780411000001102,Diazepam 2.5mg/5ml oral solution
+8792911000001105,Diazepam 2.5mg/5ml oral solution
+8780511000001103,Diazepam 2.5mg/5ml oral solution (Special Order)
+8780611000001104,Diazepam 2.5mg/5ml oral solution (Special Order)
+13892011000001108,Diazepam 2.5mg/5ml oral suspension
+13893311000001101,Diazepam 2.5mg/5ml oral suspension
+13892111000001109,Diazepam 2.5mg/5ml oral suspension (Special Order)
+13892211000001103,Diazepam 2.5mg/5ml oral suspension (Special Order)
+426016003,Diazepam 25mg/5ml oral solution
+8780711000001108,Diazepam 25mg/5ml oral solution
+8780811000001100,Diazepam 25mg/5ml oral solution (Special Order)
+8780911000001105,Diazepam 25mg/5ml oral solution (Special Order)
+321196004,Diazepam 2mg tablets
+998211000001100,Diazepam 2mg tablets
+1257511000001107,Diazepam 2mg tablets
+9107011000001104,Diazepam 2mg tablets
+9107111000001103,Diazepam 2mg tablets
+889411000001101,Diazepam 2mg tablets (A A H Pharmaceuticals Ltd)
+1423511000001100,Diazepam 2mg tablets (A A H Pharmaceuticals Ltd)
+1423611000001101,Diazepam 2mg tablets (A A H Pharmaceuticals Ltd)
+790811000001109,Diazepam 2mg tablets (Accord Healthcare Ltd)
+1423711000001105,Diazepam 2mg tablets (Accord Healthcare Ltd)
+28611000001100,Diazepam 2mg tablets (Alliance Healthcare (Distribution) Ltd)
+1424811000001104,Diazepam 2mg tablets (Alliance Healthcare (Distribution) Ltd)
+1424911000001109,Diazepam 2mg tablets (Alliance Healthcare (Distribution) Ltd)
+9790311000001108,Diazepam 2mg tablets (Almus Pharmaceuticals Ltd)
+9790511000001102,Diazepam 2mg tablets (Almus Pharmaceuticals Ltd)
+10400111000001101,Diazepam 2mg tablets (Arrow Generics Ltd)
+10400211000001107,Diazepam 2mg tablets (Arrow Generics Ltd)
+10400311000001104,Diazepam 2mg tablets (Arrow Generics Ltd)
+28922011000001107,Diazepam 2mg tablets (Crescent Pharma Ltd)
+28922111000001108,Diazepam 2mg tablets (Crescent Pharma Ltd)
+13577011000001103,Diazepam 2mg tablets (DE Pharmaceuticals)
+13577111000001102,Diazepam 2mg tablets (DE Pharmaceuticals)
+23861611000001108,Diazepam 2mg tablets (DE Pharmaceuticals)
+11019911000001105,Diazepam 2mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+11020011000001107,Diazepam 2mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+52211000001103,Diazepam 2mg tablets (IVAX Pharmaceuticals UK Ltd)
+1424111000001106,Diazepam 2mg tablets (IVAX Pharmaceuticals UK Ltd)
+708811000001109,Diazepam 2mg tablets (Kent Pharma (UK) Ltd)
+1424211000001100,Diazepam 2mg tablets (Kent Pharma (UK) Ltd)
+1424311000001108,Diazepam 2mg tablets (Kent Pharma (UK) Ltd)
+30021611000001103,Diazepam 2mg tablets (Mawdsley-Brooks & Company Ltd)
+30021911000001109,Diazepam 2mg tablets (Mawdsley-Brooks & Company Ltd)
+38868111000001106,Diazepam 2mg tablets (Medihealth (Northern) Ltd)
+38868211000001100,Diazepam 2mg tablets (Medihealth (Northern) Ltd)
+849711000001101,Diazepam 2mg tablets (Mylan)
+1424011000001105,Diazepam 2mg tablets (Mylan)
+18107111000001104,Diazepam 2mg tablets (Phoenix Healthcare Distribution Ltd)
+18107211000001105,Diazepam 2mg tablets (Phoenix Healthcare Distribution Ltd)
+23654011000001100,Diazepam 2mg tablets (Phoenix Healthcare Distribution Ltd)
+463011000001103,Diazepam 2mg tablets (Ranbaxy (UK) Ltd)
+1424511000001102,Diazepam 2mg tablets (Ranbaxy (UK) Ltd)
+1424711000001107,Diazepam 2mg tablets (Ranbaxy (UK) Ltd)
+125411000001104,Diazepam 2mg tablets (Sandoz Ltd)
+1424411000001101,Diazepam 2mg tablets (Sandoz Ltd)
+15081411000001104,Diazepam 2mg tablets (Sigma Pharmaceuticals Plc)
+15081511000001100,Diazepam 2mg tablets (Sigma Pharmaceuticals Plc)
+17196711000001107,Diazepam 2mg tablets (Sovereign Medical Ltd)
+17196811000001104,Diazepam 2mg tablets (Sovereign Medical Ltd)
+17196911000001109,Diazepam 2mg tablets (Sovereign Medical Ltd)
+223511000001101,Diazepam 2mg tablets (Teva UK Ltd)
+1423811000001102,Diazepam 2mg tablets (Teva UK Ltd)
+790211000001108,Diazepam 2mg tablets (The Boots Company Plc)
+1423911000001107,Diazepam 2mg tablets (The Boots Company Plc)
+21925411000001100,Diazepam 2mg tablets (Waymade Healthcare Plc)
+21925511000001101,Diazepam 2mg tablets (Waymade Healthcare Plc)
+23591111000001102,Diazepam 2mg tablets (Waymade Healthcare Plc)
+13937911000001108,Diazepam 2mg tablets (Wockhardt UK Ltd)
+13938011000001105,Diazepam 2mg tablets (Wockhardt UK Ltd)
+16430911000001102,Diazepam 2mg tablets (Wockhardt UK Ltd)
+321199006,Diazepam 2mg/5ml oral solution
+1133111000001105,Diazepam 2mg/5ml oral solution
+1292611000001104,Diazepam 2mg/5ml oral solution
+753911000001101,Diazepam 2mg/5ml oral solution (A A H Pharmaceuticals Ltd)
+2639211000001102,Diazepam 2mg/5ml oral solution (A A H Pharmaceuticals Ltd)
+2639311000001105,Diazepam 2mg/5ml oral solution (A A H Pharmaceuticals Ltd)
+8892111000001109,Diazepam 2mg/5ml oral solution (Actavis UK Ltd)
+8892511000001100,Diazepam 2mg/5ml oral solution (Actavis UK Ltd)
+11248711000001102,Diazepam 2mg/5ml oral solution (Alliance Healthcare (Distribution) Ltd)
+11248811000001105,Diazepam 2mg/5ml oral solution (Alliance Healthcare (Distribution) Ltd)
+182011000001108,Diazepam 2mg/5ml oral solution (Sandoz Ltd)
+2639411000001103,Diazepam 2mg/5ml oral solution (Sandoz Ltd)
+2639511000001104,Diazepam 2mg/5ml oral solution (Sandoz Ltd)
+15106611000001102,Diazepam 2mg/5ml oral solution (Sigma Pharmaceuticals Plc)
+15106811000001103,Diazepam 2mg/5ml oral solution (Sigma Pharmaceuticals Plc)
+9765111000001100,Diazepam 2mg/5ml oral solution sugar free
+38894311000001101,Diazepam 2mg/5ml oral solution sugar free
+19571011000001105,Diazepam 2mg/5ml oral solution sugar free (A A H Pharmaceuticals Ltd)
+19571111000001106,Diazepam 2mg/5ml oral solution sugar free (A A H Pharmaceuticals Ltd)
+9765211000001106,Diazepam 2mg/5ml oral solution sugar free (Accord Healthcare Ltd)
+9765311000001103,Diazepam 2mg/5ml oral solution sugar free (Accord Healthcare Ltd)
+28972511000001100,Diazepam 2mg/5ml oral solution sugar free (Alliance Healthcare (Distribution) Ltd)
+28972711000001105,Diazepam 2mg/5ml oral solution sugar free (Alliance Healthcare (Distribution) Ltd)
+30762111000001108,Diazepam 2mg/5ml oral solution sugar free (Almus Pharmaceuticals Ltd)
+30762211000001102,Diazepam 2mg/5ml oral solution sugar free (Almus Pharmaceuticals Ltd)
+37297811000001102,Diazepam 2mg/5ml oral solution sugar free (DE Pharmaceuticals)
+37297911000001107,Diazepam 2mg/5ml oral solution sugar free (DE Pharmaceuticals)
+30850511000001109,Diazepam 2mg/5ml oral solution sugar free (Mawdsley-Brooks & Company Ltd)
+30850611000001108,Diazepam 2mg/5ml oral solution sugar free (Mawdsley-Brooks & Company Ltd)
+38869411000001109,Diazepam 2mg/5ml oral solution sugar free (Medihealth (Northern) Ltd)
+38869511000001108,Diazepam 2mg/5ml oral solution sugar free (Medihealth (Northern) Ltd)
+19674811000001106,Diazepam 2mg/5ml oral suspension
+19677811000001102,Diazepam 2mg/5ml oral suspension
+32635011000001107,Diazepam 2mg/5ml oral suspension
+32903011000001104,Diazepam 2mg/5ml oral suspension (A A H Pharmaceuticals Ltd)
+32903111000001103,Diazepam 2mg/5ml oral suspension (A A H Pharmaceuticals Ltd)
+32782211000001108,Diazepam 2mg/5ml oral suspension (Alliance Healthcare (Distribution) Ltd)
+32782311000001100,Diazepam 2mg/5ml oral suspension (Alliance Healthcare (Distribution) Ltd)
+32635111000001108,Diazepam 2mg/5ml oral suspension (Sandoz Ltd)
+32635211000001102,Diazepam 2mg/5ml oral suspension (Sandoz Ltd)
+19674911000001101,Diazepam 2mg/5ml oral suspension (Special Order)
+19675011000001101,Diazepam 2mg/5ml oral suspension (Special Order)
+321197008,Diazepam 5mg tablets
+1059411000001108,Diazepam 5mg tablets
+1116611000001102,Diazepam 5mg tablets
+224211000001101,Diazepam 5mg tablets (A A H Pharmaceuticals Ltd)
+1419411000001108,Diazepam 5mg tablets (A A H Pharmaceuticals Ltd)
+1419611000001106,Diazepam 5mg tablets (A A H Pharmaceuticals Ltd)
+61811000001103,Diazepam 5mg tablets (Accord Healthcare Ltd)
+1419711000001102,Diazepam 5mg tablets (Accord Healthcare Ltd)
+521111000001100,Diazepam 5mg tablets (Alliance Healthcare (Distribution) Ltd)
+1421311000001105,Diazepam 5mg tablets (Alliance Healthcare (Distribution) Ltd)
+1421411000001103,Diazepam 5mg tablets (Alliance Healthcare (Distribution) Ltd)
+9790611000001103,Diazepam 5mg tablets (Almus Pharmaceuticals Ltd)
+9790711000001107,Diazepam 5mg tablets (Almus Pharmaceuticals Ltd)
+10400411000001106,Diazepam 5mg tablets (Arrow Generics Ltd)
+10400511000001105,Diazepam 5mg tablets (Arrow Generics Ltd)
+10400611000001109,Diazepam 5mg tablets (Arrow Generics Ltd)
+28921811000001105,Diazepam 5mg tablets (Crescent Pharma Ltd)
+28921911000001100,Diazepam 5mg tablets (Crescent Pharma Ltd)
+13577211000001108,Diazepam 5mg tablets (DE Pharmaceuticals)
+13577311000001100,Diazepam 5mg tablets (DE Pharmaceuticals)
+23862111000001105,Diazepam 5mg tablets (DE Pharmaceuticals)
+11020111000001108,Diazepam 5mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+11020211000001102,Diazepam 5mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+833711000001100,Diazepam 5mg tablets (IVAX Pharmaceuticals UK Ltd)
+1420211000001108,Diazepam 5mg tablets (IVAX Pharmaceuticals UK Ltd)
+644911000001105,Diazepam 5mg tablets (Kent Pharma (UK) Ltd)
+1420511000001106,Diazepam 5mg tablets (Kent Pharma (UK) Ltd)
+1420611000001105,Diazepam 5mg tablets (Kent Pharma (UK) Ltd)
+30022111000001101,Diazepam 5mg tablets (Mawdsley-Brooks & Company Ltd)
+30022211000001107,Diazepam 5mg tablets (Mawdsley-Brooks & Company Ltd)
+38869111000001104,Diazepam 5mg tablets (Medihealth (Northern) Ltd)
+38869211000001105,Diazepam 5mg tablets (Medihealth (Northern) Ltd)
+606511000001102,Diazepam 5mg tablets (Mylan)
+1419911000001100,Diazepam 5mg tablets (Mylan)
+18107311000001102,Diazepam 5mg tablets (Phoenix Healthcare Distribution Ltd)
+18107411000001109,Diazepam 5mg tablets (Phoenix Healthcare Distribution Ltd)
+23654111000001104,Diazepam 5mg tablets (Phoenix Healthcare Distribution Ltd)
+924411000001103,Diazepam 5mg tablets (Ranbaxy (UK) Ltd)
+1420911000001104,Diazepam 5mg tablets (Ranbaxy (UK) Ltd)
+1421011000001107,Diazepam 5mg tablets (Ranbaxy (UK) Ltd)
+10286311000001104,Diazepam 5mg tablets (Relonchem Ltd)
+10286511000001105,Diazepam 5mg tablets (Relonchem Ltd)
+10286611000001109,Diazepam 5mg tablets (Relonchem Ltd)
+213011000001103,Diazepam 5mg tablets (Sandoz Ltd)
+1421711000001109,Diazepam 5mg tablets (Sandoz Ltd)
+8826811000001109,Diazepam 5mg tablets (Sandoz Ltd)
+15081611000001101,Diazepam 5mg tablets (Sigma Pharmaceuticals Plc)
+15081711000001105,Diazepam 5mg tablets (Sigma Pharmaceuticals Plc)
+17197011000001108,Diazepam 5mg tablets (Sovereign Medical Ltd)
+17197111000001109,Diazepam 5mg tablets (Sovereign Medical Ltd)
+17197211000001103,Diazepam 5mg tablets (Sovereign Medical Ltd)
+647011000001103,Diazepam 5mg tablets (Teva UK Ltd)
+1419811000001105,Diazepam 5mg tablets (Teva UK Ltd)
+21925611000001102,Diazepam 5mg tablets (Waymade Healthcare Plc)
+21925711000001106,Diazepam 5mg tablets (Waymade Healthcare Plc)
+23591211000001108,Diazepam 5mg tablets (Waymade Healthcare Plc)
+13938111000001106,Diazepam 5mg tablets (Wockhardt UK Ltd)
+13938211000001100,Diazepam 5mg tablets (Wockhardt UK Ltd)
+16431011000001105,Diazepam 5mg tablets (Wockhardt UK Ltd)
+321203006,Diazepam 5mg/5ml oral solution
+1264311000001104,Diazepam 5mg/5ml oral solution
+109111000001104,Diazepam 5mg/5ml oral solution (A A H Pharmaceuticals Ltd)
+2645711000001108,Diazepam 5mg/5ml oral solution (A A H Pharmaceuticals Ltd)
+22326511000001101,Diazepam 5mg/5ml oral solution (AM Distributions (Yorkshire) Ltd)
+22326611000001102,Diazepam 5mg/5ml oral solution (AM Distributions (Yorkshire) Ltd)
+798311000001103,Diazepam 5mg/5ml oral solution (Sandoz Ltd)
+2645911000001105,Diazepam 5mg/5ml oral solution (Sandoz Ltd)
+32635311000001105,Diazepam 5mg/5ml oral suspension
+32654611000001100,Diazepam 5mg/5ml oral suspension
+32903211000001109,Diazepam 5mg/5ml oral suspension (A A H Pharmaceuticals Ltd)
+32903311000001101,Diazepam 5mg/5ml oral suspension (A A H Pharmaceuticals Ltd)
+32635511000001104,Diazepam 5mg/5ml oral suspension (Sandoz Ltd)
+32635911000001106,Diazepam 5mg/5ml oral suspension (Sandoz Ltd)
+321277006,Dipotassium clorazepate 15mg capsules
+4902511000001107,Dipotassium clorazepate 15mg capsules
+4902611000001106,Dipotassium clorazepate 15mg capsules
+321276002,Dipotassium clorazepate 7.5mg capsules
+4902011000001104,Dipotassium clorazepate 7.5mg capsules
+4902111000001103,Dipotassium clorazepate 7.5mg capsules
+218811000001104,Librium 10mg capsules (Mylan)
+2304311000001107,Librium 10mg capsules (Mylan)
+849211000001108,Librium 5mg capsules (Mylan)
+2306611000001106,Librium 5mg capsules (Mylan)
+12807111000001101,Lorazepam 1.125mg/5ml oral solution
+12813311000001108,Lorazepam 1.125mg/5ml oral solution
+12807211000001107,Lorazepam 1.125mg/5ml oral solution (Special Order)
+12807311000001104,Lorazepam 1.125mg/5ml oral solution (Special Order)
+12806811000001106,Lorazepam 1.125mg/5ml oral suspension
+12813411000001101,Lorazepam 1.125mg/5ml oral suspension
+12806911000001101,Lorazepam 1.125mg/5ml oral suspension (Special Order)
+12807011000001102,Lorazepam 1.125mg/5ml oral suspension (Special Order)
+37363711000001109,Lorazepam 1mg orodispersible tablets
+37600511000001104,Lorazepam 1mg orodispersible tablets
+37364611000001102,Lorazepam 1mg orodispersible tablets (Aristo Pharma Ltd)
+37365011000001108,Lorazepam 1mg orodispersible tablets (Aristo Pharma Ltd)
+321294008,Lorazepam 1mg tablets
+1114711000001102,Lorazepam 1mg tablets
+10545111000001106,Lorazepam 1mg tablets
+15171011000001108,Lorazepam 1mg tablets
+15171111000001109,Lorazepam 1mg tablets
+15473311000001108,Lorazepam 1mg tablets
+295711000001104,Lorazepam 1mg tablets (A A H Pharmaceuticals Ltd)
+1855511000001105,Lorazepam 1mg tablets (A A H Pharmaceuticals Ltd)
+15434211000001100,Lorazepam 1mg tablets (Accord Healthcare Ltd)
+15434311000001108,Lorazepam 1mg tablets (Accord Healthcare Ltd)
+814311000001105,Lorazepam 1mg tablets (Alliance Healthcare (Distribution) Ltd)
+1857811000001103,Lorazepam 1mg tablets (Alliance Healthcare (Distribution) Ltd)
+15473411000001101,Lorazepam 1mg tablets (Alliance Healthcare (Distribution) Ltd)
+13403911000001105,Lorazepam 1mg tablets (Almus Pharmaceuticals Ltd)
+13404011000001108,Lorazepam 1mg tablets (Almus Pharmaceuticals Ltd)
+37899711000001106,Lorazepam 1mg tablets (Aristo Pharma Ltd)
+37899811000001103,Lorazepam 1mg tablets (Aristo Pharma Ltd)
+10387311000001105,Lorazepam 1mg tablets (Arrow Generics Ltd)
+10387611000001100,Lorazepam 1mg tablets (Arrow Generics Ltd)
+18589811000001109,Lorazepam 1mg tablets (DE Pharmaceuticals)
+18590111000001108,Lorazepam 1mg tablets (DE Pharmaceuticals)
+24370411000001108,Lorazepam 1mg tablets (DE Pharmaceuticals)
+24370511000001107,Lorazepam 1mg tablets (DE Pharmaceuticals)
+20324811000001104,Lorazepam 1mg tablets (Genesis Pharmaceuticals Ltd)
+20324911000001109,Lorazepam 1mg tablets (Genesis Pharmaceuticals Ltd)
+917211000001100,Lorazepam 1mg tablets (Genus Pharmaceuticals Ltd)
+1856511000001103,Lorazepam 1mg tablets (Genus Pharmaceuticals Ltd)
+701811000001103,Lorazepam 1mg tablets (Kent Pharma (UK) Ltd)
+1857411000001100,Lorazepam 1mg tablets (Kent Pharma (UK) Ltd)
+37119211000001108,Lorazepam 1mg tablets (Mawdsley-Brooks & Company Ltd)
+37119311000001100,Lorazepam 1mg tablets (Mawdsley-Brooks & Company Ltd)
+39029911000001109,Lorazepam 1mg tablets (Medihealth (Northern) Ltd)
+39030011000001104,Lorazepam 1mg tablets (Medihealth (Northern) Ltd)
+24134311000001103,Lorazepam 1mg tablets (Morningside Healthcare Ltd)
+24134411000001105,Lorazepam 1mg tablets (Morningside Healthcare Ltd)
+35957811000001107,Lorazepam 1mg tablets (Morningside Healthcare Ltd)
+9480811000001109,Lorazepam 1mg tablets (Mylan)
+9481011000001107,Lorazepam 1mg tablets (Mylan)
+17938411000001106,Lorazepam 1mg tablets (Phoenix Healthcare Distribution Ltd)
+17938511000001105,Lorazepam 1mg tablets (Phoenix Healthcare Distribution Ltd)
+12533011000001103,Lorazepam 1mg tablets (Sandoz Ltd)
+12533111000001102,Lorazepam 1mg tablets (Sandoz Ltd)
+17568411000001109,Lorazepam 1mg tablets (Sigma Pharmaceuticals Plc)
+17568511000001108,Lorazepam 1mg tablets (Sigma Pharmaceuticals Plc)
+29896911000001107,Lorazepam 1mg tablets (Sigma Pharmaceuticals Plc)
+29897011000001106,Lorazepam 1mg tablets (Sigma Pharmaceuticals Plc)
+842411000001101,Lorazepam 1mg tablets (Teva UK Ltd)
+1856911000001105,Lorazepam 1mg tablets (Teva UK Ltd)
+10545011000001105,Lorazepam 1mg tablets (Waymade Healthcare Plc)
+10545211000001100,Lorazepam 1mg tablets (Waymade Healthcare Plc)
+15171211000001103,Lorazepam 1mg tablets (Waymade Healthcare Plc)
+15171311000001106,Lorazepam 1mg tablets (Waymade Healthcare Plc)
+22073811000001109,Lorazepam 1mg tablets (Waymade Healthcare Plc)
+22073911000001104,Lorazepam 1mg tablets (Waymade Healthcare Plc)
+8596111000001107,Lorazepam 1mg/5ml oral solution
+8624311000001104,Lorazepam 1mg/5ml oral solution
+19597711000001108,Lorazepam 1mg/5ml oral solution
+8596311000001109,Lorazepam 1mg/5ml oral solution (Drug Tariff Special Order)
+8596411000001102,Lorazepam 1mg/5ml oral solution (Drug Tariff Special Order)
+19597911000001105,Lorazepam 1mg/5ml oral solution (Drug Tariff Special Order)
+8596711000001108,Lorazepam 1mg/5ml oral suspension
+8624511000001105,Lorazepam 1mg/5ml oral suspension
+19598411000001103,Lorazepam 1mg/5ml oral suspension
+8596811000001100,Lorazepam 1mg/5ml oral suspension (Drug Tariff Special Order)
+8596911000001105,Lorazepam 1mg/5ml oral suspension (Drug Tariff Special Order)
+19598611000001100,Lorazepam 1mg/5ml oral suspension (Drug Tariff Special Order)
+34612111000001101,Lorazepam 1mg/ml oral solution sugar free
+34697811000001107,Lorazepam 1mg/ml oral solution sugar free
+35108511000001103,Lorazepam 1mg/ml oral solution sugar free (A A H Pharmaceuticals Ltd)
+35108611000001104,Lorazepam 1mg/ml oral solution sugar free (A A H Pharmaceuticals Ltd)
+34979011000001104,Lorazepam 1mg/ml oral solution sugar free (Alliance Healthcare (Distribution) Ltd)
+34979311000001101,Lorazepam 1mg/ml oral solution sugar free (Alliance Healthcare (Distribution) Ltd)
+34612211000001107,Lorazepam 1mg/ml oral solution sugar free (Thame Laboratories Ltd)
+34612311000001104,Lorazepam 1mg/ml oral solution sugar free (Thame Laboratories Ltd)
+37366811000001105,Lorazepam 2.5mg orodispersible tablets
+37600611000001100,Lorazepam 2.5mg orodispersible tablets
+37367111000001100,Lorazepam 2.5mg orodispersible tablets (Aristo Pharma Ltd)
+37367411000001105,Lorazepam 2.5mg orodispersible tablets (Aristo Pharma Ltd)
+321295009,Lorazepam 2.5mg tablets
+1128211000001105,Lorazepam 2.5mg tablets
+24134811000001107,Lorazepam 2.5mg tablets
+771611000001105,Lorazepam 2.5mg tablets (A A H Pharmaceuticals Ltd)
+1859111000001104,Lorazepam 2.5mg tablets (A A H Pharmaceuticals Ltd)
+15434411000001101,Lorazepam 2.5mg tablets (Accord Healthcare Ltd)
+15434511000001102,Lorazepam 2.5mg tablets (Accord Healthcare Ltd)
+115511000001108,Lorazepam 2.5mg tablets (Alliance Healthcare (Distribution) Ltd)
+1860611000001106,Lorazepam 2.5mg tablets (Alliance Healthcare (Distribution) Ltd)
+13403411000001102,Lorazepam 2.5mg tablets (Almus Pharmaceuticals Ltd)
+13403611000001104,Lorazepam 2.5mg tablets (Almus Pharmaceuticals Ltd)
+37904511000001107,Lorazepam 2.5mg tablets (Aristo Pharma Ltd)
+37904711000001102,Lorazepam 2.5mg tablets (Aristo Pharma Ltd)
+10389311000001100,Lorazepam 2.5mg tablets (Arrow Generics Ltd)
+10389511000001106,Lorazepam 2.5mg tablets (Arrow Generics Ltd)
+24370611000001106,Lorazepam 2.5mg tablets (DE Pharmaceuticals)
+24370711000001102,Lorazepam 2.5mg tablets (DE Pharmaceuticals)
+20325111000001105,Lorazepam 2.5mg tablets (Genesis Pharmaceuticals Ltd)
+20325211000001104,Lorazepam 2.5mg tablets (Genesis Pharmaceuticals Ltd)
+845311000001102,Lorazepam 2.5mg tablets (Genus Pharmaceuticals Ltd)
+1859311000001102,Lorazepam 2.5mg tablets (Genus Pharmaceuticals Ltd)
+585511000001101,Lorazepam 2.5mg tablets (Kent Pharma (UK) Ltd)
+1860011000001104,Lorazepam 2.5mg tablets (Kent Pharma (UK) Ltd)
+4582311000001108,Lorazepam 2.5mg tablets (Kent Pharma (UK) Ltd)
+39030511000001107,Lorazepam 2.5mg tablets (Medihealth (Northern) Ltd)
+39030611000001106,Lorazepam 2.5mg tablets (Medihealth (Northern) Ltd)
+24134611000001108,Lorazepam 2.5mg tablets (Morningside Healthcare Ltd)
+24135211000001107,Lorazepam 2.5mg tablets (Morningside Healthcare Ltd)
+35959111000001106,Lorazepam 2.5mg tablets (Morningside Healthcare Ltd)
+9481211000001102,Lorazepam 2.5mg tablets (Mylan)
+9481311000001105,Lorazepam 2.5mg tablets (Mylan)
+17938611000001109,Lorazepam 2.5mg tablets (Phoenix Healthcare Distribution Ltd)
+17938711000001100,Lorazepam 2.5mg tablets (Phoenix Healthcare Distribution Ltd)
+12533211000001108,Lorazepam 2.5mg tablets (Sandoz Ltd)
+12533311000001100,Lorazepam 2.5mg tablets (Sandoz Ltd)
+15108811000001102,Lorazepam 2.5mg tablets (Sigma Pharmaceuticals Plc)
+15108911000001107,Lorazepam 2.5mg tablets (Sigma Pharmaceuticals Plc)
+478511000001108,Lorazepam 2.5mg tablets (Teva UK Ltd)
+1859711000001103,Lorazepam 2.5mg tablets (Teva UK Ltd)
+22074011000001101,Lorazepam 2.5mg tablets (Waymade Healthcare Plc)
+22074111000001100,Lorazepam 2.5mg tablets (Waymade Healthcare Plc)
+8597011000001109,Lorazepam 250micrograms/5ml oral solution
+8659111000001104,Lorazepam 250micrograms/5ml oral solution
+8597211000001104,Lorazepam 250micrograms/5ml oral solution (Special Order)
+8597311000001107,Lorazepam 250micrograms/5ml oral solution (Special Order)
+8597611000001102,Lorazepam 250micrograms/5ml oral suspension
+8659211000001105,Lorazepam 250micrograms/5ml oral suspension
+8597711000001106,Lorazepam 250micrograms/5ml oral suspension (Special Order)
+8597911000001108,Lorazepam 250micrograms/5ml oral suspension (Special Order)
+8597111000001105,Lorazepam 2mg/5ml oral solution
+8659411000001109,Lorazepam 2mg/5ml oral solution
+8597411000001100,Lorazepam 2mg/5ml oral solution (Special Order)
+8597511000001101,Lorazepam 2mg/5ml oral solution (Special Order)
+8597811000001103,Lorazepam 2mg/5ml oral suspension
+8659511000001108,Lorazepam 2mg/5ml oral suspension
+8598011000001105,Lorazepam 2mg/5ml oral suspension (Special Order)
+8598111000001106,Lorazepam 2mg/5ml oral suspension (Special Order)
+12808911000001102,Lorazepam 3.75mg/5ml oral solution
+12813511000001102,Lorazepam 3.75mg/5ml oral solution
+12809611000001104,Lorazepam 3.75mg/5ml oral solution (Special Order)
+12809711000001108,Lorazepam 3.75mg/5ml oral solution (Special Order)
+12808311000001103,Lorazepam 3.75mg/5ml oral suspension
+12813611000001103,Lorazepam 3.75mg/5ml oral suspension
+12808711000001104,Lorazepam 3.75mg/5ml oral suspension (Special Order)
+12808811000001107,Lorazepam 3.75mg/5ml oral suspension (Special Order)
+12810711000001103,Lorazepam 400micrograms/5ml oral solution
+12817711000001102,Lorazepam 400micrograms/5ml oral solution
+12810811000001106,Lorazepam 400micrograms/5ml oral solution (Special Order)
+12810911000001101,Lorazepam 400micrograms/5ml oral solution (Special Order)
+12810111000001104,Lorazepam 400micrograms/5ml oral suspension
+12817811000001105,Lorazepam 400micrograms/5ml oral suspension
+12810311000001102,Lorazepam 400micrograms/5ml oral suspension (Special Order)
+12810511000001108,Lorazepam 400micrograms/5ml oral suspension (Special Order)
+12811311000001107,Lorazepam 4mg/5ml oral solution
+12817911000001100,Lorazepam 4mg/5ml oral solution
+12811411000001100,Lorazepam 4mg/5ml oral solution (Special Order)
+12811511000001101,Lorazepam 4mg/5ml oral solution (Special Order)
+12811011000001109,Lorazepam 4mg/5ml oral suspension
+12818011000001103,Lorazepam 4mg/5ml oral suspension
+12811111000001105,Lorazepam 4mg/5ml oral suspension (Special Order)
+12811211000001104,Lorazepam 4mg/5ml oral suspension (Special Order)
+377147002,Lorazepam 500microgram tablets
+37230211000001106,Lorazepam 500microgram tablets
+37480811000001104,Lorazepam 500microgram tablets (A A H Pharmaceuticals Ltd)
+37480911000001109,Lorazepam 500microgram tablets (A A H Pharmaceuticals Ltd)
+37230311000001103,Lorazepam 500microgram tablets (Advanz Pharma)
+37230411000001105,Lorazepam 500microgram tablets (Advanz Pharma)
+37660711000001108,Lorazepam 500microgram tablets (Alliance Healthcare (Distribution) Ltd)
+37660811000001100,Lorazepam 500microgram tablets (Alliance Healthcare (Distribution) Ltd)
+8598511000001102,Lorazepam 500micrograms/5ml oral solution
+8659611000001107,Lorazepam 500micrograms/5ml oral solution
+19598811000001101,Lorazepam 500micrograms/5ml oral solution
+8598611000001103,Lorazepam 500micrograms/5ml oral solution (Drug Tariff Special Order)
+8598811000001104,Lorazepam 500micrograms/5ml oral solution (Drug Tariff Special Order)
+19599111000001101,Lorazepam 500micrograms/5ml oral solution (Drug Tariff Special Order)
+8599411000001109,Lorazepam 500micrograms/5ml oral suspension
+8659811000001106,Lorazepam 500micrograms/5ml oral suspension
+19599211000001107,Lorazepam 500micrograms/5ml oral suspension
+8599511000001108,Lorazepam 500micrograms/5ml oral suspension (Drug Tariff Special Order)
+8599611000001107,Lorazepam 500micrograms/5ml oral suspension (Drug Tariff Special Order)
+19599411000001106,Lorazepam 500micrograms/5ml oral suspension (Drug Tariff Special Order)
+8598911000001109,Lorazepam 5mg/5ml oral solution
+8659911000001101,Lorazepam 5mg/5ml oral solution
+8599111000001104,Lorazepam 5mg/5ml oral solution (Special Order)
+8599211000001105,Lorazepam 5mg/5ml oral solution (Special Order)
+8599711000001103,Lorazepam 5mg/5ml oral suspension
+8660011000001104,Lorazepam 5mg/5ml oral suspension
+8599811000001106,Lorazepam 5mg/5ml oral suspension (Special Order)
+8599911000001101,Lorazepam 5mg/5ml oral suspension (Special Order)
+321308004,Meprobamate 400mg tablets
+3640711000001109,Meprobamate 400mg tablets
+3641811000001109,Meprobamate 400mg tablets (A A H Pharmaceuticals Ltd)
+3642011000001106,Meprobamate 400mg tablets (A A H Pharmaceuticals Ltd)
+3643011000001102,Meprobamate 400mg tablets (Alliance Healthcare (Distribution) Ltd)
+3643311000001104,Meprobamate 400mg tablets (Alliance Healthcare (Distribution) Ltd)
+3642611000001104,Meprobamate 400mg tablets (Kent Pharma (UK) Ltd)
+3642911000001105,Meprobamate 400mg tablets (Kent Pharma (UK) Ltd)
+29905711000001108,Meprobamate 400mg tablets (Sigma Pharmaceuticals Plc)
+29905811000001100,Meprobamate 400mg tablets (Sigma Pharmaceuticals Plc)
+3642111000001107,Meprobamate 400mg tablets (Thornton & Ross Ltd)
+3642211000001101,Meprobamate 400mg tablets (Thornton & Ross Ltd)
+12694611000001109,Meprobamate 5mg/5ml oral solution
+12701311000001107,Meprobamate 5mg/5ml oral solution
+12694711000001100,Meprobamate 5mg/5ml oral solution (Special Order)
+12694811000001108,Meprobamate 5mg/5ml oral solution (Special Order)
+12694011000001102,Meprobamate 5mg/5ml oral suspension
+12701411000001100,Meprobamate 5mg/5ml oral suspension
+12694111000001101,Meprobamate 5mg/5ml oral suspension (Special Order)
+12694311000001104,Meprobamate 5mg/5ml oral suspension (Special Order)
+321314006,Oxazepam 10mg tablets
+1217911000001108,Oxazepam 10mg tablets
+498511000001100,Oxazepam 10mg tablets (A A H Pharmaceuticals Ltd)
+1928811000001109,Oxazepam 10mg tablets (A A H Pharmaceuticals Ltd)
+214711000001104,Oxazepam 10mg tablets (Accord Healthcare Ltd)
+1928911000001104,Oxazepam 10mg tablets (Accord Healthcare Ltd)
+682511000001104,Oxazepam 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+1929211000001103,Oxazepam 10mg tablets (Alliance Healthcare (Distribution) Ltd)
+19819411000001108,Oxazepam 10mg tablets (Almus Pharmaceuticals Ltd)
+19819511000001107,Oxazepam 10mg tablets (Almus Pharmaceuticals Ltd)
+30069511000001106,Oxazepam 10mg tablets (DE Pharmaceuticals)
+30069611000001105,Oxazepam 10mg tablets (DE Pharmaceuticals)
+616111000001109,Oxazepam 10mg tablets (Genus Pharmaceuticals Ltd)
+1929011000001108,Oxazepam 10mg tablets (Genus Pharmaceuticals Ltd)
+384111000001108,Oxazepam 10mg tablets (Kent Pharma (UK) Ltd)
+1929111000001109,Oxazepam 10mg tablets (Kent Pharma (UK) Ltd)
+39068111000001105,Oxazepam 10mg tablets (Medihealth (Northern) Ltd)
+39068211000001104,Oxazepam 10mg tablets (Medihealth (Northern) Ltd)
+17950111000001102,Oxazepam 10mg tablets (Phoenix Healthcare Distribution Ltd)
+17950211000001108,Oxazepam 10mg tablets (Phoenix Healthcare Distribution Ltd)
+29974111000001104,Oxazepam 10mg tablets (Sigma Pharmaceuticals Plc)
+29974211000001105,Oxazepam 10mg tablets (Sigma Pharmaceuticals Plc)
+39490011000001104,Oxazepam 10mg tablets (Tillomed Laboratories Ltd)
+39490111000001103,Oxazepam 10mg tablets (Tillomed Laboratories Ltd)
+21828411000001100,Oxazepam 10mg tablets (Waymade Healthcare Plc)
+21828511000001101,Oxazepam 10mg tablets (Waymade Healthcare Plc)
+12133811000001103,Oxazepam 10mg/5ml oral suspension
+12141711000001106,Oxazepam 10mg/5ml oral suspension
+12133911000001108,Oxazepam 10mg/5ml oral suspension (Special Order)
+12134011000001106,Oxazepam 10mg/5ml oral suspension (Special Order)
+12133111000001105,Oxazepam 12.5mg/5ml oral suspension
+12141811000001103,Oxazepam 12.5mg/5ml oral suspension
+12133211000001104,Oxazepam 12.5mg/5ml oral suspension (Special Order)
+12133311000001107,Oxazepam 12.5mg/5ml oral suspension (Special Order)
+321315007,Oxazepam 15mg tablets
+1202211000001104,Oxazepam 15mg tablets
+647511000001106,Oxazepam 15mg tablets (A A H Pharmaceuticals Ltd)
+1929311000001106,Oxazepam 15mg tablets (A A H Pharmaceuticals Ltd)
+191811000001107,Oxazepam 15mg tablets (Accord Healthcare Ltd)
+1929411000001104,Oxazepam 15mg tablets (Accord Healthcare Ltd)
+37611000001102,Oxazepam 15mg tablets (Alliance Healthcare (Distribution) Ltd)
+1929711000001105,Oxazepam 15mg tablets (Alliance Healthcare (Distribution) Ltd)
+19819611000001106,Oxazepam 15mg tablets (Almus Pharmaceuticals Ltd)
+19819711000001102,Oxazepam 15mg tablets (Almus Pharmaceuticals Ltd)
+30069711000001101,Oxazepam 15mg tablets (DE Pharmaceuticals)
+30069811000001109,Oxazepam 15mg tablets (DE Pharmaceuticals)
+500711000001102,Oxazepam 15mg tablets (Genus Pharmaceuticals Ltd)
+1929511000001100,Oxazepam 15mg tablets (Genus Pharmaceuticals Ltd)
+762211000001107,Oxazepam 15mg tablets (Kent Pharma (UK) Ltd)
+1929611000001101,Oxazepam 15mg tablets (Kent Pharma (UK) Ltd)
+39068311000001107,Oxazepam 15mg tablets (Medihealth (Northern) Ltd)
+39068511000001101,Oxazepam 15mg tablets (Medihealth (Northern) Ltd)
+17950311000001100,Oxazepam 15mg tablets (Phoenix Healthcare Distribution Ltd)
+17950411000001107,Oxazepam 15mg tablets (Phoenix Healthcare Distribution Ltd)
+29974311000001102,Oxazepam 15mg tablets (Sigma Pharmaceuticals Plc)
+29974411000001109,Oxazepam 15mg tablets (Sigma Pharmaceuticals Plc)
+39490511000001107,Oxazepam 15mg tablets (Tillomed Laboratories Ltd)
+39490611000001106,Oxazepam 15mg tablets (Tillomed Laboratories Ltd)
+21828611000001102,Oxazepam 15mg tablets (Waymade Healthcare Plc)
+21828711000001106,Oxazepam 15mg tablets (Waymade Healthcare Plc)
+12132811000001106,Oxazepam 2.5mg/5ml oral suspension
+12141911000001108,Oxazepam 2.5mg/5ml oral suspension
+12132911000001101,Oxazepam 2.5mg/5ml oral suspension (Special Order)
+12133011000001109,Oxazepam 2.5mg/5ml oral suspension (Special Order)
+12131911000001107,Oxazepam 2mg/5ml oral suspension
+12142011000001101,Oxazepam 2mg/5ml oral suspension
+12132611000001107,Oxazepam 2mg/5ml oral suspension (Special Order)
+12132711000001103,Oxazepam 2mg/5ml oral suspension (Special Order)
+9106811000001108,Tensium 10mg tablets (DDSA Pharmaceuticals Ltd)
+9106911000001103,Tensium 10mg tablets (DDSA Pharmaceuticals Ltd)
+9107211000001109,Tensium 2mg tablets (DDSA Pharmaceuticals Ltd)
+9107411000001108,Tensium 2mg tablets (DDSA Pharmaceuticals Ltd)
+9107511000001107,Tensium 2mg tablets (DDSA Pharmaceuticals Ltd)
+4902711000001102,Tranxene 15mg capsules (Boehringer Ingelheim Ltd)
+4902811000001105,Tranxene 15mg capsules (Boehringer Ingelheim Ltd)
+4902911000001100,Tranxene 15mg capsules (Boehringer Ingelheim Ltd)
+4902211000001109,Tranxene 7.5mg capsules (Boehringer Ingelheim Ltd)
+4902311000001101,Tranxene 7.5mg capsules (Boehringer Ingelheim Ltd)
+4902411000001108,Tranxene 7.5mg capsules (Boehringer Ingelheim Ltd)
+511311000001108,Tropium 10mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+2304711000001106,Tropium 10mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+2304811000001103,Tropium 10mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+153811000001102,Tropium 10mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+2455311000001109,Tropium 10mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+2455411000001102,Tropium 10mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+307711000001103,Tropium 5mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+2306811000001105,Tropium 5mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+2306911000001100,Tropium 5mg capsules (Dr Reddy's Laboratories (UK) Ltd)
+204011000001103,Tropium 5mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+2455511000001103,Tropium 5mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+2455611000001104,Tropium 5mg tablets (Dr Reddy's Laboratories (UK) Ltd)
+4658511000001101,Xanax 250microgram tablets (Upjohn UK Ltd)
+4658611000001102,Xanax 250microgram tablets (Upjohn UK Ltd)
+4659411000001108,Xanax 500microgram tablets (Upjohn UK Ltd)
+4659511000001107,Xanax 500microgram tablets (Upjohn UK Ltd)
