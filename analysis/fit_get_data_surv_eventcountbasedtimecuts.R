@@ -24,12 +24,14 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   }
   
   non_cases <- survival_data %>% filter(!patient_id %in% cases$patient_id)
-  if(nrow(cases)*10<nrow(non_cases)){
+  
+  if(nrow(cases)*10 < nrow(non_cases)){
     non_cases <- non_cases[sample(1:nrow(non_cases), nrow(cases)*10,replace=FALSE), ]
-  }else if (nrow(cases)*10>=nrow(non_cases)){
+  }else if (nrow(cases)*10 >= nrow(non_cases)){
     non_cases=non_cases
   }
-  non_case_weight=(nrow(survival_data)-nrow(cases))/nrow(non_cases)
+  
+  non_case_inverse_weight=(nrow(survival_data)-nrow(cases))/nrow(non_cases)
   survival_data <- bind_rows(cases,non_cases)
 
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
@@ -246,7 +248,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     #Can change <400 to be lower to test on dummy data
     less_than_400_events = any((as.numeric(tbl_event_count$events_total) <400) & (tbl_event_count$expo_week=="all post expo"))
     data_surv <- data_surv %>% left_join(df_age_region)
-    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_weight, less_than_400_events))
+    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_400_events))
     
   }else{
     analyses_not_run[nrow(analyses_not_run)+1,]<- c(event,subgroup,cohort,mdl,any_exposures,any_exposed_events,any_no_expo,"FALSE")

@@ -20,7 +20,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
   interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
   ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
-  non_case_weight=list_data_surv_noncase_ids_interval_names[[5]]
+  non_case_inverse_weight=list_data_surv_noncase_ids_interval_names[[5]]
   less_than_400_events=list_data_surv_noncase_ids_interval_names[[6]]
   if(less_than_400_events=="TRUE"){
     analyses_not_run[nrow(analyses_not_run)+1,]<<-c(event,subgroup,cohort,mdl,"TRUE","TRUE","TRUE","FALSE")
@@ -33,7 +33,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
     interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
     ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
-    non_case_weight=list_data_surv_noncase_ids_interval_names[[5]]
+    non_case_inverse_weight=list_data_surv_noncase_ids_interval_names[[5]]
   }
   
   #Select covariates if using model mdl_max_adj
@@ -44,7 +44,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   }
   
   #Add inverse probablity weights for non-cases
-  data_surv$cox_weights <- ifelse(data_surv$patient_id %in% noncase_ids, non_case_weight, 1)
+  data_surv$cox_weights <- ifelse(data_surv$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
   
   # Fit model and prep output csv
   fit_model <- coxfit(data_surv, interval_names, covar_names, subgroup, mdl)
