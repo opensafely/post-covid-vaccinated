@@ -43,6 +43,8 @@ col_names <- col_names[!col_names %in% c("active","outcome","outcome_variable","
 
 strata <-col_names
 
+strata <- strata[!strata %in% c("model", "cohort", "prior_history_var")]
+
 mdl <- NULL
 for(i in 1:nrow(active_analyses)){
   if(active_analyses$model[i]=="all"){
@@ -65,14 +67,13 @@ for(i in 1:nrow(active_analyses)){
 }
 cohort <- cohort_to_run
 
-table_2_extension <- crossing(event_names, model, cohort, strata)
+table_2_long <- crossing(event_names, model, cohort, strata)
 
-exposed_person_days <- unexposed_person_days <- event_count <- ir <- ir_lower <- ir_upper <- rep("NA", nrow(table_2_extension))
+exposed_person_days <- unexposed_person_days <- event_count <- ir <- ir_lower <- ir_upper <- rep("NA", nrow(table_2_long))
 
-table_2_extension <- cbind(table_2_extension, exposed_person_days, unexposed_person_days, event_count, ir, ir_lower, ir_upper)
+table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, event_count, ir, ir_lower, ir_upper)
 
 
-library(vcdExtra)
 
   # read in data------------------------------------------------------------
   
@@ -110,6 +111,17 @@ library(vcdExtra)
   
   input <- input %>% mutate(sub_bin_sex = cov_cat_sex,
                             sub_cat_ethnicity = cov_cat_ethnicity)
+  
+  
+  setnames(input, 
+           old = c("cov_cat_sex", 
+                   "cov_num_age", 
+                   "cov_cat_ethnicity"), 
+           new = c("sub_bin_sex", 
+                   "sub_age",
+                   "sub_cat_ethnicity"))
+  
+  
   vars_names <- tidyselect::vars_select(names(input), !starts_with(c('cov_','qa_','vax_cat'), ignore.case = TRUE))
 
   # variable sub_bin_ate, does this a variable indicate whether indivdiuals have a prior history of ate?
