@@ -2,7 +2,7 @@
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
-#USE THIS - TO CHECK SINGLE AER
+#USE - TO CHECK SINGLE AER
 outcome <- "ate" 
 group <- "vaccinated" 
 strata <- "prior_history_FALSE"
@@ -10,11 +10,9 @@ fit <- "mdl_max_adj"
 
 #CALCULATE THE EXCESS RISK
 excess_risk <- function(outcome, group, strata, fit) {
-  #Call the library
   library(purrr)
   library(data.table)
   library(tidyverse)
-  
   #Load data 
   input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
   #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
@@ -26,7 +24,6 @@ excess_risk <- function(outcome, group, strata, fit) {
                           df <- fread(fpath)
                           return(df)})
   input2=rbindlist(input2, fill=TRUE)
-  
   #Preprocess the input data (most can be removed with real data inputs)
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
@@ -107,7 +104,7 @@ excess_risk <- function(outcome, group, strata, fit) {
   #Step4. Calculate the daily CVD incidence
   #----------------------------------------
   #Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
-  # for that day to derive the incidence on each day after COVID-19. 
+  # for that day to derive the incidence on each day after COVID-19.
   
   #assign the hr estimates
   lifetable$h <- ifelse(lifetable$days < 15, rep(hr_14),0)
@@ -127,7 +124,6 @@ excess_risk <- function(outcome, group, strata, fit) {
   #-----------------------------------------
   #Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
   #compared with no COVID-19 diagnosis. 
-  
   #1.AER =difference in absolute risk
   lifetable$'s-sc' <- lifetable$s - lifetable$sc
   AER_196 <- lifetable[nrow(lifetable),]$'s-sc' * total_cases
@@ -141,12 +137,11 @@ excess_risk <- function(outcome, group, strata, fit) {
   return(results)
   #return(print(results)) 
 }
-
 #---------------------------------------------------------
 #Step6. Calculate the excess risk---FOR the active analyses
 #----------------------------------------------------------
 #1. Define the active analyses
-active <- readr::read_rds("lib/active_analyses.rds") #Rebase if required to find lib folder
+active <- readr::read_rds("lib/active_analyses.rds") #Rebase if required,
 #active <- active_analyses # Manual alternative,
 active <- active[active$active==TRUE,]                                                       
 active$event <- gsub("out_date_","",active$outcome_variable)                                                    
@@ -165,7 +160,6 @@ colnames(active)[colnames(active) == 'model'] <- 'fit'
 colnames(active)[colnames(active) == 'event'] <- 'outcome'
 active <- active %>% select(-fit, everything())                                  
 active <- active %>% filter(!strata == "ethnicity_Missing")#need to recheck with real data models                     
-
 #2. Compile the results
 for (i in 1:nrow(active)) {excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])}
 AER_files=list.files(path = "output", pattern = "AER_*")
