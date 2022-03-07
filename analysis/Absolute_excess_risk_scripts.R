@@ -178,5 +178,4 @@ AER_compiled_results <- purrr::pmap(list(AER_files),
 AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
 write.csv(AER_compiled_results, "output/AER_compiled_results.csv", row.names = F)
 if (file.exists(AER_files)) { file.remove(AER_files)}
-print(AER_compiled_results)
-#-ve AER not expected with real data
+print(AER_compiled_results) #-ve AER not expected with real data
