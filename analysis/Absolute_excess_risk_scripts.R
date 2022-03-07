@@ -2,15 +2,14 @@
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
-#USE THIS ONLY TO CHECK THE FUNCTION
+#USE THIS WHEN - TO CHECK SINGLE AER
 outcome <- "ate" 
 group <- "vaccinated" 
 strata <- "prior_history_FALSE"
 fit <- "mdl_max_adj"
 
-#Create a function to output the excess risk
+#CALCULATE THE EXCESS RISK
 excess_risk <- function(outcome, group, strata, fit) {
-  
   #Call the library
   library(purrr)
   library(data.table)
@@ -19,7 +18,6 @@ excess_risk <- function(outcome, group, strata, fit) {
   #Load data 
   input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
   #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
-  #input2- Import data
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
   hr_files=paste0("output/",hr_files)
@@ -29,7 +27,7 @@ excess_risk <- function(outcome, group, strata, fit) {
                           return(df)})
   input2=rbindlist(input2, fill=TRUE)
   
-  #Preprocess the input data (can be removed when tuned in with the real data inputs)
+  #Preprocess the input data (most can be removed with real data inputs)
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
@@ -90,7 +88,6 @@ excess_risk <- function(outcome, group, strata, fit) {
   #Step2.Calculate the average daily CVD incidence   - in the unexposed
   #--------------------------------------------------------------------
   #Number of new events / sum of person-time at risk
-  
   incidence_rate <- unexposed_events/fp_person_days
   #-------------------------------------------------------------
   #Step3. Make life table to calculate cumulative risk over time
@@ -106,14 +103,13 @@ excess_risk <- function(outcome, group, strata, fit) {
   lifetable$q <- incidence_rate 
   lifetable$'1-q' <- 1 - lifetable$q 
   lifetable$s <- cumprod(lifetable$`1-q`)
-  
   #----------------------------------------
   #Step4. Calculate the daily CVD incidence
   #----------------------------------------
   #Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
   # for that day to derive the incidence on each day after COVID-19. 
   
-  #1.assign the hr estimates
+  #assign the hr estimates
   lifetable$h <- ifelse(lifetable$days < 15, rep(hr_14),0)
   lifetable$h <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28),lifetable$h)
   lifetable$h <- ifelse(lifetable$days < 29 & is.na(lifetable$h), rep(hr0_28),lifetable$h)#alternative for 0-28 days
@@ -121,16 +117,10 @@ excess_risk <- function(outcome, group, strata, fit) {
   lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56),lifetable$h)
   lifetable$h <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84),lifetable$h)
   lifetable$h <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196),lifetable$h)
-  lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)
-  #alternative for 28-196 days
+  lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)#alternative for 28-196 days
   
-  #2.assign qh
   lifetable$qh <- lifetable$q*lifetable$h
-  
-  #3.assign 1-qh
   lifetable$'1-qh' <- 1 - lifetable$qh
-  
-  #4.assign sc
   lifetable$sc <- cumprod(lifetable$`1-qh`)
   #-----------------------------------------
   #Step5. Calculate the Absolute excess risk
@@ -140,104 +130,53 @@ excess_risk <- function(outcome, group, strata, fit) {
   
   #1.AER =difference in absolute risk
   lifetable$'s-sc' <- lifetable$s - lifetable$sc
-  
-  #2.AER on day 196 
   AER_196 <- lifetable[nrow(lifetable),]$'s-sc' * total_cases
-  print(AER_196) # 183.7275
-  # 184 excess 'events' happens 196 days after 7558 total covid19 'cases'.
   
   results <- data.frame(event=outcome,
                         cohort=group,
                         subgroup=strata,
                         model=fit,
                         AER_196=AER_196)
-  
-  write.csv(results, paste0("output/AER_" , group, "_", fit, "_", strata, "_", outcome,".csv"), row.names = F) 
-  
-  return(print(results)) 
-  
+  write.csv(results, paste0("output/AER_" , group, "_", fit, "_", strata, "_", outcome,".csv"), row.names = F)
+  return(results)
+  #return(print(results)) 
 }
 
-#Check the function
-excess_risk("vte","vaccinated","prior_history_FALSE", "mdl_max_adj")
-
 #---------------------------------------------------------
-#Step6. Run the function---FOR the active analyses----
-#--------------------------------------------------------
+#Step6. Calculate the excess risk---FOR the active analyses
+#----------------------------------------------------------
 #1. Define the active analyses
-#active <- readr::read_rds("lib/active_analyses.rds")
-active <- active_analyses
-active <- active[active$active==TRUE,]
-active$event <- gsub("out_date_","",active$outcome_variable)
-active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL
-
+active <- readr::read_rds("lib/active_analyses.rds") #Rebase if required to find lib folder
+#active <- active_analyses # Manual alternative,
+active <- active[active$active==TRUE,]                                                       
+active$event <- gsub("out_date_","",active$outcome_variable)                                                    
+active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL   
 active <- tidyr::pivot_longer(active, 
                               cols = setdiff(colnames(active),c("event","model","cohort")), 
-                              names_to = "strata")
-
-active <- active[active$value==TRUE, c("event","model","cohort","strata")]
-
-active$model <- ifelse(active$model=="all","mdl_agesex;mdl_max_adj",active$model)
-active <- tidyr::separate_rows(active, model, sep = ";")
-
-active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort)
-active <- tidyr::separate_rows(active, cohort, sep = ";")
-
-#active$group <- gsub("_.*","",active$strata)
-#active$group <- ifelse(active$group=="covid" & grepl("covid_history",active$strata), "covid_history", active$group)
-#active$group <- ifelse(active$group=="covid" & grepl("covid_pheno",active$strata), "covid_pheno", active$group)
-#active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$strata), "prior_history", active$group)
-#active <- unique(active[,c("event","model","cohort","group")])
-
-#Preprocess to right outcomes, names and order
-#active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
-
-colnames(active)[colnames(active) == 'group'] <- 'strata'
+                              names_to = "strata")                                           
+active <- active[active$value==TRUE, c("event","model","cohort","strata")]                   
+active$model <- ifelse(active$model=="all","mdl_agesex;mdl_max_adj",active$model)            
+active <- tidyr::separate_rows(active, model, sep = ";")                                     
+active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort) 
+active <- tidyr::separate_rows(active, cohort, sep = ";")                                        
+colnames(active)[colnames(active) == 'group'] <- 'strata'                        
 colnames(active)[colnames(active) == 'cohort'] <- 'group'
 colnames(active)[colnames(active) == 'model'] <- 'fit'
 colnames(active)[colnames(active) == 'event'] <- 'outcome'
+active <- active %>% select(-fit, everything())                                  
+active <- active %>% filter(!strata == "ethnicity_Missing")                      
 
-active <- active %>% select(-fit, everything())
-active <- active %>% filter(!strata == "ethnicity_Missing")
-
-#2. Loop to input the active analyses --- into the function.
-
-#active_test <- subset(active, active$strata == "sex_Female" & active$outcome == "vte")
-
-#Define empty results table
-#excess_risk_results_all <- data.frame(outcome = character(),
-  #                                group = character(),
-  #                                strata = character(),
-   #                               fit = character(),
-   #                               AER_196 = numeric(),
-    #                              stringsAsFactors = FALSE)
-
-
-
-for (i in 1:nrow(active)) {
-  
-  #files <- list.files(path = "output", pattern = "lifetable_*")
-  #files <- files[grepl(active$strata[i])]
-  
-  excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])
- 
-  
-}
-
-#input2- Import data
+#2. Compile the results
+for (i in 1:nrow(active)) {excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])}
 AER_files=list.files(path = "output", pattern = "AER_*")
 AER_files=AER_files[endsWith(AER_files,".csv")]
 AER_files=paste0("output/",AER_files)
 AER_compiled_results <- purrr::pmap(list(AER_files),
                                     function(fpath){
                                       df <- fread(fpath)
-                                      return(df)
-                                    })
+                                      return(df)})
 AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
 write.csv(AER_compiled_results, "output/AER_compiled_results.csv", row.names = F)
-
-
-
-#Delete file if it exists
 if (file.exists(AER_files)) { file.remove(AER_files)}
-
+print(AER_compiled_results)
+#-ve AER not expected with real data
