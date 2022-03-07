@@ -14,7 +14,8 @@
 
 # adapted from table 2
 # comment number of rows need to be revised in "data" and "output"
-library(readr); library(dplyr); library(data.table); library(lubridate);library(stringr)
+library(readr); library(dplyr); library(data.table); library(lubridate)
+library(stringr);library(vcdExtra);library(tidyverse)
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -40,6 +41,8 @@ event_names
 col_names <- names(active_analyses)
 col_names <- col_names[!col_names %in% c("active","outcome","outcome_variable","covariates")]
 
+strata <-col_names
+
 mdl <- NULL
 for(i in 1:nrow(active_analyses)){
   if(active_analyses$model[i]=="all"){
@@ -62,9 +65,14 @@ for(i in 1:nrow(active_analyses)){
 }
 cohort <- cohort_to_run
 
+table_2_extension <- crossing(event_names, model, cohort, strata)
+
+exposed_person_days <- unexposed_person_days <- event_count <- ir <- ir_lower <- ir_upper <- rep("NA", nrow(table_2_extension))
+
+table_2_extension <- cbind(table_2_extension, exposed_person_days, unexposed_person_days, event_count, ir, ir_lower, ir_upper)
 
 
-
+library(vcdExtra)
 
   # read in data------------------------------------------------------------
   
