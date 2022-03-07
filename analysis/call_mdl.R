@@ -42,8 +42,9 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
     }
   }
   
-  # Filter for age group of interest ----
+  # Filter for age group of interest -------------------------------------------
   
+  # If a age group subgroup analysis then use the age subgroup otherwise analyse for all ages
   if(startsWith(subgroup,"agegp")){
     agebreaks=agebreaks_strata
     agelabels=agelabels_strata
@@ -52,6 +53,8 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
     agelabels=agelabels_all
   }
   
+  # Create new variable agegroup which splits AGE_AT_COHORT_START into the required age groups
+  # and give these group the matching age labels
   setDT(survival_data)[ , agegroup := cut(AGE_AT_COHORT_START, 
                                           breaks = agebreaks, 
                                           right = FALSE, 

@@ -17,6 +17,7 @@ agelabels_all <- c("all")
 agebreaks_strata <- c(0, 40, 60, 80, 111)
 agelabels_strata <- c("18_39", "40_59", "60_79", "80_110")
 
+#These are the study start and end dates for the Delta era
 cohort_start_date <- as.Date("2021-06-01")
 cohort_end_date <- as.Date("2021-12-14")
 

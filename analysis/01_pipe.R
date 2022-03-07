@@ -35,17 +35,6 @@ if(length(args)==0){
   event_name  = args[[1]] 
 }
 
-########
-#To Test
-########
-
-#event="ate"
-#subgroup="main"
-#stratify_by_subgroup="main"
-#stratify_by="main"
-#mdl="mdl_max_adj"
-
-
 # Specify directories ----------------------------------------------------------
 output_dir <- "output"
 scripts_dir <- "analysis"

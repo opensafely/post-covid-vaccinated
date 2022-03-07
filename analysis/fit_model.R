@@ -109,14 +109,15 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   #options(datadist="dd")
   options(datadist="dd", contrasts=c("contr.treatment", "contr.treatment"))
   fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
-  robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id) #to get robust standard errors
+  # To get robust variance-covariance matrix so that robust standard errots can be used in CI's
+  robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
   
   
   # Results ----
   results=as.data.frame(names(fit_cox_model$coefficients))
   colnames(results)="term"
   results$estimate=exp(fit_cox_model$coefficients)
-  results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust SE to calculate CI
+  results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
   results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
   results$std.error=exp(sqrt(diag(vcov(fit_cox_model))))
   results$robust.se=exp(sqrt(diag(vcov(robust_fit_cox_model))))
