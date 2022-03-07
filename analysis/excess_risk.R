@@ -36,4 +36,4 @@ for (i in 1:nrow(active)) {
 
 # Save output ------------------------------------------------------------------
 
-eadr::write_csv(df, file = file.path("output", "excess_risk.csv"))
+readr::write_csv(df, file = file.path("output", "excess_risk.csv"))
