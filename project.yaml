@@ -96,114 +96,153 @@ actions:
         venn_diagram: output/venn_diagram_*.svg
         venn_diagram_number_check: output/venn_diagram_number_check_*.csv
 
-  analysis_cox_ami:
+  ## Apply cox model for ami 
+
+  Analysis_cox_ami:
     run: r:latest analysis/01_pipe.R ami
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_ami.html
-        compiled_event_counts_html: output/compiled_event_counts_ami.html
+        compiled_hrs: output/suppressed_compiled_HR_results_ami.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_ami.html
         analyses_not_run: output/analyses_not_run_ami.csv
-        compiled_hrs_csv: output/compiled_HR_results_ami.csv
-        compiled_event_counts_csv: output/compiled_event_counts_ami.csv
-  
-  analysis_cox_stroke_isch:
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_ami.csv
+        compiled_event_counts: output/compiled_event_counts_ami.csv
+
+  ## Apply cox model for stroke_isch 
+
+  Analysis_cox_stroke_isch:
     run: r:latest analysis/01_pipe.R stroke_isch
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_stroke_isch.html
-        compiled_event_counts_html: output/compiled_event_counts_stroke_isch.html
+        compiled_hrs: output/suppressed_compiled_HR_results_stroke_isch.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_stroke_isch.html
         analyses_not_run: output/analyses_not_run_stroke_isch.csv
-        compiled_hrs_csv: output/compiled_HR_results_stroke_isch.csv
-        compiled_event_counts_csv: output/compiled_event_counts_stroke_isch.csv
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_stroke_isch.csv
+        compiled_event_counts: output/compiled_event_counts_stroke_isch.csv
 
-  
-  analysis_cox_dvt:
+  ## Apply cox model for dvt 
+
+  Analysis_cox_dvt:
     run: r:latest analysis/01_pipe.R dvt
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/compiled_HR_results_dvt.html
-        compiled_event_counts: output/compiled_event_counts_dvt.html
+        compiled_hrs: output/suppressed_compiled_HR_results_dvt.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_dvt.html
         analyses_not_run: output/analyses_not_run_dvt.csv
-        compiled_hrs_csv: output/compiled_HR_results_dvt.csv
-        compiled_event_counts_csv: output/compiled_event_counts_dvt.csv
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_dvt.csv
+        compiled_event_counts: output/compiled_event_counts_dvt.csv
 
-  analysis_cox_pe:
+  ## Apply cox model for pe 
+
+  Analysis_cox_pe:
     run: r:latest analysis/01_pipe.R pe
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_pe.html
-        compiled_event_counts_html: output/compiled_event_counts_pe.html
+        compiled_hrs: output/suppressed_compiled_HR_results_pe.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_pe.html
         analyses_not_run: output/analyses_not_run_pe.csv
-        compiled_hrs_csv: output/compiled_HR_results_pe.csv
-        compiled_event_counts_csv: output/compiled_event_counts_pe.csv
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_pe.csv
+        compiled_event_counts: output/compiled_event_counts_pe.csv
 
-  analysis_cox_tia:
+  ## Apply cox model for tia 
+
+  Analysis_cox_tia:
     run: r:latest analysis/01_pipe.R tia
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_tia.html
-        compiled_event_counts_html: output/compiled_event_counts_tia.html
+        compiled_hrs: output/suppressed_compiled_HR_results_tia.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_tia.html
         analyses_not_run: output/analyses_not_run_tia.csv
-        compiled_hrs_csv: output/compiled_HR_results_tia.csv
-        compiled_event_counts_csv: output/compiled_event_counts_tia.csv
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_tia.csv
+        compiled_event_counts: output/compiled_event_counts_tia.csv
 
+  ## Apply cox model for stroke_sah_hs 
 
-  analysis_cox_stroke_sah_hs:
+  Analysis_cox_stroke_sah_hs:
     run: r:latest analysis/01_pipe.R stroke_sah_hs
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_stroke_sah_hs.html
-        compiled_event_counts_html: output/compiled_event_counts_stroke_sah_hs.html
+        compiled_hrs: output/suppressed_compiled_HR_results_stroke_sah_hs.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_stroke_sah_hs.html
         analyses_not_run: output/analyses_not_run_stroke_sah_hs.csv
-        compiled_hrs_csv: output/compiled_HR_results_stroke_sah_hs.csv
-        compiled_event_counts_csv: output/compiled_event_counts_stroke_sah_hs.csv
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_stroke_sah_hs.csv
+        compiled_event_counts: output/compiled_event_counts_stroke_sah_hs.csv
 
-  analysis_cox_hf:
+  ## Apply cox model for hf 
+
+  Analysis_cox_hf:
     run: r:latest analysis/01_pipe.R hf
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_hf.html
-        compiled_event_counts_html: output/compiled_event_counts_hf.html
+        compiled_hrs: output/suppressed_compiled_HR_results_hf.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_hf.html
         analyses_not_run: output/analyses_not_run_hf.csv
-        compiled_hrs_csv: output/compiled_HR_results_hf.csv
-        compiled_event_counts_csv: output/compiled_event_counts_hf.csv
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_hf.csv
+        compiled_event_counts: output/compiled_event_counts_hf.csv
 
-  analysis_cox_angina:
+  ## Apply cox model for angina 
+
+  Analysis_cox_angina:
     run: r:latest analysis/01_pipe.R angina
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_angina.html
-        compiled_event_counts_html: output/compiled_event_counts_angina.html
+        compiled_hrs: output/suppressed_compiled_HR_results_angina.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_angina.html
         analyses_not_run: output/analyses_not_run_angina.csv
-        compiled_hrs_csv: output/compiled_HR_results_angina.csv
-        compiled_event_counts_csv: output/compiled_event_counts_angina.csv
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_angina.csv
+        compiled_event_counts: output/compiled_event_counts_angina.csv
 
-  analysis_cox_ate:
+  ## Apply cox model for ate 
+
+  Analysis_cox_ate:
     run: r:latest analysis/01_pipe.R ate
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_ate.html
-        compiled_event_counts_html: output/compiled_event_counts_ate.html
+        compiled_hrs: output/suppressed_compiled_HR_results_ate.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_ate.html
         analyses_not_run: output/analyses_not_run_ate.csv
-        compiled_hrs_csv: output/compiled_HR_results_ate.csv
-        compiled_event_counts_csv: output/compiled_event_counts_ate.csv
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_ate.csv
+        compiled_event_counts: output/compiled_event_counts_ate.csv
 
-  analysis_cox_vte:
+  ## Apply cox model for vte 
+
+  Analysis_cox_vte:
     run: r:latest analysis/01_pipe.R vte
-    needs: [stage1_data_cleaning_both]
+    needs:
+    - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs_html: output/compiled_HR_results_vte.html
-        compiled_event_counts_html: output/compiled_event_counts_vte.html
+        compiled_hrs: output/suppressed_compiled_HR_results_vte.html
+        compiled_event_counts: output/suppressed_compiled_event_counts_vte.html
         analyses_not_run: output/analyses_not_run_vte.csv
-        compiled_hrs_csv: output/compiled_HR_results_vte.csv
-        compiled_event_counts_csv: output/compiled_event_counts_vte.csv
+      highly_sensitive:
+        compiled_hrs: output/compiled_HR_results_vte.csv
+        compiled_event_counts: output/compiled_event_counts_vte.csv
+

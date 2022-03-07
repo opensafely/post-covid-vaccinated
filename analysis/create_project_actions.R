@@ -1,8 +1,10 @@
-library('tidyverse')
-library('yaml')
-library('here')
-library('glue')
+library(tidyverse)
+library(yaml)
+library(here)
+library(glue)
 library(readr)
+#library(dplyr)
+
 
 
 ###########################
@@ -85,10 +87,10 @@ apply_model_function <- function(outcome){
       name = glue("Analysis_cox_{outcome}"),
       run = "r:latest analysis/01_pipe.R",
       arguments = c(outcome),
-      needs = list("active_analyses","stage1_data_cleaning_both"),
+      needs = list("stage1_data_cleaning_both"),
       moderately_sensitive = list(
-        compiled_hrs = glue("output/compiled_HR_results_{outcome}.html"),
-        compiled_event_counts = glue("output/compiled_event_counts_{outcome}.html"),
+        compiled_hrs = glue("output/suppressed_compiled_HR_results_{outcome}.html"),
+        compiled_event_counts = glue("output/suppressed_compiled_event_counts_{outcome}.html"),
         analyses_not_run = glue("output/analyses_not_run_{outcome}.csv")
       ),
       highly_sensitive = list(
@@ -215,13 +217,13 @@ actions_list <- splice(
       venn_diagram = glue("output/venn_diagram_*.svg"),
       venn_diagram_number_check = glue("output/venn_diagram_number_check_*.csv")
     )
-  )#,
+  ),
 
   #comment("Stage 5 - Apply models"),
-  #splice(
-  #  # over outcomes
-  #  unlist(lapply(outcomes_model, function(x) apply_model_function(outcome = x)), recursive = FALSE)
-  #)
+  splice(
+    # over outcomes
+    unlist(lapply(outcomes_model, function(x) apply_model_function(outcome = x)), recursive = FALSE)
+  )
 )
 
 ## combine everything ----
