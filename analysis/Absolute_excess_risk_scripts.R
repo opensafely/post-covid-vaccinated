@@ -164,7 +164,7 @@ colnames(active)[colnames(active) == 'cohort'] <- 'group'
 colnames(active)[colnames(active) == 'model'] <- 'fit'
 colnames(active)[colnames(active) == 'event'] <- 'outcome'
 active <- active %>% select(-fit, everything())                                  
-active <- active %>% filter(!strata == "ethnicity_Missing")                      
+active <- active %>% filter(!strata == "ethnicity_Missing")#need to recheck with real data models                     
 
 #2. Compile the results
 for (i in 1:nrow(active)) {excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])}
