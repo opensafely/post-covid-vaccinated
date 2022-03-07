@@ -85,43 +85,62 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
   #input <- input %>% mutate(sub_bin_sex = cov_cat_sex, sub_num_age = cov_num_age, 
   #                        sub_cat_ethnicity = cov_cat_ethnicity)
 
+  # # Define age groups
+  # 
+  # #For all analysis aside from age stratifed, analysis is performed across all ages 
+  # agebreaks_all <- c(0, 111)
+  # agelabels_all <- c("all")
+  # 
+  # #Age breaks and labels for age sub group analysis
+  # agebreaks_strata <- c(0, 40, 60, 80, 111)
+  # agelabels_strata <- c("18_39", "40_59", "60_79", "80_110")
+  # 
+  # #subgroup = "agegp"
+  # 
+  # if(startsWith(subgroup,"agegp")){
+  #   agebreaks=agebreaks_strata
+  #   agelabels=agelabels_strata
+  # }else{
+  #   agebreaks=agebreaks_all
+  #   agelabels=agelabels_all
+  # }
+  # 
+  # setDT(input)[ , agegroup := cut(cov_num_age, 
+  #                                         breaks = agebreaks, 
+  #                                         right = FALSE, 
+  #                                         labels = agelabels)]
+  # 
+  # 
+  # # rename variables to indicate them as subgroups
+  # setnames(input, 
+  #          old = c("cov_cat_sex", 
+  #                  "agegroup", 
+  #                  "cov_cat_ethnicity"), 
+  #          new = c("sub_bin_sex", 
+  #                  "sub_cat_age",
+  #                  "sub_cat_ethnicity"))
+  
   # Define age groups
-
-  #For all analysis aside from age stratifed, analysis is performed across all ages 
-  agebreaks_all <- c(0, 111)
-  agelabels_all <- c("all")
   
-  #Age breaks and labels for age sub group analysis
-  agebreaks_strata <- c(0, 40, 60, 80, 111)
-  agelabels_strata <- c("18_39", "40_59", "60_79", "80_110")
-
-  subgroup = "agegp"
-  
-  if(startsWith(subgroup,"agegp")){
-    agebreaks=agebreaks_strata
-    agelabels=agelabels_strata
-  }else{
-    agebreaks=agebreaks_all
-    agelabels=agelabels_all
-  }
-  
-  setDT(input)[ , agegroup := cut(cov_num_age, 
-                                          breaks = agebreaks, 
-                                          right = FALSE, 
-                                          labels = agelabels)]
-  
+  input$cov_cat_age_group <- ""
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=18 & input$cov_num_age<=29, "18-29", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=30 & input$cov_num_age<=39, "30-39", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=49, "40-49", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=50 & input$cov_num_age<=59, "50-59", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=60 & input$cov_num_age<=69, "60-69", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=70 & input$cov_num_age<=79, "70-79", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=80 & input$cov_num_age<=89, "80-89", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=90, "90+", input$cov_cat_age_group)
   
   # rename variables to indicate them as subgroups
-  setnames(input, 
-           old = c("cov_cat_sex", 
-                   "agegroup", 
-                   "cov_cat_ethnicity"), 
-           new = c("sub_bin_sex", 
-                   "sub_cat_age",
+  setnames(input,
+           old = c("cov_cat_sex",
+                   "cov_cat_age_group",
+                   "cov_cat_ethnicity"),
+           new = c("sub_bin_sex",
+                   "sub_cat_age_group",
                    "sub_cat_ethnicity"))
-  
 
- 
   outcome_names <- tidyselect::vars_select(names(input), starts_with(c("out_"), ignore.case=TRUE))
   outcome_names_not_active <- outcome_names[!outcome_names %in% event_names]
   
@@ -130,7 +149,7 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
   # variable sub_bin_ate, does this a variable indicate whether indivdiuals have a prior history of ate?
   # strata_names <- tidyselect::vars_select(names(active_analyses), !contains(c('active','outcome','outcome_variable','covariates','prior_history_var', 'model', 'cohort'), ignore.case = TRUE))
   sub_grp_names <- tidyselect::vars_select(names(input), starts_with(c('sub_'), ignore.case = TRUE))
-  sub_grp_names <- sub_grp_names[which(sub_grp_names!="sub_bin_ate")]
+  #sub_grp_names <- sub_grp_names[which(sub_grp_names!="sub_bin_ate")]
   # Create a data frame for survival data: to avoid carrying covariates in the calculation
   survival_data <- input[,vars_names] 
   
