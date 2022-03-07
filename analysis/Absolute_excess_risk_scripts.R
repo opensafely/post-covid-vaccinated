@@ -198,6 +198,11 @@ colnames(active)[colnames(active) == 'event'] <- 'outcome'
 
 active <- active %>% select(-fit, everything())
 
+#active <- active[-190,]
+active <- active[-190,]
+active <- active[-191,]
+
+
 #2. Loop to input the active analyses --- into the function.
 
 
@@ -207,9 +212,7 @@ for (i in 1:nrow(active)) {
   #files <- files[grepl(active$strata[i])]
   
   excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])
-  AER_all_results <- results
-  AER_all_results <- rbind(AER_all_results, results)
-  rm(results)
+  
   #write.csv(f4_compiled_lifetables, paste0("output/Figure4_compiled_lifetables.csv"), row.names = F)
 }
 
