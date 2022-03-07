@@ -60,8 +60,12 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   # WITH COVID
   #-------------------------------------------------------------------------------
   with_expo <- survival_data %>% filter(!is.na(expo_date))
+  
+  # Check whether there are any people with COVID exposure
   any_exposures <- nrow(with_expo)>0
-  any_exposed_events <- nrow(with_expo %>% filter(is.na(event_date)==F))>0
+  
+  # Check whether there are any people with post-expo events
+  any_exposed_events <- nrow(with_expo %>% filter(!is.na(event_date)))>0
   
   if(any_exposures==T & any_exposed_events ==T ){
     if(startsWith(subgroup,"covid_pheno_")==T){
