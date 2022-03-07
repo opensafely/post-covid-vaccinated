@@ -16,12 +16,12 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   if(startsWith(subgroup,"covid_pheno_")){
   cases <- survival_data %>% filter((!is.na(event_date)) & 
                                      (
-                                       ((event_date == follow_up_end) & (event_date>=follow_up_start)) & ((event_date < date_expo_censor) | is.na(date_expo_censor))
+                                       (event_date == follow_up_end) & (event_date < date_expo_censor | is.na(date_expo_censor))
                                      ))
   }else{
   cases <- survival_data %>% filter((!is.na(event_date)) & 
                                       (
-                                        (event_date == follow_up_end & event_date>=follow_up_start )
+                                        event_date == follow_up_end
                                       ))
   }
   
