@@ -2,13 +2,13 @@
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
-#use only to check the function
-#outcome <- "ate" 
-#group <- "vaccinated" 
-#strata <- "prior_history_FALSE"
-#fit <- "mdl_max_adj"
+#USE THIS ONLY TO CHECK THE FUNCTION
+outcome <- "ate" 
+group <- "vaccinated" 
+strata <- "prior_history_FALSE"
+fit <- "mdl_max_adj"
 
-#Create the function
+#Create a function to output the excess risk
 excess_risk <- function(outcome, group, strata, fit) {
   
   #Call the library
@@ -26,11 +26,10 @@ excess_risk <- function(outcome, group, strata, fit) {
   input2 <- purrr::pmap(list(hr_files),
                         function(fpath){
                           df <- fread(fpath)
-                          return(df)
-                        })
+                          return(df)})
   input2=rbindlist(input2, fill=TRUE)
   
-  #Preprocess the input data (can be reduced when tuned in with real data inputs)
+  #Preprocess the input data (can be removed when tuned in with the real data inputs)
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
@@ -157,22 +156,10 @@ excess_risk <- function(outcome, group, strata, fit) {
   
   return(print(results)) 
   
-  
-  
-  
 }
 
-#excess_risk("vte","vaccinated","prior_history_FALSE", "mdl_max_adj")
-
-#outcome <- "ate" 
-#group <- "vaccinated" 
-#strata <- "prior_history_FALSE"
-#fit <- "mdl_max_adj"
-
-#AER_vaccinated_mdl_max_adj_prior_history_FALSE_ate.csv
-
-
-#results
+#Check the function
+excess_risk("vte","vaccinated","prior_history_FALSE", "mdl_max_adj")
 
 #---------------------------------------------------------
 #Step6. Run the function---FOR the active analyses----
