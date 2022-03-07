@@ -69,6 +69,7 @@ cohort <- cohort_to_run
 
 table_2_long <- crossing(event_names, model, cohort, strata)
 
+#ir = incidence rate; ir_lower = lower bound of the 95% CI for ir; ir_upper = upper bound of the 95% CI for ir
 exposed_person_days <- unexposed_person_days <- event_count <- ir <- ir_lower <- ir_upper <- rep("NA", nrow(table_2_long))
 
 table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, event_count, ir, ir_lower, ir_upper)
@@ -109,21 +110,23 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
                                           right = FALSE, 
                                           labels = agelabels)]
   
-  input <- input %>% mutate(sub_bin_sex = cov_cat_sex,
-                            sub_cat_ethnicity = cov_cat_ethnicity)
   
-  
+  # rename variables to indicate them as subgroups
   setnames(input, 
            old = c("cov_cat_sex", 
-                   "cov_num_age", 
+                   "agegroup", 
                    "cov_cat_ethnicity"), 
            new = c("sub_bin_sex", 
-                   "sub_age",
+                   "sub_cat_age",
                    "sub_cat_ethnicity"))
   
+
+ 
+  outcome_names <- tidyselect::vars_select(names(input), starts_with(c("out_"), ignore.case=TRUE))
+  outcome_names_not_active <- outcome_names[!outcome_names %in% event_names]
   
   vars_names <- tidyselect::vars_select(names(input), !starts_with(c('cov_','qa_','vax_cat'), ignore.case = TRUE))
-
+  vars_names <- vars_names[!vars_names %in% outcome_names_not_active]
   # variable sub_bin_ate, does this a variable indicate whether indivdiuals have a prior history of ate?
   # strata_names <- tidyselect::vars_select(names(active_analyses), !contains(c('active','outcome','outcome_variable','covariates','prior_history_var', 'model', 'cohort'), ignore.case = TRUE))
   sub_grp_names <- tidyselect::vars_select(names(input), starts_with(c('sub_'), ignore.case = TRUE))
