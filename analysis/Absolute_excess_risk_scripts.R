@@ -82,7 +82,7 @@ excess_risk <- function(outcome, group, strata, fit) {
   hr28_196 <- input2[input2$event == outcome  & input2$model == fit  & 
                        input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$estimate
   #--------------------------------------------------------------------
-  #Step2.Calculate the average daily CVD incidence   - in the unexposed
+  #Step2.Average daily CVD incidence - in the unexposed
   #--------------------------------------------------------------------
   #Number of new events / sum of person-time at risk
   incidence_rate <- unexposed_events/fp_person_days
@@ -101,7 +101,7 @@ excess_risk <- function(outcome, group, strata, fit) {
   lifetable$'1-q' <- 1 - lifetable$q 
   lifetable$s <- cumprod(lifetable$`1-q`)
   #----------------------------------------
-  #Step4. Calculate the daily CVD incidence
+  #Step4.Daily CVD incidence
   #----------------------------------------
   #Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
   # for that day to derive the incidence on each day after COVID-19.
@@ -120,7 +120,7 @@ excess_risk <- function(outcome, group, strata, fit) {
   lifetable$'1-qh' <- 1 - lifetable$qh
   lifetable$sc <- cumprod(lifetable$`1-qh`)
   #-----------------------------------------
-  #Step5. Calculate the Absolute excess risk
+  #Step5. Absolute excess risk
   #-----------------------------------------
   #Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
   #compared with no COVID-19 diagnosis. 
@@ -137,9 +137,9 @@ excess_risk <- function(outcome, group, strata, fit) {
   return(results)
   #return(print(results)) 
 }
-#---------------------------------------------------------
-#Step6. Calculate the excess risk---FOR the active analyses
-#----------------------------------------------------------
+#-------------------------------
+#Step6. AER for active analyses
+#-------------------------------
 #1. Define the active analyses
 active <- readr::read_rds("lib/active_analyses.rds") #Rebase if required,
 #active <- active_analyses # Manual alternative,
@@ -160,7 +160,9 @@ colnames(active)[colnames(active) == 'model'] <- 'fit'
 colnames(active)[colnames(active) == 'event'] <- 'outcome'
 active <- active %>% select(-fit, everything())                                  
 active <- active %>% filter(!strata == "ethnicity_Missing")#need to recheck with real data models                     
-#2. Compile the results
+#-------------------------------
+#Step7. Output results
+#-------------------------------
 for (i in 1:nrow(active)) {excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])}
 AER_files=list.files(path = "output", pattern = "AER_*")
 AER_files=AER_files[endsWith(AER_files,".csv")]
