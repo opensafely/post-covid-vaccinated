@@ -90,19 +90,24 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
     survival_data <- set_dates_outofrange_na(survival_data, colname)
   }
   
-  #Update COVID phenotypes after setting COVID exposure dates to NA that lie
-  #outside follow up
+  # Update COVID phenotypes after setting COVID exposure dates to NA that lie
+  # outside follow up
   survival_data$expo_pheno=as.character(survival_data$expo_pheno)
   survival_data=survival_data%>%rowwise()%>%mutate(expo_pheno =ifelse(is.na(expo_date), "no_infection",expo_pheno))
 
   
-  #get COVID pheno specific dataset if necessary
+  # Get COVID pheno specific dataset if necessary
   if(startsWith(subgroup,"covid_pheno")){
     survival_data <- get_pheno_specific_dataset(survival_data, pheno_of_interest=stratify_by)
   }
   
-  #Adjust follow up end date for COVID phenotype dataset to censor at COVID exposure for the
-  #phenotype that is not of interest
+  # 1.Adjust follow up end date for COVID phenotype dataset to censor at COVID exposure for the
+  # phenotype that is not of interest
+  # 2.Remove people who's COVID exposure censor date is the same as their follow-up start date as they 
+  # have no follow up period (for the pheno not of interest follow up is follow up start to the day before exposure so
+  # if follow_up_start = date_expo_censor, follow up end is prior to follow up start).
+  # 3.Follow up end being the day before date_expo_censor if the min on line 111 is taken into account in a later script
+  
   if(startsWith(subgroup,"covid_pheno_")){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(follow_up_end, date_expo_censor,na.rm = TRUE))
     survival_data <- survival_data %>% filter((follow_up_start != date_expo_censor)|is.na(date_expo_censor))
