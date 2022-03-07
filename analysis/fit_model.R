@@ -27,7 +27,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     return(fit_model_reducedcovariates)
   }
 
-  if (ind_any_zeroeventperiod==TRUE){
+  if(ind_any_zeroeventperiod==TRUE){
     list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event,subgroup, stratify_by_subgroup, stratify_by,mdl, cuts_days_since_expo=cuts_days_since_expo_reduced)
     data_surv <- list_data_surv_noncase_ids_interval_names[[1]]
     noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
