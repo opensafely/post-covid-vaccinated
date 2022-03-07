@@ -1,7 +1,6 @@
 #Project:Vaccinated delta wave population study
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
-
 #USE - TO CHECK SINGLE AER
 outcome <- "ate" 
 group <- "vaccinated" 
@@ -81,9 +80,9 @@ excess_risk <- function(outcome, group, strata, fit) {
   #Alternative 28_196 days
   hr28_196 <- input2[input2$event == outcome  & input2$model == fit  & 
                        input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$estimate
-  #--------------------------------------------------------------------
+  #-----------------------------------------------------
   #Step2.Average daily CVD incidence - in the unexposed
-  #--------------------------------------------------------------------
+  #-----------------------------------------------------
   #Number of new events / sum of person-time at risk
   incidence_rate <- unexposed_events/fp_person_days
   #-------------------------------------------------------------
@@ -96,13 +95,12 @@ excess_risk <- function(outcome, group, strata, fit) {
   lifetable$model <- fit
   lifetable$cohort <- group
   lifetable$subgroup <- strata 
-  
   lifetable$q <- incidence_rate 
   lifetable$'1-q' <- 1 - lifetable$q 
   lifetable$s <- cumprod(lifetable$`1-q`)
-  #----------------------------------------
+  #-------------------------
   #Step4.Daily CVD incidence
-  #----------------------------------------
+  #-------------------------
   #Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
   # for that day to derive the incidence on each day after COVID-19.
   
@@ -119,9 +117,9 @@ excess_risk <- function(outcome, group, strata, fit) {
   lifetable$qh <- lifetable$q*lifetable$h
   lifetable$'1-qh' <- 1 - lifetable$qh
   lifetable$sc <- cumprod(lifetable$`1-qh`)
-  #-----------------------------------------
+  #---------------------------
   #Step5. Absolute excess risk
-  #-----------------------------------------
+  #---------------------------
   #Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
   #compared with no COVID-19 diagnosis. 
   #1.AER =difference in absolute risk
@@ -160,9 +158,9 @@ colnames(active)[colnames(active) == 'model'] <- 'fit'
 colnames(active)[colnames(active) == 'event'] <- 'outcome'
 active <- active %>% select(-fit, everything())                                  
 active <- active %>% filter(!strata == "ethnicity_Missing")#need to recheck with real data models                     
-#-------------------------------
+#----------------------
 #Step7. Output results
-#-------------------------------
+#----------------------
 for (i in 1:nrow(active)) {excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])}
 AER_files=list.files(path = "output", pattern = "AER_*")
 AER_files=AER_files[endsWith(AER_files,".csv")]
@@ -174,4 +172,4 @@ AER_compiled_results <- purrr::pmap(list(AER_files),
 AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
 write.csv(AER_compiled_results, "output/AER_compiled_results.csv", row.names = F)
 if (file.exists(AER_files)) { file.remove(AER_files)}
-print(AER_compiled_results) #-ve AERs not expected with real data
+print(AER_compiled_results) #-ve AERs not expected with actual data
