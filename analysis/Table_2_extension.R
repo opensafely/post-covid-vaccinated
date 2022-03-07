@@ -31,36 +31,75 @@ cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 # indicate active analyses -----------------------------------------------
-
 active_analyses <- read_rds("output/active_analyses.rds")
+active_analyses <- active_analyses[which(active_analyses$active==T), ]
+# automation
+event_dates_names <- active_analyses$outcome_variable
+event_names<- event_names <- gsub("out_date_","",event_dates_names)
+event_names
+col_names <- names(active_analyses)
+col_names <- col_names[!col_names %in% c("active","outcome","outcome_variable","covariates")]
+
+mdl <- NULL
+for(i in 1:nrow(active_analyses)){
+  if(active_analyses$model[i]=="all"){
+    mdl=c(mdl, "mdl_agesex","mdl_max_adj")
+  }else{
+    mdl=c(mdl, active_analyses$model)
+  }
+}
+mdl
+
+model <-mdl
+
+cohort_to_run <- NULL
+for(i in 1:nrow(active_analyses)){
+  if(active_analyses$cohort[i]=="all"){
+    cohort_to_run=c(cohort_to_run,"vaccinated", "electively_unvaccinated")
+  }else{
+    cohort_to_run=c(cohort_to_run,active_analyses$cohort)
+  }  
+}
+cohort <- cohort_to_run
+
+
+
+
 
   # read in data------------------------------------------------------------
   
   input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
-  input <- filter(input, sub_bin_covid19_confirmed_history==T) # they should all have covid history?
-  # if(covid_history == "without_covid_history"){
-  #   input <- filter(input, sub_bin_covid19_confirmed_history==F)
-  # }
-  # if(covid_history == "with_covid_history"){
-  #   input <- filter(input, sub_bin_covid19_confirmed_history==T)
-  # }
+  # input <- filter(input, sub_bin_covid19_confirmed_history==T) # T when the subgroup is covid_history, and F when other subgroups
+
   # record variable names for covariate
   #input <- input %>% mutate(sub_bin_sex = cov_cat_sex, sub_num_age = cov_num_age, 
   #                        sub_cat_ethnicity = cov_cat_ethnicity)
 
   # Define age groups
+
+  #For all analysis aside from age stratifed, analysis is performed across all ages 
+  agebreaks_all <- c(0, 111)
+  agelabels_all <- c("all")
   
-  input$cov_cat_age_group <- ""
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=18 & input$cov_num_age<=29, "18-29", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=30 & input$cov_num_age<=39, "30-39", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=49, "40-49", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=50 & input$cov_num_age<=59, "50-59", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=60 & input$cov_num_age<=69, "60-69", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=70 & input$cov_num_age<=79, "70-79", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=80 & input$cov_num_age<=89, "80-89", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=90, "90+", input$cov_cat_age_group)
+  #Age breaks and labels for age sub group analysis
+  agebreaks_strata <- c(0, 40, 60, 80, 111)
+  agelabels_strata <- c("18_39", "40_59", "60_79", "80_110")
+
+  subgroup = "agegp"
   
-  # need to add age subgroup
+  if(startsWith(subgroup,"agegp")){
+    agebreaks=agebreaks_strata
+    agelabels=agelabels_strata
+  }else{
+    agebreaks=agebreaks_all
+    agelabels=agelabels_all
+  }
+  
+  setDT(input)[ , agegroup := cut(cov_num_age, 
+                                          breaks = agebreaks, 
+                                          right = FALSE, 
+                                          labels = agelabels)]
+  
   input <- input %>% mutate(sub_bin_sex = cov_cat_sex,
                             sub_cat_ethnicity = cov_cat_ethnicity)
   vars_names <- tidyselect::vars_select(names(input), !starts_with(c('cov_','qa_','vax_cat'), ignore.case = TRUE))
@@ -76,11 +115,6 @@ active_analyses <- read_rds("output/active_analyses.rds")
   survival_data <- survival_data %>% 
     mutate(cohort_start_date = cohort_start,
            cohort_end_date = cohort_end)
-  
-  # automation
-  event_dates_names <- active_analyses$outcome_variable[which(active_analyses$active==T)]
-  event_names<- event_names <- gsub("out_date_","",event_dates_names)
-  #event_names
   
   #define data frame for output table
   col_headings <- c("event", "cohort", "strata", "person_days")
