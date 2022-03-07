@@ -2,17 +2,26 @@
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
+#Prephasic use to check the function
+cohort <- "vaccinated" 
+fit <- "mdl_max_adj"
+subgroup <- "prior_history_FALSE"
+model <- "mdl_max_adj"
+
+
 excess_risk <- function(event, cohort, subgroup, model) {
   
+  #Call the library
   library(purrr)
   library(data.table)
   library(tidyverse)
   
-  #Import data 
+  #Load data 
   input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
   #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
   #input2- Import data
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
+  hr_files=hr_files[endsWith(hr_files,".csv")]
   hr_files=paste0("output/",hr_files)
   input2 <- purrr::pmap(list(hr_files),
                         function(fpath){
