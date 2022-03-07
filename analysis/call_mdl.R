@@ -100,6 +100,10 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
 
   
   # Get COVID pheno specific dataset if necessary
+  # Adds in variable date_expo_censor which is the COVID exposure date for the phenotype  not of interest
+  # We want to be able to include follow up time prior to exposure for the pheno no of interest which uses date_expo_censor
+  # to find this time period
+  
   if(startsWith(subgroup,"covid_pheno")){
     survival_data <- get_pheno_specific_dataset(survival_data, pheno_of_interest=stratify_by)
   }

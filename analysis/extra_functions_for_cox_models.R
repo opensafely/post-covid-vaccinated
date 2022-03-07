@@ -9,6 +9,10 @@ set_dates_outofrange_na <- function(df, colname)
 
 
 #----------------------- GET COVID PHENO-SPECIFIC DATASET ----------------------
+# Adds in variable date_expo_censor which is the COVID exposure date for the phenotype  not of interest
+# We want to be able to include follow up time prior to exposure for the pheno no of interest which uses date_expo_censor
+# to find this time period
+
 get_pheno_specific_dataset <- function(survival_data, pheno_of_interest){
   survival_data$date_expo_censor <- as.Date(ifelse(!(survival_data$expo_pheno %in% pheno_of_interest),
                                                    survival_data$expo_date, 
