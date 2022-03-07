@@ -2,7 +2,7 @@
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 
-#USE THIS WHEN - TO CHECK SINGLE AER
+#USE THIS - TO CHECK SINGLE AER
 outcome <- "ate" 
 group <- "vaccinated" 
 strata <- "prior_history_FALSE"
