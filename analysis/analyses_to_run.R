@@ -1,5 +1,5 @@
 ##==============================================================================
-## ## Pipeline (2): Reads in the active analyses table which specifies which 
+## Reads in the active analyses table which specifies which 
 ## analysis to run for the outcome
 ##
 ## Creates a table of all the analyses to run for the outcome

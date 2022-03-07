@@ -1,8 +1,8 @@
 ## =============================================================================
-## MODEL3B: FULLY ADJUSTED -- USING PRE-DEFINED OUTSOME-SPECIFIC FIXED COVARIATES 
-## and AMI BACKWARD-SELECTED COVARIATES
-##
-## Author: Samantha Ip
+## 1.Calls the functions that formats the survival data into the relevant format
+## to be used in the cox model
+## 2.Defines the cox survival formula and fits the cox model
+## 3.Format the results table
 ## =============================================================================
 source(file.path(scripts_dir,"fit_get_data_surv_eventcountbasedtimecuts.R"))
 

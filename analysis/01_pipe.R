@@ -2,7 +2,8 @@
 ## Pipeline (1): Control center, calls relevant analysis scripts, sets working 
 ## and saving directories, parallelises processes
 ##
-## Author: Samantha Ip
+## Based on scripts written by Samantha Ip, see the following repo's for 
+## original scripts: https://github.com/BHFDSC/CCU002_01 & https://github.com/BHFDSC/CCU002_03
 ## =============================================================================
 
 

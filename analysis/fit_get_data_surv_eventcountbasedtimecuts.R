@@ -1,8 +1,6 @@
 ## =============================================================================
-## MAKE SURVIVAL DATA -- FORMAT FOR TIME-DEPENDENT COXPH
-##
-## Authors: Samantha Ip, Jenny Cooper
-## Thanks to: Thomas Bolton, Venexia Walker and Angela Wood
+## 1. Format the survival data for the cox model
+## 2. Calculate pre/post exposure event counts
 ## =============================================================================
 
 fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,mdl, survival_data,cuts_days_since_expo){

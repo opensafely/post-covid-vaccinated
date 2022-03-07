@@ -1,7 +1,6 @@
 ## =============================================================================
-## Pipeline (2): Reads in analysis-specific data, loads parameters, 
-##
-## Author: Samantha Ip
+## Pipeline (2): Reads in analysis-specific data, loads/sets any parameters,
+## renames any variables used throughout the following scripts
 ## =============================================================================
 
 # ---------------------- READ IN DATA ------------------------------------------
@@ -27,7 +26,8 @@ cohort_end_date <- as.Date("2021-12-14")
 cuts_days_since_expo <- c(14, 28, 56, 84, 197) 
 cuts_days_since_expo_reduced <- c(28,197) 
 
-#Rename input variable names
+#Rename input variable names (by renaming here it means that these scripts can be used for other datasets without
+## having to keep updating all the varaible names throughout the following scripts)
 setnames(input, 
          old = c("death_date",  
                  "cov_cat_sex", 

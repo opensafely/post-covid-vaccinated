@@ -1,11 +1,7 @@
 ## =============================================================================
 ## 1.Creates the base survival data that includes the event date for the outcome of interest
 ## 2.Stratify to relevant subgroup if necessary
-## 3.Sets the names of the covariates that need to be included if performing a subgroup analysis
-## 4.If running COVID pheno subgroup will get pheno-specific dataset
-## 5.Add follow up start and end dates
-##
-## Based on scripts by Samantha Ip
+## 3.Add follow up start and end dates
 ## =============================================================================
 source(file.path(scripts_dir,"fit_model.R"))
 
@@ -79,10 +75,16 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
     survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
   }
   
-  # detect if a column is of date type, if so impose study start/end dates
-  schema <- sapply(survival_data, is.Date) #only really interested in event_date and expo_date being within follow-up at this point
+  # Detect if a column is of date type, if so impose study start/end dates
+  # only really interested in event_date and expo_date being within follow-up at this point as all other date variable 
+  #have been checked in inclusion/exclusion & QA
+  
+  schema <- sapply(survival_data, is.Date) 
   schema = names(schema)[schema==TRUE]
   schema=schema[!schema %in% c("follow_up_start","follow_up_end")]
+  
+  # The function set_dates_outofrange_na can be found in the script extra_functions_for_cox_model.R which contains
+  # additional functions that are used throughout the modelling scripts
   
   for (colname in schema){
     survival_data <- set_dates_outofrange_na(survival_data, colname)
