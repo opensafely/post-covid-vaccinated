@@ -124,7 +124,7 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
   
   input$cov_cat_age_group <- ""
   input$cov_cat_age_group <- ifelse(input$cov_num_age>=18 & input$cov_num_age<=39, "18-39", input$cov_cat_age_group)
-  input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=59, "30-59", input$cov_cat_age_group)
+  input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=59, "40-59", input$cov_cat_age_group)
   input$cov_cat_age_group <- ifelse(input$cov_num_age>=60 & input$cov_num_age<=79, "60-79", input$cov_cat_age_group)
   input$cov_cat_age_group <- ifelse(input$cov_num_age>=80, "80_110", input$cov_cat_age_group)
   
