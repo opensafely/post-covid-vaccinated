@@ -6,9 +6,7 @@
 
 rm(list=setdiff(ls(), c("cohort_to_run","mdl","output_dir","scripts_dir","analyses_to_run","event_name")))
 
-
 results_needed=analyses_to_run
-
        
 result_file_paths <- pmap(list(results_needed$event, results_needed$subgroup,results_needed$cohort_to_run, results_needed$mdl),
                function(event, subgroup, cohort, mdl)
@@ -53,6 +51,7 @@ if(length(results_done)>0){
   df_hr <- df_hr %>% mutate_if(is.numeric, round, digits=5)%>%select(-V1)
 }
 
+write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_", event_name, ".csv") , row.names=F)
 
 # =============================  R events count ================================
 event_count_file_paths<- pmap(list(results_needed$event, results_needed$subgroup,results_needed$cohort_to_run, results_needed$mdl),
@@ -86,67 +85,104 @@ for (i in 1:nrow(results_needed)) {
   }
 }
 
-
-if(length(event_count_done)>0){
-  event_counts_completed <- pmap(list(event_count_done), 
+event_counts_completed <- pmap(list(event_count_done), 
                                  function(fpath){ 
                                    df <- fread(fpath) 
                                    return(df)
                                  })
-  
-  
-  
-  df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
-  write.csv(df_event_counts, paste0(output_dir,"/compiled_event_counts_", event_name, ".csv") , row.names=F)
-  rmarkdown::render("analysis/compiled_event_counts.Rmd",output_file=paste0("/compiled_event_counts_",event_name),output_dir="output")
-  
-}else if(length(event_count_done)==0){
-  no_event_counts=data.frame(matrix(nrow = 1,ncol = 1))
-  colnames(no_event_counts)="no_results"
-  write.csv(no_event_counts,paste0(output_dir,"/compiled_event_counts_",event_name, ".csv") , row.names=F)
-  rmarkdown::render("analysis/compiled_event_counts.Rmd",output_file=paste0("/compiled_event_counts_",event_name),output_dir="output")
-}  
+
+df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
+write.csv(df_event_counts, paste0(output_dir,"/compiled_event_counts_", event_name, ".csv") , row.names=F)
+
+# Add in suppression for counts <=5
+df_event_counts$redacted_results <- "NA"
+
+subgroup <- unique(df_event_counts$subgroup)
+cohort <- unique(df_event_counts$cohort)
+model <- unique(df_event_counts$model)
+
+supressed_df_event_counts <- df_event_counts[0,]
+
+for (i in subgroup){
+  for (j in cohort ){
+    for (k in model){
+      tmp <- df_event_counts %>% filter(subgroup == i & cohort == j & model == k)
+      tmp$events_total <- as.numeric(tmp$events_total)
+      tmp <- tmp %>% 
+        mutate(events_total = replace(events_total, expo_week=="all post expo", sum(tmp[which(tmp$events_total >5 & !(tmp$expo_week %in% c("pre expo", "all post expo"))),events_total])))
+      tmp <- tmp %>% 
+             mutate(events_total = replace(events_total, events_total <=5, "[Redacted]"))
+      tmp$events_total <- as.character(tmp$events_total)
+      tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]"), "Redacted", tmp$redacted_results)
+      supressed_df_event_counts <- rbind(supressed_df_event_counts,tmp)
+      
+    }
+  }
+}
+
+supressed_df_event_counts$redacted_results <- factor(supressed_df_event_counts$redacted_results, levels = c("Redacted",
+                                                                                                            "NA"))
+supressed_df_event_counts <- supressed_df_event_counts[order(supressed_df_event_counts$redacted_results),]
+
+write.csv(supressed_df_event_counts, paste0(output_dir,"/suppressed_compiled_event_counts_", event_name, ".csv") , row.names=F)
+rmarkdown::render("analysis/compiled_event_counts.Rmd",output_file=paste0("/suppressed_compiled_event_counts_",event_name),output_dir="output")
 
 
 #=========================COMBINE EVENT COUNTS AND HRS==========================
 
-if(length(results_done)>0){
-  event_counts_to_left_join=data.frame(matrix(nrow=0,ncol=7))
-  colnames(event_counts_to_left_join)=c("term","subgroup","event","expo_week","events_total","cohort","model")
-  subgroup=unique(df_hr$subgroup)
-  cohort=unique(df_hr$cohort)
-  model=unique(df_hr$model)
-  
-  for(i in subgroup){
-    for(j in cohort){
-      for(k in model){
-        df_hr_subgroup=df_hr%>%filter(subgroup==i & cohort == j & model == k)
-        df_counts_subgroup=df_event_counts%>%filter(subgroup==i & cohort == j & model == k)
-        df_hr_subgroup=df_hr_subgroup[1:nrow(df_counts_subgroup),]
-        df_hr_subgroup$expo_week=df_counts_subgroup$expo_week
-        df_hr_subgroup$events_total=df_counts_subgroup$events_total
-        df_hr_subgroup=df_hr_subgroup%>%select(term,subgroup,event,expo_week,events_total,cohort,model)
-        event_counts_to_left_join=rbind(event_counts_to_left_join,df_hr_subgroup)
-      }
+event_counts_to_left_join=data.frame(matrix(nrow=0,ncol=7))
+colnames(event_counts_to_left_join)=c("term","subgroup","event","expo_week","events_total","cohort","model")
+subgroup=unique(df_hr$subgroup)
+cohort=unique(df_hr$cohort)
+model=unique(df_hr$model)
+
+for(i in subgroup){
+  for(j in cohort){
+    for(k in model){
+      df_hr_subgroup=df_hr%>%filter(subgroup==i & cohort == j & model == k)
+      df_counts_subgroup=supressed_df_event_counts%>%filter(subgroup==i & cohort == j & model == k)
+      df_hr_subgroup=df_hr_subgroup[1:nrow(df_counts_subgroup),]
+      df_hr_subgroup$expo_week=df_counts_subgroup$expo_week
+      df_hr_subgroup$events_total=df_counts_subgroup$events_total
+      df_hr_subgroup=df_hr_subgroup%>%select(term,subgroup,event,expo_week,events_total,cohort,model)
+      event_counts_to_left_join=rbind(event_counts_to_left_join,df_hr_subgroup)
     }
   }
-  
-  combined_hr_event_counts=df_hr%>%left_join(event_counts_to_left_join, by=c("term","event","subgroup","cohort","model"))
-  
-  combined_hr_event_counts=combined_hr_event_counts%>%select(term,estimate,conf.low,conf.high,std.error,robust.se,P,expo_week,events_total,
-                                                               event,subgroup,model,cohort,covariates_removed,cat_covars_collapsed,total_covid19_cases)
-  
-  write.csv(combined_hr_event_counts,paste0(output_dir,"/compiled_HR_results_",event_name ,".csv") , row.names=F)
-  rmarkdown::render("analysis/compiled_HR_results.Rmd",output_file=paste0("/compiled_HR_results_",event_name),output_dir="output")
-  
-}else if(length(results_done)==0){
-  no_results=data.frame(matrix(nrow = 1,ncol = 1))
-  colnames(no_results)="no_results"
-  write.csv(no_results,paste0(output_dir,"/compiled_HR_results_",event_name, ".csv") , row.names=F)
-  rmarkdown::render("analysis/compiled_HR_results.Rmd",output_file=paste0("/compiled_HR_results_",event_name),output_dir="output")
-  
 }
 
+combined_hr_event_counts=df_hr%>%left_join(event_counts_to_left_join, by=c("term","event","subgroup","cohort","model"))
+
+combined_hr_event_counts=combined_hr_event_counts%>%select(term,estimate,conf.low,conf.high,std.error,robust.se,P,expo_week,events_total,
+                                                           event,subgroup,model,cohort,covariates_removed,cat_covars_collapsed,total_covid19_cases)
+
+# Add in suppression for counts <=5
+combined_hr_event_counts$redacted_results <- "NA"
+
+subgroup <- unique(combined_hr_event_counts$subgroup)
+cohort <- unique(combined_hr_event_counts$cohort)
+model <- unique(combined_hr_event_counts$model)
+
+supressed_combined_hr_event_counts <- combined_hr_event_counts[0,]
+
+for (i in subgroup){
+  for (j in cohort ){
+    for (k in model){
+      tmp <- combined_hr_event_counts %>% filter(subgroup == i & cohort == j & model == k)
+      tmp <- tmp %>% mutate(across(where(is.numeric), as.character))
+      redacted_counts <- tmp[which(tmp$events_total == "[Redacted]"),expo_week]
+      tmp[which(tmp$term %in% redacted_counts),2:7] = "[Redacted]"
+      tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]"), "Redacted", tmp$redacted_results)
+      supressed_combined_hr_event_counts <- rbind(supressed_combined_hr_event_counts,tmp)
+    }
+  }
+}
+
+supressed_combined_hr_event_counts$redacted_results <- factor(supressed_combined_hr_event_counts$redacted_results, levels = c("Redacted",
+                                                                                                            "NA"))
+supressed_combined_hr_event_counts <- supressed_combined_hr_event_counts[order(supressed_combined_hr_event_counts$redacted_results),]
+
+write.csv(supressed_combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name ,".csv") , row.names=F)
+rmarkdown::render("analysis/compiled_HR_results.Rmd",output_file=paste0("/suppressed_compiled_HR_results_",event_name),output_dir="output")
 
 #==============================ANALYSES NOT RUN=================================
 analyses_not_run=data.frame(matrix(nrow=0,ncol = 8))
