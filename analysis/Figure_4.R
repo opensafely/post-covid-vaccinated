@@ -163,7 +163,6 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #-------------------------------------------
   
   rm(list = ls())
-  
 }
 
 #***************************************************************************************
@@ -214,10 +213,8 @@ active <- active[-32,]
 active <- active[-66,]
 active <- active[-66,]
 
-#For loop the active analysis list to the figure4 table function
-
+#2.For loop the active analysis list to the figure4 table function
 for (i in 1:nrow(active)) {
-  
   #1.run the function
   figure4_tbl(active$group[i],active$fit[i],active$outcome[i],active$strata[i])
   
@@ -233,51 +230,46 @@ for (i in 1:nrow(active)) {
   f4_compiled_lifetables=rbindlist(f4_compiled_lifetables, fill=TRUE)
   
   #3.output the csv
-  write.csv(f4_compiled_lifetables, paste0("output/Figure4_compiled_lifetables.csv"), row.names = F)
-}
+  write.csv(f4_compiled_lifetables, paste0("output/Figure4_compiled_lifetables.csv"), row.names = F)}
 
-#4.Delete un using file if exists
+#4.Delete un used files
 if (file.exists(lt_files)) { file.remove(lt_files)}
 69*196
 
-#******************************START FROM HERE 
+#****************************** 
 #III. Figure4 - plotting
 #******************************
+group <- "vaccinated"
+fit <- "mdl_max_adj"
+outcome <- "ate"
+strata <- "sex_Female"
+
    figure4_plot <- function(group, fit, outcome, strata) {
-    
   library(magrittr)
   library(dplyr)
   library(ggplot2)
-    
-  #Gather the lifetable CSV.s
-  hr_files=list.files(path = "output", pattern = "lifetable_delta_*")
-  hr_files=hr_files[endsWith(hr_files,".csv")]
-  hr_files=paste0("output/",hr_files)
-  lifetables <- purrr::pmap(list(hr_files),
-                        function(fpath){ df <- fread(fpath)
-                          return(df)})
-  lifetables=rbindlist(lifetables, fill=TRUE)
+     
+  #1.Load data
+  lifetables <- readr::read_csv("output/Figure4_compiled_lifetables.csv")
+  
+  #2.subset for the 'group' and outcome'
+  lifetable_vacc_ate <- subset(lifetables, cohort == "vaccinated" & event == "ate")
+  
+  #3.identify subgroups
+  table(lifetable_vacc_ate$subgroup)#18 subgroups
+  lifetable_vacc_ate$subgroup<-factor(lifetable_vacc_ate$subgroup,
+                                      levels = c('agegp_18_39','agegp_40_59', 'agegp_60_79', 'agegp_80_110',
+                                                 'sex_Male', 'sex_Female',
+                                                 'ethnicity_White','ethnicity_Black', 'ethnicity_South_Asian', 'ethnicity_Mixed', 'ethnicity_Other', 'ethnicity_Missing',
+                                                 'covid_pheno_hospitalised','covid_pheno_non_hospitalised',
+                                                  'prior_history_FALSE','prior_history_TRUE',
+                                                 'covid_history',
+                                                 'main'))
+  str(lifetable_vacc_ate$subgroup)
+  
+  #4.Plot subgroups
   
   
-  lifetables$subgroup <-factor(lifetables$subgroup,levels = c('sex_Male','sex_Female'))
-  
-  p_line<-ggplot(lifetable,
-                 aes(x=days,
-                     y=AERp,
-                     group=1)) +
-    #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
-    #              position=position_dodge(.9))+
-    geom_line(size=1, col = 'red')+
-    geom_ribbon(aes(ymin = CIp.low, ymax = CIp.high), alpha = 0.1)+
-    #geom_point()+
-    scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200),limits = c(0,200))+
-    scale_y_continuous(breaks = c(-2. -1.5, -1, -0.5, 0, .5, 1, 1.5, 2))+
-    labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
-         title = 'Arterial Thrombotic Events')+
-    theme(plot.title = element_text(hjust = 0.5))
-  
-  p_line
-  #RT - to add plot saving file location 
   
   }
   
