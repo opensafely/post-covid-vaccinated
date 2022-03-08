@@ -104,9 +104,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_ami.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_ami.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_ami.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_ami.html
         analyses_not_run: output/analyses_not_run_ami.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_ami.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_ami.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_ami.csv
         compiled_event_counts: output/compiled_event_counts_ami.csv
@@ -119,9 +121,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_stroke_isch.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_stroke_isch.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_stroke_isch.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_stroke_isch.html
         analyses_not_run: output/analyses_not_run_stroke_isch.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_stroke_isch.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_stroke_isch.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_stroke_isch.csv
         compiled_event_counts: output/compiled_event_counts_stroke_isch.csv
@@ -134,9 +138,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_dvt.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_dvt.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_dvt.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_dvt.html
         analyses_not_run: output/analyses_not_run_dvt.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_dvt.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_dvt.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_dvt.csv
         compiled_event_counts: output/compiled_event_counts_dvt.csv
@@ -149,9 +155,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_pe.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_pe.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_pe.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_pe.html
         analyses_not_run: output/analyses_not_run_pe.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_pe.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_pe.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_pe.csv
         compiled_event_counts: output/compiled_event_counts_pe.csv
@@ -164,9 +172,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_tia.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_tia.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_tia.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_tia.html
         analyses_not_run: output/analyses_not_run_tia.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_tia.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_tia.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_tia.csv
         compiled_event_counts: output/compiled_event_counts_tia.csv
@@ -179,9 +189,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_stroke_sah_hs.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_stroke_sah_hs.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_stroke_sah_hs.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_stroke_sah_hs.html
         analyses_not_run: output/analyses_not_run_stroke_sah_hs.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_stroke_sah_hs.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_stroke_sah_hs.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_stroke_sah_hs.csv
         compiled_event_counts: output/compiled_event_counts_stroke_sah_hs.csv
@@ -194,9 +206,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_hf.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_hf.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_hf.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_hf.html
         analyses_not_run: output/analyses_not_run_hf.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_hf.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_hf.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_hf.csv
         compiled_event_counts: output/compiled_event_counts_hf.csv
@@ -209,9 +223,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_angina.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_angina.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_angina.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_angina.html
         analyses_not_run: output/analyses_not_run_angina.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_angina.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_angina.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_angina.csv
         compiled_event_counts: output/compiled_event_counts_angina.csv
@@ -224,9 +240,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_ate.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_ate.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_ate.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_ate.html
         analyses_not_run: output/analyses_not_run_ate.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_ate.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_ate.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_ate.csv
         compiled_event_counts: output/compiled_event_counts_ate.csv
@@ -239,9 +257,11 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        compiled_hrs: output/suppressed_compiled_HR_results_vte.html
-        compiled_event_counts: output/suppressed_compiled_event_counts_vte.html
+        compiled_hrs_html: output/suppressed_compiled_HR_results_vte.html
+        compiled_event_counts_html: output/suppressed_compiled_event_counts_vte.html
         analyses_not_run: output/analyses_not_run_vte.csv
+        compiled_hrs_csv: output/suppressed_compiled_HR_results_vte.csv
+        compiled_event_counts_csv: output/suppressed_compiled_event_counts_vte.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_vte.csv
         compiled_event_counts: output/compiled_event_counts_vte.csv
