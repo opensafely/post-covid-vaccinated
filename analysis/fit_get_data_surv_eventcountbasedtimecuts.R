@@ -239,8 +239,13 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
     
-    write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",mdl,".csv"), row.names = T)
+    # If ind_any_zeroeventperiod==TRUE then this script will re-run again with reduced time periods and
+    # we only want to save the final event count file. For reduced time periods, ind_any_zeroeventperiod will
+    # always be FALSE
     
+    if(ind_any_zeroeventperiod==FALSE){
+      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",mdl,".csv"), row.names = T)
+    }
     
     #===============================================================================
     # FINALIZE age, region, data_surv
