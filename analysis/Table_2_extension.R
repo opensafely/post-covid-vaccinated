@@ -221,7 +221,7 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
 
 
   #define data frame for output table
-  col_headings <- c("event", "cohort", "strata", "person_days")
+  col_headings <- c("event", "cohort", "strata", "unexposed_person_days", "person_days")
   table_person_days <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
   colnames(table_person_days) <- col_headings
   table_person_days$event <- event_names
@@ -231,15 +231,20 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
     survival_data$event_date <- survival_data[,event_dates_names[index]]
     if(population=="vaccinated"){
       survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
-    }else if(population=="electively_unvaccinated"){
+      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
+     }else if(population=="electively_unvaccinated"){
       survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
       survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
+      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
       survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
     }
     # follow-up days
     survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
     survival_data = survival_data %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
     person_days_unexposed_total  = round(sum(survival_data$person_days_unexposed, na.rm = TRUE),1)
+    survival_data = survival_data %>% mutate(person_days = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1)
+    survival_data = survival_data %>% filter(person_days >=1 & person_days <= 197) # filter out follow up period
+    person_days_total  = round(sum(survival_data$person_days, na.rm = TRUE),1)
     outcome_name <- gsub("out_date_", "", event_dates_names[index])
     strata <- NULL
     data <- data.frame(matrix(ncol=length(col_headings), nrow=total_levels)) # define data frame for output table for each outcome
@@ -252,6 +257,8 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
       level_names <- names(table(survival_data[,current]))
       x <- tapply(survival_data$person_days_unexposed, survival_data[,current], FUN=sum)
       # print(x)
+      y <- tapply(survival_data$person_days, survival_data[,current], FUN=sum)
+      # print(y)
       strata_level <- NULL # initialization
       for(j in level_names){
         strata_level[j] <- paste0(strata[i], "_",j)
@@ -260,7 +267,8 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
       start = index_data
       end = index_data + len - 1
       # column 4 is person days
-      data$person_days[start:end] <- as.vector(x)
+      data$unexposed_person_days[start:end] <- as.vector(x)
+      data$person_days[start:end] <- as.vector(y)
       data$strata[start:end] <- strata_level
       data$event[start:end] <- outcome_name
       data$cohort[start:end] <- population
@@ -280,4 +288,7 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
     index_output = end+1
   }
   names(output) <- col_headings
+  output$strata <- gsub('sub_bin_','', output$strata)
+  output$strata <- gsub('sub_cat_','', output$strata)
+  
   write.csv(output, file= paste0("output/", "table2_suppl_", population, ".csv"), row.names = F)
