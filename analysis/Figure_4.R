@@ -239,43 +239,36 @@ if (file.exists(lt_files)) { file.remove(lt_files)}
 #****************************** 
 #III. Figure4 - plotting
 #******************************
-group <- "vaccinated"
-fit <- "mdl_max_adj"
-outcome <- "ate"
-strata <- "sex_Female"
+event <- "vte" 
+group <- "agegp"
 
-   figure4_plot <- function(group, fit, outcome, strata) {
-  library(magrittr)
-  library(dplyr)
-  library(ggplot2)
-     
-  #1.Load data
-  lifetables <- readr::read_csv("output/Figure4_compiled_lifetables.csv")
-  
-  #2.subset for the 'group' and outcome'
-  lifetable_vacc_ate <- subset(lifetables, cohort == "vaccinated" & event == "ate")
-  
-  #3.identify subgroups
-  table(lifetable_vacc_ate$subgroup)#18 subgroups
-  lifetable_vacc_ate$subgroup<-factor(lifetable_vacc_ate$subgroup,
-                                      levels = c('agegp_18_39','agegp_40_59', 'agegp_60_79', 'agegp_80_110',
-                                                 'sex_Male', 'sex_Female',
-                                                 'ethnicity_White','ethnicity_Black', 'ethnicity_South_Asian', 'ethnicity_Mixed', 'ethnicity_Other', 'ethnicity_Missing',
-                                                 'covid_pheno_hospitalised','covid_pheno_non_hospitalised',
-                                                  'prior_history_FALSE','prior_history_TRUE',
-                                                 'covid_history',
-                                                 'main'))
-  str(lifetable_vacc_ate$subgroup)
-  
-  #4.Plot subgroups
-  
-  
-  
-  }
-  
-  
-}
-#------------------RUN the function-------------------------------------------------------------------------------------
+library(magrittr)
+library(dplyr)
+library(ggplot2)
+library(RColorBrewer)
+
+#1.Load data
+lifetables <- readr::read_csv("output/Figure4_compiled_lifetables.csv")
+
+#2.Define poltting groups and subgroups
+lifetables$group <- gsub("_.*","",lifetables$subgroup)
+lifetables$group <- ifelse(lifetables$group=="covid" & grepl("covid_history",lifetables$subgroup), "covid_history", lifetables$group)
+lifetables$group <- ifelse(lifetables$group=="covid" & grepl("covid_pheno",lifetables$subgroup), "covid_pheno", lifetables$group)
+lifetables$group <- ifelse(lifetables$group=="prior" & grepl("prior_history",lifetables$subgroup), "prior_history", lifetables$group)
+
+#3.Shape the subgroups
+table(lifetables$subgroup)#18 subgroups
+lifetables$subgroup<-factor(lifetables$subgroup,
+                            levels = c('agegp_18_39','agegp_40_59', 'agegp_60_79', 'agegp_80_110',
+                                       'sex_Male', 'sex_Female',
+                                       'ethnicity_White','ethnicity_Black', 'ethnicity_South_Asian', 'ethnicity_Mixed', 'ethnicity_Other', 'ethnicity_Missing',
+                                       'covid_pheno_hospitalised','covid_pheno_non_hospitalised',
+                                       'prior_history_FALSE','prior_history_TRUE',
+                                       'covid_history',
+                                       'main'))
+str(lifetables$subgroup)
+
+#4. Define active plotting lines
 active <- readr::read_rds("lib/active_analyses.rds")
 active <- active[active$active==TRUE,]
 active$event <- gsub("out_date_","",active$outcome_variable)
@@ -297,137 +290,37 @@ active$group <- gsub("_.*","",active$strata)
 active$group <- ifelse(active$group=="covid" & grepl("covid_history",active$strata), "covid_history", active$group)
 active$group <- ifelse(active$group=="covid" & grepl("covid_pheno",active$strata), "covid_pheno", active$group)
 active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$strata), "prior_history", active$group)
-active <- unique(active[,c("event","model","cohort","group")])
-
 active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
-colnames(active)[colnames(active) == 'group'] <- 'strata'
-colnames(active)[colnames(active) == 'cohort'] <- 'group'
-colnames(active)[colnames(active) == 'model'] <- 'fit'
-colnames(active)[colnames(active) == 'event'] <- 'outcome'
+active <- unique(active[,c("event","strata")])
 
-group <- "vaccinated"
-fit <- "mdl_max_adj"
-outcome <- "ate"
-strata <- "sex_Female"
-
-
-for (i in 1:nrow(active)) {
-
-  files <- list.files(path = "output", pattern = "lifetable_*")
-  files <- files[grepl(active$group[i])]
-  
-  figure4_tbl(active$cohort[i],active$model[i],active$event[i],active$group[i])
-  
-}
-
-#group <- "vaccinated"
-#fit <- "mdl_max_adj"
-#outcome <- "vte"
-#stratas <- c("main", 
-             #"sex_Male", "sex_Female",
-             #"agegp_18_39", "agegp_40_59", "agegp_60_79", "agegp_80_110",
-            # "ethnicity_South_Asian", "ethnicity_Black", "ethnicity_White", "ethnicity_Mixed","ethnicity_Other", "ethnicity_Missing",
-            # "prior_history_FALSE", "prior_history_TRUE", "covid_pheno_hospitalised", "covid_pheno_non_hospitalised",
-             #"covid_history")
-
-#Call the figure4 table function
-figure4_tables(group, fit, outcome, strata)
-
-#run for active analysis
-
-figure4(group, fit, outcome, strata)
-
-for (strata in stratas) { figure4("vaccinated","mdl_max_adj","ate", sex_Male)}
-
-#output life tables
-#subgroups = 18
-figure4("vaccinated","mdl_max_adj","ate", stratas)
-
-figure4("vaccinated","mdl_max_adj","ate", "sex_Male")
-figure4("vaccinated","mdl_max_adj","ate", "sex_Female")
-
-figure4("vaccinated","mdl_max_adj","ate", "agegp_18_39")
-figure4("vaccinated","mdl_max_adj","ate", "agegp_40_59")
-figure4("vaccinated","mdl_max_adj","ate", "agegp_60_79")
-figure4("vaccinated","mdl_max_adj","ate", "agegp_80_110")
-
-figure4("vaccinated","mdl_max_adj","ate", "ethnicity_South_Asian")
-figure4("vaccinated","mdl_max_adj","ate", "ethnicity_Black")
-figure4("vaccinated","mdl_max_adj","ate", "ethnicity_White")
-figure4("vaccinated","mdl_max_adj","ate", "ethnicity_Mixed")
-figure4("vaccinated","mdl_max_adj","ate", "ethnicity_Other")
-figure4("vaccinated","mdl_max_adj","ate", "ethnicity_Missing")
-
-figure4("vaccinated","mdl_max_adj","ate", "prior_history_FALSE")
-figure4("vaccinated","mdl_max_adj","ate", "prior_history_TRUE")
-
-figure4("vaccinated","mdl_max_adj","ate", "covid_pheno_hospitalised")
-figure4("vaccinated","mdl_max_adj","ate", "covid_pheno_non_hospitalised")
-
-figure4("vaccinated","mdl_max_adj","ate", "covid_history")
-
-#----------------------outcomes = 2
-figure4("vaccinated","mdl_max_adj","vte", "main")
-
-figure4("vaccinated","mdl_max_adj","vte", "sex_Male")
-figure4("vaccinated","mdl_max_adj","vte", "sex_Female")
-
-figure4("vaccinated","mdl_max_adj","vte", "agegp_18_39")
-figure4("vaccinated","mdl_max_adj","vte", "agegp_40_59")
-figure4("vaccinated","mdl_max_adj","vte", "agegp_60_79")
-figure4("vaccinated","mdl_max_adj","vte", "agegp_80_110")
-
-figure4("vaccinated","mdl_max_adj","vte", "ethnicity_South_Asian")
-figure4("vaccinated","mdl_max_adj","vte", "ethnicity_Black")
-figure4("vaccinated","mdl_max_adj","vte", "ethnicity_White")
-figure4("vaccinated","mdl_max_adj","vte", "ethnicity_Mixed")
-figure4("vaccinated","mdl_max_adj","vte", "ethnicity_Other")
-figure4("vaccinated","mdl_max_adj","vte", "ethnicity_Missing")
-
-figure4("vaccinated","mdl_max_adj","vte", "prior_history_FALSE")
-figure4("vaccinated","mdl_max_adj","vte", "prior_history_TRUE")
-
-figure4("vaccinated","mdl_max_adj","vte", "covid_pheno_hospitalised")
-figure4("vaccinated","mdl_max_adj","vte", "covid_pheno_non_hospitalised")
-
-figure4("vaccinated","mdl_max_adj","vte", "covid_history")
+event <- "ate" 
+group <- "ethnicity"
 
 
 
 
 
-table(input2$subgroup)
-
-figure4("ate","vaccinated","main","mdl_agesex")
-
-#subgroups =2
-figure4("ate","vaccinated","main","mdl_max_adj")
-figure4("ate","vaccinated","main","mdl_agesex")
 
 
-figure4("ate","electively_unvaccinated","main","mdl_max_adj")
+#For loop to run the plot codes -PENDING----------------------------------
+plot <- subset(lifetables, event=="ate" & group == "ethnicity")
 
-figure4("vte","vaccinated","main","mdl_max_adj")
-
-
-
-##########################
-#plotting
-######life table##########
-plot(Figure_4$days, Figure_4$AERp_main)
-
-p_line<-ggplot(Figure_4,
-               aes(x=days,
-                   y=AERp_main,
-                   group=1)) +
-  #geom_errorbar(aes(ymin=incidence_rate_difference_LB, ymax=incidence_rate_difference_UB), width=.2,
-  #              position=position_dodge(.9))+
-  geom_line(size=1.5)+
-  #geom_point()+
+p_line<-ggplot(plot,
+               aes(x=days,y=AERp,colour=subgroup)) + 
+  facet_grid(~cohort)+
+  geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
+  scale_linetype_manual(values = c(rep("solid", 18)))+
+  #scale_color_manual(values = c(brewer.pal(18, "Set3")))+
+  #scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
   scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
-  scale_y_continuous(limits = c(0,2))+
-  labs(x='days since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
-       title = 'ATE')+
-  theme(plot.title = element_text(hjust = 0.5))
-
+  #scale_y_continuous(limits = c(0,2))+
+  labs(x='Weeks since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
+       title = 'Arterial thrombotic events')+
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme_bw()+
+  theme(legend.key.size = unit(1.2,'cm'), legend.key = element_blank())+
+  labs(color='Subgroup',linetype='Subgroup')
 p_line
+
+ggsave(p_line, filename = paste0("output/Figure4_delta_", group, "_", event,".png"), dpi=300,width = 10,height = 6)
+
