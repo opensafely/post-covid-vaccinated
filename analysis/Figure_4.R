@@ -1,36 +1,33 @@
 #Project:Vaccinated delta wave population study
 #Branch:Figure4_graphical plotting of the estimated AER of ATE and VTE 
-#Scripts: Renin Toms
+#Scripts: Renin Toms, Venexia Walker
 
-#group <- "vaccinated"
-#fit <- "mdl_max_adj"
-#outcome <- "ate"
-#strata <- "sex_Female"
+#USE TO RUN A SINGLE PLOT
+group <- "vaccinated"
+fit <- "mdl_max_adj"
+outcome <- "ate"
+strata <- "sex_Female"
 
 #******************************************************
 #I. Create the function to out put the figure 4_tables
 #******************************************************
-#*
+
 figure4_tbl <- function(group, fit, outcome, strata){
   
   library(purrr)
   library(data.table)
   library(tidyverse)
-  
   #Import data 
   input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
   #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
-  #input2- Import data
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
   hr_files=paste0("output/",hr_files)
   input2 <- purrr::pmap(list(hr_files),
                         function(fpath){
                           df <- fread(fpath)
-                          return(df)
-                        })
+                          return(df)})
   input2=rbindlist(input2, fill=TRUE)
-  
   #Preprocess the input data
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
@@ -52,10 +49,9 @@ figure4_tbl <- function(group, fit, outcome, strata){
   
   input1$strata[input1$strata =="prior_history_true"] <- "prior_history_TRUE"
   input1$strata[input1$strata =="prior_history_false"] <- "prior_history_FALSE"
-  
-  #---------------------------------
+  #--------------------------------------
   # Step1: Extract the required variables
-  #---------------------------------
+  #--------------------------------------
   #1. Person days
   fp_person_days <- input1[input1$event == outcome & input1$model == fit  &
                              input1$cohort == group & input1$strata == strata,]$person_days
@@ -93,9 +89,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #Step2.Calculate the average daily CVD incidence   - in the unexposed
   #--------------------------------------------------------------------
   #Number of new events / sum of person-time at risk
-  
   incidence_rate <- unexposed_events/fp_person_days
-  
   #-------------------------------------------------------------
   #Step3. Make life table to calculate cumulative risk over time
   #-------------------------------------------------------------
@@ -124,18 +118,13 @@ figure4_tbl <- function(group, fit, outcome, strata){
   lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56),lifetable$h)
   lifetable$h <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84),lifetable$h)
   lifetable$h <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196),lifetable$h)
-  lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)
-  #alternative for 28-196 days
-  
+  lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)#alternative for 28-196 days
   #2.assign qh
   lifetable$qh <- lifetable$q*lifetable$h
-  
   #3.assign 1-qh
   lifetable$'1-qh' <- 1 - lifetable$qh
-  
   #4.assign sc
   lifetable$sc <- cumprod(lifetable$`1-qh`)
-  
   #-------------------------------------------
   #Step5. Calculate the Absolute excess risk--
   #-------------------------------------------
@@ -149,8 +138,8 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #Confidence Interval = Attributable risk +/- 1.96 x Square Root of [p x q (1/n1+ 1/n2)]
   #Where, p = qh, q = 1-qh, n1= unexposed person days, n2 = exposed person days
   #https://fhop.ucsf.edu/sites/fhop.ucsf.edu/files/wysiwyg/pg_apxIIIB.pdf
-  #reconfirm - RT
-  lifetable$CI <- 1.96*lifetable$qh*lifetable$'1-qh'*(1/fp_person_days + 1/fp_person_days)
+  
+  lifetable$CI <- 1.96*lifetable$qh*lifetable$'1-qh'*(1/fp_person_days + 1/fp_person_days)#RT - input awaited for exposed person days
   
   #3.AER%
   lifetable$AERp <-lifetable$'s-sc'*100
@@ -158,6 +147,8 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #CI of AER%
   #95% CI = ARP +/- ARP x (C.I. range from the attributable risk / the attributable risk)
   #Where, ARP=AERp, CI range= CI, attributable risk = s-sc
+  #https://fhop.ucsf.edu/sites/fhop.ucsf.edu/files/wysiwyg/pg_apxIIIB.pdf
+  
   lifetable$CIp <- lifetable$AERp*(lifetable$CI / lifetable$`s-sc`)
   lifetable$CIp.low <- lifetable$AERp - lifetable$CIp
   lifetable$CIp.high <- lifetable$AERp + lifetable$CIp
