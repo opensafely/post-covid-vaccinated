@@ -7,7 +7,7 @@
 ##
 ## Data:     Post covid vaccinated project study population
 ##
-## Content:  person days of follow up, for each outcome by subgroup
+## Content:  person days of follow up, for each outcome for the main analyses and all subgroups
 ##
 ## Output:   One CSV file
 ## =============================================================================
