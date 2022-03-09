@@ -1,5 +1,5 @@
-## =============================================================================
-## Purpose:  Calculate person days as input for absolute access risk
+## ====================================================================================
+## Purpose:  Table 2 extension to all subgroups + main (all eligible)
 ## 
 ## Author:   Yinghui Wei
 ##
@@ -7,12 +7,11 @@
 ##
 ## Data:     Post covid vaccinated project study population
 ##
-## Content:  person days of follow up, for each outcome for the main analyses and all subgroups
+## Content:  person days of follow up, unexposed person days, incidence rate, and 95% CI
 ##
 ## Output:   One CSV file
-## =============================================================================
+## ====================================================================================
 
-# adapted from table 2
 # comment number of rows need to be revised in "data" and "output"
 library(readr); library(dplyr); library(data.table); library(lubridate)
 library(stringr);library(vcdExtra);library(tidyverse)
@@ -129,7 +128,7 @@ survival_data <- survival_data %>%
 
 
 #define data frame for output table
-col_headings <- c("event", "cohort", "strata", "unexposed_person_days", "person_days")
+col_headings <- c("event", "cohort", "strata", "unexposed_person_days", "person_days", "event_count", "incidence rate", "ir lower", "ir upper")
 table_person_days <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
 colnames(table_person_days) <- col_headings
 table_person_days$event <- event_names
@@ -180,6 +179,19 @@ person_days <- function(population, survival_data, event_dates_names, sub_grp_na
     data$strata[start:end] <- strata_level
     data$event[start:end] <- outcome_name
     data$cohort[start:end] <- population
+    
+    if(sub_grp_names[i] == "sub_bin_covid19_confirmed_history"){
+      data$event_count[start:end] <- length(which(survival_data$event_date   >= survival_data$index_date &
+                                    survival_data$event_date >= survival_data$exp_date_covid19_confirmed & 
+                                    survival_data$event_date <= survival_data$follow_up_end))
+    }else{
+      data$event_count[start:end] <- length(which((survival_data$event_date >= survival_data$index_date & survival_data$event_date <= survival_data$follow_up_end) &
+                                    (survival_data$event_date < survival_data$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
+      ))
+    }
+    # data$incidence_rate[start:end]= round(data$event_count[start:end]/data$person_days[start:end], 4)
+    # data$incidence_rate_lower[start:end] = data$incidence_rate[start:end] - 1.96 * sqrt(data$event_count[start:end]/data$person_days[start:end]^2)
+    # data$incidence_rate_upper[start:end] = data$incidence_rate[start:end] + 1.96 * sqrt(data$event_count[start:end]/data$person_days[start:end]^2)
     index_data = end+1
   }
   print(data)
