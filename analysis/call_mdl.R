@@ -113,8 +113,9 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
   # 2.Remove people who's COVID exposure censor date is the same as their follow-up start date as they 
   # have no follow up period (for the pheno not of interest follow up is follow up start to the day before exposure so
   # if follow_up_start = date_expo_censor, follow up end is prior to follow up start).
-  # 3.Follow up end being the day before date_expo_censor if the min on line 111 is taken into account in a later script
-  # 4.Line 113: want to keep people who's exposure censor date is after follow up start or who do not have an exposure data
+  # 3.Follow up end being the day before date_expo_censor if the min of follow_up_end/date_expo_censor is date_expo_censor
+  # is taken into account in a later script
+  # 4.We want to keep people who's exposure censor date is after follow up start or who do not have an exposure data
   
   if(startsWith(subgroup,"covid_pheno_")){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(follow_up_end, date_expo_censor,na.rm = TRUE))
