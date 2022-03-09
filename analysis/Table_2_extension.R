@@ -190,7 +190,6 @@ person_days <- function(population, survival_data, event_dates_names, sub_grp_na
   return(data)
 }
 
-#output <- person_days(population, survival_data, event_dates_names, sub_grp_names, 1)
 output <- data.frame(matrix(ncol=length(col_headings), nrow=10*total_levels))
 index_output = 1
 for(i in 1:length(event_dates_names)){
