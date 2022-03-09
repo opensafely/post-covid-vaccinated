@@ -128,7 +128,7 @@ survival_data <- survival_data %>%
 
 
 #define data frame for output table
-col_headings <- c("event", "cohort", "strata", "unexposed_person_days", "person_days", "event_count", "incidence rate", "ir lower", "ir upper")
+col_headings <- c("event", "cohort", "strata", "unexposed_person_days", "person_days", "event_count", "ir", "ir_lower", "ir_upper")
 table_person_days <- data.frame(matrix(ncol=length(col_headings), nrow=length(event_dates_names)))
 colnames(table_person_days) <- col_headings
 table_person_days$event <- event_names
@@ -189,7 +189,7 @@ person_days <- function(population, survival_data, event_dates_names, sub_grp_na
                                     (survival_data$event_date < survival_data$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
       ))
     }
-    # data$incidence_rate[start:end]= round(data$event_count[start:end]/data$person_days[start:end], 4)
+    #data$incidence_rate[start:end]= round(data$event_count[start:end]/data$person_days[start:end], 4)
     # data$incidence_rate_lower[start:end] = data$incidence_rate[start:end] - 1.96 * sqrt(data$event_count[start:end]/data$person_days[start:end]^2)
     # data$incidence_rate_upper[start:end] = data$incidence_rate[start:end] + 1.96 * sqrt(data$event_count[start:end]/data$person_days[start:end]^2)
     index_data = end+1
@@ -210,5 +210,7 @@ for(i in 1:length(event_dates_names)){
 names(output) <- col_headings
 output$strata <- gsub('sub_bin_','', output$strata)
 output$strata <- gsub('sub_cat_','', output$strata)
-
+output$ir <- output$event_count/output$person_days
+output$ir_lower <- output$ir - 1.96 * sqrt(output$event_count/output$person_days^2)
+output$ir_upper <- output$ir + 1.96 * sqrt(output$event_count/output$person_days^2)
 write.csv(output, file= paste0("output/", "table2_suppl_", population, ".csv"), row.names = F)
