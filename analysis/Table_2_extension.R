@@ -78,11 +78,6 @@ table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, 
 # read in data------------------------------------------------------------
 
 input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
-# input <- filter(input, sub_bin_covid19_confirmed_history==T) # T when the subgroup is covid_history, and F when other subgroups
-
-# record variable names for covariate
-#input <- input %>% mutate(sub_bin_sex = cov_cat_sex, sub_num_age = cov_num_age, 
-#                        sub_cat_ethnicity = cov_cat_ethnicity)
 
 # Define age groups
 
@@ -189,9 +184,6 @@ person_days <- function(population, survival_data, event_dates_names, sub_grp_na
                                     (survival_data$event_date < survival_data$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
       ))
     }
-    #data$incidence_rate[start:end]= round(data$event_count[start:end]/data$person_days[start:end], 4)
-    # data$incidence_rate_lower[start:end] = data$incidence_rate[start:end] - 1.96 * sqrt(data$event_count[start:end]/data$person_days[start:end]^2)
-    # data$incidence_rate_upper[start:end] = data$incidence_rate[start:end] + 1.96 * sqrt(data$event_count[start:end]/data$person_days[start:end]^2)
     index_data = end+1
   }
   print(data)
@@ -211,6 +203,6 @@ names(output) <- col_headings
 output$strata <- gsub('sub_bin_','', output$strata)
 output$strata <- gsub('sub_cat_','', output$strata)
 output$ir <- output$event_count/output$person_days
-output$ir_lower <- output$ir - 1.96 * sqrt(output$event_count/output$person_days^2)
-output$ir_upper <- output$ir + 1.96 * sqrt(output$event_count/output$person_days^2)
+output$ir_lower <- round(output$ir - 1.96 * sqrt(output$event_count/output$person_days^2),4)
+output$ir_upper <- round(output$ir + 1.96 * sqrt(output$event_count/output$person_days^2),4)
 write.csv(output, file= paste0("output/", "table2_suppl_", population, ".csv"), row.names = F)
