@@ -2,10 +2,10 @@
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 #USE - TO CHECK SINGLE AER
-outcome <- "ate" 
-group <- "vaccinated" 
-strata <- "prior_history_FALSE"
-fit <- "mdl_max_adj"
+#outcome <- "ate" 
+#group <- "vaccinated" 
+#strata <- "prior_history_FALSE"
+#fit <- "mdl_max_adj"
 
 #CALCULATE THE EXCESS RISK
 excess_risk <- function(outcome, group, strata, fit) {
