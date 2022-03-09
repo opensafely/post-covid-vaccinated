@@ -291,52 +291,35 @@ active$group <- ifelse(active$group=="covid" & grepl("covid_history",active$stra
 active$group <- ifelse(active$group=="covid" & grepl("covid_pheno",active$strata), "covid_pheno", active$group)
 active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$strata), "prior_history", active$group)
 active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
-active <- unique(active[,c("event","strata")])
-
-output <- "ate" 
-cat <- "ethnicity"
-
-
-
-rm(plot)
-
-
+active <- unique(active[,c("event", "strata", "group")])#,
 
 #For loop to run the plot codes -PENDING----------------------------------
-#plot <- subset(lifetables, event=="ate" & group == "ethnicity")
-#plot <- subset(lifetables, event==output & group == cat)
 
 for (i in 1:nrow(active)) {
-  plot <- subset(lifetables, i)
-}
-plot <- subset(lifetables, event==output & group == cat)
+  plot <- subset(lifetables, lifetables$event == active$event[i] & lifetables$group == active$group[i] )
 
-
-outputs <- unique(lifetables$event)
-stratas <- unique(lifetables$group) - "ethnicity_Missing"
-
-
-for (strata in stratas) { 
+  p_line<-ggplot(plot,
+                 aes(x=days,y=AERp,colour=subgroup)) + 
+    facet_grid(~cohort)+
+    geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
+    scale_linetype_manual(values = c(rep("solid", 18)))+
+    #scale_color_manual(values = c(brewer.pal(18, "Set3")))+
+    #scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
+    scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
+    #scale_y_continuous(limits = c(0,2))+
+    labs(x='Weeks since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
+         title = active$event[i])+
+    theme(plot.title = element_text(hjust = 0.5))+
+    theme_bw()+
+    theme(legend.key.size = unit(1.2,'cm'), legend.key = element_blank())+
+    labs(color='Subgroup',linetype='Subgroup')
+  p_line
   
-  #plot <- subset(lifetables, lifetables$group == strata)
-  plot <- subset(lifetables, lifetables$event == unique(lifetables$event)}
+  ggsave(p_line, filename = paste0("output/Figure4_delta_", active$group[i], "_", active$event[i],".png"), dpi=300,width = 10,height = 6)}
+  
+  
 
-p_line<-ggplot(plot,
-               aes(x=days,y=AERp,colour=subgroup)) + 
-  facet_grid(~cohort)+
-  geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
-  scale_linetype_manual(values = c(rep("solid", 18)))+
-  #scale_color_manual(values = c(brewer.pal(18, "Set3")))+
-  #scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
-  scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
-  #scale_y_continuous(limits = c(0,2))+
-  labs(x='Weeks since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
-       title = 'Arterial thrombotic events')+
-  theme(plot.title = element_text(hjust = 0.5))+
-  theme_bw()+
-  theme(legend.key.size = unit(1.2,'cm'), legend.key = element_blank())+
-  labs(color='Subgroup',linetype='Subgroup')
-p_line
 
-ggsave(p_line, filename = paste0("output/Figure4_delta_", group, "_", event,".png"), dpi=300,width = 10,height = 6)}
+
+
 
