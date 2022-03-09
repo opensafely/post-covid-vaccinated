@@ -33,14 +33,14 @@ df <- data.frame(active = logical(),
 
 # Add cardiovascular outcomes --------------------------------------------------
 
-outcomes <- c("acute myocardial infarction",
-              "ischaemic stroke",
-              "deep vein thrombosis",
+outcomes <- c("Acute myocardial infarction",
+              "Ischaemic stroke",
+              "Deep vein thrombosis",
               "pulmonary embolism",
-              "transient ischaemic attack",
-              "subarachnoid haemorrhage and haemorrhagic stroke",
-              "heart failure",
-              "angina")
+              "Transient ischaemic attack",
+              "Subarachnoid haemorrhage and haemorrhagic stroke",
+              "Heart failure",
+              "Angina")
 
 outcomes_short <- c("ami","stroke_isch","dvt","pe","tia","stroke_sah_hs","hf","angina")
 
@@ -56,8 +56,8 @@ for (i in 1:length(outcomes)) {
 }
 
 
-outcomes <- c("arterial thrombosis event",
-              "venous thrombosis event")
+outcomes <- c("Arterial thrombosis event",
+              "Venous thrombosis event")
 
 outcomes_short <- c("ate","vte")
 
@@ -76,10 +76,10 @@ df$prior_history_var <- ifelse(df$outcome=="venous thrombosis event","cov_bin_vt
 
 # Add diabetes outcomes --------------------------------------------------------
 
-outcomes <- c("type 1 diabetes",
-              "type 2 diabetes",
-              "other or non-specific diabetes",
-              "gestational diabetes")
+outcomes <- c("Type 1 diabetes",
+              "Type 2 diabetes",
+              "Other or non-specific diabetes",
+              "Gestational diabetes")
 
 outcomes_short <- c("diabetes_type1","diabetes_type2","diabetes_other","diabetes_gestational")
 
@@ -92,16 +92,16 @@ for (i in 1:length(outcomes)) {
 
 # Add diabetes outcomes --------------------------------------------------------
 
-outcomes <- c("depression",
-              "anxiety - general",
-              "anxiety - obsessive compulsive disorder", 
-              "anxiety - post traumatic stress disorder", 
-              "eating disorders", 
-              "serious mental illness",
-              "self harm, aged >=10",
-              "self harm, aged >=15",
-              "suicide",
-              "addiction")
+outcomes <- c("Depression",
+              "Anxiety - general",
+              "Anxiety - obsessive compulsive disorder", 
+              "Anxiety - post traumatic stress disorder", 
+              "Eating disorders", 
+              "Serious mental illness",
+              "Self harm, aged >=10",
+              "Self harm, aged >=15",
+              "Suicide",
+              "Addiction")
 
 outcomes_short <- c("out_date_depression",
                     "out_date_anxiety_general",
