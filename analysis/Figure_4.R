@@ -293,17 +293,33 @@ active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$stra
 active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
 active <- unique(active[,c("event","strata")])
 
-event <- "ate" 
-group <- "ethnicity"
+output <- "ate" 
+cat <- "ethnicity"
 
 
 
-
+rm(plot)
 
 
 
 #For loop to run the plot codes -PENDING----------------------------------
-plot <- subset(lifetables, event=="ate" & group == "ethnicity")
+#plot <- subset(lifetables, event=="ate" & group == "ethnicity")
+#plot <- subset(lifetables, event==output & group == cat)
+
+for (i in 1:nrow(active)) {
+  plot <- subset(lifetables, i)
+}
+plot <- subset(lifetables, event==output & group == cat)
+
+
+outputs <- unique(lifetables$event)
+stratas <- unique(lifetables$group) - "ethnicity_Missing"
+
+
+for (strata in stratas) { 
+  
+  #plot <- subset(lifetables, lifetables$group == strata)
+  plot <- subset(lifetables, lifetables$event == unique(lifetables$event)}
 
 p_line<-ggplot(plot,
                aes(x=days,y=AERp,colour=subgroup)) + 
@@ -322,5 +338,5 @@ p_line<-ggplot(plot,
   labs(color='Subgroup',linetype='Subgroup')
 p_line
 
-ggsave(p_line, filename = paste0("output/Figure4_delta_", group, "_", event,".png"), dpi=300,width = 10,height = 6)
+ggsave(p_line, filename = paste0("output/Figure4_delta_", group, "_", event,".png"), dpi=300,width = 10,height = 6)}
 
