@@ -135,23 +135,6 @@ table_person_days$event <- event_names
 person_days <- function(population, survival_data, event_dates_names, sub_grp_names, index)
 {
   survival_data$event_date <- survival_data[,event_dates_names[index]]
-  
-  if(population=="vaccinated"){
-    survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
-    survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
-  }else if(population=="electively_unvaccinated"){
-    survival_data <- survival_data %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
-    survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
-    survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
-    survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
-  }
-  # follow-up days
-  survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
-  survival_data = survival_data %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
-  person_days_unexposed_total  = round(sum(survival_data$person_days_unexposed, na.rm = TRUE),1)
-  survival_data = survival_data %>% mutate(person_days = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1)
-  survival_data = survival_data %>% filter(person_days >=1 & person_days <= 197) # filter out follow up period
-  person_days_total  = round(sum(survival_data$person_days, na.rm = TRUE),1)
   outcome_name <- gsub("out_date_", "", event_dates_names[index])
   strata <- NULL
   data <- data.frame(matrix(ncol=length(col_headings), nrow=total_levels)) # define data frame for output table for each outcome
@@ -159,35 +142,47 @@ person_days <- function(population, survival_data, event_dates_names, sub_grp_na
   index_data = 1
   for(i in 1:length(sub_grp_names)){
     current <- strata[i] <- sub_grp_names[i]
-    print(current)
-    level_names <- names(table(survival_data[,current]))
-    x <- tapply(survival_data$person_days_unexposed, survival_data[,current], FUN=sum)
+    print(c(outcome_name,current))
+    if(sub_grp_names[i] == "sub_bin_covid19_confirmed_history"){
+       survival_data_subgrp <- survival_data %>% filter(sub_bin_covid19_confirmed_history ==T)
+     }else{
+      survival_data_subgrp <- survival_data %>% filter(sub_bin_covid19_confirmed_history ==F)
+     }
+    if(population=="vaccinated"){
+      survival_data_subgrp <- survival_data_subgrp %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
+      survival_data_subgrp <- survival_data_subgrp %>% rowwise() %>% mutate(follow_up_end=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
+    }else if(population=="electively_unvaccinated"){
+      survival_data_subgrp <- survival_data_subgrp %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
+      survival_data_subgrp <- survival_data_subgrp %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
+      survival_data_subgrp <- survival_data_subgrp %>% rowwise() %>% mutate(follow_up_end = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
+      survival_data_subgrp <- survival_data_subgrp %>% dplyr::select(!c(vax_date_covid_1))
+    }
+    # follow-up days
+    survival_data_subgrp = survival_data_subgrp %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
+    survival_data_subgrp = survival_data_subgrp %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
+    person_days_unexposed_total  = round(sum(survival_data_subgrp$person_days_unexposed, na.rm = TRUE),1)
+    survival_data_subgrp = survival_data_subgrp %>% mutate(person_days = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1)
+    survival_data_subgrp = survival_data_subgrp %>% filter(person_days >=1 & person_days <= 197) # filter out follow up period
+    person_days_total  = round(sum(survival_data_subgrp$person_days, na.rm = TRUE),1)
+    level_names <- names(table(survival_data_subgrp[,current]))
+    x <- tapply(survival_data_subgrp$person_days_unexposed, survival_data_subgrp[,current], FUN=sum)
     # print(x)
-    y <- tapply(survival_data$person_days, survival_data[,current], FUN=sum)
+    y <- tapply(survival_data_subgrp$person_days, survival_data_subgrp[,current], FUN=sum)
     # print(y)
     strata_level <- NULL # initialization
     for(j in level_names){
       strata_level[j] <- paste0(strata[i], "_",j)
+      survival_data_strata_level <- survival_data_subgrp[, strata[i] == strata_level[j]]
     }
     len = length(x)
     start = index_data
     end = index_data + len - 1
     # column 4 is person days
-    data$unexposed_person_days[start:end] <- as.vector(x)
-    data$person_days[start:end] <- as.vector(y)
+    data$unexposed_person_days[start:end] <- as.vector(x) # by strata level
+    data$person_days[start:end] <- as.vector(y) # by strata level
     data$strata[start:end] <- strata_level
     data$event[start:end] <- outcome_name
     data$cohort[start:end] <- population
-    
-    if(sub_grp_names[i] == "sub_bin_covid19_confirmed_history"){
-      data$event_count[start:end] <- length(which(survival_data[,current]$event_date   >= survival_data[,current]$index_date &
-                                    survival_data[,current]$event_date >= survival_data[,current]$exp_date_covid19_confirmed & 
-                                    survival_data[,current]$event_date <= survival_data[,current]$follow_up_end))
-    }else{
-      data$event_count[start:end] <- length(which((survival_data[,current]$event_date >= survival_data[,current]$index_date & survival_data[,current]$event_date <= survival_data[,current]$follow_up_end) &
-                                    (survival_data[,current]$event_date < survival_data[,current]$exp_date_covid19_confirmed | is.na(survival_data[,current]$exp_date_covid19_confirmed))
-      ))
-    }
     index_data = end+1
   }
   print(data)
@@ -205,6 +200,7 @@ for(i in 1:length(event_dates_names)){
 names(output) <- col_headings
 output$strata <- gsub('sub_bin_','', output$strata)
 output$strata <- gsub('sub_cat_','', output$strata)
+output$strata <- gsub('sub_main_main','', output$strata)
 output$ir <- output$event_count/output$person_days
 output$ir_lower <- round(output$ir - 1.96 * sqrt(output$event_count/output$person_days^2),4)
 output$ir_upper <- round(output$ir + 1.96 * sqrt(output$event_count/output$person_days^2),4)
