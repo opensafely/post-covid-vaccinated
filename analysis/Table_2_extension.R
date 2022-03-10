@@ -117,9 +117,9 @@ input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
 
 # Define age groups
 input$cov_cat_age_group <- ""
-input$cov_cat_age_group <- ifelse(input$cov_num_age>=18 & input$cov_num_age<=39, "18-39", input$cov_cat_age_group)
-input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=59, "40-59", input$cov_cat_age_group)
-input$cov_cat_age_group <- ifelse(input$cov_num_age>=60 & input$cov_num_age<=79, "60-79", input$cov_cat_age_group)
+input$cov_cat_age_group <- ifelse(input$cov_num_age>=18 & input$cov_num_age<=39, "18_39", input$cov_cat_age_group)
+input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=59, "40_59", input$cov_cat_age_group)
+input$cov_cat_age_group <- ifelse(input$cov_num_age>=60 & input$cov_num_age<=79, "60_79", input$cov_cat_age_group)
 input$cov_cat_age_group <- ifelse(input$cov_num_age>=80, "80_110", input$cov_cat_age_group)
 
 # rename variables to indicate them as subgroups
@@ -163,6 +163,7 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
               data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==F)
       }
       # filter the population according to the strata level
+      
       data_active$active_sub_grp <- data_active[,sub_grp]
       data_active <- data_active%>%filter(active_sub_grp==strata_level)
      
@@ -173,9 +174,15 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
       }else if(cohort=="electively_unvaccinated"){
         data_active <- data_active %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
         data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
+        data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed = max(follow_up_end_unexposed, index_date))
         data_active <- data_active %>% rowwise() %>% mutate(follow_up_end = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
         data_active <- data_active %>% dplyr::select(!c(vax_date_covid_1))
       }
+      #select_names <- c("index_date","vax_date_covid_1","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed")
+     # data_select <- data_active[,select_names]
+      #View(data_select)
+      
+      
       # calculate follow-up days
       data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
       data_active = data_active %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
@@ -204,16 +211,22 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
 }
 
 col_names <- names(table_2_long)
-#grep("unexposed_person_days", col_names)
-#ncol(table_2_long)
-for(i in 1:nrow(table_2_long)){
+start = grep("unexposed_person_days", col_names)
+end = ncol(table_2_long)
+
+#for(i in 1:nrow(table_2_long)){
+for(i in 1:2){
   d <- table_2_long
   print(i)
   if(d$strata[i]!="prior_history_FALSE" & d$strata[i]!="prior_history_TRUE"){
-    table_2_long[,grep("unexposed_person_days", col_names): ncol(table_2_long) ] <- table_2_subgroup(survival_data, event=d$event_names[i],cohort=d$cohort[i],strata=d$strata[i], strata_level=d$strata_level[i], sub_grp=d$sub_grp[i])
+    table_2_long[i,start:end] <- table_2_subgroup(survival_data, event=d$event_names[i],cohort=d$cohort[i],strata=d$strata[i], strata_level=d$strata_level[i], sub_grp=d$sub_grp[i])
   }
 }
 
+write.csv(table_2_long, file="output/table_2_extension_subgroups.csv")
+
+i = 1
+event=d$event_names[i]; cohort=d$cohort[i]; strata=d$strata[i]; strata_level=d$strata_level[i]; sub_grp=d$sub_grp[i]
 #table_2_subgroup(survival_data, event="ami",cohort="vaccinated",strata="covid_history", strata_level="TRUE", sub_grp="sub_bin_covid19_confirmed_history")
   
 # total_levels = 0
