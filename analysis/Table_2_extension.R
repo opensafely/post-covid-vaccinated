@@ -99,11 +99,20 @@ setnames(input,
 outcome_names <- tidyselect::vars_select(names(input), starts_with(c("out_"), ignore.case=TRUE))
 outcome_names_not_active <- outcome_names[!outcome_names %in% event_dates_names]
 
-vars_names <- tidyselect::vars_select(names(input), !starts_with(c('cov_','qa_','vax_cat'), ignore.case = TRUE))
-vars_names <- vars_names[!vars_names %in% outcome_names_not_active]
+sub_main = rep("main", nrow(input))
+input <- input %>% mutate(sub_main = sub_main)
+
 sub_grp_names <- tidyselect::vars_select(names(input), starts_with(c('sub_'), ignore.case = TRUE))
 
+vars_names <- tidyselect::vars_select(names(input), !starts_with(c('cov_','qa_','vax_cat'), ignore.case = TRUE))
+vars_names <- vars_names[!vars_names %in% outcome_names_not_active]
+# cohort start date and end date
+
 survival_data <- input[,vars_names]
+
+survival_data <- survival_data %>% 
+  mutate(cohort_start_date = cohort_start,
+         cohort_end_date = cohort_end)
 
 # for(i in sub_grp_names){
 #   survival_data[,i] <- as.factor(survival_data[,i])
@@ -116,11 +125,6 @@ for(i in sub_grp_names){
   total_levels = total_levels + nlevels(survival_data[,i])
 }
 
-# cohort start date and end date
-survival_data <- survival_data %>% 
-  mutate(cohort_start_date = cohort_start,
-         cohort_end_date = cohort_end)
-
 
 #define data frame for output table
 col_headings <- c("event", "cohort", "strata", "unexposed_person_days", "person_days", "event_count", "ir", "ir_lower", "ir_upper")
@@ -131,6 +135,7 @@ table_person_days$event <- event_names
 person_days <- function(population, survival_data, event_dates_names, sub_grp_names, index)
 {
   survival_data$event_date <- survival_data[,event_dates_names[index]]
+  
   if(population=="vaccinated"){
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
@@ -153,7 +158,6 @@ person_days <- function(population, survival_data, event_dates_names, sub_grp_na
   colnames(data) <- col_headings
   index_data = 1
   for(i in 1:length(sub_grp_names)){
-    #strata[i] <- str_sub(sub_grp_names[i], 9) # remove the first nine characters
     current <- strata[i] <- sub_grp_names[i]
     print(current)
     level_names <- names(table(survival_data[,current]))
@@ -176,12 +180,12 @@ person_days <- function(population, survival_data, event_dates_names, sub_grp_na
     data$cohort[start:end] <- population
     
     if(sub_grp_names[i] == "sub_bin_covid19_confirmed_history"){
-      data$event_count[start:end] <- length(which(survival_data$event_date   >= survival_data$index_date &
-                                    survival_data$event_date >= survival_data$exp_date_covid19_confirmed & 
-                                    survival_data$event_date <= survival_data$follow_up_end))
+      data$event_count[start:end] <- length(which(survival_data[,current]$event_date   >= survival_data[,current]$index_date &
+                                    survival_data[,current]$event_date >= survival_data[,current]$exp_date_covid19_confirmed & 
+                                    survival_data[,current]$event_date <= survival_data[,current]$follow_up_end))
     }else{
-      data$event_count[start:end] <- length(which((survival_data$event_date >= survival_data$index_date & survival_data$event_date <= survival_data$follow_up_end) &
-                                    (survival_data$event_date < survival_data$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
+      data$event_count[start:end] <- length(which((survival_data[,current]$event_date >= survival_data[,current]$index_date & survival_data[,current]$event_date <= survival_data[,current]$follow_up_end) &
+                                    (survival_data[,current]$event_date < survival_data[,current]$exp_date_covid19_confirmed | is.na(survival_data[,current]$exp_date_covid19_confirmed))
       ))
     }
     index_data = end+1
