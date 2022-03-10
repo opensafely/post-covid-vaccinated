@@ -138,7 +138,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #Where, p = qh, q = 1-qh, n1= unexposed person days, n2 = exposed person days
   #https://fhop.ucsf.edu/sites/fhop.ucsf.edu/files/wysiwyg/pg_apxIIIB.pdf
   
-  lifetable$CI <- 1.96*lifetable$qh*lifetable$'1-qh'*(1/fp_person_days + 1/fp_person_days)#RT - input awaited for exposed person days
+  lifetable$CI <- 1.96*lifetable$qh*lifetable$'1-qh'*(1/fp_person_days + 1/fp_person_days)#RT - input awaited for person days, currently works on dummy.
   
   #3.AER%
   lifetable$AERp <-lifetable$'s-sc'*100
@@ -238,8 +238,6 @@ if (file.exists(lt_files)) { file.remove(lt_files)}
 #****************************** 
 #III. Figure4 - plotting
 #******************************
-event <- "vte" 
-group <- "agegp"
 
 library(magrittr)
 library(dplyr)
@@ -249,7 +247,7 @@ library(RColorBrewer)
 #1.Load data
 lifetables <- readr::read_csv("output/Figure4_compiled_lifetables.csv")
 
-#2.Define poltting groups and subgroups
+#2.Define plotting groups and subgroups
 lifetables$group <- gsub("_.*","",lifetables$subgroup)
 lifetables$group <- ifelse(lifetables$group=="covid" & grepl("covid_history",lifetables$subgroup), "covid_history", lifetables$group)
 lifetables$group <- ifelse(lifetables$group=="covid" & grepl("covid_pheno",lifetables$subgroup), "covid_pheno", lifetables$group)
@@ -292,18 +290,18 @@ active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$stra
 active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
 active <- unique(active[,c("event", "strata", "group")])#,
 
-#For loop to run the plot codes -PENDING----------------------------------
+#5.For loop to create outputs ----------14 figures-------------------------
 
 for (i in 1:nrow(active)) {
   plot <- subset(lifetables, lifetables$event == active$event[i] & lifetables$group == active$group[i] )
 
   p_line<-ggplot(plot,
-                 aes(x=days,y=AERp,colour=subgroup)) + 
-    facet_grid(~cohort)+
+                 aes(x=days,y=AERp,colour=subgroup)) + facet_grid(~cohort)+
     geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
     scale_linetype_manual(values = c(rep("solid", 18)))+
     #scale_color_manual(values = c(brewer.pal(18, "Set3")))+
     #scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
+    geom_ribbon(aes(ymin = CIp.low, ymax = CIp.high), alpha = 0.1)+
     scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
     #scale_y_continuous(limits = c(0,2))+
     labs(x='Weeks since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
@@ -314,11 +312,10 @@ for (i in 1:nrow(active)) {
     labs(color='Subgroup',linetype='Subgroup')
   p_line
   
-  ggsave(p_line, filename = paste0("output/Figure4_delta_", active$group[i], "_", active$event[i],".png"), dpi=300,width = 10,height = 6)}
+  ggsave(p_line, filename = paste0("output/Figure4_delta_", active$group[i], "_", active$event[i],".png"), dpi=300,width = 10,height = 6)
+  }
   
-  
-
-
+  #Find 14 figures in the output folder, each for Vaccinated vs Un-vaccinated panels of each subgroups of 'ate' and 'vte'.
 
 
 
