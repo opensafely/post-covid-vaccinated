@@ -1007,7 +1007,8 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Suicide
-    out_date_suicide=patients.admitted_to_hospital(
+        # HES
+    tmp_out_date_suicide=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=suicide_icd10,
         on_or_after=f"{index_date_variable}",
@@ -1019,6 +1020,23 @@ def generate_common_variables(index_date_variable):
             "incidence": 0.01,
         },
     ),
+        # ONS
+    tmp_out_date_suicide_death=patients.with_these_codes_on_death_certificate(
+        suicide_icd10,
+        returning="date_of_death",
+        on_or_after=f"{index_date_variable}",
+        match_only_underlying_cause=True,
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.01
+        },
+    ),
+        # Combined
+    out_date_suicide=patients.minimum_of(
+        "tmp_out_date_suicide", "tmp_out_date_suicide_death"
+    ),     
 
     ## Addiction
         # Primary care

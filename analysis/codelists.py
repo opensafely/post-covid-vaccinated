@@ -1097,5 +1097,6 @@ anxiety_combined_snomed_cov = combine_codelists(
 
 anxiety_combined_hes_cov = combine_codelists(
     anxiety_icd10,
-    ocd_icd10
+    ocd_icd10,
+    ptsd_icd10
 )

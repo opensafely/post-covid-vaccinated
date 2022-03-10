@@ -762,6 +762,12 @@
       "downloaded_at": "2022-01-19 16:58:03.199556Z",
       "sha": "fcf9ebe14d0240fdc30ee45f7de1fe2503d85bd5"
     },
+    "user-kurttaylor-opioid_misuse_icd10.csv": {
+      "id": "user/kurttaylor/opioid_misuse_icd10/39b36876",
+      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/opioid_misuse_icd10/39b36876/",
+      "downloaded_at": "2022-03-04 10:29:35.536207Z",
+      "sha": "e489c74031b42c81eec5770623a698dbf9e7759a"
+    },
     "user-kurttaylor-alcohol_misuse_icd10.csv": {
       "id": "user/kurttaylor/alcohol_misuse_icd10/18f3c3a5",
       "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/alcohol_misuse_icd10/18f3c3a5/",
@@ -881,12 +887,6 @@
       "url": "https://codelists.opensafely.org/codelist/opensafely/tricyclic-and-related-antidepressants-dmd/1268eae1/",
       "downloaded_at": "2022-03-04 09:40:10.076705Z",
       "sha": "83a2fab241ad02c9175479b8cad6955395b2f0ee"
-    },
-    "user-kurttaylor-opioid_misuse_icd10.csv": {
-      "id": "user/kurttaylor/opioid_misuse_icd10/39b36876",
-      "url": "https://codelists.opensafely.org/codelist/user/kurttaylor/opioid_misuse_icd10/39b36876/",
-      "downloaded_at": "2022-03-04 10:29:35.536207Z",
-      "sha": "e489c74031b42c81eec5770623a698dbf9e7759a"
     }
   }
 }
