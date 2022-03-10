@@ -1,15 +1,14 @@
 #Project:Vaccinated delta wave population study
 #Branch:Figure4_graphical plotting of the estimated AER of ATE and VTE 
 #Scripts: Renin Toms, Venexia Walker
-
 #USE TO RUN A SINGLE PLOT
-group <- "vaccinated"
-fit <- "mdl_max_adj"
-outcome <- "ate"
-strata <- "sex_Female"
+#group <- "vaccinated"
+#fit <- "mdl_max_adj"
+#outcome <- "ate"
+#strata <- "sex_Female"
 
 #******************************************************
-#I. Create the function to out put the figure 4_tables
+#I. Create a function to out put the figure 4_tables
 #******************************************************
 
 figure4_tbl <- function(group, fit, outcome, strata){
