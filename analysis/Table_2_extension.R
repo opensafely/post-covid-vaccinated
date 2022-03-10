@@ -150,14 +150,19 @@ vars_names <- vars_names[!vars_names %in% outcome_names_not_active]
 
 survival_data <- input[,vars_names]
 
-survival_data <- survival_data %>% 
-  mutate(cohort_start_date = cohort_start,
-         cohort_end_date = cohort_end)
+survival_data <- survival_data %>% mutate(cohort_start_date = cohort_start,cohort_end_date = cohort_end)
 
 
 # rewrite the function
 
-table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level){
+# testing
+# event = "ami"
+# strata = "covid_history"
+# cohort = "vaccinated"
+# sub_grp = "sub_cat_age_group"
+# strata_level ="18-39"
+
+table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, sub_grp){
       #survival_data$event_date <- survival_data[,paste0("out_date_","ami")]
      # specify event date for the event of interest, e.g. ami
       survival_data$event_date <- survival_data[,paste0("out_date_",event)]
@@ -169,7 +174,9 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level){
               survival_data <- survival_data %>% filter(sub_bin_covid19_confirmed_history ==F)
       }
       # filter the population according to the strata level
-      
+      survival_data$active_sub_grp <- survival_data[,sub_grp]
+      survival_data <- survival_data%>%filter(active_sub_grp==strata_level)
+     
       # specify the cohort according to vaccination status
       if(cohort=="vaccinated"){
         survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
@@ -188,9 +195,6 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level){
       survival_data = survival_data %>% filter(person_days >=1 & person_days <= 197) # filter out follow up period
       person_days_total  = round(sum(survival_data$person_days, na.rm = TRUE),1)
       # calculate the number of event 
-      
-    
-  
 }
   
 
