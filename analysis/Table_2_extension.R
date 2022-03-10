@@ -107,9 +107,9 @@ table_2_long$sub_grp[index] <- "sub_bin_ate"
 View(table_2_long)
 
 #ir = incidence rate; ir_lower = lower bound of the 95% CI for ir; ir_upper = upper bound of the 95% CI for ir
-exposed_person_days <- unexposed_person_days <- event_count <- ir <- ir_lower <- ir_upper <- rep("NA", nrow(table_2_long))
+person_days <- unexposed_person_days <- event_count <- ir <- ir_lower <- ir_upper <- rep("NA", nrow(table_2_long))
 
-table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, event_count, ir, ir_lower, ir_upper)
+table_2_long <- cbind(table_2_long, unexposed_person_days, person_days, event_count, ir, ir_lower, ir_upper)
 
 # read in data------------------------------------------------------------
 
@@ -147,22 +147,15 @@ survival_data <- input[,vars_names]
 
 survival_data <- survival_data %>% mutate(cohort_start_date = cohort_start,cohort_end_date = cohort_end)
 
-
 # rewrite the function
-
 # testing
-event = "ami"
-strata = "covid_history"
-cohort = "vaccinated"
-sub_grp = "sub_cat_age_group"
-strata_level ="18-39"
+#event="ami";cohort="vaccinated";strata="covid_history"; strata_level="TRUE"; sub_grp="sub_bin_covid19_confirmed_history"
 
 table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, sub_grp){
       #survival_data$event_date <- survival_data[,paste0("out_date_","ami")]
      # specify event date for the event of interest, e.g. ami
       data_active <- survival_data
       data_active$event_date <- survival_data[,paste0("out_date_",event)]
-      
       # filter the population according to whether the subgroup is covid_history
       if(strata == "covid_history"){
                data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==T)
@@ -191,9 +184,38 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
       data_active = data_active %>% filter(person_days >=1 & person_days <= 197) # filter out follow up period
       person_days_total  = round(sum(data_active$person_days, na.rm = TRUE),1)
       # calculate the number of event 
+      if(strata == "covid_history"){
+        event_count <- length(which(data_active$event_date >= data_active$index_date &
+                                    data_active$event_date >= data_active$exp_date_covid19_confirmed & 
+                                    data_active$event_date <= data_active$follow_up_end))
+      }else{
+        event_count<- length(which((data_active$event_date >= data_active$index_date & 
+                                    data_active$event_date <= data_active$follow_up_end) &
+                                   (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
+        ))
+      }
+      
+      person_years_total = person_days_total/365.2
+      person_years_unexposed_total = person_days_unexposed_total/365.2
+      incidence_rate = round(event_count/person_years_total, 4)
+      incidence_rate_lower = incidence_rate - 1.96 * sqrt(event_count/person_days_total^2)
+      incidence_rate_upper = incidence_rate + 1.96 * sqrt(event_count/person_days_total^2)
+      return(c(person_days_unexposed_total, person_days_total, event_count, incidence_rate, incidence_rate_lower, incidence_rate_upper))
 }
-  
 
+col_names <- names(table_2_long)
+#grep("unexposed_person_days", col_names)
+#ncol(table_2_long)
+for(i in 1:nrow(table_2_long)){
+  d <- table_2_long
+  print(i)
+  if(d$strata[i]!="prior_history_FALSE" & d$strata[i]!="prior_history_TRUE"){
+    table_2_long[,grep("unexposed_person_days", col_names): ncol(table_2_long) ] <- table_2_subgroup(survival_data, event=d$event_names[i],cohort=d$cohort[i],strata=d$strata[i], strata_level=d$strata_level[i], sub_grp=d$sub_grp[i])
+  }
+}
+
+#table_2_subgroup(survival_data, event="ami",cohort="vaccinated",strata="covid_history", strata_level="TRUE", sub_grp="sub_bin_covid19_confirmed_history")
+  
 # total_levels = 0
 # for(i in sub_grp_names){
 #   survival_data[,i] <- as.factor(survival_data[,i])
