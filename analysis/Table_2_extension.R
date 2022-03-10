@@ -101,26 +101,21 @@ table_2_long$sub_grp[index] <- "sub_bin_sex"
 index <- grepl("main", table_2_long$strata, fixed = TRUE)
 table_2_long$sub_grp[index] <- "sub_main"
 
-
 index <- grepl("ate", table_2_long$strata, fixed = TRUE)
 table_2_long$sub_grp[index] <- "sub_bin_ate"
 
 View(table_2_long)
-
 
 #ir = incidence rate; ir_lower = lower bound of the 95% CI for ir; ir_upper = upper bound of the 95% CI for ir
 exposed_person_days <- unexposed_person_days <- event_count <- ir <- ir_lower <- ir_upper <- rep("NA", nrow(table_2_long))
 
 table_2_long <- cbind(table_2_long, exposed_person_days, unexposed_person_days, event_count, ir, ir_lower, ir_upper)
 
-
-
 # read in data------------------------------------------------------------
 
 input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
 
 # Define age groups
-
 input$cov_cat_age_group <- ""
 input$cov_cat_age_group <- ifelse(input$cov_num_age>=18 & input$cov_num_age<=39, "18-39", input$cov_cat_age_group)
 input$cov_cat_age_group <- ifelse(input$cov_num_age>=40 & input$cov_num_age<=59, "40-59", input$cov_cat_age_group)
