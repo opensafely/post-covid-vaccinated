@@ -59,7 +59,7 @@ combined_hr$colour <- ifelse(combined_hr$subgroup=="Non-hospitalised COVID-19","
 combined_hr$colour <- ifelse(combined_hr$subgroup=="Hospitalised COVID-19","#e31a1c",combined_hr$colour)
 
 # Create figure-----------------------------------------------------------------
-i="electively_unvaccinated"
+
 for(i in cohort){
   
   # Filter to cohort of interest
