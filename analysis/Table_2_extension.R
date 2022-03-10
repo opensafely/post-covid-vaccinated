@@ -172,7 +172,6 @@ person_days <- function(population, survival_data, event_dates_names, sub_grp_na
     strata_level <- NULL # initialization
     for(j in level_names){
       strata_level[j] <- paste0(strata[i], "_",j)
-      survival_data_strata_level <- survival_data_subgrp[, strata[i] == strata_level[j]]
     }
     len = length(x)
     start = index_data
