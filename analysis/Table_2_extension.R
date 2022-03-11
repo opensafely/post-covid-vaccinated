@@ -20,8 +20,8 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  population <- "vaccinated"
-  #population = "electively_unvaccinated"
+  #population <- "vaccinated"
+  population = "electively_unvaccinated"
 }else{
   population <- args[[1]]
 }
@@ -177,53 +177,56 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
         data_active <- data_active %>% rowwise() %>% mutate(follow_up_end = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
         data_active <- data_active %>% dplyr::select(!c(vax_date_covid_1))
       }
-      #data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed = max(follow_up_end_unexposed, index_date))
-     # data_active <- data_active %>% rowwise() %>% mutate(follow_up_end = max(follow_up_end, index_date))
+
       data_active <- data_active %>% filter(follow_up_end_unexposed >= index_date)
       data_active <- data_active %>% filter(follow_up_end >= index_date)
       
-     # select_names <- c("index_date","vax_date_covid_1","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
-      select_names <- c("index_date","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
-
-      data_select <- data_active[,select_names]
-      View(data_select)
-
-      
-       select_names <- c("index_date", "follow_up_end_unexposed", "follow_up_end")
-
-       data_select <- data_active[,select_names]
-       View(data_select)
+      # select_names <- c("index_date","vax_date_covid_1","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
+      # select_names <- c("index_date","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
+      # 
+      # data_select <- data_active[,select_names]
+      # View(data_select)
+      # 
+      # 
+      #  select_names <- c("index_date", "follow_up_end_unexposed", "follow_up_end")
+      # 
+      #  data_select <- data_active[,select_names]
+      #  View(data_select)
       # calculate follow-up days
-       # I am not sure if we should +1
       data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
-      hist(data_active$person_days_unexposed)
+      #hist(data_active$person_days_unexposed)
       data_active = data_active %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
-      person_days_unexposed_total  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
+      person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
   
       data_active = data_active %>% mutate(person_days = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1)
       data_active = data_active %>% filter(person_days >=1 & person_days <= 197) # filter out follow up period
-      hist(data_active$person_days)
+      #hist(data_active$person_days)
        person_days_total  = round(sum(data_active$person_days, na.rm = TRUE),1)
-      # calculate the number of event 
-      if(strata == "covid_history"){
-        # post-exposure event
-        event_count <- length(which(data_active$event_date >= data_active$index_date &
+ 
+      # post-exposure event
+       event_count <- length(which(data_active$event_date >= data_active$index_date &
                                     data_active$event_date >= data_active$exp_date_covid19_confirmed & 
                                     data_active$event_date <= data_active$follow_up_end))
-      }else{
-        # pre-exposure event count
-        event_count<- length(which((data_active$event_date >= data_active$index_date & 
+
+      # pre-exposure event count
+        event_count_unexposed<- length(which((data_active$event_date >= data_active$index_date & 
                                     data_active$event_date <= data_active$follow_up_end) &
-                                   (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
+                                   (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
         ))
-      }
-      
+    
       person_years_total = person_days_total/365.2
-      person_years_unexposed_total = person_days_unexposed_total/365.2
-      incidence_rate = round(event_count/person_years_total, 4)
-      incidence_rate_lower = incidence_rate - 1.96 * sqrt(event_count/person_days_total^2)
-      incidence_rate_upper = incidence_rate + 1.96 * sqrt(event_count/person_days_total^2)
-      return(c(person_days_unexposed_total, person_days_total, event_count, incidence_rate, incidence_rate_lower, incidence_rate_upper))
+      person_years_total_unexposed = person_days_total_unexposed/365.2
+      # incidence rate post exposure
+      incidence_rate= round(event_count/person_years_total, 4)
+      ir_lower = incidence_rate- 1.96 * sqrt(event_count/person_days_total^2)
+      ir_upper = incidence_rate + 1.96 * sqrt(event_count/person_days_total^2)
+      
+      # incidence rate pre exposure
+      incidence_rate_unexposed= round(event_count_unexposed/person_years_total_unexposed, 4)
+      ir_lower_unexposed = incidence_rate_unexposed - 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2)
+      ir_upper_unexposed = incidence_rate_unexposed + 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2)
+      
+      return(c(person_days_total_unexposed, event_count_unexposed, incidence_rate_unexposed, ir_lower_unexposed, ir_upper_unexposed, person_days_total, event_count, incidence_rate, ir_lower, ir_upper))
 }
 
 col_names <- names(table_2_long)
@@ -241,8 +244,10 @@ for(i in 1:2){
 
 write.csv(table_2_long, file="output/table_2_extension_subgroups.csv")
 
-i = 1
-event=d$event_names[i]; cohort=d$cohort[i]; strata=d$strata[i]; strata_level=d$strata_level[i]; sub_grp=d$sub_grp[i]
+# i = 1
+# event=d$event_names[i]; cohort=d$cohort[i]; strata=d$strata[i]; strata_level=d$strata_level[i]; sub_grp=d$sub_grp[i]
+# 
+
 #table_2_subgroup(survival_data, event="ami",cohort="vaccinated",strata="covid_history", strata_level="TRUE", sub_grp="sub_bin_covid19_confirmed_history")
   
 # total_levels = 0
