@@ -115,11 +115,14 @@ exposed_person_days <- exposed_event_count <- exposed_ir <- exposed_ir_lower <- 
 table_2_long <- cbind(table_2_long, unexposed_person_days, unexposed_event_count, unexposed_ir, unexposed_ir_lower, unexposed_ir_upper,
                                     exposed_person_days, exposed_event_count, exposed_ir, exposed_ir_lower, exposed_ir_upper)
 
-if(population == "vaccinated"){
-  table_2_long <- table_2_long %>% filter(cohort == "vaccinated")
-}else{
-  table_2_long <- table_2_long %>% filter(cohort == "electively_unvaccinated")
-}
+# if(population == "vaccinated"){
+#   table_2_long <- table_2_long %>% filter(cohort == "vaccinated")
+# }
+# if(population == "electively_unvaccinated"){
+#   table_2_long <- table_2_long %>% filter(cohort == "electively_unvaccinated")
+# }
+
+table_2_long <- table_2_long %>% filter(cohort == population)
 
 # read in data------------------------------------------------------------
 
@@ -228,9 +231,6 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
                                     data_active$event_date <= data_active$follow_up_end_unexposed) &
                                    (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
         ))
-    
-
-  
       # incidence rate post exposure
       person_years_total_exposed = person_days_total_exposed/365.2
       incidence_rate_exposed= round(event_count_exposed/person_years_total_exposed, 4)
@@ -251,8 +251,10 @@ start = grep("unexposed_person_days", col_names)
 end = ncol(table_2_long)
 
 for(i in 1:nrow(table_2_long)){
+# for quick testing
 #for(i in 357:358){
 #for(i in 87:88){
+#for(i in 1:2){
   d <- table_2_long
   print(i)
   if((d$strata[i]=="prior_history_FALSE" | d$strata[i]=="prior_history_TRUE") & (d$event_names[i]=="ate"|d$event_names[i]=="vte")){
