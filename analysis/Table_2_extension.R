@@ -20,8 +20,8 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  #population <- "vaccinated"
-  population = "electively_unvaccinated"
+  population <- "vaccinated"
+  #population = "electively_unvaccinated"
 }else{
   population <- args[[1]]
 }
@@ -164,8 +164,7 @@ survival_data <- survival_data %>% mutate(cohort_start_date = cohort_start,cohor
 # rewrite the function
 # testing
 # event="ami";cohort="vaccinated";strata="covid_history"; strata_level="TRUE"; sub_grp="sub_bin_covid19_confirmed_history"
-event="vte";cohort="vaccinated";strata="sub_bin_vte"; strata_level="FALSE"; sub_grp="sub_bin_vte"
->
+#event="vte";cohort="vaccinated";strata="sub_bin_vte"; strata_level="FALSE"; sub_grp="sub_bin_vte"
 
 table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, sub_grp){
       #survival_data$event_date <- survival_data[,paste0("out_date_","ami")]
@@ -251,18 +250,19 @@ col_names <- names(table_2_long)
 start = grep("unexposed_person_days", col_names)
 end = ncol(table_2_long)
 
-#for(i in 1:nrow(table_2_long)){
+for(i in 1:nrow(table_2_long)){
 #for(i in 357:358){
-for(i in 87:88){
+#for(i in 87:88){
   d <- table_2_long
   print(i)
-  if(d$strata[i]=="prior_history_FALSE" | d$strata[i]=="prior_history_TRUE"){
+  if((d$strata[i]=="prior_history_FALSE" | d$strata[i]=="prior_history_TRUE") & (d$event_names[i]=="ate"|d$event_names[i]=="vte")){
     if(d$event_names[i]=="ate"){d$sub_grp[i] = "sub_bin_ate"}
     if(d$event_names[i]=="vte"){d$sub_grp[i] = "sub_bin_vte"}
-  }
-  #if(d$strata[i]!="prior_history_FALSE" & d$strata[i]!="prior_history_TRUE"){
     table_2_long[i,start:end] <- table_2_subgroup(survival_data, event=d$event_names[i],cohort=d$cohort[i],strata=d$strata[i], strata_level=d$strata_level[i], sub_grp=d$sub_grp[i])
-  #}
+  }
+  if(d$strata[i]!="prior_history_FALSE" & d$strata[i]!="prior_history_TRUE"){
+    table_2_long[i,start:end] <- table_2_subgroup(survival_data, event=d$event_names[i],cohort=d$cohort[i],strata=d$strata[i], strata_level=d$strata_level[i], sub_grp=d$sub_grp[i])
+  }
 }
 
 write.csv(table_2_long, file=paste0("output/table_2_subgroups_", population, ".csv"))
