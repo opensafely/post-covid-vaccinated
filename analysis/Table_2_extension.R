@@ -111,6 +111,12 @@ person_days <- unexposed_person_days <- event_count <- ir <- ir_lower <- ir_uppe
 
 table_2_long <- cbind(table_2_long, unexposed_person_days, person_days, event_count, ir, ir_lower, ir_upper)
 
+if(population == "vaccinated"){
+  table_2_long <- table_2_long %>% filter(cohort == "vaccinated")
+}else{
+  table_2_long <- table_2_long %>% filter(cohort == "electively_unvaccinated")
+}
+
 # read in data------------------------------------------------------------
 
 input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
@@ -149,7 +155,7 @@ survival_data <- survival_data %>% mutate(cohort_start_date = cohort_start,cohor
 
 # rewrite the function
 # testing
-event="ami";cohort="vaccinated";strata="covid_history"; strata_level="TRUE"; sub_grp="sub_bin_covid19_confirmed_history"
+# event="ami";cohort="vaccinated";strata="covid_history"; strata_level="TRUE"; sub_grp="sub_bin_covid19_confirmed_history"
 
 table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, sub_grp){
       #survival_data$event_date <- survival_data[,paste0("out_date_","ami")]
@@ -162,8 +168,8 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
       }else{
               data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==F)
       }
-      # filter the population according to the strata level
       
+      # filter the population according to the strata level
       data_active$active_sub_grp <- data_active[,sub_grp]
       data_active <- data_active%>%filter(active_sub_grp==strata_level)
      
@@ -174,12 +180,12 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
       }else if(cohort=="electively_unvaccinated"){
         data_active <- data_active %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
         data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
-        data_active <- data_active %>% rowwise() %>% mutate(follow_up_end = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
+        data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_exposed = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
         data_active <- data_active %>% dplyr::select(!c(vax_date_covid_1))
       }
 
       data_active <- data_active %>% filter(follow_up_end_unexposed >= index_date)
-      data_active <- data_active %>% filter(follow_up_end >= index_date)
+      data_active <- data_active %>% filter(follow_up_end_exposed >= index_date)
       
       # select_names <- c("index_date","vax_date_covid_1","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
       # select_names <- c("index_date","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
@@ -198,13 +204,13 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
       data_active = data_active %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
       person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
   
-      data_active = data_active %>% mutate(person_days = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1)
-      data_active = data_active %>% filter(person_days >=1 & person_days <= 197) # filter out follow up period
+      data_active = data_active %>% mutate(person_days_exposed = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1)
+      data_active = data_active %>% filter(person_days_exposed >=1 & person_days_exposed <= 197) # filter out follow up period
       #hist(data_active$person_days)
-       person_days_total  = round(sum(data_active$person_days, na.rm = TRUE),1)
+       person_days_total_exposed  = round(sum(data_active$person_days_exposed, na.rm = TRUE),1)
  
       # post-exposure event
-       event_count <- length(which(data_active$event_date >= data_active$index_date &
+       event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
                                     data_active$event_date >= data_active$exp_date_covid19_confirmed & 
                                     data_active$event_date <= data_active$follow_up_end))
 
@@ -214,19 +220,21 @@ table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, s
                                    (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
         ))
     
-      person_years_total = person_days_total/365.2
-      person_years_total_unexposed = person_days_total_unexposed/365.2
+
+  
       # incidence rate post exposure
-      incidence_rate= round(event_count/person_years_total, 4)
-      ir_lower = incidence_rate- 1.96 * sqrt(event_count/person_days_total^2)
-      ir_upper = incidence_rate + 1.96 * sqrt(event_count/person_days_total^2)
+      person_years_total_exposed = person_days_total_exposed/365.2
+      incidence_rate_exposed= round(event_count_exposed/person_years_total_exposed, 4)
+      ir_lower_exposed = incidence_rate_exposed - 1.96 * sqrt(event_count_exposed/person_days_total_exposed^2)
+      ir_upper_exposed = incidence_rate_exposed + 1.96 * sqrt(event_count_exposed/person_days_total_exposed^2)
       
       # incidence rate pre exposure
+      person_years_total_unexposed = person_days_total_unexposed/365.2
       incidence_rate_unexposed= round(event_count_unexposed/person_years_total_unexposed, 4)
       ir_lower_unexposed = incidence_rate_unexposed - 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2)
       ir_upper_unexposed = incidence_rate_unexposed + 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2)
       
-      return(c(person_days_total_unexposed, event_count_unexposed, incidence_rate_unexposed, ir_lower_unexposed, ir_upper_unexposed, person_days_total, event_count, incidence_rate, ir_lower, ir_upper))
+      return(c(person_days_total_unexposed, event_count_unexposed, incidence_rate_unexposed, ir_lower_unexposed, ir_upper_unexposed, person_days_total_exposed, event_count_exposed, incidence_rate_exposed, ir_lower_exposed, ir_upper_exposed))
 }
 
 col_names <- names(table_2_long)
