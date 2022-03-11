@@ -42,7 +42,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     covar_names = names(covars)[ names(covars) != "patient_id"]
     data_surv <- data_surv %>% left_join(covars)
   }
-  
+ 
   #Add inverse probablity weights for non-cases
   data_surv$cox_weights <- ifelse(data_surv$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
   
@@ -95,6 +95,11 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   #If subgroup is not sex then add sex into formula
   if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
     surv_formula <- paste(surv_formula, "sex", sep="+")
+  }
+  
+  #If subgroup is not ethnicity then add ethnicity into formula
+  if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age)){
+    surv_formula <- paste(surv_formula, "ethnicity", sep="+")
   }
   
   #If subgroup is not age then add in age spline otherwise use age and age_sq

@@ -55,8 +55,8 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   #   CACHE some features
   #-------------------------------------------------------------------------------  
   df_sex <- survival_data %>% dplyr::select(patient_id, sex)
-  df_age_region <- survival_data %>% dplyr::select(patient_id, AGE_AT_COHORT_START, region_name) %>% rename(age = AGE_AT_COHORT_START)
-  df_age_region$age_sq <- df_age_region$age^2
+  df_age_region_ethnicity <- survival_data %>% dplyr::select(patient_id, AGE_AT_COHORT_START, region_name, ethnicity) %>% rename(age = AGE_AT_COHORT_START)
+  df_age_region_ethnicity$age_sq <- df_age_region_ethnicity$age^2
   
   #===============================================================================
   # WITH COVID
@@ -252,7 +252,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     #-------------------------------------------------------------------------------
     #Can change <400 to be lower to test on dummy data
     less_than_400_events = any((as.numeric(tbl_event_count$events_total) <400) & (tbl_event_count$expo_week=="all post expo"))
-    data_surv <- data_surv %>% left_join(df_age_region)
+    data_surv <- data_surv %>% left_join(df_age_region_ethnicity)
     return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_400_events))
     
   }else{
