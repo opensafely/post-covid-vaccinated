@@ -71,8 +71,8 @@ for (i in 1:length(outcomes)) {
                        "")
 }
 
-df$prior_history_var <- ifelse(df$outcome=="arterial thrombosis event","sub_bin_ate",df$prior_history_var)
-df$prior_history_var <- ifelse(df$outcome=="venous thrombosis event","cov_bin_vte",df$prior_history_var)
+df$prior_history_var <- ifelse(df$outcome=="Arterial thrombosis event","sub_bin_ate",df$prior_history_var)
+df$prior_history_var <- ifelse(df$outcome=="Venous thrombosis event","cov_bin_vte",df$prior_history_var)
 
 # Add diabetes outcomes --------------------------------------------------------
 
