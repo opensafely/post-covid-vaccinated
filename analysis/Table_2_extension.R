@@ -101,7 +101,6 @@ table_2_extension_output <- function(population){
   index <- grepl("agegp", table_2_long$strata, fixed = TRUE)
   table_2_long$sub_grp[index] <- "sub_cat_age_group"
   
-  
   index <- grepl("covid_history", table_2_long$strata, fixed = TRUE)
   table_2_long$sub_grp[index] <- "sub_bin_covid19_confirmed_history"
   
@@ -217,6 +216,7 @@ table_2_extension_output <- function(population){
       # 
       #  data_select <- data_active[,select_names]
       #  View(data_select)
+      
       # calculate follow-up days
       data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
       #hist(data_active$person_days_unexposed)
@@ -281,7 +281,6 @@ table_2_extension_output <- function(population){
 }
 
 # Run function using specified commandArgs
-
 if(population == "both"){
   table_2_extension_output("vaccinated")
   table_2_extension_output("electively_unvaccinated")
