@@ -121,7 +121,7 @@ table_2_extension_output <- function(population){
   index <- grepl("ate", table_2_long$strata, fixed = TRUE)
   table_2_long$sub_grp[index] <- "sub_bin_ate"
   
-  View(table_2_long)
+  #View(table_2_long)
   
   #ir = incidence rate; ir_lower = lower bound of the 95% CI for ir; ir_upper = upper bound of the 95% CI for ir
   unexposed_person_days <- unexposed_event_count <- unexposed_ir <- unexposed_ir_lower <- unexposed_ir_upper <- rep("NA", nrow(table_2_long))
