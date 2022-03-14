@@ -288,7 +288,7 @@ active$group <- ifelse(active$group=="covid" & grepl("covid_history",active$stra
 active$group <- ifelse(active$group=="covid" & grepl("covid_pheno",active$strata), "covid_pheno", active$group)
 active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$strata), "prior_history", active$group)
 active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
-active <- unique(active[,c("event", "strata", "group")])
+active <- unique(active[,c("event", "strata", "model","group")])
 
 #5.For loop to create outputs ----------14 figures-------------------------
 
