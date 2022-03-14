@@ -12,7 +12,6 @@
 ## Output:   CSV files: table_2_subgroups_*.csv, input1_aer_*.csv
 ## ====================================================================================
 
-# comment number of rows need to be revised in "data" and "output"
 library(readr); library(dplyr); library(data.table); library(lubridate)
 library(stringr);library(tidyverse)
 
@@ -166,7 +165,6 @@ table_2_extension_output <- function(population){
   
   vars_names <- tidyselect::vars_select(names(input), !starts_with(c('cov_','qa_','vax_cat'), ignore.case = TRUE))
   vars_names <- vars_names[!vars_names %in% outcome_names_not_active]
-  # cohort start date and end date
   
   survival_data <- input[,vars_names]
   
