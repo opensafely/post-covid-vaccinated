@@ -285,6 +285,9 @@ table_2_extension_output <- function(population){
   }
   
   write.csv(table_2_long, file=paste0("output/table_2_subgroups_", population, ".csv"))
+  input1_aer <- table_2_long %>% select(c("event_names", "cohort", "strata", "analyses", "strata_level", "sub_grp", "unexposed_person_days")) 
+  write.csv(input1_aer, file=paste0("output/input1_aer", population, ".csv"))
+  
 }
 
 # Run function using specified commandArgs
