@@ -234,24 +234,34 @@ table_2_extension_output <- function(population){
        event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
                                     data_active$event_date >= data_active$exp_date_covid19_confirmed & 
                                     data_active$event_date <= data_active$follow_up_end_exposed))
+      
   
       # pre-exposure event count
         event_count_unexposed<- length(which((data_active$event_date >= data_active$index_date & 
                                     data_active$event_date <= data_active$follow_up_end_unexposed) &
                                    (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
         ))
-      # incidence rate post exposure
+      # incidence rate post exposure, do not calculate if event_count <=5
+      if(event_count_exposed >5){
       person_years_total_exposed = person_days_total_exposed/365.2
       incidence_rate_exposed= round(event_count_exposed/person_years_total_exposed, 4)
       ir_lower_exposed = round(incidence_rate_exposed - 1.96 * sqrt(event_count_exposed/person_days_total_exposed^2),4)
       ir_upper_exposed = round(incidence_rate_exposed + 1.96 * sqrt(event_count_exposed/person_days_total_exposed^2),4)
+      }else{
+        event_count_exposed = "redacted"
+        person_days_total_exposed = person_years_total_exposed = incidence_rate_exposed = ir_lower_exposed = ir_upper_exposed = "redacted"
+      }
       
-      # incidence rate pre exposure
+      # incidence rate pre exposure, do not calculate if event_count <=5
+      if(event_count_unexposed >5){
       person_years_total_unexposed = person_days_total_unexposed/365.2
       incidence_rate_unexposed= round(event_count_unexposed/person_years_total_unexposed, 4)
       ir_lower_unexposed = round(incidence_rate_unexposed - 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2),4)
       ir_upper_unexposed = round(incidence_rate_unexposed + 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2),4)
-      
+      }else{
+          event_count_unexposed = "redacted"
+          person_days_total_unexposed = person_years_total_unexposed = incidence_rate_unexposed = ir_lower_unexposed = ir_upper_unexposed = "redacted"
+      }
       return(c(person_days_total_unexposed, event_count_unexposed, incidence_rate_unexposed, ir_lower_unexposed, ir_upper_unexposed, person_days_total_exposed, event_count_exposed, incidence_rate_exposed, ir_lower_exposed, ir_upper_exposed))
   }
   
