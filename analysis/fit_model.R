@@ -42,7 +42,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     covar_names = names(covars)[ names(covars) != "patient_id"]
     data_surv <- data_surv %>% left_join(covars)
   }
-  
+ 
   #Add inverse probablity weights for non-cases
   data_surv$cox_weights <- ifelse(data_surv$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
   
@@ -55,15 +55,17 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   fit_model$total_covid19_cases <- total_covid_cases
   
   write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",mdl, ".csv"), row.names = T)
-  
+  print(paste0("Hazard ratios saved: ", output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",mdl, ".csv"))
 }
 
 
 #------------------------ GET SURV FORMULA & COXPH() ---------------------------
 coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
+  print("Working on cox model")
   
   if(mdl == "mdl_max_adj"){
     covars_to_remove <- rm_lowvar_covars(data_surv)[!is.na((rm_lowvar_covars(data_surv)))]
+    print(paste0("Covariates removed: ", covars_to_remove))
     data_surv <- data_surv %>% dplyr::select(!all_of(covars_to_remove))
     collapse_covars_list=collapse_categorical_covars(data_surv)
     data_surv=collapse_covars_list[[1]]
@@ -97,6 +99,11 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     surv_formula <- paste(surv_formula, "sex", sep="+")
   }
   
+  #If subgroup is not ethnicity then add ethnicity into formula
+  if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age)){
+    surv_formula <- paste(surv_formula, "ethnicity", sep="+")
+  }
+  
   #If subgroup is not age then add in age spline otherwise use age and age_sq
   if ((startsWith(subgroup,"agegp_"))==F){
     surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
@@ -104,14 +111,17 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
   }
   
+  print(surv_formula)
+  
   # fit cox model
   dd <<- datadist(data_surv)
   #options(datadist="dd")
   options(datadist="dd", contrasts=c("contr.treatment", "contr.treatment"))
+  print("Fitting cox model")
   fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
   # To get robust variance-covariance matrix so that robust standard errots can be used in CI's
   robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
-  
+  print("Finished fitting cox model")
   
   # Results ----
   results=as.data.frame(names(fit_cox_model$coefficients))
@@ -124,17 +134,20 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   if(mdl == "mdl_max_adj"){
     results$covariates_removed=paste0(covars_to_remove, collapse = ",")
     results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
+    print(paste0("Categorical covariates collapsed: ", covars_collapsed))
   }
   
   #Add in P-values to results table
   #Can only get for covariate as a whole and not for each level so left join onto main covariate name
   results$covariate=results$term
   results$covariate=sub('\\=.*', '', results$covariate)
-  anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
-  anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
-  anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
-  results=results%>%left_join(anova_fit_cox_model,by="covariate")
+  results$P="NA"
+  #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
+  #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
+  #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
+  #results=results%>%left_join(anova_fit_cox_model,by="covariate")
   
+  print("Finised working on cox model")
   return(results)
 }
 

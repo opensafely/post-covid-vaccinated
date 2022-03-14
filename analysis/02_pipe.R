@@ -5,7 +5,27 @@
 
 # ---------------------- READ IN DATA ------------------------------------------
 # read in core analysis information
-input=read_rds(paste0("output/input_",cohort,"_stage1.rds"))
+read_in_cols <- c("patient_id",
+                  "death_date",  
+                  "cov_cat_sex", 
+                  "cov_num_age", 
+                  "exp_date_covid19_confirmed",
+                  "sub_cat_covid19_hospital",
+                  "cov_cat_region",
+                  "index_date",
+                  "cov_cat_ethnicity",
+                  "sub_bin_covid19_confirmed_history",
+                  "vax_date_covid_1",
+                  paste0("out_date_",event_name))
+
+if(active_analyses$prior_history_var != ""){
+  read_in_cols <- unique(append(read_in_cols, c(active_analyses$prior_history_var, covar_names)))
+}else{
+  read_in_cols <- unique(append(read_in_cols, c(covar_names)))
+}
+
+input <- read_rds(paste0("output/input_",cohort,"_stage1.rds"))
+input <- input %>% select(all_of(read_in_cols))
 
 #---------------------------SPECIFY MAIN PARAMETERS-----------------------------
 # specify study parameters

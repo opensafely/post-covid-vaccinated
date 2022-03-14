@@ -6,6 +6,8 @@
 source(file.path(scripts_dir,"fit_model.R"))
 
 get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names){
+  print(paste0("Working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
+  
   #Reduce dataset to those who do NOT have a prior history of COVID unless running the subgroup
   #analysis for this with a prior history
   
@@ -127,6 +129,7 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
   total_covid_cases=nrow(survival_data %>% filter(!is.na(expo_date)))
     
   res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
+  print(paste0("Finished working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
   return(res_vacc)
 }
   

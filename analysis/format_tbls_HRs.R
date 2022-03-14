@@ -1,8 +1,8 @@
 ## =============================================================================
-## FORMATS RESULTS from RSTUDIO
-##
-## Author: Samantha Ip
+## Format results into combined HR and event counts files
 ## =============================================================================
+
+print("Working on formating tables")
 
 rm(list=setdiff(ls(), c("cohort_to_run","mdl","output_dir","scripts_dir","analyses_to_run","event_name")))
 
@@ -38,7 +38,6 @@ for (i in 1:nrow(results_needed)) {
   }
 }
 
-
 result_file_paths <- pmap(list(results_done), 
                function(fpath){ 
                  df <- fread(fpath) 
@@ -50,13 +49,14 @@ if(length(results_done)>0){
   df_hr <- rbindlist(result_file_paths, fill=TRUE)
   df_hr <- df_hr %>% mutate_if(is.numeric, round, digits=5)%>%select(-V1)
   write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_", event_name, ".csv") , row.names=F)
+  print(paste0("Compiled HR's saved: ", output_dir,"/compiled_HR_results_", event_name, ".csv"))
 }else{
   df_hr <- as.data.frame(matrix(ncol = 15))
   colnames(df_hr) <- c("term", "estimate", "conf.low", "conf.high", "std.error", "robust.se", "covariate", "P", "subgroup", "event",
                        "cohort", "model", "total_covid19_cases", "covariates_removed", "cat_covars_collapsed")
   write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_", event_name, ".csv") , row.names=F)
+  print(paste0("Compiled HR's saved: ", output_dir,"/compiled_HR_results_", event_name, ".csv"))
 }
-
 
 
 # =============================  R events count ================================
@@ -100,6 +100,7 @@ event_counts_completed <- pmap(list(event_count_done),
 if(length(event_count_done)>0){
   df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
   write.csv(df_event_counts, paste0(output_dir,"/compiled_event_counts_", event_name, ".csv") , row.names=F)
+  print(paste0("Compiled event counts saved: ", output_dir,"/compiled_event_counts_", event_name, ".csv"))
   
   # Add in suppression for counts <=5
   df_event_counts$redacted_results <- "NA"
@@ -132,12 +133,15 @@ if(length(event_count_done)>0){
   supressed_df_event_counts <- supressed_df_event_counts[order(supressed_df_event_counts$redacted_results),]
   
   write.csv(supressed_df_event_counts, paste0(output_dir,"/suppressed_compiled_event_counts_", event_name, ".csv") , row.names=F)
+  print(paste0("Supressed event counts saved: ", output_dir,"/suppressed_compiled_event_counts_", event_name, ".csv"))
+  
 }else{
-  colnames(df_event_counts)
   df_event_counts <- as.data.frame(matrix(ncol = 6))
   colnames(df_event_counts)<- c("expo_week", "events_total", "event", "subgroup", "cohort", "model")
   write.csv(df_event_counts, paste0(output_dir,"/compiled_event_counts_", event_name, ".csv") , row.names=F)
+  print(paste0("Compiled event counts saved: ", output_dir,"/compiled_event_counts_", event_name, ".csv"))
   write.csv(df_event_counts, paste0(output_dir,"/suppressed_compiled_event_counts_", event_name, ".csv") , row.names=F)
+  print(paste0("Supressed event counts saved: ", output_dir,"/suppressed_compiled_event_counts_", event_name, ".csv"))
   
 }
 
@@ -199,11 +203,14 @@ if(length(results_done)>0){
   supressed_combined_hr_event_counts <- supressed_combined_hr_event_counts[order(supressed_combined_hr_event_counts$redacted_results),]
   
   write.csv(supressed_combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name ,".csv") , row.names=F)
+  print(paste0("Supressed HR with event counts saved: ", output_dir,"/suppressed_compiled_HR_results_",event_name ,".csv"))
+  
 }else{
   supressed_combined_hr_event_counts <- as.data.frame(matrix(ncol = 17))
   colnames(supressed_combined_hr_event_counts) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","P","expo_week","events_total",
                                                     "event","subgroup","model","cohort","covariates_removed","cat_covars_collapsed","total_covid19_cases")
   write.csv(supressed_combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name ,".csv") , row.names=F)
+  print(paste0("Supressed HR with event counts saved: ", output_dir,"/suppressed_compiled_HR_results_",event_name ,".csv"))
 }
 rmarkdown::render("analysis/compiled_HR_results.Rmd",output_file=paste0("/suppressed_compiled_HR_results_",event_name),output_dir="output")
 
@@ -216,4 +223,6 @@ for(cohort in cohort_to_run){
 }
 
 write.csv(analyses_not_run,paste0(output_dir,"/analyses_not_run_",event_name, ".csv") , row.names=F)
+print(paste0("Analyses not run saved: ", output_dir,"/analyses_not_run_",event_name, ".csv"))
+
 
