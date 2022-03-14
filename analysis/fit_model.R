@@ -141,10 +141,11 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   #Can only get for covariate as a whole and not for each level so left join onto main covariate name
   results$covariate=results$term
   results$covariate=sub('\\=.*', '', results$covariate)
-  anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
-  anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
-  anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
-  results=results%>%left_join(anova_fit_cox_model,by="covariate")
+  results$P="NA"
+  #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
+  #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
+  #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
+  #results=results%>%left_join(anova_fit_cox_model,by="covariate")
   
   print("Finised working on cox model")
   return(results)
