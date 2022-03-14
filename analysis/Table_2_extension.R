@@ -71,7 +71,6 @@ table_2_extension_output <- function(population){
   }
   cohort <- cohort_to_run
   
-  
   #table_2_long <- crossing(event_names, model, cohort, strata)
   table_2_long <- crossing(event_names, cohort, strata)
   table_2_long$analyses <- rep("NA", nrow(table_2_long))
@@ -129,13 +128,6 @@ table_2_extension_output <- function(population){
   
   table_2_long <- cbind(table_2_long, unexposed_person_days, unexposed_event_count, unexposed_ir, unexposed_ir_lower, unexposed_ir_upper,
                                     exposed_person_days, exposed_event_count, exposed_ir, exposed_ir_lower, exposed_ir_upper)
-  
-  # if(population == "vaccinated"){
-  #   table_2_long <- table_2_long %>% filter(cohort == "vaccinated")
-  # }
-  # if(population == "electively_unvaccinated"){
-  #   table_2_long <- table_2_long %>% filter(cohort == "electively_unvaccinated")
-  # }
   
   table_2_long <- table_2_long %>% filter(cohort == population)
   
@@ -283,11 +275,9 @@ table_2_extension_output <- function(population){
   }
   }
   }
-  
   write.csv(table_2_long, file=paste0("output/table_2_subgroups_", population, ".csv"))
   input1_aer <- table_2_long %>% select(c("event_names", "cohort", "strata", "analyses", "strata_level", "sub_grp", "unexposed_person_days")) 
   write.csv(input1_aer, file=paste0("output/input1_aer", population, ".csv"))
-  
 }
 
 # Run function using specified commandArgs
