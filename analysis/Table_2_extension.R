@@ -9,12 +9,14 @@
 ##
 ## Content:  person days of follow up, unexposed person days, incidence rate, and 95% CI
 ##
-## Output:   One CSV file
+## Output:   CSV files: table_2_subgroups_*.csv, input1_aer_*.csv
 ## ====================================================================================
 
 # comment number of rows need to be revised in "data" and "output"
 library(readr); library(dplyr); library(data.table); library(lubridate)
-library(stringr);library(vcdExtra);library(tidyverse)
+library(stringr);library(tidyverse)
+
+#library(vcdExtra)
 
 args <- commandArgs(trailingOnly=TRUE)
 
