@@ -84,16 +84,19 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
   # only really interested in event_date and expo_date being within follow-up at this point as all other date variable 
   #have been checked in inclusion/exclusion & QA
   
-  schema <- sapply(survival_data, is.Date) 
-  schema = names(schema)[schema==TRUE]
-  schema=schema[!schema %in% c("follow_up_start","follow_up_end")]
+  survival_data <- survival_data %>% mutate(event_date = replace(event_date, which(event_date>follow_up_end | event_date<follow_up_start), NA))
+  survival_data <- survival_data %>% mutate(expo_date = replace(expo_date, which(expo_date>follow_up_end | expo_date<follow_up_start), NA))
+  
+  #schema <- sapply(survival_data, is.Date) 
+  #schema = names(schema)[schema==TRUE]
+  #schema=schema[!schema %in% c("follow_up_start","follow_up_end")]
   
   # The function set_dates_outofrange_na can be found in the script extra_functions_for_cox_model.R which contains
   # additional functions that are used throughout the modelling scripts
   
-  for (colname in schema){
-    survival_data <- set_dates_outofrange_na(survival_data, colname)
-  }
+  #for (colname in schema){
+  #  survival_data <- set_dates_outofrange_na(survival_data, colname)
+  #}
   
   # Update COVID phenotypes after setting COVID exposure dates to NA that lie
   # outside follow up
