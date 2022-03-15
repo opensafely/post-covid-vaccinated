@@ -100,7 +100,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   }
   
   #If subgroup is not ethnicity then add ethnicity into formula
-  if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age)){
+  if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & mdl == "mdl_max_adj"){
     surv_formula <- paste(surv_formula, "ethnicity", sep="+")
   }
   
