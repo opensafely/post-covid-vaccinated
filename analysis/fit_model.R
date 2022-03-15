@@ -73,6 +73,13 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     covars_collapsed=unique(covars_collapsed[covars_collapsed %in% c("cov_cat_deprivation","cov_cat_smoking_status")])
   }
   
+  print("Post Exposure event counts split by covariate levels")
+  if(mdl=="mdl_agesex"){
+    print(covariate_exploration(data_surv, c()))
+  }else{
+    print(covariate_exploration(data_surv, append(covar_names,"ethnicity")))
+  }
+
   covariates <- covar_names[covar_names %in% names(data_surv)] %>% sort()
   interval_names_withpre <- c("days_pre", interval_names)
   
