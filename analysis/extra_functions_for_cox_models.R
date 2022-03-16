@@ -27,8 +27,8 @@ get_pheno_specific_dataset <- function(survival_data, pheno_of_interest){
 
 rm_lowvar_covars <- function(data_surv){
   cov_bin <- colnames(data_surv)[grepl("cov_bin", colnames(data_surv))]
-  df <- data_surv %>% dplyr::select(c( "expo", "event", all_of(cov_bin))) %>% distinct() %>% filter((expo==1) & (event==1))
-  df <- df %>%  dplyr::select(!c("expo", "event", 
+  df <- data_surv %>% dplyr::select(c( "expo", "event", all_of(cov_bin),"patient_id")) %>% distinct() %>% filter((expo==1) & (event==1))
+  df <- df %>%  dplyr::select(!c("expo", "event", "patient_id",
                                  df %>%  dplyr::select_if(is.numeric) %>% names()
                                  
   ))
@@ -46,8 +46,8 @@ rm_lowvar_covars <- function(data_surv){
 
 collapse_categorical_covars <- function(data_surv){
   cov_cat <-colnames(data_surv)[grepl("cov_cat", colnames(data_surv))]
-  df <- data_surv %>% dplyr::select(c( "expo", "event", all_of(cov_cat))) %>% distinct() %>% filter((expo==1) & (event==1))
-  df <- df %>%  dplyr::select(!c("expo", "event", 
+  df <- data_surv %>% dplyr::select(c( "expo", "event", all_of(cov_cat), "patient_id")) %>% distinct() %>% filter((expo==1) & (event==1))
+  df <- df %>%  dplyr::select(!c("expo", "event", "patient_id",
                                  df %>%  dplyr::select_if(is.numeric) %>% names()
                                  
   ))
@@ -76,4 +76,21 @@ collapse_categorical_covars <- function(data_surv){
   }
   return(list(data_surv,cat_cov_to_remove))
 }
+
+
+covariate_exploration <- function(data_surv, covars){
+  df <- data_surv %>% dplyr::select(c( "expo", "event", all_of(covars), "region_name","sex","patient_id")) %>% distinct() %>% filter((expo==1) & (event==1))
+  df <- df %>%  dplyr::select(!c("expo", "event", "patient_id",
+                                 df %>%  dplyr::select_if(is.numeric) %>% names()
+                                 
+  ))
+  summary <- as.data.frame(summary(df,maxsum=100))
+  summary <- summary %>% filter(startsWith(Freq,"Mode")==F)
+  summary$Count <- summary$Freq
+  summary$Freq=gsub(":.*", "",summary$Freq)#Remove everything after:
+  summary$Count=gsub(".*:", "",summary$Count)#Remove everything before
+  summary$Var2 <- gsub("\\s","",summary$Var2)
+  return(summary)
+}
+
 
