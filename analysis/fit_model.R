@@ -77,7 +77,8 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   if(mdl=="mdl_agesex"){
     print(covariate_exploration(data_surv, c()))
   }else{
-    print(covariate_exploration(data_surv, append(covar_names,"ethnicity")))
+    covars_to_print <- covar_names[!covar_names %in% covars_to_remove]
+    print(covariate_exploration(data_surv, append(covars_to_print,"ethnicity")))
   }
 
   covariates <- covar_names[covar_names %in% names(data_surv)] %>% sort()
