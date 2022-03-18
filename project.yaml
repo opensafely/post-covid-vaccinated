@@ -630,6 +630,17 @@ actions:
         compiled_event_counts: output/compiled_event_counts_eating_disorders_electively_unvaccinated.csv
 
   ## Apply cox model for serious_mental_illness - vaccinated cohort 
+  stage4_table_2_subgroups_both:
+    run: r:latest analysis/table_2_subgroups.R both
+    needs:
+    - preprocess_data
+    - stage1_data_cleaning_both
+    outputs:
+      moderately_sensitive:
+        table_2_subgroups: output/table_2_subgroups_*.csv
+        input_1_aer: output/input1_aer_*.csv
+
+  ## Apply cox model for ami 
 
   Analysis_cox_serious_mental_illness_vaccinated:
     run: r:latest analysis/01_pipe.R serious_mental_illness vaccinated
@@ -801,13 +812,3 @@ actions:
         compiled_hrs: output/compiled_HR_results_addiction_electively_unvaccinated.csv
         compiled_event_counts: output/compiled_event_counts_addiction_electively_unvaccinated.csv
 
-  
-  ## Table_2 for subgroups
-
-  table_2_extension:
-    run: r:latest analysis/table_2_extension.R both
-    needs: [active_analyses, preprocess_data, stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-          table_2_extension: output/table_2_subgroups_*.csv
-          intput1_aer: output/input1_aer_*.csv
