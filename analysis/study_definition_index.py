@@ -82,7 +82,6 @@ study = StudyDefinition(
             ),
             ### HES APC
             prostate_cancer_hes=patients.admitted_to_hospital(
-                prostate_cancer_icd10,
                 returning='binary_flag',
                 return_expectations={
                     "incidence": 0.03,
