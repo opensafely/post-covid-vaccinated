@@ -268,7 +268,8 @@ for (j in c("vaccinated","electively_unvaccinated")) {
   
   tmp$sub_cat_covid19_hospital <- as.factor(tmp$sub_cat_covid19_hospital)
   tmp[,c("sub_date_covid19_hospital")] <- NULL
-
+  tmp <- tmp[!is.na(tmp$patient_id),]
+  
   # Restrict columns and save analysis dataset ---------------------------------
   
   tmp1 <- tmp[,c("patient_id","death_date","index_date",

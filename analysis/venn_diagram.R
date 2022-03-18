@@ -27,7 +27,7 @@ if(length(args)==0){
 }
 
 # to prepare for extracting outcome variable names in the current analyses ---------------------------
-active_analyses <- read_rds("output/active_analyses.rds")
+active_analyses <- read_rds("lib/active_analyses.rds")
 
 venn_output <- function(population){
   # read in data------------------------------------------------------------
@@ -38,8 +38,8 @@ venn_output <- function(population){
   variable_names <- tidyselect::vars_select(names(input), starts_with(c('tmp_out_date_','out_date'), ignore.case = TRUE))
   input <- input[,variable_names]
   
-  #-- function to check number < 5 in the venn diagram ---------------------------
-  count_le5 <- function(outcome_names)
+  #-- function to check number <= 5 in the venn diagram ---------------------------
+  count_le5_function <- function(outcome_names)
   {
     print(outcome_names)
     
@@ -61,7 +61,7 @@ venn_output <- function(population){
   
     number_venn <- c(len_src1_only, len_src2_only, len_src3_only, len_inter12_only, len_inter13_only, len_inter23_only, length(inter123))
     #number_venn
-    low_count <- length(which(number_venn <5))
+    low_count <- length(which(number_venn<=5))
     return(low_count)
   }
   
@@ -113,7 +113,7 @@ venn_output <- function(population){
   
   unique_outcome_names <- unique(outcome_names)
   
-  count_less_than_5 <- rep("NA", length(unique_outcome_names))
+  count_le5 <- rep("NA", length(unique_outcome_names))
   
   index_lc = 1
   
@@ -126,14 +126,14 @@ venn_output <- function(population){
     if(length(venn_outcome)!=3){print("number of data sources > 3!")}
     figure_name = figure_title <- paste0("venn_diagram_",population, "_", i)
     venn_digram(venn_outcome,figure_name, figure_title)
-    count_less_than_5[index_lc] <- count_le5(venn_outcome)
+    count_le5[index_lc] <- count_le5_function(venn_outcome)
     index_lc = index_lc +1
   }
   
-  low_count_df <- data.frame(count_less_than_5, unique_outcome_names)
-  low_count_df <- low_count_df %>% mutate(count_less_than_5 = if_else(count_less_than_5>0, "lower than 5", "No issue"))
+  low_count_df <- data.frame(count_le5, unique_outcome_names)
+  low_count_df <- low_count_df %>% mutate(count_le5 = if_else(count_le5>0, "<= 5", "No issue"))
   
-  names(low_count_df) <- c("any number < 5?", "outcome name")
+  names(low_count_df) <- c("any number <= 5?", "outcome name")
   write.csv(low_count_df, file= paste0("output/","venn_diagram_number_check_", population,".csv"), row.names = F)
 }
 

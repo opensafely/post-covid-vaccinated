@@ -1,0 +1,32 @@
+---
+title: "Hazard ratio results"
+output: html_document
+---
+Hazard ratios for outcome of interest.
+
+Time periods with less than or equal to 5 events have been marked as [Redacted] and the corresponding HRs have also been marked as [Redacted].
+
+Any results with redacted results will be at the top of the results file for easy review.
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(DT)
+library(readr)
+knitr::opts_knit$set(root.dir = gsub("/analysis","",getwd()))
+```
+
+## Compiled hazard ratios
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+df=read_csv(paste0(output_dir,"/suppressed_compiled_HR_results_", event_name, ".csv"))
+df %>%
+    datatable(extensions = 'Buttons',
+              options = list(dom = 'Blfrtip',
+                             buttons = c('copy', 'csv', 'excel', 'pdf', 'print' ),
+                             lengthMenu = list(c(50,-1),
+                                               c(50,"All"))))
+```
+
+
