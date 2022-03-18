@@ -271,17 +271,19 @@ for (j in c("vaccinated","electively_unvaccinated")) {
 
   # Restrict columns and save analysis dataset ---------------------------------
   
-  tmp1 <- tmp[,c("patient_id","death_date","index_date",
-              colnames(tmp)[grepl("sub_",colnames(tmp))], # Subgroups
-              colnames(tmp)[grepl("exp_",colnames(tmp))], # Exposures
-              colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
-              colnames(tmp)[grepl("cov_",colnames(tmp))], # Covariates
-              colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
-              colnames(tmp)[grepl("vax_date_eligible",colnames(tmp))], # Vaccination eligbility
-              colnames(tmp)[grepl("vax_date_covid_",colnames(tmp))], # Vaccination dates
-              colnames(tmp)[grepl("vax_cat_",colnames(tmp))])] # Vaccination products and JCVI groupings
+  tmp1 <- tmp[!is.na(tmp1$patient_id),
+              c("patient_id","death_date","index_date",
+                colnames(tmp)[grepl("sub_",colnames(tmp))], # Subgroups
+                colnames(tmp)[grepl("exp_",colnames(tmp))], # Exposures
+                colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
+                colnames(tmp)[grepl("cov_",colnames(tmp))], # Covariates
+                colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
+                colnames(tmp)[grepl("vax_date_eligible",colnames(tmp))], # Vaccination eligbility
+                colnames(tmp)[grepl("vax_date_covid_",colnames(tmp))], # Vaccination dates
+                colnames(tmp)[grepl("vax_cat_",colnames(tmp))])] # Vaccination products and JCVI groupings
   
   tmp1[,colnames(tmp)[grepl("tmp_out_",colnames(tmp))]] <- NULL
+ 
   
   saveRDS(tmp1, file = paste0("output/input_",j,".rds"))
   
