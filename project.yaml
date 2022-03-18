@@ -275,11 +275,4 @@ actions:
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_vte.csv
         compiled_event_counts: output/compiled_event_counts_vte.csv
-  
-  table_2_extension:
-    run: r:latest analysis/table_2_extension.R both
-    needs: [active_analyses, preprocess_data, stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-          table_2_extension: output/table_2_subgroups_*.csv
-          intput1_aer: output/input1_aer_*.csv
+
