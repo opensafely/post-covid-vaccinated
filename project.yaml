@@ -2,7 +2,7 @@ version: '3.0'
 
 expectations:
 
-  population_size: 40000
+  population_size: 400000
 
 actions:
 
@@ -95,6 +95,16 @@ actions:
       moderately_sensitive:
         venn_diagram: output/venn_diagram_*.svg
         venn_diagram_number_check: output/venn_diagram_number_check_*.csv
+
+  stage4_table_2_subgroups_both:
+    run: r:latest analysis/table_2_subgroups.R both
+    needs:
+    - preprocess_data
+    - stage1_data_cleaning_both
+    outputs:
+      moderately_sensitive:
+        table_2_subgroups: output/table_2_subgroups_*.csv
+        input_1_aer: output/input1_aer_*.csv
 
   ## Apply cox model for ami 
 
@@ -266,13 +276,3 @@ actions:
         compiled_hrs: output/compiled_HR_results_vte.csv
         compiled_event_counts: output/compiled_event_counts_vte.csv
 
-  
-  ## Table_2 for subgroups
-
-  table_2_extension:
-    run: r:latest analysis/table_2_extension.R both
-    needs: [active_analyses, preprocess_data, stage1_data_cleaning_both]
-    outputs:
-      moderately_sensitive:
-          table_2_extension: output/table_2_subgroups_*.csv
-          intput1_aer: output/input1_aer_*.csv

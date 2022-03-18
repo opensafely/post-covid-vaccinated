@@ -33,7 +33,7 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 table_2_extension_output <- function(population){
   # indicate active analyses -----------------------------------------------
-  active_analyses <- read_rds("output/active_analyses.rds")
+  active_analyses <- read_rds("lib/active_analyses.rds")
   active_analyses <- active_analyses[which(active_analyses$active==T), ]
   active_analyses$prior_history_var = gsub("cov_", "sub_", active_analyses$prior_history_var)
   
