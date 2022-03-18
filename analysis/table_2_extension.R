@@ -63,11 +63,12 @@ table_2_extension_output <- function(population){
   model <- NULL
   
   cohort_to_run <- NULL
+  #active_analyses$cohort[1] = "vaccinated"
   for(i in 1:nrow(active_analyses)){
   if(active_analyses$cohort[i]=="all"){
     cohort_to_run=c(cohort_to_run,"vaccinated", "electively_unvaccinated")
   }else{
-    cohort_to_run=c(cohort_to_run,active_analyses$cohort)
+    cohort_to_run=c(cohort_to_run,active_analyses$cohort[i])
   }  
   }
   cohort <- cohort_to_run
