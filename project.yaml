@@ -801,3 +801,13 @@ actions:
         compiled_hrs: output/compiled_HR_results_addiction_electively_unvaccinated.csv
         compiled_event_counts: output/compiled_event_counts_addiction_electively_unvaccinated.csv
 
+  
+  ## Table_2 for subgroups
+      
+  table_2_extension:
+    run: r:latest analysis/table_2_extension.R both
+    needs: [active_analyses, preprocess_data, stage1_data_cleaning_both]
+    outputs:
+      moderately_sensitive:
+          table_2_extension: output/table_2_extension_*.csv
+          intput1_aer: output/intput1_aer_*.csv
