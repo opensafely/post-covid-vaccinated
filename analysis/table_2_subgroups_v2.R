@@ -34,22 +34,22 @@ cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 
-table_2_calculation <- function(survival_data, event,cohort,strata, strata_level, sub_grp){
+table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level, sub_grp){
   #survival_data$event_date <- survival_data[,paste0("out_date_","ami")]
   # specify event date for the event of interest, e.g. ami
   data_active <- survival_data
   #data_active$event_date <- survival_data[,paste0("out_date_",event)]
   data_active$event_date <- survival_data[,event]
   # filter the population according to whether the subgroup is covid_history
-  if(strata == "covid_history"){
+  if(subgrp == "covid_history"){
     data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==T)
   }else{
     data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==F)
   }
   
-  # filter the population according to the strata level
+  # filter the population according to the subgrp level
   data_active$active_sub_grp <- data_active[,sub_grp]
-  data_active <- data_active%>%filter(active_sub_grp==strata_level)
+  data_active <- data_active%>%filter(active_sub_grp==subgrp_level)
   
   # specify the cohort according to vaccination status
   if(cohort=="vaccinated"){
@@ -186,8 +186,6 @@ table_2_calculation <- function(survival_data, event,cohort,strata, strata_level
                                      exposed_person_days, exposed_event_count, exposed_ir, exposed_ir_lower, exposed_ir_upper)
 
   # # specify subgroup names
-
-  
   index <- grepl("agegp", analyses_of_interest$subgroup, fixed = TRUE)
   analyses_of_interest$stratify_by_subgroup[index] <- "sub_cat_age_group"
 
@@ -252,8 +250,8 @@ table_2_calculation <- function(survival_data, event,cohort,strata, strata_level
   
   # rewrite the function
   # testing
-  #event="out_date_ami";cohort="vaccinated";strata="covid_history"; strata_level="TRUE"; sub_grp="sub_bin_covid19_confirmed_history"
-  #event="vte";cohort="vaccinated";strata="sub_bin_vte"; strata_level="FALSE"; sub_grp="sub_bin_vte"
+  #event="out_date_ami";cohort="vaccinated";strata="covid_history"; subgrp_level="TRUE"; sub_grp="sub_bin_covid19_confirmed_history"
+  #event="vte";cohort="vaccinated";strata="sub_bin_vte"; subgrp_level="FALSE"; sub_grp="sub_bin_vte"
   
   col_names <- names(analyses_of_interest)
   start = grep("unexposed_person_days", col_names)
@@ -266,10 +264,10 @@ table_2_calculation <- function(survival_data, event,cohort,strata, strata_level
     #for(i in 5:6){
     d <- analyses_of_interest
     print(i)
-    analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, event=d$event[i],cohort=d$cohort_to_run[i],strata=d$subgroup[i], strata_level=d$strata[i], sub_grp=d$stratify_by_subgroup[i])
+    analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, event=d$event[i],cohort=d$cohort_to_run[i],subgrp=d$subgroup[i], subgrp_level=d$strata[i], sub_grp=d$stratify_by_subgroup[i])
   }
   write.csv(table_2_subgrp, file=paste0("output/table_2_subgroups_", population, ".csv"), row.names = F)
-  input1_aer <- table_2_subgrp %>% select(c("event_names", "cohort", "strata", "analyses", "strata_level", "sub_grp", "unexposed_person_days")) 
+  input1_aer <- table_2_subgrp %>% select(c("event_names", "cohort", "subgroup", "analyses", "subgrp_level", "sub_grp", "unexposed_person_days")) 
   write.csv(input1_aer, file=paste0("output/input1_aer_", population, ".csv"), row.names=F)
   
   
