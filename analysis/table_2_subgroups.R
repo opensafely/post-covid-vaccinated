@@ -33,7 +33,7 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 table_2_extension_output <- function(population){
   # indicate active analyses -----------------------------------------------
-  active_analyses <- read_rds("lib/active_analyses.rds")
+  active_analyses <- read_rds("output/active_analyses.rds")
   active_analyses <- active_analyses[which(active_analyses$active==T), ]
   active_analyses$prior_history_var = gsub("cov_", "sub_", active_analyses$prior_history_var)
   
@@ -159,8 +159,9 @@ table_2_extension_output <- function(population){
   outcome_names <- tidyselect::vars_select(names(input), starts_with(c("out_"), ignore.case=TRUE))
   outcome_names_not_active <- outcome_names[!outcome_names %in% event_dates_names]
   
-  sub_main = rep("main", nrow(input))
-  input <- input %>% mutate(sub_main = sub_main)
+  # sub_main = rep("main", nrow(input))
+  # input <- input %>% mutate(sub_main = sub_main)
+  input$sub_main <- "main"
   
   sub_grp_names <- tidyselect::vars_select(names(input), starts_with(c('sub_'), ignore.case = TRUE))
   
@@ -168,6 +169,8 @@ table_2_extension_output <- function(population){
   vars_names <- vars_names[!vars_names %in% outcome_names_not_active]
   
   survival_data <- input[,vars_names]
+  
+  rm(list=c("input"))
   
   survival_data <- survival_data %>% mutate(cohort_start_date = cohort_start,cohort_end_date = cohort_end)
   
