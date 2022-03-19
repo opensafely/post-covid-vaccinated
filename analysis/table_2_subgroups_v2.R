@@ -207,6 +207,9 @@ analyses_of_interest$stratify_by_subgroup[index] <- "sub_main"
 index <- grepl("ate", analyses_of_interest$subgroup, fixed = TRUE)
 analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_ate"
 
+index <- grepl("cov_bin_vte", analyses_of_interest$stratify_by_subgroup, fixed = TRUE)
+analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_vte"
+
 # read in data------------------------------------------------------------
 
 input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
@@ -230,7 +233,7 @@ setnames(input,
                "sub_bin_vte"))
 
 levels(input$sub_cat_ethnicity) <- c("White", "Mixed", "South_Asian", "Black", "Other", "Missing")
-
+event_dates_names <- active_analyses$outcome_variable
 outcome_names <- tidyselect::vars_select(names(input), starts_with(c("out_"), ignore.case=TRUE))
 outcome_names_not_active <- outcome_names[!outcome_names %in% event_dates_names]
 
