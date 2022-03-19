@@ -266,9 +266,9 @@ for(i in 1:nrow(analyses_of_interest)){
   print(i)
   analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, event=d$event[i],cohort=d$cohort_to_run[i],subgrp=d$subgroup[i], subgrp_level=d$strata[i], sub_grp=d$stratify_by_subgroup[i])
 }
-write.csv(table_2_subgrp, file=paste0("output/table_2_subgroups_", population, ".csv"), row.names = F)
+write.csv(table_2_subgrp, file=paste0("output/table_2_subgroups", ".csv"), row.names = F)
 input1_aer <- table_2_subgrp %>% select(c("event_names", "cohort", "subgroup", "analyses", "subgrp_level", "sub_grp", "unexposed_person_days")) 
-write.csv(input1_aer, file=paste0("output/input1_aer_", population, ".csv"), row.names=F)
+write.csv(input1_aer, file=paste0("output/input1_aer", ".csv"), row.names=F)
 
 
 
