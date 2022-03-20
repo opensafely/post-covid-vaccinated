@@ -34,7 +34,7 @@ cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 
-table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level, sub_grp){
+table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level, subgrp_full_name){
   #survival_data$event_date <- survival_data[,paste0("out_date_","ami")]
   # specify event date for the event of interest, e.g. ami
   data_active <- survival_data
@@ -48,8 +48,8 @@ table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level
   }
   
   # filter the population according to the subgrp level
-  data_active$active_sub_grp <- data_active[,sub_grp]
-  data_active <- data_active%>%filter(active_sub_grp==subgrp_level)
+  data_active$active_subgrp_full_name <- data_active[,subgrp_full_name]
+  data_active <- data_active%>%filter(active_subgrp_full_name==subgrp_level)
   
   # specify the cohort according to vaccination status
   if(cohort=="vaccinated"){
@@ -133,6 +133,7 @@ analyses_of_interest <- as.data.frame(matrix(ncol = 8,nrow = 0))
 
 outcomes<-active_analyses$outcome_variable
 
+# for testing: i="out_date_ate"
 for(i in outcomes){
   analyses_to_run <- active_analyses %>% filter(outcome_variable==i)
   
@@ -149,7 +150,10 @@ for(i in outcomes){
   analyses_to_run <- as.data.frame(t(analyses_to_run))
   analyses_to_run$subgroup <- row.names(analyses_to_run)
   colnames(analyses_to_run) <- c("run","subgroup")
-  analyses_to_run<- analyses_to_run %>% filter(run=="TRUE" & subgroup != "active" ) 
+ # analyses_to_run$prior_history_var <- analyses_to_run$run
+  #analyses_to_run$prior_history_var <- ifelse(startsWith(row.names(analyses_to_run),"prior_history"),analyses_to_run$run,FALSE)
+  
+  analyses_to_run<- analyses_to_run %>% filter(run=="TRUE"  & subgroup != "active") 
   rownames(analyses_to_run) <- NULL
   analyses_to_run <- analyses_to_run %>% select(!run)
   analyses_to_run$event=i
@@ -159,10 +163,11 @@ for(i in outcomes){
   
   ## Add in which covariates to stratify by
   analyses_to_run$stratify_by_subgroup=NA
-  for(i in c("ethnicity","sex")){
+  for(j in c("ethnicity","sex")){
     analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,i),i,analyses_to_run$stratify_by_subgroup)
   }
-  analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,"prior_history"),active_analyses$prior_history_var,analyses_to_run$stratify_by_subgroup)
+  index = which(active_analyses$outcome_variable == i)
+  analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,"prior_history"),active_analyses$prior_history_var[index],analyses_to_run$stratify_by_subgroup)
   analyses_to_run$stratify_by_subgroup <- ifelse(is.na(analyses_to_run$stratify_by_subgroup),analyses_to_run$subgroup,analyses_to_run$stratify_by_subgroup)
   
   
@@ -179,8 +184,8 @@ for(i in outcomes){
 }
 
 #ir = incidence rate; ir_lower = lower bound of the 95% CI for ir; ir_upper = upper bound of the 95% CI for ir
-unexposed_person_days <- unexposed_event_count <- unexposed_ir <- unexposed_ir_lower <- unexposed_ir_upper <- rep("NA", nrow(table_2_subgrp))
-exposed_person_days <- exposed_event_count <- exposed_ir <- exposed_ir_lower <- exposed_ir_upper <- rep("NA", nrow(table_2_subgrp))
+unexposed_person_days <- unexposed_event_count <- unexposed_ir <- unexposed_ir_lower <- unexposed_ir_upper <- rep("NA", nrow(analyses_of_interest))
+exposed_person_days <- exposed_event_count <- exposed_ir <- exposed_ir_lower <- exposed_ir_upper <- rep("NA", nrow(analyses_of_interest))
 
 analyses_of_interest <- cbind(analyses_of_interest, unexposed_person_days, unexposed_event_count, unexposed_ir, unexposed_ir_lower, unexposed_ir_upper,
                                    exposed_person_days, exposed_event_count, exposed_ir, exposed_ir_lower, exposed_ir_upper)
@@ -253,36 +258,41 @@ survival_data <- survival_data %>% mutate(cohort_start_date = cohort_start,cohor
 
 # rewrite the function
 # testing
-#event="out_date_ami";cohort="vaccinated";strata="covid_history"; subgrp_level="TRUE"; sub_grp="sub_bin_covid19_confirmed_history"
-#event="vte";cohort="vaccinated";strata="sub_bin_vte"; subgrp_level="FALSE"; sub_grp="sub_bin_vte"
+#event="out_date_ami";cohort="vaccinated";strata="covid_history"; subgrp_level="TRUE"; subgrp_full_name="sub_bin_covid19_confirmed_history"
+#event="vte";cohort="vaccinated";strata="sub_bin_vte"; subgrp_level="FALSE"; subgrp_full_name="sub_bin_vte"
 
 col_names <- names(analyses_of_interest)
 start = grep("unexposed_person_days", col_names)
 end = ncol(analyses_of_interest)
 
-# for(i in 1:nrow(analyses_of_interest)){
-#   #for quick testing
-#   #for(i in 357:358){
-#   #for(i in 87:88){
-#   #for(i in 5:6){
-#   d <- analyses_of_interest
-#   print(i)
-#   analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, event=d$event[i],cohort=d$cohort_to_run[i],subgrp=d$subgroup[i], subgrp_level=d$strata[i], sub_grp=d$stratify_by_subgroup[i])
-# }
+for(i in 1:nrow(analyses_of_interest)){
+  #for quick testing
+  #for(i in 357:358){
+  #for(i in 87:88){
+  #for(i in 5:6){
+  d <- analyses_of_interest
+  print(i)
+  analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, 
+                                                           event=analyses_of_interest$event[i],
+                                                           cohort=analyses_of_interest$cohort_to_run[i],
+                                                           subgrp=analyses_of_interest$subgroup[i], 
+                                                           subgrp_level=analyses_of_interest$strata[i], 
+                                                           subgrp_full_name=analyses_of_interest$stratify_by_subgroup[i])
+}
 
-lapply(split(analyses_of_interest,seq(nrow(analyses_of_interest))),
-       function(analyses_of_interest)
-         table_2_calculation(
-           survival_data = survival_data,
-           event=analyses_of_interest$event,
-           cohort=analyses_of_interest$cohort_to_run,
-           subgrp=analyses_of_interest$subgroup, 
-           subgrp_level=analyses_of_interest$strata, 
-           sub_grp=analyses_of_interest$stratify_by_subgroup)
-)
+# results <- lapply(split(analyses_of_interest,seq(nrow(analyses_of_interest))),
+#        function(analyses_of_interest)
+#          table_2_calculation(
+#            survival_data = survival_data,
+#            event=analyses_of_interest$event,
+#            cohort=analyses_of_interest$cohort_to_run,
+#            subgrp=analyses_of_interest$subgroup,
+#            subgrp_level=analyses_of_interest$strata,
+#            subgrp_full_name=analyses_of_interest$stratify_by_subgroup)
+# )
 
-write.csv(table_2_subgrp, file=paste0("output/table_2_subgroups", ".csv"), row.names = F)
-input1_aer <- table_2_subgrp %>% select(c("event_names", "cohort", "subgroup", "analyses", "subgrp_level", "sub_grp", "unexposed_person_days")) 
+write.csv(analyses_of_interest, file=paste0("output/table_2_subgroups", ".csv"), row.names = F)
+input1_aer <- analyses_of_interest %>% select(c("event", "cohort_to_run", "stratify_by_subgroup", "subgroup", "strata", "unexposed_person_days"))
 write.csv(input1_aer, file=paste0("output/input1_aer", ".csv"), row.names=F)
 
 
