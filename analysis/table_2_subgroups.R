@@ -71,12 +71,11 @@ table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level
   # data_select <- data_active[,select_names]
   # View(data_select)
   # 
-  # 
   #  select_names <- c("index_date", "follow_up_end_unexposed", "follow_up_end")
   # 
   #  data_select <- data_active[,select_names]
   #  View(data_select)
-  
+
   # calculate follow-up days
   data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
   #hist(data_active$person_days_unexposed)
@@ -267,10 +266,6 @@ table_2_subgroups_output <- function(population){
   end = ncol(analyses_of_interest)
   
   for(i in 1:nrow(analyses_of_interest)){
-    #for quick testing
-    #for(i in 357:358){
-    #for(i in 87:88){
-    #for(i in 5:6){
     d <- analyses_of_interest
     print(i)
     analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, 
@@ -300,7 +295,6 @@ table_2_subgroups_output <- function(population){
 }
 
 # Run function using specified commandArgs
-
 if(population == "both"){
   table_2_subgroups_output("vaccinated")
   table_2_subgroups_output("electively_unvaccinated")
