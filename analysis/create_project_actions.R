@@ -247,11 +247,11 @@ actions_list <- splice(
   #comment("Stage 4 - Table 2 subgroups"),
   action(
     name = "stage4_table_2_subgroups",
-    run = "r:latest analysis/table_2_subgroups_v2.R",
+    run = "r:latest analysis/table_2_subgroups.R",
     needs = list("preprocess_data","stage1_data_cleaning_both"),
     moderately_sensitive = list(
-      table_2_subgroups = glue("output/table_2_subgroups.csv"),
-      input_1_aer = glue("output/input1_aer.csv")
+      table_2_subgroups = glue("output/table_2_subgroups_*.csv"),
+      input_1_aer = glue("output/input1_aer_*.csv")
     )
   ),
   #comment("Stage 5 - Apply models"),

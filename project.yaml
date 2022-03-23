@@ -637,8 +637,8 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        table_2_subgroups: output/table_2_subgroups.csv
-        input_1_aer: output/input1_aer.csv
+        table_2_subgroups: output/table_2_subgroups_*.csv
+        input_1_aer: output/input1_aer_*.csv
 
   ## Apply cox model for ami 
 
