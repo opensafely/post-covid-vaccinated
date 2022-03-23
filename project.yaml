@@ -97,7 +97,7 @@ actions:
         venn_diagram_number_check: output/venn_diagram_number_check_*.csv
 
   stage4_table_2_subgroups:
-    run: r:latest analysis/table_2_subgroups.R
+    run: r:latest analysis/table_2_subgroups.R both
     needs:
     - preprocess_data
     - stage1_data_cleaning_both

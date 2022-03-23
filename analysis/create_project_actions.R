@@ -224,7 +224,7 @@ actions_list <- splice(
   #comment("Stage 4 - Table 2 subgroups"),
   action(
     name = "stage4_table_2_subgroups",
-    run = "r:latest analysis/table_2_subgroups.R",
+    run = "r:latest analysis/table_2_subgroups.R both",
     needs = list("preprocess_data","stage1_data_cleaning_both"),
     moderately_sensitive = list(
       table_2_subgroups = glue("output/table_2_subgroups_*.csv"),
