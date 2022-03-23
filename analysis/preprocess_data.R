@@ -23,6 +23,9 @@ df <- arrow::read_feather(file = "output/input_index.feather",
                           col_select = c("patient_id",
                                          "cov_num_consulation_rate",
                                          "cov_bin_healthcare_worker",
+                                         "qa_bin_prostate_cancer",
+                                         "qa_bin_pregnancy",
+                                         "qa_num_birth_year",
                                          "death_date"))
 
 # Load data --------------------------------------------------------------------
