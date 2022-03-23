@@ -292,7 +292,7 @@ table_2_subgroups_output <- function(population){
     #            subgrp_full_name=analyses_of_interest$stratify_by_subgroup)
     # )
     
-    write.csv(analyses_of_interest, file=paste0("output/table_2_subgroups", population, ".csv"), row.names = F)
+    write.csv(analyses_of_interest, file=paste0("output/table_2_subgroups_", population, ".csv"), row.names = F)
     input1_aer <- analyses_of_interest %>% select(c("event", "cohort_to_run", "subgroup", "strata", "unexposed_person_days"))
     names(input1_aer)[which(names(input1_aer) == "cohort_to_run")] = "cohort"
     input1_aer$event <- ifelse(startsWith(input1_aer$event,"out_"),gsub("out_date_","",input1_aer$event),input1_aer$evevent)
