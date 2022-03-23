@@ -296,7 +296,7 @@ table_2_subgroups_output <- function(population){
     input1_aer <- analyses_of_interest %>% select(c("event", "cohort_to_run", "subgroup", "strata", "unexposed_person_days"))
     names(input1_aer)[which(names(input1_aer) == "cohort_to_run")] = "cohort"
     input1_aer$event <- ifelse(startsWith(input1_aer$event,"out_"),gsub("out_date_","",input1_aer$event),input1_aer$evevent)
-    write.csv(input1_aer, file=paste0("output/input1_aer", population, ".csv"), row.names=F)
+    write.csv(input1_aer, file=paste0("output/input1_aer_", population, ".csv"), row.names=F)
 }
 
 # Run function using specified commandArgs
