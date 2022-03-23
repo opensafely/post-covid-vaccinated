@@ -97,14 +97,14 @@ actions:
         venn_diagram_number_check: output/venn_diagram_number_check_*.csv
 
   stage4_table_2_subgroups:
-    run: r:latest analysis/table_2_subgroups_v2.R
+    run: r:latest analysis/table_2_subgroups.R
     needs:
     - preprocess_data
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        table_2_subgroups: output/table_2_subgroups.csv
-        input_1_aer: output/input1_aer.csv
+        table_2_subgroups: output/table_2_subgroups_*.csv
+        input_1_aer: output/input1_aer_*.csv
 
   ## Apply cox model for ami 
 

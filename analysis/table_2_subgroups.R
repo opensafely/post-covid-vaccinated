@@ -24,7 +24,7 @@ args <- commandArgs(trailingOnly=TRUE)
 if(length(args)==0){
   # use for interactive testing
   population <- "vaccinated"
-  #population = "electively_unvaccinated"
+  population = "electively_unvaccinated"
 }else{
   population <- args[[1]]
 }
@@ -33,106 +33,189 @@ if(length(args)==0){
 cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
-table_2_extension_output <- function(population){
-  # indicate active analyses -----------------------------------------------
-  active_analyses <- read_rds("output/active_analyses.rds")
-  active_analyses <- active_analyses[which(active_analyses$active==T), ]
-  active_analyses$prior_history_var = gsub("cov_", "sub_", active_analyses$prior_history_var)
-  
-  # automation
-  event_dates_names <- active_analyses$outcome_variable
-  event_names<- event_names <- gsub("out_date_","",event_dates_names)
-  event_names
-  active_analyses$outcome_variable <- event_names
-  col_names <- names(active_analyses)
-  col_names <- col_names[!col_names %in% c("active","outcome","outcome_variable","covariates")]
-  
-  strata <-col_names
-  
-  strata <- strata[!strata %in% c("model", "cohort", "prior_history_var")]
-  
-  # mdl <- NULL
-  # for(i in 1:nrow(active_analyses)){
-  #    if(active_analyses$model[i]=="all"){
-  #      mdl=c(mdl, "mdl_agesex","mdl_max_adj")
-  #    }else{
-  #      mdl=c(mdl, active_analyses$model)
-  #    }
-  # }
-  #  mdl
-  # model <-mdl
-  
-  model <- NULL
-  
-  cohort_to_run <- NULL
-  #active_analyses$cohort[1] = "vaccinated"
-  for(i in 1:nrow(active_analyses)){
-  if(active_analyses$cohort[i]=="all"){
-    cohort_to_run=c(cohort_to_run,"vaccinated", "electively_unvaccinated")
+
+table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level, subgrp_full_name){
+  #survival_data$event_date <- survival_data[,paste0("out_date_","ami")]
+  # specify event date for the event of interest, e.g. ami
+  data_active <- survival_data
+  #data_active$event_date <- survival_data[,paste0("out_date_",event)]
+  data_active$event_date <- survival_data[,event]
+  # filter the population according to whether the subgroup is covid_history
+  if(subgrp == "covid_history"){
+    data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==T)
   }else{
-    cohort_to_run=c(cohort_to_run,active_analyses$cohort[i])
-  }  
-  }
-  cohort <- cohort_to_run
-  
-  #table_2_long <- crossing(event_names, model, cohort, strata)
-  table_2_long <- crossing(event_names, cohort, strata)
-  table_2_long$analyses <- rep("NA", nrow(table_2_long))
-  names_active_analyses <-names(active_analyses)
-  
-  for(i in 1:nrow(table_2_long)){
-  temp.grp = table_2_long$strata[i]
-  temp.out = table_2_long$event_names[i]
-  index.r = which(active_analyses$outcome_variable ==temp.out)
-  index.c = which(colnames(active_analyses)==temp.grp)
-  table_2_long$analyses[i] = active_analyses[index.r,index.c]
+    data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==F)
   }
   
-  # specify strata level
-  table_2_long$strata_level <- table_2_long$strata
-  table_2_long$strata_level <- gsub("agegp_","",table_2_long$strata_level)
-  table_2_long$strata_level <- gsub("covid_history","TRUE",table_2_long$strata_level)
-  table_2_long$strata_level <- gsub("covid_pheno_", "", table_2_long$strata_level)
-  table_2_long$strata_level <- gsub("ethnicity_", "", table_2_long$strata_level)
-  table_2_long$strata_level <- gsub("prior_history_", "", table_2_long$strata_level)
-  table_2_long$strata_level <- gsub("sex_", "", table_2_long$strata_level)
+  # filter the population according to the subgrp level
+  data_active$active_subgrp_full_name <- data_active[,subgrp_full_name]
+  data_active <- data_active%>%filter(active_subgrp_full_name==subgrp_level)
   
-  # specify subgroup names
+  # specify the cohort according to vaccination status
+  if(cohort=="vaccinated"){
+    data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
+    data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_exposed=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
+  }else if(cohort=="electively_unvaccinated"){
+    data_active <- data_active %>% left_join(data_active%>%dplyr::select(patient_id,vax_date_covid_1))
+    data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
+    data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_exposed = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
+    data_active <- data_active %>% dplyr::select(!c(vax_date_covid_1))
+  }
   
-  table_2_long$sub_grp <- table_2_long$strata
-  table_2_long <- table_2_long[,c("event_names", "cohort", "strata", "strata_level", "sub_grp", "analyses")]
+  data_active <- data_active %>% filter(follow_up_end_unexposed >= index_date & follow_up_end_unexposed != Inf)
+  data_active <- data_active %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
   
-  index <- grepl("agegp", table_2_long$strata, fixed = TRUE)
-  table_2_long$sub_grp[index] <- "sub_cat_age_group"
+  # select_names <- c("index_date","vax_date_covid_1","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
+  # select_names <- c("index_date","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
+  # 
+  # data_select <- data_active[,select_names]
+  # View(data_select)
+  # 
+  # 
+  #  select_names <- c("index_date", "follow_up_end_unexposed", "follow_up_end")
+  # 
+  #  data_select <- data_active[,select_names]
+  #  View(data_select)
   
-  index <- grepl("covid_history", table_2_long$strata, fixed = TRUE)
-  table_2_long$sub_grp[index] <- "sub_bin_covid19_confirmed_history"
+  # calculate follow-up days
+  data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
+  #hist(data_active$person_days_unexposed)
+  data_active = data_active %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
+  person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
   
-  index <- grepl("covid_pheno_", table_2_long$strata, fixed = TRUE)
-  table_2_long$sub_grp[index] <- "sub_cat_covid19_hospital"
+  data_active = data_active %>% mutate(person_days_exposed = as.numeric((as.Date(follow_up_end_exposed) - as.Date(index_date)))+1)
+  data_active = data_active %>% filter(person_days_exposed >=1 & person_days_exposed <= 197) # filter out follow up period
+  #hist(data_active$person_days)
+  person_days_total_exposed  = round(sum(data_active$person_days_exposed, na.rm = TRUE),1)
   
-  index <- grepl("ethnicity", table_2_long$strata, fixed = TRUE)
-  table_2_long$sub_grp[index] <- "sub_cat_ethnicity"
+  # post-exposure event
+  event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
+                                        data_active$event_date >= data_active$exp_date_covid19_confirmed & 
+                                        data_active$event_date <= data_active$follow_up_end_exposed))
   
-  index <- grepl("sex", table_2_long$strata, fixed = TRUE)
-  table_2_long$sub_grp[index] <- "sub_bin_sex"
   
-  index <- grepl("main", table_2_long$strata, fixed = TRUE)
-  table_2_long$sub_grp[index] <- "sub_main"
+  # pre-exposure event count
+  event_count_unexposed<- length(which((data_active$event_date >= data_active$index_date & 
+                                          data_active$event_date <= data_active$follow_up_end_unexposed) &
+                                         (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
+  ))
+  # incidence rate post exposure, do not calculate if event_count <=5
+  if(event_count_exposed >5){
+    person_years_total_exposed = person_days_total_exposed/365.2
+    incidence_rate_exposed= round(event_count_exposed/person_years_total_exposed, 4)
+    ir_lower_exposed = round(incidence_rate_exposed - 1.96 * sqrt(event_count_exposed/person_days_total_exposed^2),4)
+    ir_upper_exposed = round(incidence_rate_exposed + 1.96 * sqrt(event_count_exposed/person_days_total_exposed^2),4)
+  }else{
+    event_count_exposed = "redacted"
+    person_days_total_exposed = person_years_total_exposed = incidence_rate_exposed = ir_lower_exposed = ir_upper_exposed = "redacted"
+  }
   
-  index <- grepl("ate", table_2_long$strata, fixed = TRUE)
-  table_2_long$sub_grp[index] <- "sub_bin_ate"
+  # incidence rate pre exposure, do not calculate if event_count <=5
+  if(event_count_unexposed >5){
+    person_years_total_unexposed = person_days_total_unexposed/365.2
+    incidence_rate_unexposed= round(event_count_unexposed/person_years_total_unexposed, 4)
+    ir_lower_unexposed = round(incidence_rate_unexposed - 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2),4)
+    ir_upper_unexposed = round(incidence_rate_unexposed + 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2),4)
+  }else{
+    event_count_unexposed = "redacted"
+    person_days_total_unexposed = person_years_total_unexposed = incidence_rate_unexposed = ir_lower_unexposed = ir_upper_unexposed = "redacted"
+  }
+  return(c(person_days_total_unexposed, event_count_unexposed, incidence_rate_unexposed, ir_lower_unexposed, ir_upper_unexposed, person_days_total_exposed, event_count_exposed, incidence_rate_exposed, ir_lower_exposed, ir_upper_exposed))
+}
+
+
+table_2_subgroups_output <- function(population){
+  # define analyses of interests
+  active_analyses <- read_rds("lib/active_analyses.rds")
+  active_analyses <- active_analyses %>%dplyr::filter(active == "TRUE")
   
-  #View(table_2_long)
+  analyses_of_interest <- as.data.frame(matrix(ncol = 8,nrow = 0))
   
+  outcomes<-active_analyses$outcome_variable
+  
+  # for testing: i="out_date_ate"
+  for(i in outcomes){
+    analyses_to_run <- active_analyses %>% filter(outcome_variable==i)
+    
+    ##Set which cohorts are required
+    
+    if(analyses_to_run$cohort=="all"){
+      cohort_to_run=c("vaccinated", "electively_unvaccinated")
+    }else{
+      analyses_to_run=active_analyses$cohort
+    }  
+    
+    ## Transpose active_analyses to single column so can filter to analysis models to run
+    
+    analyses_to_run <- as.data.frame(t(analyses_to_run))
+    analyses_to_run$subgroup <- row.names(analyses_to_run)
+    colnames(analyses_to_run) <- c("run","subgroup")
+    # analyses_to_run$prior_history_var <- analyses_to_run$run
+    #analyses_to_run$prior_history_var <- ifelse(startsWith(row.names(analyses_to_run),"prior_history"),analyses_to_run$run,FALSE)
+    
+    analyses_to_run<- analyses_to_run %>% filter(run=="TRUE"  & subgroup != "active") 
+    rownames(analyses_to_run) <- NULL
+    analyses_to_run <- analyses_to_run %>% select(!run)
+    analyses_to_run$event=i
+    
+    ## Add in  all possible combinations of the subgroups, models and cohorts
+    analyses_to_run <- crossing(analyses_to_run,cohort_to_run)
+    
+    ## Add in which covariates to stratify by
+    analyses_to_run$stratify_by_subgroup=NA
+    for(j in c("ethnicity","sex")){
+      analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,i),i,analyses_to_run$stratify_by_subgroup)
+    }
+    index = which(active_analyses$outcome_variable == i)
+    analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,"prior_history"),active_analyses$prior_history_var[index],analyses_to_run$stratify_by_subgroup)
+    analyses_to_run$stratify_by_subgroup <- ifelse(is.na(analyses_to_run$stratify_by_subgroup),analyses_to_run$subgroup,analyses_to_run$stratify_by_subgroup)
+    
+    
+    ## Add in relevant subgroup levels to specify which stratum to run for
+    analyses_to_run$strata <- NA
+    analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="main","main",analyses_to_run$strata)
+    analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="covid_history","TRUE",analyses_to_run$strata)
+    
+    for(i in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
+      analyses_to_run$strata <- ifelse(startsWith(analyses_to_run$subgroup,i),gsub(i,"",analyses_to_run$subgroup),analyses_to_run$strata)
+    }
+    analyses_of_interest <- rbind(analyses_of_interest,analyses_to_run)
+    
+  }
+  
+  analyses_of_interest <- analyses_of_interest %>% filter(cohort_to_run == population)
+  write.csv(analyses_of_interest, file=paste0("output/analyses_of_interest", population, ".csv"))
   #ir = incidence rate; ir_lower = lower bound of the 95% CI for ir; ir_upper = upper bound of the 95% CI for ir
-  unexposed_person_days <- unexposed_event_count <- unexposed_ir <- unexposed_ir_lower <- unexposed_ir_upper <- rep("NA", nrow(table_2_long))
-  exposed_person_days <- exposed_event_count <- exposed_ir <- exposed_ir_lower <- exposed_ir_upper <- rep("NA", nrow(table_2_long))
+  unexposed_person_days <- unexposed_event_count <- unexposed_ir <- unexposed_ir_lower <- unexposed_ir_upper <- rep("NA", nrow(analyses_of_interest))
+  exposed_person_days <- exposed_event_count <- exposed_ir <- exposed_ir_lower <- exposed_ir_upper <- rep("NA", nrow(analyses_of_interest))
   
-  table_2_long <- cbind(table_2_long, unexposed_person_days, unexposed_event_count, unexposed_ir, unexposed_ir_lower, unexposed_ir_upper,
-                                    exposed_person_days, exposed_event_count, exposed_ir, exposed_ir_lower, exposed_ir_upper)
+  analyses_of_interest <- cbind(analyses_of_interest, unexposed_person_days, unexposed_event_count, unexposed_ir, unexposed_ir_lower, unexposed_ir_upper,
+                                exposed_person_days, exposed_event_count, exposed_ir, exposed_ir_lower, exposed_ir_upper)
   
-  table_2_long <- table_2_long %>% filter(cohort == population)
+  # # specify subgroup names
+  index <- grepl("agegp", analyses_of_interest$subgroup, fixed = TRUE)
+  analyses_of_interest$stratify_by_subgroup[index] <- "sub_cat_age_group"
+  
+  index <- grepl("covid_history", analyses_of_interest$subgroup, fixed = TRUE)
+  analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_covid19_confirmed_history"
+  
+  index <- grepl("covid_pheno_", analyses_of_interest$subgroup, fixed = TRUE)
+  analyses_of_interest$stratify_by_subgroup[index] <- "sub_cat_covid19_hospital"
+  
+  index <- grepl("ethnicity", analyses_of_interest$subgroup, fixed = TRUE)
+  analyses_of_interest$stratify_by_subgroup[index] <- "sub_cat_ethnicity"
+  
+  index <- grepl("sex", analyses_of_interest$subgroup, fixed = TRUE)
+  analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_sex"
+  
+  index <- grepl("main", analyses_of_interest$subgroup, fixed = TRUE)
+  analyses_of_interest$stratify_by_subgroup[index] <- "sub_main"
+  
+  index <- grepl("ate", analyses_of_interest$subgroup, fixed = TRUE)
+  analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_ate"
+  
+  index <- grepl("cov_bin_vte", analyses_of_interest$stratify_by_subgroup, fixed = TRUE)
+  analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_vte"
   
   # read in data------------------------------------------------------------
   
@@ -147,22 +230,20 @@ table_2_extension_output <- function(population){
   
   # rename variables to indicate them as subgroups
   setnames(input,
-         old = c("cov_cat_sex",
-                 "cov_cat_age_group",
-                 "cov_cat_ethnicity",
-                 "cov_bin_vte"),
-         new = c("sub_bin_sex",
-                 "sub_cat_age_group",
-                 "sub_cat_ethnicity",
-                 "sub_bin_vte"))
+           old = c("cov_cat_sex",
+                   "cov_cat_age_group",
+                   "cov_cat_ethnicity",
+                   "cov_bin_vte"),
+           new = c("sub_bin_sex",
+                   "sub_cat_age_group",
+                   "sub_cat_ethnicity",
+                   "sub_bin_vte"))
   
   levels(input$sub_cat_ethnicity) <- c("White", "Mixed", "South_Asian", "Black", "Other", "Missing")
-  
+  event_dates_names <- active_analyses$outcome_variable
   outcome_names <- tidyselect::vars_select(names(input), starts_with(c("out_"), ignore.case=TRUE))
   outcome_names_not_active <- outcome_names[!outcome_names %in% event_dates_names]
   
-  # sub_main = rep("main", nrow(input))
-  # input <- input %>% mutate(sub_main = sub_main)
   input$sub_main <- "main"
   
   sub_grp_names <- tidyselect::vars_select(names(input), starts_with(c('sub_'), ignore.case = TRUE))
@@ -178,129 +259,52 @@ table_2_extension_output <- function(population){
   
   # rewrite the function
   # testing
-  # event="ami";cohort="vaccinated";strata="covid_history"; strata_level="TRUE"; sub_grp="sub_bin_covid19_confirmed_history"
-  #event="vte";cohort="vaccinated";strata="sub_bin_vte"; strata_level="FALSE"; sub_grp="sub_bin_vte"
+  #event="out_date_ami";cohort="vaccinated";strata="covid_history"; subgrp_level="TRUE"; subgrp_full_name="sub_bin_covid19_confirmed_history"
+  #event="vte";cohort="vaccinated";strata="sub_bin_vte"; subgrp_level="FALSE"; subgrp_full_name="sub_bin_vte"
   
-  table_2_subgroup <- function(survival_data, event,cohort,strata, strata_level, sub_grp){
-      #survival_data$event_date <- survival_data[,paste0("out_date_","ami")]
-     # specify event date for the event of interest, e.g. ami
-      data_active <- survival_data
-      data_active$event_date <- survival_data[,paste0("out_date_",event)]
-      # filter the population according to whether the subgroup is covid_history
-      if(strata == "covid_history"){
-               data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==T)
-      }else{
-              data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==F)
-      }
-      
-      # filter the population according to the strata level
-      data_active$active_sub_grp <- data_active[,sub_grp]
-      data_active <- data_active%>%filter(active_sub_grp==strata_level)
-     
-      # specify the cohort according to vaccination status
-      if(cohort=="vaccinated"){
-        data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
-        data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_exposed=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
-      }else if(cohort=="electively_unvaccinated"){
-        data_active <- data_active %>% left_join(input%>%dplyr::select(patient_id,vax_date_covid_1))
-        data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
-        data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_exposed = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
-        data_active <- data_active %>% dplyr::select(!c(vax_date_covid_1))
-      }
-  
-      data_active <- data_active %>% filter(follow_up_end_unexposed >= index_date & follow_up_end_unexposed != Inf)
-      data_active <- data_active %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
-      
-      # select_names <- c("index_date","vax_date_covid_1","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
-      # select_names <- c("index_date","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
-      # 
-      # data_select <- data_active[,select_names]
-      # View(data_select)
-      # 
-      # 
-      #  select_names <- c("index_date", "follow_up_end_unexposed", "follow_up_end")
-      # 
-      #  data_select <- data_active[,select_names]
-      #  View(data_select)
-      
-      # calculate follow-up days
-      data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
-      #hist(data_active$person_days_unexposed)
-      data_active = data_active %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
-      person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
-  
-      data_active = data_active %>% mutate(person_days_exposed = as.numeric((as.Date(follow_up_end_exposed) - as.Date(index_date)))+1)
-      data_active = data_active %>% filter(person_days_exposed >=1 & person_days_exposed <= 197) # filter out follow up period
-      #hist(data_active$person_days)
-       person_days_total_exposed  = round(sum(data_active$person_days_exposed, na.rm = TRUE),1)
-  
-      # post-exposure event
-       event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
-                                    data_active$event_date >= data_active$exp_date_covid19_confirmed & 
-                                    data_active$event_date <= data_active$follow_up_end_exposed))
-      
-  
-      # pre-exposure event count
-        event_count_unexposed<- length(which((data_active$event_date >= data_active$index_date & 
-                                    data_active$event_date <= data_active$follow_up_end_unexposed) &
-                                   (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
-        ))
-      # incidence rate post exposure, do not calculate if event_count <=5
-      if(event_count_exposed >5){
-      person_years_total_exposed = person_days_total_exposed/365.2
-      incidence_rate_exposed= round(event_count_exposed/person_years_total_exposed, 4)
-      ir_lower_exposed = round(incidence_rate_exposed - 1.96 * sqrt(event_count_exposed/person_days_total_exposed^2),4)
-      ir_upper_exposed = round(incidence_rate_exposed + 1.96 * sqrt(event_count_exposed/person_days_total_exposed^2),4)
-      }else{
-        event_count_exposed = "redacted"
-        person_days_total_exposed = person_years_total_exposed = incidence_rate_exposed = ir_lower_exposed = ir_upper_exposed = "redacted"
-      }
-      
-      # incidence rate pre exposure, do not calculate if event_count <=5
-      if(event_count_unexposed >5){
-      person_years_total_unexposed = person_days_total_unexposed/365.2
-      incidence_rate_unexposed= round(event_count_unexposed/person_years_total_unexposed, 4)
-      ir_lower_unexposed = round(incidence_rate_unexposed - 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2),4)
-      ir_upper_unexposed = round(incidence_rate_unexposed + 1.96 * sqrt(event_count_unexposed/person_days_total_unexposed^2),4)
-      }else{
-          event_count_unexposed = "redacted"
-          person_days_total_unexposed = person_years_total_unexposed = incidence_rate_unexposed = ir_lower_unexposed = ir_upper_unexposed = "redacted"
-      }
-      return(c(person_days_total_unexposed, event_count_unexposed, incidence_rate_unexposed, ir_lower_unexposed, ir_upper_unexposed, person_days_total_exposed, event_count_exposed, incidence_rate_exposed, ir_lower_exposed, ir_upper_exposed))
-  }
-  
-  col_names <- names(table_2_long)
+  col_names <- names(analyses_of_interest)
   start = grep("unexposed_person_days", col_names)
-  end = ncol(table_2_long)
+  end = ncol(analyses_of_interest)
   
-  for(i in 1:nrow(table_2_long)){
-  # for quick testing
-  #for(i in 357:358){
-  #for(i in 87:88){
-  #for(i in 1:2){
-  if(table_2_long$analyses[i] == TRUE){
-  d <- table_2_long
-  print(i)
-  if((d$strata[i]=="prior_history_FALSE" | d$strata[i]=="prior_history_TRUE") & (d$event_names[i]=="ate"|d$event_names[i]=="vte")){
-    if(d$event_names[i]=="ate"){d$sub_grp[i] = "sub_bin_ate"}
-    if(d$event_names[i]=="vte"){d$sub_grp[i] = "sub_bin_vte"}
-    table_2_long[i,start:end] <- table_2_subgroup(survival_data, event=d$event_names[i],cohort=d$cohort[i],strata=d$strata[i], strata_level=d$strata_level[i], sub_grp=d$sub_grp[i])
+  for(i in 1:nrow(analyses_of_interest)){
+    #for quick testing
+    #for(i in 357:358){
+    #for(i in 87:88){
+    #for(i in 5:6){
+    d <- analyses_of_interest
+    print(i)
+    analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, 
+                                                             event=analyses_of_interest$event[i],
+                                                             cohort=analyses_of_interest$cohort_to_run[i],
+                                                             subgrp=analyses_of_interest$subgroup[i], 
+                                                             subgrp_level=analyses_of_interest$strata[i], 
+                                                             subgrp_full_name=analyses_of_interest$stratify_by_subgroup[i])
   }
-  if(d$strata[i]!="prior_history_FALSE" & d$strata[i]!="prior_history_TRUE"){
-    table_2_long[i,start:end] <- table_2_subgroup(survival_data, event=d$event_names[i],cohort=d$cohort[i],strata=d$strata[i], strata_level=d$strata_level[i], sub_grp=d$sub_grp[i])
-  }
-  }
-  }
-  write.csv(table_2_long, file=paste0("output/table_2_subgroups_", population, ".csv"), row.names = F)
-  input1_aer <- table_2_long %>% select(c("event_names", "cohort", "strata", "analyses", "strata_level", "sub_grp", "unexposed_person_days")) 
+  
+  # results <- lapply(split(analyses_of_interest,seq(nrow(analyses_of_interest))),
+  #        function(analyses_of_interest)
+  #          table_2_calculation(
+  #            survival_data = survival_data,
+  #            event=analyses_of_interest$event,
+  #            cohort=analyses_of_interest$cohort_to_run,
+  #            subgrp=analyses_of_interest$subgroup,
+  #            subgrp_level=analyses_of_interest$strata,
+  #            subgrp_full_name=analyses_of_interest$stratify_by_subgroup)
+  # )
+  
+  write.csv(analyses_of_interest, file=paste0("output/table_2_subgroups", population, ".csv"), row.names = F)
+  input1_aer <- analyses_of_interest %>% select(c("event", "cohort_to_run", "subgroup", "strata", "unexposed_person_days"))
+  names(input1_aer)[which(names(input1_aer) == "cohort_to_run")] = "cohort"
+  input1_aer$event <- ifelse(startsWith(input1_aer$event,"out_"),gsub("out_date_","",input1_aer$event),input1_aer$evevent)
   write.csv(input1_aer, file=paste0("output/input1_aer_", population, ".csv"), row.names=F)
 }
 
 # Run function using specified commandArgs
+
 if(population == "both"){
-  table_2_extension_output("vaccinated")
-  table_2_extension_output("electively_unvaccinated")
+  table_2_subgroups_output("vaccinated")
+  table_2_subgroups_output("electively_unvaccinated")
 }else{
-  table_2_extension_output(population)
+  table_2_subgroups_output(population)
 }
 
