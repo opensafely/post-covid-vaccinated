@@ -2,7 +2,7 @@ version: '3.0'
 
 expectations:
 
-  population_size: 40000
+  population_size: 400000
 
 actions:
 
@@ -43,23 +43,37 @@ actions:
       highly_sensitive:
         cohort: output/input_index.feather
 
-  preprocess_data:
-    run: r:latest analysis/preprocess_data.R
+  preprocess_data_vaccinated:
+    run: r:latest analysis/preprocess_data.R vaccinated
     needs:
     - generate_study_population_index
     - generate_study_population_vaccinated
     - generate_study_population_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        describe: output/describe_*.txt
+        describe: output/describe_input_vaccinated_*.txt
       highly_sensitive:
-        cohort: output/input_*.rds
-        venn: output/venn_*.rds
+        cohort: output/input_vaccinated.rds
+        venn: output/venn_vaccinated.rds
+
+  preprocess_data_electively_unvaccinated:
+    run: r:latest analysis/preprocess_data.R electively_unvaccinated
+    needs:
+    - generate_study_population_index
+    - generate_study_population_vaccinated
+    - generate_study_population_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        describe: output/describe_input_electively_unvaccinated_*.txt
+      highly_sensitive:
+        cohort: output/input_electively_unvaccinated.rds
+        venn: output/venn_electively_unvaccinated.rds
 
   stage1_data_cleaning_both:
     run: r:latest analysis/Stage1_data_cleaning.R both
     needs:
-    - preprocess_data
+    - preprocess_data_vaccinated
+    - preprocess_data_electively_unvaccinated
     outputs:
       moderately_sensitive:
         refactoring: output/meta_data_factors_*.csv
@@ -89,7 +103,8 @@ actions:
   stage4_venn_diagram_both:
     run: r:latest analysis/venn_diagram.R both
     needs:
-    - preprocess_data
+    - preprocess_data_vaccinated
+    - preprocess_data_electively_unvaccinated
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:

@@ -156,17 +156,31 @@ actions_list <- splice(
     )
   ), 
 
-  #comment("Preprocess data"),
+  #comment("Preprocess data - vaccinated"),
   action(
-    name = "preprocess_data",
-    run = "r:latest analysis/preprocess_data.R",
+    name = "preprocess_data_vaccinated",
+    run = "r:latest analysis/preprocess_data.R vaccinated",
     needs = list("generate_study_population_index", "generate_study_population_vaccinated", "generate_study_population_electively_unvaccinated"),
     moderately_sensitive = list(
-      describe = glue("output/describe_*.txt")
+      describe = glue("output/describe_input_vaccinated_*.txt")
     ),
     highly_sensitive = list(
-      cohort = glue("output/input_*.rds"),
-      venn = glue("output/venn_*.rds")
+      cohort = glue("output/input_vaccinated.rds"),
+      venn = glue("output/venn_vaccinated.rds")
+    )
+  ), 
+
+  #comment("Preprocess data - electively_unvaccinated"),
+  action(
+    name = "preprocess_data_electively_unvaccinated",
+    run = "r:latest analysis/preprocess_data.R electively_unvaccinated",
+    needs = list("generate_study_population_index", "generate_study_population_vaccinated", "generate_study_population_electively_unvaccinated"),
+    moderately_sensitive = list(
+      describe = glue("output/describe_input_electively_unvaccinated_*.txt")
+    ),
+    highly_sensitive = list(
+      cohort = glue("output/input_electively_unvaccinated.rds"),
+      venn = glue("output/venn_electively_unvaccinated.rds")
     )
   ), 
 
@@ -174,7 +188,7 @@ actions_list <- splice(
   action(
     name = "stage1_data_cleaning_both",
     run = "r:latest analysis/Stage1_data_cleaning.R both",
-    needs = list("preprocess_data"),
+    needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated"),
     moderately_sensitive = list(
       refactoring = glue("output/meta_data_factors_*.csv"),
       QA_rules = glue("output/QA_summary_*.csv"),
@@ -214,7 +228,7 @@ actions_list <- splice(
   action(
     name = "stage4_venn_diagram_both",
     run = "r:latest analysis/venn_diagram.R both",
-    needs = list("preprocess_data","stage1_data_cleaning_both"),
+    needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated","stage1_data_cleaning_both"),
     moderately_sensitive = list(
       venn_diagram = glue("output/venn_diagram_*.svg"),
       venn_diagram_number_check = glue("output/venn_diagram_number_check_*.csv")

@@ -1,126 +1,69 @@
+# Specify command arguments ----------------------------------------------------
+
+args <- commandArgs(trailingOnly=TRUE)
+
+if(length(args)==0){
+  # use for interactive testing
+  cohort <- "vaccinated"
+} else {
+  cohort <- args[[1]]
+}
+
+# Define other parameters ------------------------------------------------------
+
+study_start <- "2021-06-01"
+
 # Load libraries ---------------------------------------------------------------
 
 library(magrittr)
 
-# Define parameters ------------------------------------------------------------
-
-study_start <- "2021-06-01"
-
 # Create spine dataset ---------------------------------------------------------
 
 df <- arrow::read_feather(file = "output/input_index.feather",
-                          col_select = c("patient_id","death_date"))
+                          col_select = c("patient_id",
+                                         "cov_num_consulation_rate",
+                                         "cov_bin_healthcare_worker",
+                                         "death_date"))
 
-# Merge each dataset to the spine dataset --------------------------------------
+# Load data --------------------------------------------------------------------
 
-for (i in c("index","vaccinated","electively_unvaccinated")) {
+tmp1 <- arrow::read_feather(file = "output/input_electively_unvaccinated.feather",
+                            col_select = c("patient_id",
+                                           "cov_cat_sex",
+                                           "vax_date_eligible",
+                                           "vax_cat_jcvi_group"))
 
-  ## Load dataset
-  
-  tmp <- arrow::read_feather(file = paste0("output/input_",i,".feather"))
-  
-   # Describe data --------------------------------------------------------------
-  
-  sink(paste0("output/describe_input_",i,"_studydefinition.txt"))
-  print(Hmisc::describe(tmp))
-  sink()
+tmp2 <- arrow::read_feather(file = "output/input_vaccinated.feather",
+                            col_select = c("patient_id",
+                                           "vax_date_Pfizer_1",
+                                           "vax_date_Pfizer_2",
+                                           "vax_date_Pfizer_3",
+                                           "vax_date_AstraZeneca_1",
+                                           "vax_date_AstraZeneca_2",
+                                           "vax_date_AstraZeneca_3",
+                                           "vax_date_Moderna_1",
+                                           "vax_date_Moderna_2",
+                                           "vax_date_Moderna_3"))
 
-  # Overwrite patient IDs for dummy data only ----------------------------------
-  
-  if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
-    tmp$patient_id <- df$patient_id
-  }
-  
-  ## Identify dynamic variables in dataset
-  
-  keep <- c("patient_id",
-            colnames(tmp)[grepl("sub_",colnames(tmp))], # Subgroups
-            colnames(tmp)[grepl("exp_",colnames(tmp))], # Exposures
-            colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
-            colnames(tmp)[grepl("cov_",colnames(tmp))]) # Covariates
-  
-  keep <- keep[!grepl("tmp_exp_",keep)]
-  keep <- keep[!grepl("tmp_sub_",keep)]
-  keep <- keep[!grepl("tmp_cov_",keep)]
-  
-  keep <- intersect(keep,colnames(tmp))
-  
-  tmp_dynamic <- tmp[,keep]
-  
-  ## Rename dynamic variables to indicate source data
-  
-  colnames(tmp_dynamic) <- paste0(colnames(tmp_dynamic),"_",i)
-  
-  tmp_dynamic <- dplyr::rename(tmp_dynamic, patient_id = paste0("patient_id_",i))
-  
-  ## Merge dynamic variables to spine
-  
-  df <- merge(df,tmp_dynamic, by = "patient_id")
+# Overwrite patient IDs for dummy data only ------------------------------------
 
-  ## Identify static variables
-  
-  keep <- c("patient_id",
-            colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
-            colnames(tmp)[grepl("vax_",colnames(tmp))]) # Vaccinations
-  
-  keep <- intersect(keep,colnames(tmp))
-  
-  tmp_static <- tmp[,keep]
-  
-  ## Merge static variables to spine if applicable
-  
-  if (ncol(tmp_static)>1) {
-    df <- merge(df,tmp_static, by = "patient_id") 
-  }
-  
+if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
+  tmp1$patient_id <- df$patient_id
+  tmp2$patient_id <- df$patient_id
 }
 
-# Remove vax_date_covid_* variables --------------------------------------------
-# NB: These will be removed from future study definitions
+# Make single spine dataset ----------------------------------------------------
 
-df[,c("vax_date_covid_1","vax_date_covid_2","vax_date_covid_3")] <- NULL
+df <- merge(df,tmp1, by = "patient_id")
+df <- merge(df,tmp2, by = "patient_id")
+rm(tmp1,tmp2)
 
-# Remove temporary datasets ----------------------------------------------------
+print("Spine dataset created successfully")
 
-rm(tmp, tmp_dynamic, tmp_static)
-
-# Rename universally defined variables -----------------------------------------
-# NB: These appear in only one dataset so do not need dataset specific names
-
-df <- dplyr::rename(df, 
-                    "cov_cat_sex" = "cov_cat_sex_electively_unvaccinated",
-                    "cov_num_consulation_rate" = "cov_num_consulation_rate_index",
-                    "cov_bin_healthcare_worker" = "cov_bin_healthcare_worker_index")
-
-# Remove JCVI age variables ----------------------------------------------------
-# NB: These are used to determine JCVI category only
-
-df[,c("vax_jcvi_age_1","vax_jcvi_age_2")] <- NULL
-
-# Convert dates to date format -------------------------------------------------
+# Covert all dates to date format ----------------------------------------------
 
 for (i in colnames(df)[grepl("_date",colnames(df))]) {
   df[,i] <- as.Date(df[,i])
-}
-
-# Convert numbers to number format ---------------------------------------------
-
-df$qa_num_birth_year <- format(df$qa_num_birth_year,"%Y")
-
-for (i in colnames(df)[grepl("_num",colnames(df))]) {
-  df[,i] <- as.numeric(df[,i])
-}
-
-# Convert categories to factor format ------------------------------------------
-
-for (i in colnames(df)[grepl("_cat",colnames(df))]) {
-  df[,i] <- as.factor(df[,i])
-}
-
-# Convert binaries to logical format -------------------------------------------
-
-for (i in colnames(df)[grepl("_bin",colnames(df))]) {
-  df[,i] <- as.logical(df[,i])
 }
 
 # Overwrite vaccination information for dummy data only ------------------------
@@ -161,7 +104,6 @@ tmp <- df %>%
       dplyr::full_join(tmp_Moderna, by=c("patient_id", "date_covid")),
     by = "patient_id"
   ) 
-
 
 # Determine product at each vaccination date -----------------------------------
 
@@ -208,94 +150,142 @@ tmp <- tmp %>%
 # Add summary variables to main data -------------------------------------------
 
 df <- merge(df, tmp, by = "patient_id", all.x = TRUE)
+rm(tmp_AstraZeneca, tmp_Moderna, tmp_Pfizer)
 
-# Split into "vaccinated" and "electively_unvaccinated" cohorts ----------------
+print("Vaccination information recorded successfully")
 
-for (j in c("vaccinated","electively_unvaccinated")) {
-  
-  # Make temporary data frame --------------------------------------------------
-  
-  tmp <- df 
-  
-  # Remove dynamic variables from 'other' dataset --------------------------------
-  
-  tmp[,colnames(tmp)[grepl(paste0("_",ifelse(j=="vaccinated","electively_unvaccinated","vaccinated")),colnames(tmp))]] <- NULL
-  
-  # Determine patient index date -----------------------------------------------
-  
-  tmp$study_start_date <- as.Date(study_start)
-  
-  if(j=="vaccinated"){
-    tmp$pat_start_date <- as.Date(tmp$vax_date_covid_2)+14
-  }else{
-    tmp$pat_start_date <- as.Date(tmp$vax_date_eligible)+84
-  }
-  
-  tmp$use_date <- ifelse(tmp$study_start_date>tmp$pat_start_date ,"index","nonindex")
-  
-  # Identify variables for those using study start as index --------------------
-  
-  index <- tmp[tmp$use_date=="index",]
-  index[,grepl(paste0("_",j),colnames(index))] <- NULL
-  colnames(index) <- gsub("_index","",colnames(index))
-  index$index_date <- index$study_start_date
-  index[,c("use_date")] <- NULL
-  
-  # Identify variables for those not using study start as index ----------------
-  
-  nonindex <- tmp[tmp$use_date=="nonindex",]
-  nonindex[,grepl("_index",colnames(nonindex))] <- NULL
-  colnames(nonindex) <- gsub(paste0("_",j),"",colnames(nonindex))
-  nonindex$index_date <- nonindex$pat_start_date 
-  nonindex[,c("use_date")] <- NULL
-  
-  # Combine index and nonindex back into a single dataset ----------------------
-  
-  tmp <- rbind(index,nonindex)
-  
-  # Define COVID-19 severity ---------------------------------------------------
-  
-  tmp$sub_cat_covid19_hospital <- "no_infection"
-  
-  tmp$sub_cat_covid19_hospital <- ifelse(!is.na(tmp$exp_date_covid19_confirmed),
-                                        "non_hospitalised",tmp$sub_cat_covid19_hospital)
-  
-  tmp$sub_cat_covid19_hospital <- ifelse(!is.na(tmp$exp_date_covid19_confirmed) & 
-                                          !is.na(tmp$sub_date_covid19_hospital) &
-                                          (tmp$sub_date_covid19_hospital-tmp$exp_date_covid19_confirmed>=0 &
-                                             tmp$sub_date_covid19_hospital-tmp$exp_date_covid19_confirmed<29),
-                                        "hospitalised",tmp$sub_cat_covid19_hospital)
-  
-  tmp$sub_cat_covid19_hospital <- as.factor(tmp$sub_cat_covid19_hospital)
-  tmp[,c("sub_date_covid19_hospital")] <- NULL
-  tmp <- tmp[!is.na(tmp$patient_id),]
-  
-  # Restrict columns and save analysis dataset ---------------------------------
-  
-  tmp1 <- tmp[,c("patient_id","death_date","index_date",
-              colnames(tmp)[grepl("sub_",colnames(tmp))], # Subgroups
-              colnames(tmp)[grepl("exp_",colnames(tmp))], # Exposures
-              colnames(tmp)[grepl("out_",colnames(tmp))], # Outcomes
-              colnames(tmp)[grepl("cov_",colnames(tmp))], # Covariates
-              colnames(tmp)[grepl("qa_",colnames(tmp))], # Quality assurance
-              colnames(tmp)[grepl("vax_date_eligible",colnames(tmp))], # Vaccination eligbility
-              colnames(tmp)[grepl("vax_date_covid_",colnames(tmp))], # Vaccination dates
-              colnames(tmp)[grepl("vax_cat_",colnames(tmp))])] # Vaccination products and JCVI groupings
-  
-  tmp1[,colnames(tmp)[grepl("tmp_out_",colnames(tmp))]] <- NULL
-  
-  saveRDS(tmp1, file = paste0("output/input_",j,".rds"))
-  
-  # Describe data --------------------------------------------------------------
-  
-  sink(paste0("output/describe_input_",j,"_stage0.txt"))
-  print(Hmisc::describe(tmp1))
-  sink()
-  
-  # Restrict columns and save Venn diagram input dataset -----------------------
-  
-  tmp2 <- tmp[,c("patient_id",colnames(tmp)[grepl("out_",colnames(tmp))])]
-  
-  saveRDS(tmp2, file = paste0("output/venn_",j,".rds"))
-  
+# Tidy dataset -----------------------------------------------------------------
+
+df <- df[,c("patient_id","death_date",
+            colnames(df)[grepl("vax_date_eligible",colnames(df))], # Vaccination eligbility
+            colnames(df)[grepl("vax_date_covid_",colnames(df))], # Vaccination dates
+            colnames(df)[grepl("vax_cat_",colnames(df))], # Vaccination products
+            colnames(df)[grepl("cov_",colnames(df))])] # Covariates
+
+# Determine patient index date -----------------------------------------------
+
+df$study_start_date <- as.Date(study_start)
+
+if(cohort=="vaccinated"){
+  df$pat_start_date <- as.Date(df$vax_date_covid_2)+14
 }
+
+if(cohort=="electively_unvaccinated"){
+  df$pat_start_date <- as.Date(df$vax_date_eligible)+84
+}
+
+df$index_source <- ifelse(df$study_start_date>df$pat_start_date ,"study_start_date","pat_start_date")
+
+df$index_date <- as.Date(ifelse(df$study_start_date>df$pat_start_date ,df$study_start_date,df$pat_start_date), origin = "1970-01-01")# Convert dates to date format -------------------------------------------------
+
+print("Index date and source determined successfully")
+
+# Load covariate data ----------------------------------------------------------
+
+tmp_index <- arrow::read_feather(file = "output/input_index.feather")
+tmp_other <- arrow::read_feather(file = paste0("output/input_",cohort,".feather"))
+
+# Overwrite patient IDs for dummy data only ------------------------------------
+
+if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
+  tmp_index$patient_id <- df$patient_id
+  tmp_other$patient_id <- df$patient_id
+}
+
+# Make and merge covariate dataset ---------------------------------------------
+
+tmp_index <- tmp_index[tmp_index$patient_id %in% df[df$index_source=="study_start_date",]$patient_id,
+                       intersect(colnames(tmp_index),colnames(tmp_other))]
+
+tmp_other <- tmp_other[tmp_other$patient_id %in% df[df$index_source=="pat_start_date",]$patient_id,
+                       intersect(colnames(tmp_index),colnames(tmp_other))]
+
+tmp <- rbind(tmp_index, tmp_other)
+
+tmp <- tmp[,!grepl("tmp_exp_",colnames(tmp))]
+tmp <- tmp[,!grepl("tmp_sub_",colnames(tmp))]
+tmp <- tmp[,!grepl("tmp_cov_",colnames(tmp))]
+
+df <- merge(df, tmp, by = "patient_id")
+rm(tmp, tmp_index,tmp_other)
+
+print("Non-spine variables added to dataset successfully")
+
+# Convert dates to date format -------------------------------------------------
+
+for (i in colnames(df)[grepl("_date",colnames(df))]) {
+  df[,i] <- as.Date(df[,i])
+}
+
+# Convert numbers to number format ---------------------------------------------
+
+df$qa_num_birth_year <- format(df$qa_num_birth_year,"%Y")
+
+for (i in colnames(df)[grepl("_num",colnames(df))]) {
+  df[,i] <- as.numeric(df[,i])
+}
+
+# Convert categories to factor format ------------------------------------------
+
+for (i in colnames(df)[grepl("_cat",colnames(df))]) {
+  df[,i] <- as.factor(df[,i])
+}
+
+# Convert binaries to logical format -------------------------------------------
+
+for (i in colnames(df)[grepl("_bin",colnames(df))]) {
+  df[,i] <- as.logical(df[,i])
+}
+
+print("Variable formats updated successfully")
+
+# Define COVID-19 severity ---------------------------------------------------
+
+df$sub_cat_covid19_hospital <- "no_infection"
+
+df$sub_cat_covid19_hospital <- ifelse(!is.na(df$exp_date_covid19_confirmed),
+                                      "non_hospitalised",df$sub_cat_covid19_hospital)
+
+df$sub_cat_covid19_hospital <- ifelse(!is.na(df$exp_date_covid19_confirmed) & 
+                                        !is.na(df$sub_date_covid19_hospital) &
+                                        (df$sub_date_covid19_hospital-df$exp_date_covid19_confirmed>=0 &
+                                           df$sub_date_covid19_hospital-df$exp_date_covid19_confirmed<29),
+                                      "hospitalised",df$sub_cat_covid19_hospital)
+
+df$sub_cat_covid19_hospital <- as.factor(df$sub_cat_covid19_hospital)
+df[,c("sub_date_covid19_hospital")] <- NULL
+df <- df[!is.na(df$patient_id),]
+
+print("COVID19 severity determined successfully")
+
+# Restrict columns and save analysis dataset ---------------------------------
+
+df1 <- df[,c("patient_id","death_date","index_date",
+             colnames(df)[grepl("sub_",colnames(df))], # Subgroups
+             colnames(df)[grepl("exp_",colnames(df))], # Exposures
+             colnames(df)[grepl("out_",colnames(df))], # Outcomes
+             colnames(df)[grepl("cov_",colnames(df))], # Covariates
+             colnames(df)[grepl("qa_",colnames(df))], # Quality assurance
+             colnames(df)[grepl("vax_date_eligible",colnames(df))], # Vaccination eligbility
+             colnames(df)[grepl("vax_date_covid_",colnames(df))], # Vaccination dates
+             colnames(df)[grepl("vax_cat_",colnames(df))])] # Vaccination products
+
+df1[,colnames(df)[grepl("tmp_out_",colnames(df))]] <- NULL
+
+saveRDS(df1, file = paste0("output/input_",cohort,".rds"))
+
+print("Input data saved successfully")
+
+# Describe data --------------------------------------------------------------
+
+sink(paste0("output/describe_input_",cohort,"_stage0.txt"))
+print(Hmisc::describe(df1))
+sink()
+
+# Restrict columns and save Venn diagram input dataset -----------------------
+
+df2 <- df[,c("patient_id",colnames(df)[grepl("out_",colnames(df))])]
+
+saveRDS(df2, file = paste0("output/venn_",cohort,".rds"))
+
+print("Venn diagram data saved successfully")
