@@ -160,6 +160,7 @@ print("Vaccination information recorded successfully")
 # Tidy dataset -----------------------------------------------------------------
 
 df <- df[,c("patient_id","death_date",
+            colnames(df)[grepl("qa_",colnames(df))],
             colnames(df)[grepl("vax_date_eligible",colnames(df))], # Vaccination eligbility
             colnames(df)[grepl("vax_date_covid_",colnames(df))], # Vaccination dates
             colnames(df)[grepl("vax_cat_",colnames(df))], # Vaccination products
