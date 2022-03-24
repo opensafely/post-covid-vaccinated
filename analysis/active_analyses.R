@@ -90,7 +90,7 @@ for (i in 1:length(outcomes)) {
                        rep("",22))
 }
 
-# Add mental health outcomes ---------------------------------------------------
+# Add diabetes outcomes --------------------------------------------------------
 
 outcomes <- c("Depression",
               "Anxiety - general",
@@ -115,14 +115,10 @@ outcomes_short <- c("out_date_depression",
                     "out_date_addiction")
 
 for (i in 1:length(outcomes)) {
-  df[nrow(df)+1,] <- c(TRUE,
+  df[nrow(df)+1,] <- c(FALSE,
                        outcomes[i],
                        paste0("out_date_",outcomes_short[i]),
-                       "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_cat_sex",
-                       rep("all",2),
-                       rep(TRUE,4),
-                       rep(FALSE,14),
-                       "")
+                       rep("",22))
 }
 
 # Save active analyses list ----------------------------------------------------
