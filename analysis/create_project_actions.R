@@ -128,7 +128,7 @@ actions_list <- splice(
     )
   ),
   
-  #comment("Generate dummy data for study_definition - unvaccinated"),
+  #comment("Generate dummy data for study_definition - electively_unvaccinated"),
   action(
     name = "generate_study_population_electively_unvaccinated",
     run = "cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated --output-format feather",
