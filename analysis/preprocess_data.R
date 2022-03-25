@@ -270,7 +270,7 @@ df1 <- df[,c("patient_id","death_date","index_date",
              colnames(df)[grepl("out_",colnames(df))], # Outcomes
              colnames(df)[grepl("cov_",colnames(df))], # Covariates
              colnames(df)[grepl("qa_",colnames(df))], # Quality assurance
-             colnames(df)[grepl("vax_date_eligible",colnames(df))], # Vaccination eligbility
+             colnames(df)[grepl("vax_date_eligible",colnames(df))], # Vaccination eligibility
              colnames(df)[grepl("vax_date_covid_",colnames(df))], # Vaccination dates
              colnames(df)[grepl("vax_cat_",colnames(df))])] # Vaccination products
 
