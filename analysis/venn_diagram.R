@@ -20,124 +20,170 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  #population <- "vaccinated"
   population <- "electively_unvaccinated"
 } else {
   population <- args[[1]]
 }
 
-# to prepare for extracting outcome variable names in the current analyses ---------------------------
-active_analyses <- read_rds("lib/active_analyses.rds")
-
 venn_output <- function(population){
-  # read in data------------------------------------------------------------
-  input <- read_rds(paste0("output/venn_",population,".rds"))
-  input_stage1 <- read_rds(paste0("output/input_", population,"_stage1.rds"))
-  input <- input %>% inner_join(input_stage1,by="patient_id")
   
-  variable_names <- tidyselect::vars_select(names(input), starts_with(c('tmp_out_date_','out_date'), ignore.case = TRUE))
-  input <- input[,variable_names]
+  # Identify active outcomes ---------------------------------------------------
   
-  #-- function to check number <= 5 in the venn diagram ---------------------------
-  count_le5_function <- function(outcome_names)
-  {
-    print(outcome_names)
+  active_analyses <- readr::read_rds("lib/active_analyses.rds")
+  outcomes <- active_analyses[active_analyses$active==TRUE,]$outcome_variable
+  
+  # Load data ------------------------------------------------------------------
+  
+  input <- readr::read_rds(paste0("output/venn_",population,".rds"))
+  input_stage1 <- readr::read_rds(paste0("output/input_", population,"_stage1.rds"))
+  input <- input[input$patient_id %in% input_stage1$patient_id,]
+  
+  # Create empty table ---------------------------------------------------------
+  
+  df <- data.frame(outcome = character(),
+                   snomed = numeric(),
+                   hes = numeric(),
+                   death = numeric(),
+                   snomed_hes = numeric(),
+                   snomed_death = numeric(),
+                   hes_death = numeric(),
+                   snomed_hes_death = numeric(),
+                   total = numeric(),
+                   stringsAsFactors = FALSE)
+  
+  # Populate table and make Venn for each outcome ------------------------------
+  
+  for (outcome in outcomes) {
     
-    #---"SNOMED", "Hospital Episodes", "Deaths"--------
-    index1 <- which(!is.na(input[,outcome_names[1]]))
-    index2 <- which(!is.na(input[,outcome_names[2]]))
-    index3 <- which(!is.na(input[,outcome_names[3]]))
+    # Restrict data to that relevant to the given outcome ----------------------
     
-    inter12 <- intersect(index1, index2)
-    inter23 <- intersect(index2, index3)
-    inter13 <- intersect(index1, index3)
-    inter123 <- intersect(inter12, index3)
-    len_inter12_only <- length(inter12) - length(inter123)
-    len_inter23_only <- length(inter23) - length(inter123)
-    len_inter13_only <- length(inter13) - length(inter123)
-    len_src1_only <- length(index1) - length(inter12) - len_inter13_only
-    len_src2_only <- length(index2) - length(inter12) - len_inter23_only
-    len_src3_only <- length(index3) - length(inter13) - len_inter23_only
-  
-    number_venn <- c(len_src1_only, len_src2_only, len_src3_only, len_inter12_only, len_inter13_only, len_inter23_only, length(inter123))
-    #number_venn
-    low_count <- length(which(number_venn<=5))
-    return(low_count)
-  }
-  
-  #-- function to create venn diagram --------------------------------------------
-  venn_digram <- function(outcome_names, figure_name, figure_title)
-  {
-    print(outcome_names)
-    n_src = length(outcome_names)
-    if(n_src ==3){
-      index1 <- which(!is.na(input[,outcome_names[1]]))
-      index2 <- which(!is.na(input[,outcome_names[2]]))
-      index3 <- which(!is.na(input[,outcome_names[3]]))
-      index = list(index1, index2, index3)
-      names(index) <- c("SNOMED", "Hospital Episodes", "Deaths")
-      mycol=c("thistle", "lightcyan", "lemonchiffon")
-    }else{
-      print("number of data sources != 3")
+    tmp <- input[!is.na(input[,outcome]),c("patient_id",colnames(input)[grepl(outcome,colnames(input))])]
+    
+    # Identify and add missing columns -----------------------------------------
+    
+    complete <- data.frame(patient_id = tmp$patient_id,
+                           snomed = as.Date(NA),
+                           hes = as.Date(NA),
+                           death = as.Date(NA))
+    
+    colnames(complete) <- c("patient_id",paste0("tmp_",outcome,c("_snomed","_hes","_death")))
+    
+    complete[,setdiff(colnames(tmp),"patient_id")] <- NULL
+    notused <- NULL
+    
+    if (ncol(complete)>1) {
+      tmp <- merge(tmp, complete, by = c("patient_id"))
+      notused <- gsub(paste0("tmp_",outcome,"_"),"",setdiff(colnames(complete),"patient_id"))
     }
-    svglite(file= paste0("output/",figure_name, ".svg"))
-    g <- ggvenn(
-      index, 
-      fill_color = mycol,
-      stroke_color = "white",
-      text_size = 5,
-      set_name_size = 5, 
-      fill_alpha = 0.9
-    ) +  ggtitle(figure_title) +
-      theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"))
-    print(g)
-    dev.off()
+    
+    # Calculate the number contributing to each source combo -------------------
+    
+    tmp$snomed <- !is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
+      is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
+      is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    
+    tmp$hes <- is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
+      !is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
+      is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    
+    tmp$death <- is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
+      is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
+      !is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    
+    tmp$snomed_hes <- !is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
+      !is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
+      is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    
+    tmp$hes_death <- is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
+      !is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
+      !is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    
+    tmp$snomed_death <- !is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
+      is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
+      !is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    
+    tmp$snomed_hes_death <- !is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
+      !is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
+      !is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    
+    df[nrow(df)+1,] <- c(outcome,
+                         snomed = sum(tmp$snomed),
+                         hes = sum(tmp$hes),
+                         death = sum(tmp$death),
+                         snomed_hes = sum(tmp$snomed_hes),
+                         snomed_death = sum(tmp$snomed_death),
+                         hes_death = sum(tmp$hes_death),
+                         snomed_hes_death = sum(tmp$snomed_hes_death),
+                         total = nrow(tmp))
+    
+    # Remove sources not in study definition from Venn plots -------------------
+    
+    consider <- c("snomed","hes","death","snomed_hes","snomed_death","hes_death","snomed_hes_death")
+    
+    if (!is.null(notused)) {
+      for (i in notused) {
+        consider <- consider[!grepl(i,consider)]
+      }
+    }
+
+    # Proceed to create Venn diagram if all source combos exceed 5 -------------
+    
+    if (min(as.numeric(df[df$outcome==outcome,consider]))>5) {
+      
+      # Calculate contents of each Venn cell for plotting ----------------------
+      
+      index1 <- integer(0)
+      index2 <- integer(0)
+      index3 <- integer(0)
+      
+      if ("snomed" %in% consider) {
+        index1 <- which(!is.na(tmp[,paste0("tmp_",outcome,"_snomed")]))
+      }
+      if ("hes" %in% consider) {
+        index2 <- which(!is.na(tmp[,paste0("tmp_",outcome,"_hes")]))
+      }
+      if ("death" %in% consider) {
+        index3 <- which(!is.na(tmp[,paste0("tmp_",outcome,"_death")]))
+      }
+      
+      index <- list(index1, index2, index3)
+      names(index) <- c("SNOMED", "Hospital Episodes", "Deaths")
+      index <- Filter(length, index)
+      
+      # Fix colours --------------------------------------------------------------
+      
+      mycol <- c(ifelse("SNOMED" %in% names(index),"thistle",""),
+                 ifelse("Hospital Episodes" %in% names(index),"lightcyan",""),
+                 ifelse("Deaths" %in% names(index),"lemonchiffon",""))
+      
+      mycol <- mycol[mycol!=""]
+      
+      # Make Venn diagram --------------------------------------------------------
+      
+      svglite(file = paste0("output/venn_diagram_",population,"_",gsub("out_date_","",outcome),".svg"))
+      g <- ggvenn(
+        index, 
+        fill_color = mycol,
+        stroke_color = "white",
+        text_size = 5,
+        set_name_size = 5, 
+        fill_alpha = 0.9
+      ) +  ggtitle(active_analyses[active_analyses$outcome_variable==outcome,]$outcome) +
+        theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"))
+      print(g)
+      dev.off()
+      
+    }
+    
   }
   
-  # replace this line with the outcome variable name in the active analyses table
-  #outcome_full_names_sources <- tidyselect::vars_select(names(input), starts_with('tmp_out_date_', ignore.case = TRUE))
-  outcome_variable_names <- active_analyses$outcome_variable[active_analyses$active==T]
-  outcome_full_names_sources <- NULL
-  for(i in 1: length(outcome_variable_names))
-  {
-    outcome_full_names_sources <- c(outcome_full_names_sources,
-                                     paste0("tmp_", outcome_variable_names[i], "_snomed"),
-                                     paste0("tmp_", outcome_variable_names[i], "_hes"),
-                                     paste0("tmp_", outcome_variable_names[i], "_death"))
-  }
+  # Save summary file ----------------------------------------------------------
   
-  outcome_names_sources <- gsub("tmp_out_date_","",outcome_full_names_sources) #delete the prefix
-  outcome_names <- gsub("_snomed","",outcome_names_sources) 
-  outcome_names <- gsub("_hes","",outcome_names) 
-  outcome_names <- gsub("_death","",outcome_names) 
+  write.csv(df, file = paste0("output/venn_diagram_number_check_", population,".csv"), row.names = F)
   
-  unique_outcome_names <- unique(outcome_names)
-  
-  count_le5 <- rep("NA", length(unique_outcome_names))
-  
-  index_lc = 1
-  
-  #--10 separate svg files, one for each outcome----------------------------------
-  for (i in unique_outcome_names){
-    print(i)
-    index <- which(outcome_names == i)
-    venn_outcome <- outcome_full_names_sources[index]
-    print(venn_outcome)
-    if(length(venn_outcome)!=3){print("number of data sources > 3!")}
-    figure_name = figure_title <- paste0("venn_diagram_",population, "_", i)
-    venn_digram(venn_outcome,figure_name, figure_title)
-    count_le5[index_lc] <- count_le5_function(venn_outcome)
-    index_lc = index_lc +1
-  }
-  
-  low_count_df <- data.frame(count_le5, unique_outcome_names)
-  low_count_df <- low_count_df %>% mutate(count_le5 = if_else(count_le5>0, "<= 5", "No issue"))
-  
-  names(low_count_df) <- c("any number <= 5?", "outcome name")
-  write.csv(low_count_df, file= paste0("output/","venn_diagram_number_check_", population,".csv"), row.names = F)
 }
 
-# Run function using specified commandArgs
+# Run function using specified commandArgs -------------------------------------
 
 if(population == "both"){
   venn_output("electively_unvaccinated")
