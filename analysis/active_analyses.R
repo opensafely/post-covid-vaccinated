@@ -103,22 +103,26 @@ outcomes <- c("Depression",
               "Suicide",
               "Addiction")
 
-outcomes_short <- c("out_date_depression",
-                    "out_date_anxiety_general",
-                    "out_date_anxiety_ocd", 
-                    "out_date_anxiety_ptsd", 
-                    "out_date_eating_disorders", 
-                    "out_date_serious_mental_illness",
-                    "out_date_self_harm_10plus",
-                    "out_date_self_harm_15plus",
-                    "out_date_suicide",
-                    "out_date_addiction")
+outcomes_short <- c("depression",
+                    "anxiety_general",
+                    "anxiety_ocd", 
+                    "anxiety_ptsd", 
+                    "eating_disorders", 
+                    "serious_mental_illness",
+                    "self_harm_10plus",
+                    "self_harm_15plus",
+                    "suicide",
+                    "addiction")
 
 for (i in 1:length(outcomes)) {
-  df[nrow(df)+1,] <- c(FALSE,
+  df[nrow(df)+1,] <- c(TRUE,
                        outcomes[i],
                        paste0("out_date_",outcomes_short[i]),
-                       rep("",22))
+                       "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_cat_sex;cov_bin_lipid_medications;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_chronic_obstructive_pulmonary_disease;cov_bin_depression;cov_bin_anxiety;cov_bin_eating_disorders;cov_bin_serious_mental_illness;cov_bin_self_harm",
+                       rep("all",2),
+                       rep(TRUE,4),
+                       rep(FALSE,14),
+                       "")
 }
 
 # Save active analyses list ----------------------------------------------------
