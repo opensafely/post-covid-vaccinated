@@ -14,8 +14,6 @@
 ## Output:   Venn diagrams in SVG files, venn_diagram_number_check.csv
 ## =============================================================================
 
-library(readr); library("ggvenn"); library("svglite"); library("gridExtra")
-
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
@@ -160,16 +158,16 @@ venn_output <- function(population){
       
       # Make Venn diagram --------------------------------------------------------
       
-      svglite(file = paste0("output/venn_diagram_",population,"_",gsub("out_date_","",outcome),".svg"))
-      g <- ggvenn(
+      svglite::svglite(file = paste0("output/venn_diagram_",population,"_",gsub("out_date_","",outcome),".svg"))
+      g <- ggvenn::ggvenn(
         index, 
         fill_color = mycol,
         stroke_color = "white",
         text_size = 5,
         set_name_size = 5, 
         fill_alpha = 0.9
-      ) +  ggtitle(active_analyses[active_analyses$outcome_variable==outcome,]$outcome) +
-        theme(plot.title = element_text(hjust = 0.5, size = 15, face = "bold"))
+      ) +  ggplot2::ggtitle(active_analyses[active_analyses$outcome_variable==outcome,]$outcome) +
+        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 15, face = "bold"))
       print(g)
       dev.off()
       
