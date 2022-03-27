@@ -15,7 +15,7 @@
 ## ====================================================================================
 
 library(readr); library(dplyr); library(data.table); library(lubridate)
-library(stringr);library(tidyverse)
+library(stringr);library(tidyverse); library(htmlTable)
 
 #library(vcdExtra)
 
@@ -35,10 +35,7 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 
 table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level, subgrp_full_name){
-  #survival_data$event_date <- survival_data[,paste0("out_date_","ami")]
-  # specify event date for the event of interest, e.g. ami
   data_active <- survival_data
-  #data_active$event_date <- survival_data[,paste0("out_date_",event)]
   data_active$event_date <- survival_data[,event]
   # filter the population according to whether the subgroup is covid_history
   if(subgrp == "covid_history"){
@@ -64,17 +61,6 @@ table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level
   
   data_active <- data_active %>% filter(follow_up_end_unexposed >= index_date & follow_up_end_unexposed != Inf)
   data_active <- data_active %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
-  
-  # select_names <- c("index_date","vax_date_covid_1","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
-  # select_names <- c("index_date","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date", "follow_up_end_unexposed", "follow_up_end")
-  # 
-  # data_select <- data_active[,select_names]
-  # View(data_select)
-  # 
-  #  select_names <- c("index_date", "follow_up_end_unexposed", "follow_up_end")
-  # 
-  #  data_select <- data_active[,select_names]
-  #  View(data_select)
 
   # calculate follow-up days
   data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
@@ -149,9 +135,7 @@ table_2_subgroups_output <- function(population){
     analyses_to_run <- as.data.frame(t(analyses_to_run))
     analyses_to_run$subgroup <- row.names(analyses_to_run)
     colnames(analyses_to_run) <- c("run","subgroup")
-    # analyses_to_run$prior_history_var <- analyses_to_run$run
-    #analyses_to_run$prior_history_var <- ifelse(startsWith(row.names(analyses_to_run),"prior_history"),analyses_to_run$run,FALSE)
-    
+
     analyses_to_run<- analyses_to_run %>% filter(run=="TRUE"  & subgroup != "active") 
     rownames(analyses_to_run) <- NULL
     analyses_to_run <- analyses_to_run %>% select(!run)
@@ -256,11 +240,6 @@ table_2_subgroups_output <- function(population){
   
   survival_data <- survival_data %>% mutate(cohort_start_date = cohort_start,cohort_end_date = cohort_end)
   
-  # rewrite the function
-  # testing
-  #event="out_date_ami";cohort="vaccinated";strata="covid_history"; subgrp_level="TRUE"; subgrp_full_name="sub_bin_covid19_confirmed_history"
-  #event="vte";cohort="vaccinated";strata="sub_bin_vte"; subgrp_level="FALSE"; subgrp_full_name="sub_bin_vte"
-  
   col_names <- names(analyses_of_interest)
   start = grep("unexposed_person_days", col_names)
   end = ncol(analyses_of_interest)
@@ -276,22 +255,13 @@ table_2_subgroups_output <- function(population){
                                                              subgrp_full_name=analyses_of_interest$stratify_by_subgroup[i])
   }
   
-  # results <- lapply(split(analyses_of_interest,seq(nrow(analyses_of_interest))),
-  #        function(analyses_of_interest)
-  #          table_2_calculation(
-  #            survival_data = survival_data,
-  #            event=analyses_of_interest$event,
-  #            cohort=analyses_of_interest$cohort_to_run,
-  #            subgrp=analyses_of_interest$subgroup,
-  #            subgrp_level=analyses_of_interest$strata,
-  #            subgrp_full_name=analyses_of_interest$stratify_by_subgroup)
-  # )
-  
   write.csv(analyses_of_interest, file=paste0("output/table_2_subgroups_", population, ".csv"), row.names = F)
   input1_aer <- analyses_of_interest %>% select(c("event", "cohort_to_run", "subgroup", "strata", "unexposed_person_days"))
   names(input1_aer)[which(names(input1_aer) == "cohort_to_run")] = "cohort"
   input1_aer$event <- ifelse(startsWith(input1_aer$event,"out_"),gsub("out_date_","",input1_aer$event),input1_aer$evevent)
   write.csv(input1_aer, file=paste0("output/input1_aer_", population, ".csv"), row.names=F)
+  htmlTable(analyses_of_interest, file=paste0("output/table_2_subgroups_", population, ".html"))
+  htmlTable(input1_aer, file=paste0("output/input1_aer_", population, ".html"), row.names=F)
 }
 
 # Run function using specified commandArgs
