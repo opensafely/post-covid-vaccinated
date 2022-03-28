@@ -9,16 +9,20 @@ group <- "vaccinated"
 strata <- "prior_history_FALSE"
 fit <- "mdl_max_adj"
 
+library(purrr)
+library(data.table)
+library(tidyverse)
+
 #CALCULATE THE EXCESS RISK
 excess_risk <- function(outcome, group, strata, fit) {
-  library(purrr)
-  library(data.table)
-  library(tidyverse)
+  
   #Load data 
-  input1.1 <- readr::read_csv("output/input1_aer_vaccinated.csv") #1.person days
+  #1.Input1 - 1.unexposed person days
+  input1.1 <- readr::read_csv("output/input1_aer_vaccinated.csv")
   input1.2 <- readr::read_csv("output/input1_aer_electively_unvaccinated.csv") 
   input1 <- rbind(input1.1,input1.2)
   rm(input1.1, input1.2)
+  
   #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
