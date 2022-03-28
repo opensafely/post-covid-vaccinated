@@ -1,11 +1,13 @@
 #Project:Vaccinated delta wave population study
 #Branch:Absolute excess risk calculations
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
+#Reviewer: Genevieve Cezard
+
 #USE - TO CHECK SINGLE AER
-#outcome <- "ate" 
-#group <- "vaccinated" 
-#strata <- "prior_history_FALSE"
-#fit <- "mdl_max_adj"
+outcome <- "ate" 
+group <- "vaccinated" 
+strata <- "prior_history_FALSE"
+fit <- "mdl_max_adj"
 
 #CALCULATE THE EXCESS RISK
 excess_risk <- function(outcome, group, strata, fit) {
@@ -16,6 +18,7 @@ excess_risk <- function(outcome, group, strata, fit) {
   input1.1 <- readr::read_csv("output/input1_aer_vaccinated.csv") #1.person days
   input1.2 <- readr::read_csv("output/input1_aer_electively_unvaccinated.csv") 
   input1 <- rbind(input1.1,input1.2)
+  rm(input1.1, input1.2)
   #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
