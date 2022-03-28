@@ -22,8 +22,10 @@ excess_risk <- function(outcome, group, strata, fit) {
   input1.2 <- readr::read_csv("output/input1_aer_electively_unvaccinated.csv") 
   input1 <- rbind(input1.1,input1.2)
   rm(input1.1, input1.2)
+  #Preprocess input1
+  input1 <- input1 %>% select(-strata)
   
-  #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
+  #input2 - 2.unexposed events, 3.total population cases, 4.HR
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
   hr_files=paste0("output/",hr_files)
@@ -32,7 +34,7 @@ excess_risk <- function(outcome, group, strata, fit) {
                           df <- fread(fpath)
                           return(df)})
   input2=rbindlist(input2, fill=TRUE)
-  #Preprocess the input data (most can be removed with real data inputs)
+  #Preprocess input2
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
@@ -41,18 +43,6 @@ excess_risk <- function(outcome, group, strata, fit) {
                                 term == "days84_197"|
                                 term == "days0_28"|
                                 term == "days28_197")
-  input1$strata[input1$strata =="sex_M"] <- "sex_Male"
-  input1$strata[input1$strata =="sex_F"] <- "sex_Female"
-  
-  input1$strata[input1$strata =="ethnicity_1"] <- "ethnicity_White"
-  input1$strata[input1$strata =="ethnicity_2"] <- "ethnicity_Black"
-  input1$strata[input1$strata =="ethnicity_3"] <- "ethnicity_South_Asian"
-  input1$strata[input1$strata =="ethnicity_4"] <- "ethnicity_Mixed"
-  input1$strata[input1$strata =="ethnicity_5"] <- "ethnicity_Other"
-  input1$strata[input1$strata =="ethnicity_6"] <- "ethnicity_Missing"
-  
-  input1$strata[input1$strata =="prior_history_true"] <- "prior_history_TRUE"
-  input1$strata[input1$strata =="prior_history_false"] <- "prior_history_FALSE"
   #--------------------------------------
   # Step1: Extract the required variables
   #--------------------------------------
