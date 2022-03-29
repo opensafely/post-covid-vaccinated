@@ -188,5 +188,5 @@ write.csv(AER_compiled_results, "output/AER_compiled_results.csv", row.names = F
 #3.Clear the folder(except compiled results)
 if (file.exists(AER_files)) { file.remove(AER_files)}
 #4.Sample the results
-print(AER_compiled_results) #-ve AERs not expected with actual data
-table(AER_compiled_results$AER_196<0)
+print(AER_compiled_results)                                                      #-ve AERs not expected with actual data
+table(AER_compiled_results$AER_196<0)                                            #264 obs with 5 variables as per active analysis list.
