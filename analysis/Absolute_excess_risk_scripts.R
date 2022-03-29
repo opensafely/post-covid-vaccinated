@@ -54,8 +54,8 @@ excess_risk <- function(outcome, group, strata, fit) {
   # Step1: Extract the required variables
   #--------------------------------------
   #1. Person days
-  fp_person_days <- input1[input1$event == outcome & input1$model == fit  &
-                             input1$cohort == group & input1$strata == strata,]$person_days
+  fp_person_days <- input1[input1$event == outcome & input1$fit == fit  &
+                             input1$cohort == group & input1$subgroup == strata,]$unexposed_person_days
   #2.unexposed events
   unexposed_events <- input2[input2$event == outcome & input2$model == fit  & 
                                input2$cohort == group & input2$subgroup == strata & 
@@ -145,29 +145,37 @@ excess_risk <- function(outcome, group, strata, fit) {
 #Step6. AER for active analyses
 #-------------------------------
 #1. Define the active analyses
-active <- readr::read_rds("lib/active_analyses.rds") #Rebase if required,
+active <- readr::read_rds("lib/active_analyses.rds")                             # selects active analyses
 #active <- active_analyses # Manual alternative,
-active <- active[active$active==TRUE,]                                                       
-active$event <- gsub("out_date_","",active$outcome_variable)                                                    
-active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL   
+active <- active[active$active==TRUE,]   
+
+#Preprocess the active analyses
+active$event <- gsub("out_date_","",active$outcome_variable)                                     # refine event name                                                    
+active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL       # removes un used columns
 active <- tidyr::pivot_longer(active, 
                               cols = setdiff(colnames(active),c("event","model","cohort")), 
-                              names_to = "strata")                                           
-active <- active[active$value==TRUE, c("event","model","cohort","strata")]                   
-active$model <- ifelse(active$model=="all","mdl_agesex;mdl_max_adj",active$model)            
-active <- tidyr::separate_rows(active, model, sep = ";")                                     
-active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort) 
-active <- tidyr::separate_rows(active, cohort, sep = ";")                                        
-colnames(active)[colnames(active) == 'group'] <- 'strata'                        
+                              names_to = "strata")                                               # converts to long data                                        
+active <- active[active$value==TRUE, c("event","model","cohort","strata")]                       # refines to active models                         
+active$model <- ifelse(active$model=="all","mdl_agesex;mdl_max_adj",active$model)                # includes 2 model types     
+active <- tidyr::separate_rows(active, model, sep = ";")                                         # separate rows for each model
+active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort) # includes 2 cohorts
+active <- tidyr::separate_rows(active, cohort, sep = ";")                                        # separate rows for each cohort
+
+colnames(active)[colnames(active) == 'group'] <- 'strata'                                        #Tweaks the column names                   
 colnames(active)[colnames(active) == 'cohort'] <- 'group'
 colnames(active)[colnames(active) == 'model'] <- 'fit'
 colnames(active)[colnames(active) == 'event'] <- 'outcome'
-active <- active %>% select(-fit, everything())                                  
-active <- active %>% filter(!strata == "ethnicity_Missing")#need to recheck with real data models                     
+active <- active %>% select(-fit, everything())                                                  #Order the columns 
+
+active <- active %>% filter(!strata == "ethnicity_Missing")                                      #Remove not available models                  
+input1 <- input1 %>% filter(!subgroup== "ethnicity_Missing")                                     #matches above with input1
+
 #----------------------
 #Step7. Output results
 #----------------------
+#1.For Loop the function.
 for (i in 1:nrow(active)) {excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])}
+#2.Compile the results
 AER_files=list.files(path = "output", pattern = "AER_*")
 AER_files=AER_files[endsWith(AER_files,".csv")]
 AER_files=paste0("output/",AER_files)
@@ -177,5 +185,8 @@ AER_compiled_results <- purrr::pmap(list(AER_files),
                                       return(df)})
 AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
 write.csv(AER_compiled_results, "output/AER_compiled_results.csv", row.names = F)
+#3.Clear the folder(except compiled results)
 if (file.exists(AER_files)) { file.remove(AER_files)}
+#4.Sample the results
 print(AER_compiled_results) #-ve AERs not expected with actual data
+table(AER_compiled_results$AER_196<0)
