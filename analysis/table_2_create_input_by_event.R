@@ -106,6 +106,19 @@ input_table_2 <- function(population){
           data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_exposed = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
           data_active <- data_active %>% dplyr::select(!c(vax_date_covid_1))
         }
+        data_active <- data_active %>% filter(follow_up_end_unexposed >= index_date & follow_up_end_unexposed != Inf)
+        data_active <- data_active %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
+        
+        # calculate follow-up days
+        data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
+        #hist(data_active$person_days_unexposed)
+        data_active = data_active %>% filter(person_days_unexposed >=1 & person_days_unexposed <= 197) # filter out follow up period
+        person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
+        
+        data_active = data_active %>% mutate(person_days_exposed = as.numeric((as.Date(follow_up_end_exposed) - as.Date(index_date)))+1)
+        data_active = data_active %>% filter(person_days_exposed >=1 & person_days_exposed <= 197) # filter out follow up period
+        data_active <- data_active %>% mutate(cohort_start_date = cohort_start,cohort_end_date = cohort_end)
+        
         event_short <- gsub("out_date_","", event)
         write.csv(data_active, file=paste0("output/input_table_2_",population,"_", event_short,"_stage1.rds"), row.names=F)
     }
