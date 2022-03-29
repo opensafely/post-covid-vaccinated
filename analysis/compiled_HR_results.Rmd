@@ -20,7 +20,7 @@ knitr::opts_knit$set(root.dir = gsub("/analysis","",getwd()))
 ## Compiled hazard ratios
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-df=read_csv(paste0(output_dir,"/suppressed_compiled_HR_results_", event_name, ".csv"))
+df=read_csv(paste0(output_dir,"/suppressed_compiled_HR_results_", event_name,"_", cohort, ".csv"))
 df %>%
     datatable(extensions = 'Buttons',
               options = list(dom = 'Blfrtip',
