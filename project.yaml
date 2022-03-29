@@ -98,7 +98,7 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        table2: output/table2_vaccinated.csv
+        table2: output/table2_vaccinated_without_covid_history.csv
 
   Stage_4_Table_2_electively_unvaccinated:
     run: r:latest analysis/table_2.R electively_unvaccinated
@@ -106,7 +106,7 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        table2: output/table2_electively_unvaccinated.csv
+        table2: output/table2_electively_unvaccinated_without_covid_history.csv
 
   stage4_venn_diagram_both:
     run: r:latest analysis/venn_diagram.R both

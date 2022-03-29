@@ -111,7 +111,7 @@ apply_table2_function <- function(cohort){
       arguments = c(cohort),
       needs = list("stage1_data_cleaning_both"),
       moderately_sensitive = list(
-        table2 = glue("output/table2_{cohort}.csv")
+        table2 = glue("output/table2_{cohort}_without_covid_history.csv")
       )
     )
   )
