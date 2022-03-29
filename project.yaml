@@ -92,13 +92,21 @@ actions:
         DateChecks: output/Check_dates_range_*.csv
         Descriptive_Table: output/Table1_*.csv
 
-  stage4_table2_both:
-    run: r:latest analysis/table_2.R both
+  Stage_4_Table_2_vaccinated:
+    run: r:latest analysis/table_2.R vaccinated
     needs:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        table2: output/table2_*.csv
+        table2: output/table2_vaccinated.csv
+
+  Stage_4_Table_2_electively_unvaccinated:
+    run: r:latest analysis/table_2.R electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    outputs:
+      moderately_sensitive:
+        table2: output/table2_electively_unvaccinated.csv
 
   stage4_venn_diagram_both:
     run: r:latest analysis/venn_diagram.R both
