@@ -635,6 +635,7 @@ actions:
     needs:
     - preprocess_data
     - stage1_data_cleaning_both
+    - stage4_input_for_table_2_subgroups
     outputs:
       moderately_sensitive:
         table_2_subgroups: output/table_2_subgroups_*.csv
