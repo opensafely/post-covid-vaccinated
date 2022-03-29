@@ -96,6 +96,15 @@ actions:
         venn_diagram: output/venn_diagram_*.svg
         venn_diagram_number_check: output/venn_diagram_number_check_*.csv
 
+  stage4_input_for_table_2_subgroups:
+    run: r:latest analysis/table_2_create_input_by_event.R both
+    needs:
+    - preprocess_data
+    - stage1_data_cleaning_both
+    outputs:
+      highly_sensitive:
+        input_table_2_subgroups: output/input_table_2_*_stage1.rds
+
   stage4_table_2_subgroups:
     run: r:latest analysis/table_2_subgroups.R both
     needs:

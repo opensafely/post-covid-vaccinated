@@ -221,6 +221,15 @@ actions_list <- splice(
     )
   ),
 
+  #comment("Stage 4 - Create input for table 2 subgroups"),
+  action(
+    name = "stage4_input_for_table_2_subgroups",
+    run = "r:latest analysis/table_2_create_input_by_event.R both",
+    needs = list("preprocess_data","stage1_data_cleaning_both"),
+    highly_sensitive = list(
+      input_table_2_subgroups = glue("output/input_table_2_*_stage1.rds")
+    )
+  ),
   #comment("Stage 4 - Table 2 subgroups"),
   action(
     name = "stage4_table_2_subgroups",
