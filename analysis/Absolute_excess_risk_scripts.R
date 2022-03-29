@@ -30,6 +30,7 @@ excess_risk <- function(outcome, group, strata, fit) {
   
   input1 <-rbind(input1.3,input1.4)                                              
   input1 <- input1 %>% select(-strata)                                           
+  rm(input1.1, input1.2, input1.3, input1.4)
   
   #input2 - 2.unexposed events, 3.total population cases, 4.HR                   #COMBINES THE HR TABLES
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
@@ -40,7 +41,7 @@ excess_risk <- function(outcome, group, strata, fit) {
                           df <- fread(fpath)
                           return(df)})
   input2=rbindlist(input2, fill=TRUE)
-  #Preprocess input2                                                            #SELECTS ONLY REQUIRED COLUMNS&TERMS
+  #Preprocess input2                                                            #SELECTS REQUIRED COLUMNS&TERMS
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
