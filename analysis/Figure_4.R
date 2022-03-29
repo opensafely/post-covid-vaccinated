@@ -58,8 +58,8 @@ figure4_tbl <- function(group, fit, outcome, strata){
   # Step1: Extract the required variables
   #--------------------------------------
   #1. Person days
-  fp_person_days <- input1[input1$event == outcome & input1$model == fit  &
-                             input1$cohort == group & input1$strata == strata,]$person_days
+  fp_person_days <- input1[input1$event == outcome & input1$fit == fit  &
+                             input1$cohort == group & input1$subgroup == strata,]$unexposed_person_days
   #2.unexposed events
   unexposed_events <- input2[input2$event == outcome & input2$model == fit  & 
                                input2$cohort == group & input2$subgroup == strata & 
