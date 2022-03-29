@@ -106,10 +106,11 @@ actions:
         input_table_2_subgroups: output/input_table_2_*_stage1.rds
 
   stage4_table_2_subgroups:
-    run: r:latest analysis/table_2_subgroups.R both
+    run: r:latest analysis/table_2_subgroups_efficiency_testing.R both
     needs:
     - preprocess_data
     - stage1_data_cleaning_both
+    - stage4_input_for_table_2_subgroups
     outputs:
       moderately_sensitive:
         table_2_subgroups: output/table_2_subgroups_*.csv

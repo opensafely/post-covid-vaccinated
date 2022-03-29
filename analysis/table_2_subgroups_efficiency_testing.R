@@ -250,7 +250,7 @@ table_2_subgroups_output <- function(population){
     d <- analyses_of_interest
     print(i)
     event_short = gsub("out_date_", "",analyses_of_interest$event[i])
-    # not sure why read_csv doesn't work
+    # not sure why read_rds doesn't work
     survival_data <- read_csv(paste0("output/input_table_2_",population,"_", event_short,"_stage1.rds"))
     analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, 
                                                              event=analyses_of_interest$event[i],

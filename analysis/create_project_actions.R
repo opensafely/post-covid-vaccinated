@@ -230,16 +230,29 @@ actions_list <- splice(
       input_table_2_subgroups = glue("output/input_table_2_*_stage1.rds")
     )
   ),
+  
   #comment("Stage 4 - Table 2 subgroups"),
   action(
     name = "stage4_table_2_subgroups",
-    run = "r:latest analysis/table_2_subgroups.R both",
-    needs = list("preprocess_data","stage1_data_cleaning_both"),
+    run = "r:latest analysis/table_2_subgroups_efficiency_testing.R both",
+    needs = list("preprocess_data","stage1_data_cleaning_both","stage4_input_for_table_2_subgroups"),
     moderately_sensitive = list(
       table_2_subgroups = glue("output/table_2_subgroups_*.csv"),
       input_1_aer = glue("output/input1_aer_*.csv")
     )
   ),
+
+  # #comment("Stage 4 - Table 2 subgroups"),
+  # action(
+  #   name = "stage4_table_2_subgroups",
+  #   run = "r:latest analysis/table_2_subgroups.R both",
+  #   needs = list("preprocess_data","stage1_data_cleaning_both"),
+  #   moderately_sensitive = list(
+  #     table_2_subgroups = glue("output/table_2_subgroups_*.csv"),
+  #     input_1_aer = glue("output/input1_aer_*.csv")
+  #   )
+  # ),
+  
   #comment("Stage 5 - Apply models"),
   splice(
     # over outcomes
