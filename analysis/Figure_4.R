@@ -1,11 +1,17 @@
 #Project:Vaccinated delta wave population study
 #Branch:Figure4_graphical plotting of the estimated AER of ATE and VTE 
 #Scripts: Renin Toms, Venexia Walker
+#Reviewer: Genevieve Cezard
+
 #USE TO RUN A SINGLE PLOT
-#group <- "vaccinated"
-#fit <- "mdl_max_adj"
-#outcome <- "ate"
-#strata <- "sex_Female"
+group <- "vaccinated"
+fit <- "mdl_max_adj"
+outcome <- "ate"
+strata <- "sex_Female"
+
+library(purrr)
+library(data.table)
+library(tidyverse)
 
 #******************************************************
 #I. Create a function to out put the figure 4_tables
@@ -13,12 +19,23 @@
 
 figure4_tbl <- function(group, fit, outcome, strata){
   
-  library(purrr)
-  library(data.table)
-  library(tidyverse)
-  #Import data 
-  input1 <- readr::read_csv("output/input1_aer.csv") #1.person days
-  #input2 <- readr::read_csv("output/input2_aer.csv") #2.unexposed events, 3.total cases, 4.hr
+  #Load data 
+  #1.Input1 - 1.unexposed person days
+  input1.1 <- readr::read_csv("output/input1_aer_vaccinated.csv")
+  input1.2 <- readr::read_csv("output/input1_aer_electively_unvaccinated.csv") 
+  
+  #Preprocess input1
+  input1.3 <- rbind(input1.1,input1.2)
+  input1.3$fit <- "mdl_agesex"
+  
+  input1.4 <- input1.3
+  input1.4$fit <- "mdl_max_adj"
+  
+  input1 <-rbind(input1.3,input1.4) 
+  input1 <- input1 %>% select(-strata)
+  rm(input1.1, input1.2, input1.3, input1.4)
+  
+  #Input2 - 2.unexposed events, 3.total cases, 4.hr
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
   hr_files=paste0("output/",hr_files)
@@ -27,7 +44,8 @@ figure4_tbl <- function(group, fit, outcome, strata){
                           df <- fread(fpath)
                           return(df)})
   input2=rbindlist(input2, fill=TRUE)
-  #Preprocess the input data
+  
+  #Preprocess the Input2 
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
@@ -36,18 +54,6 @@ figure4_tbl <- function(group, fit, outcome, strata){
                                 term == "days84_197"|
                                 term == "days0_28"|
                                 term == "days28_197")
-  input1$strata[input1$strata =="sex_M"] <- "sex_Male"
-  input1$strata[input1$strata =="sex_F"] <- "sex_Female"
-  
-  input1$strata[input1$strata =="ethnicity_1"] <- "ethnicity_White"
-  input1$strata[input1$strata =="ethnicity_2"] <- "ethnicity_Black"
-  input1$strata[input1$strata =="ethnicity_3"] <- "ethnicity_South_Asian"
-  input1$strata[input1$strata =="ethnicity_4"] <- "ethnicity_Mixed"
-  input1$strata[input1$strata =="ethnicity_5"] <- "ethnicity_Other"
-  input1$strata[input1$strata =="ethnicity_6"] <- "ethnicity_Missing"
-  
-  input1$strata[input1$strata =="prior_history_true"] <- "prior_history_TRUE"
-  input1$strata[input1$strata =="prior_history_false"] <- "prior_history_FALSE"
   #--------------------------------------
   # Step1: Extract the required variables
   #--------------------------------------
