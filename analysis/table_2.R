@@ -132,7 +132,7 @@ if(population == "both"){
   table_2_output("electively_unvaccinated", "with_covid_history")
   table_2_output("electively_unvaccinated", "without_covid_history")
 }else{
-  table_2_output(population, "with_covid_history")
+  #table_2_output(population, "with_covid_history")
   table_2_output(population, "without_covid_history")
 }
 

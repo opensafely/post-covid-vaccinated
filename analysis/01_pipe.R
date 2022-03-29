@@ -31,8 +31,10 @@ args = commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   event_name="ami"
+  cohort="vaccinated"
 }else{
-  event_name  = args[[1]] 
+  event_name  = args[[1]]
+  cohort = args[[2]]
 }
 
 # Specify directories ----------------------------------------------------------
@@ -42,31 +44,27 @@ scripts_dir <- "analysis"
 # Source relevant files --------------------------------------------------------
 source(file.path(scripts_dir,"analyses_to_run.R"))
 
-for(i in cohort_to_run){
-  cohort<-i
-  source(file.path(scripts_dir,"02_pipe.R")) # Prepare dataset for model
-  source(file.path(scripts_dir,"extra_functions_for_cox_models.R"))
-  source(file.path(scripts_dir,paste0("call_mdl.R"))) # Model specification
-  
-  ls_events_missing <- get(paste0("analyses_to_run_",cohort)) 
-  
-  # ------------------------------------ LAUNCH JOBS -----------------------------
-  
-  lapply(split(ls_events_missing,seq(nrow(ls_events_missing))),
-         function(ls_events_missing) 
-           get_vacc_res(
-             event=ls_events_missing$event,
-             subgroup=ls_events_missing$subgroup,
-             stratify_by_subgroup=ls_events_missing$stratify_by_subgroup,
-             stratify_by=ls_events_missing$strata,
-             mdl=ls_events_missing$mdl,
-             input, cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names)
-  )
-  
-  
-  #Save csv of anlayses not run
-  write.csv(analyses_not_run, paste0(output_dir,"/analyses_not_run_" , event_name ,"_",cohort, ".csv"), row.names = T)
-}
+source(file.path(scripts_dir,"02_pipe.R")) # Prepare dataset for model
+source(file.path(scripts_dir,"extra_functions_for_cox_models.R"))
+source(file.path(scripts_dir,paste0("call_mdl.R"))) # Model specification
+
+ls_events_missing <- analyses_to_run
+
+# ------------------------------------ LAUNCH JOBS -----------------------------
+
+lapply(split(ls_events_missing,seq(nrow(ls_events_missing))),
+       function(ls_events_missing) 
+         get_vacc_res(
+           event=ls_events_missing$event,
+           subgroup=ls_events_missing$subgroup,
+           stratify_by_subgroup=ls_events_missing$stratify_by_subgroup,
+           stratify_by=ls_events_missing$strata,
+           mdl=ls_events_missing$mdl,
+           input, cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names)
+)
+
+#Save csv of anlayses not run
+write.csv(analyses_not_run, paste0(output_dir,"/analyses_not_run_" , event_name ,"_",cohort, ".csv"), row.names = T)
 
 
 #Combine all results into one .csv
