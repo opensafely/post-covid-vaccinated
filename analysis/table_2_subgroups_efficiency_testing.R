@@ -62,7 +62,7 @@ table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level
   
   data_active <- data_active %>% filter(follow_up_end_unexposed >= index_date & follow_up_end_unexposed != Inf)
   data_active <- data_active %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
-
+  
   # calculate follow-up days
   data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
   #hist(data_active$person_days_unexposed)
@@ -136,7 +136,7 @@ table_2_subgroups_output <- function(population){
     analyses_to_run <- as.data.frame(t(analyses_to_run))
     analyses_to_run$subgroup <- row.names(analyses_to_run)
     colnames(analyses_to_run) <- c("run","subgroup")
-
+    
     analyses_to_run<- analyses_to_run %>% filter(run=="TRUE"  & subgroup != "active") 
     rownames(analyses_to_run) <- NULL
     analyses_to_run <- analyses_to_run %>% select(!run)
