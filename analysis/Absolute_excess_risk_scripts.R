@@ -20,12 +20,18 @@ excess_risk <- function(outcome, group, strata, fit) {
   #1.Input1 - 1.unexposed person days
   input1.1 <- readr::read_csv("output/input1_aer_vaccinated.csv")
   input1.2 <- readr::read_csv("output/input1_aer_electively_unvaccinated.csv") 
-  input1 <- rbind(input1.1,input1.2)
-  rm(input1.1, input1.2)
-  #Preprocess input1
-  input1 <- input1 %>% select(-strata)
   
-  #input2 - 2.unexposed events, 3.total population cases, 4.HR
+  #Preprocess input1                                                             #ADDS TWO MODEL FITS WITH SAME PERSON DAYS
+  input1.3 <- rbind(input1.1,input1.2)                                           
+  input1.3$fit <- "mdl_agesex"                                                   
+  
+  input1.4 <- input1.3                                                           
+  input1.4$fit <- "mdl_max_adj"                                                  
+  
+  input1 <-rbind(input1.3,input1.4)                                              
+  input1 <- input1 %>% select(-strata)                                           
+  
+  #input2 - 2.unexposed events, 3.total population cases, 4.HR                   #COMBINES THE HR TABLES
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
   hr_files=paste0("output/",hr_files)
@@ -34,7 +40,7 @@ excess_risk <- function(outcome, group, strata, fit) {
                           df <- fread(fpath)
                           return(df)})
   input2=rbindlist(input2, fill=TRUE)
-  #Preprocess input2
+  #Preprocess input2                                                            #SELECTS ONLY REQUIRED COLUMNS&TERMS
   input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
   input2 <- input2 %>% filter(term == "days0_14" |
                                 term == "days14_28" |
