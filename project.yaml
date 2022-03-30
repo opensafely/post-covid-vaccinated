@@ -128,7 +128,7 @@ actions:
         input_table_2_subgroups: output/input_table_2_*_stage1.rds
 
   stage4_table_2_subgroups_vaccinated:
-    run: r:latest analysis/table_2_subgroups_efficiency_testing.R vaccinated
+    run: r:latest analysis/table_2_subgroups.R vaccinated
     needs:
     - stage4_input_for_table_2_subgroups
     outputs:
@@ -139,7 +139,7 @@ actions:
         input_1_aer_html: output/input1_aer_vaccinated.html
 
   stage4_table_2_subgroups_electively_unvaccinated:
-    run: r:latest analysis/table_2_subgroups_efficiency_testing.R electively_unvaccinated
+    run: r:latest analysis/table_2_subgroups.R electively_unvaccinated
     needs:
     - stage4_input_for_table_2_subgroups
     outputs:

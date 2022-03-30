@@ -120,7 +120,7 @@ apply_table2_subgroups_function <- function(cohort){
   splice(
     action(
       name = glue("stage4_table_2_subgroups_{cohort}"),
-      run = "r:latest analysis/table_2_subgroups_efficiency_testing.R",
+      run = "r:latest analysis/table_2_subgroups.R",
       arguments = c(cohort),
       needs = list("stage4_input_for_table_2_subgroups"),
       moderately_sensitive = list(
