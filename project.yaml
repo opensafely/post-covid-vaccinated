@@ -111,10 +111,10 @@ actions:
     - stage4_input_for_table_2_subgroups
     outputs:
       moderately_sensitive:
-        table_2_subgroups: output/table2_subgroups_vaccinated.csv
-        input_1_aer: output/input1_aer_vaccinated.csv
-        table_2_subgroups: output/table2_subgroups_vaccinated.html
-        input_1_aer: output/input1_aer_vaccinated.html
+        table_2_subgroups_csv: output/table2_subgroups_vaccinated.csv
+        input_1_aer_csv: output/input1_aer_vaccinated.csv
+        table_2_subgroups_html: output/table2_subgroups_vaccinated.html
+        input_1_aer_html: output/input1_aer_vaccinated.html
 
   stage4_table_2_subgroups_electively_unvaccinated:
     run: r:latest analysis/table_2_subgroups_efficiency_testing.R electively_unvaccinated
@@ -122,10 +122,10 @@ actions:
     - stage4_input_for_table_2_subgroups
     outputs:
       moderately_sensitive:
-        table_2_subgroups: output/table2_subgroups_electively_unvaccinated.csv
-        input_1_aer: output/input1_aer_electively_unvaccinated.csv
-        table_2_subgroups: output/table2_subgroups_electively_unvaccinated.html
-        input_1_aer: output/input1_aer_electively_unvaccinated.html
+        table_2_subgroups_csv: output/table2_subgroups_electively_unvaccinated.csv
+        input_1_aer_csv: output/input1_aer_electively_unvaccinated.csv
+        table_2_subgroups_html: output/table2_subgroups_electively_unvaccinated.html
+        input_1_aer_html: output/input1_aer_electively_unvaccinated.html
 
   ## Apply cox model for ami 
 
