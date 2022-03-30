@@ -633,13 +633,11 @@ actions:
   stage4_table_2_subgroups_both:
     run: r:latest analysis/table_2_subgroups.R both
     needs:
-    - preprocess_data
-    - stage1_data_cleaning_both
     - stage4_input_for_table_2_subgroups
     outputs:
       moderately_sensitive:
-        table_2_subgroups: output/table_2_subgroups_*.csv
-        input_1_aer: output/input1_aer_*.csv
+        table_2_subgroups: output/table2_subgrous_electively_unvaccinated.csv
+        input_1_aer: output/input1_aer_electively_unvaccinated.csv
 
   ## Apply cox model for ami 
 
