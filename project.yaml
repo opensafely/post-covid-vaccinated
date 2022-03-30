@@ -105,16 +105,23 @@ actions:
       highly_sensitive:
         input_table_2_subgroups: output/input_table_2_*_stage1.rds
 
-  stage4_table_2_subgroups:
-    run: r:latest analysis/table_2_subgroups_efficiency_testing.R both
+  stage4_table_2_subgroups_vaccinated:
+    run: r:latest analysis/table_2_subgroups_efficiency_testing.R vaccinated
     needs:
-    - preprocess_data
-    - stage1_data_cleaning_both
     - stage4_input_for_table_2_subgroups
     outputs:
       moderately_sensitive:
-        table_2_subgroups: output/table_2_subgroups_*.csv
-        input_1_aer: output/input1_aer_*.csv
+        table_2_subgroups: output/table2_subgrous_vaccinated.csv
+        input_1_aer: output/input1_aer_vaccinated.csv
+
+  stage4_table_2_subgroups_electively_unvaccinated:
+    run: r:latest analysis/table_2_subgroups_efficiency_testing.R electively_unvaccinated
+    needs:
+    - stage4_input_for_table_2_subgroups
+    outputs:
+      moderately_sensitive:
+        table_2_subgroups: output/table2_subgrous_electively_unvaccinated.csv
+        input_1_aer: output/input1_aer_electively_unvaccinated.csv
 
   ## Apply cox model for ami 
 

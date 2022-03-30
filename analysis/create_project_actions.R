@@ -20,7 +20,7 @@ defaults_list <- list(
 active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses_table <- subset(active_analyses, active_analyses$active =="TRUE")
 outcomes_model <- active_analyses_table$outcome_variable %>% str_replace("out_date_", "")
-
+cohort_to_run <- c("vaccinated", "electively_unvaccinated")
 
 # create action functions ----
 
@@ -103,7 +103,20 @@ apply_model_function <- function(outcome){
   )
 }
 
-
+apply_table2_subgroups_function <- function(cohort){
+  splice(
+    action(
+      name = glue("stage4_table_2_subgroups_{cohort}"),
+      run = "r:latest analysis/table_2_subgroups_efficiency_testing.R",
+      arguments = c(cohort),
+      needs = list("stage4_input_for_table_2_subgroups"),
+      moderately_sensitive = list(
+        table_2_subgroups = glue("output/table2_subgrous_{cohort}.csv"),
+        input_1_aer = glue("output/input1_aer_{cohort}.csv")
+      )
+    )
+  )
+}
 
 ##########################################################
 ## Define and combine all actions into a list of actions #
@@ -210,6 +223,7 @@ actions_list <- splice(
     )
   ),
   
+  
   #comment("Stage 4 - Venn diagrams"),
   action(
     name = "stage4_venn_diagram_both",
@@ -231,16 +245,44 @@ actions_list <- splice(
     )
   ),
   
-  #comment("Stage 4 - Table 2 subgroups"),
-  action(
-    name = "stage4_table_2_subgroups",
-    run = "r:latest analysis/table_2_subgroups_efficiency_testing.R both",
-    needs = list("preprocess_data","stage1_data_cleaning_both","stage4_input_for_table_2_subgroups"),
-    moderately_sensitive = list(
-      table_2_subgroups = glue("output/table_2_subgroups_*.csv"),
-      input_1_aer = glue("output/input1_aer_*.csv")
-    )
+  #comment("Stage 4 - Table 2"),
+  splice(
+    # over outcomes
+    unlist(lapply(cohort_to_run, function(x) apply_table2_subgroups_function( cohort = x)), recursive = FALSE)
   ),
+  
+  # #comment("Stage 4 - Table 2 subgroups"),
+  # action(
+  #   name = "stage4_table_2_subgroups",
+  #   run = "r:latest analysis/table_2_subgroups_efficiency_testing.R both",
+  #   needs = list("stage4_input_for_table_2_subgroups"),
+  #   moderately_sensitive = list(
+  #     table_2_subgroups = glue("output/table_2_subgroups_*.csv"),
+  #     input_1_aer = glue("output/input1_aer_*.csv")
+  #   )
+  # ),
+  
+  # #comment("Stage 4 - Table 2 subgroups vaccinated"),
+  # action(
+  #   name = "stage4_table_2_subgroups_vaccinated",
+  #   run = "r:latest analysis/table_2_subgroups_efficiency_testing.R vaccinated",
+  #   needs = list("stage4_input_for_table_2_subgroups"),
+  #   moderately_sensitive = list(
+  #     table_2_subgroups = glue("output/table_2_subgroups_vaccinated.csv"),
+  #     input_1_aer = glue("output/input1_aer_vaccinated.csv")
+  #   )
+  # ),
+  
+  # #comment("Stage 4 - Table 2 subgroups electively unvaccinated"),
+  # action(
+  #   name = "stage4_table_2_subgroups_electively_unvaccinated",
+  #   run = "r:latest analysis/table_2_subgroups_efficiency_testing.R electively_unvaccinated",
+  #   needs = list("stage4_input_for_table_2_subgroups"),
+  #   moderately_sensitive = list(
+  #     table_2_subgroups = glue("output/table_2_subgroups_electively_unvaccinated.csv"),
+  #     input_1_aer = glue("output/input1_aer_electively_unvaccinated.csv")
+  #   )
+  # ),
 
   # #comment("Stage 4 - Table 2 subgroups"),
   # action(
