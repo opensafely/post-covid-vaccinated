@@ -133,7 +133,6 @@ apply_table2_subgroups_function <- function(cohort){
   )
 }
 
-
 ##########################################################
 ## Define and combine all actions into a list of actions #
 ##########################################################
@@ -248,6 +247,7 @@ actions_list <- splice(
     # over outcomes
     unlist(lapply(cohort_to_run, function(x) apply_table2_function( cohort = x)), recursive = FALSE)
     ),
+  
   
   
   #comment("Stage 4 - Venn diagrams"),
