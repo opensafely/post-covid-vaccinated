@@ -112,6 +112,10 @@ apply_table2_function <- function(cohort){
       needs = list("stage1_data_cleaning_both"),
       moderately_sensitive = list(
         table2 = glue("output/table2_{cohort}_without_covid_history.csv")
+      )
+    )
+  )
+}
 apply_table2_subgroups_function <- function(cohort){
   splice(
     action(
@@ -261,7 +265,7 @@ actions_list <- splice(
   action(
     name = "stage4_input_for_table_2_subgroups",
     run = "r:latest analysis/table_2_create_input_by_event.R both",
-    needs = list("preprocess_data","stage1_data_cleaning_both"),
+    needs = list("stage1_data_cleaning_both"),
     highly_sensitive = list(
       input_table_2_subgroups = glue("output/input_table_2_*_stage1.rds")
     )

@@ -119,6 +119,36 @@ actions:
         venn_diagram: output/venn_diagram_*.svg
         venn_diagram_number_check: output/venn_diagram_number_check_*.csv
 
+  stage4_input_for_table_2_subgroups:
+    run: r:latest analysis/table_2_create_input_by_event.R both
+    needs:
+    - stage1_data_cleaning_both
+    outputs:
+      highly_sensitive:
+        input_table_2_subgroups: output/input_table_2_*_stage1.rds
+
+  stage4_table_2_subgroups_vaccinated:
+    run: r:latest analysis/table_2_subgroups_efficiency_testing.R vaccinated
+    needs:
+    - stage4_input_for_table_2_subgroups
+    outputs:
+      moderately_sensitive:
+        table_2_subgroups_csv: output/table2_subgroups_vaccinated.csv
+        input_1_aer_csv: output/input1_aer_vaccinated.csv
+        table_2_subgroups_html: output/table2_subgroups_vaccinated.html
+        input_1_aer_html: output/input1_aer_vaccinated.html
+
+  stage4_table_2_subgroups_electively_unvaccinated:
+    run: r:latest analysis/table_2_subgroups_efficiency_testing.R electively_unvaccinated
+    needs:
+    - stage4_input_for_table_2_subgroups
+    outputs:
+      moderately_sensitive:
+        table_2_subgroups_csv: output/table2_subgroups_electively_unvaccinated.csv
+        input_1_aer_csv: output/input1_aer_electively_unvaccinated.csv
+        table_2_subgroups_html: output/table2_subgroups_electively_unvaccinated.html
+        input_1_aer_html: output/input1_aer_electively_unvaccinated.html
+
   ## Apply cox model for ami - vaccinated cohort 
 
   Analysis_cox_ami_vaccinated:
@@ -630,18 +660,6 @@ actions:
         compiled_event_counts: output/compiled_event_counts_eating_disorders_electively_unvaccinated.csv
 
   ## Apply cox model for serious_mental_illness - vaccinated cohort 
-  stage4_table_2_subgroups_both:
-    run: r:latest analysis/table_2_subgroups.R both
-    needs:
-    - stage4_input_for_table_2_subgroups
-    outputs:
-      moderately_sensitive:
-        table_2_subgroups_csv: output/table2_subgroups_electively_unvaccinated.csv
-        input_1_aer_csv: output/input1_aer_electively_unvaccinated.csv
-        table_2_subgroups_html: output/table2_subgroups_electively_unvaccinated.html
-        input_1_aer_html: output/input1_aer_electively_unvaccinated.html
-
-  ## Apply cox model for ami 
 
   Analysis_cox_serious_mental_illness_vaccinated:
     run: r:latest analysis/01_pipe.R serious_mental_illness vaccinated
