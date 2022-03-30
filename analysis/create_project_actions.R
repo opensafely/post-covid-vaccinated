@@ -120,10 +120,10 @@ apply_table2_subgroups_function <- function(cohort){
       arguments = c(cohort),
       needs = list("stage4_input_for_table_2_subgroups"),
       moderately_sensitive = list(
-        table_2_subgroups = glue("output/table2_subgroups_{cohort}.csv"),
-        input_1_aer = glue("output/input1_aer_{cohort}.csv"),
-        table_2_subgroups = glue("output/table2_subgroups_{cohort}.html"),
-        input_1_aer = glue("output/input1_aer_{cohort}.html")
+        table_2_subgroups_csv = glue("output/table2_subgroups_{cohort}.csv"),
+        input_1_aer_csv = glue("output/input1_aer_{cohort}.csv"),
+        table_2_subgroups_html = glue("output/table2_subgroups_{cohort}.html"),
+        input_1_aer_html = glue("output/input1_aer_{cohort}.html")
       )
     )
   )
