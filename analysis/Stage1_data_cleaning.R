@@ -41,6 +41,7 @@
 library(readr)
 library(dplyr)
 library(stringr)
+library(tidyr)
 
 
 
@@ -72,6 +73,9 @@ stage1 <- function(cohort_name){
     # Handle missing values
     
     input$cov_cat_smoking_status <- replace(input$cov_cat_smoking_status, is.na(input$cov_cat_smoking_status),"M")
+    input <- input %>% mutate(cov_cat_region = as.character(cov_cat_region)) %>%
+                    mutate(cov_cat_region = replace_na(cov_cat_region, "Missing")) %>%
+                    mutate(cov_cat_region = as.factor(cov_cat_region))
     
     # For categorical factors, specify references
     

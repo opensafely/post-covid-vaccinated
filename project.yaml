@@ -52,6 +52,9 @@ actions:
     outputs:
       moderately_sensitive:
         describe: output/describe_input_vaccinated_*.txt
+        describe_index: output/describe_tmp_index_vaccinated.txt
+        describe_cohort: output/describe_tmp_vaccinated.txt
+        descrive_venn: output/describe_venn_vaccinated.txt
       highly_sensitive:
         cohort: output/input_vaccinated.rds
         venn: output/venn_vaccinated.rds
@@ -65,6 +68,9 @@ actions:
     outputs:
       moderately_sensitive:
         describe: output/describe_input_electively_unvaccinated_*.txt
+        describe_index: output/describe_tmp_index_electively_unvaccinated.txt
+        describe_cohort: output/describe_tmp_electively_unvaccinated.txt
+        descrive_venn: output/describe_venn_electively_unvaccinated.txt
       highly_sensitive:
         cohort: output/input_electively_unvaccinated.rds
         venn: output/venn_electively_unvaccinated.rds

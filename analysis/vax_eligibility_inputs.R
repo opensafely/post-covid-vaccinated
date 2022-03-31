@@ -51,8 +51,8 @@ readr::write_csv(jcvi_groups, "output/vax_jcvi_groups.csv")
 elig_dates <-
 tribble(
     ~date, ~description, ~jcvi_groups,
-    "2020-12-08", "vax_cat_jcvi_group='01' OR vax_cat_jcvi_group='02' OR vax_cat_jcvi_group='03'", "01, 02, 03",
-    "2021-01-18", "vax_cat_jcvi_group='04'", "04",
+    "2020-12-08", "vax_cat_jcvi_group='01' OR vax_cat_jcvi_group='02'", "01, 02",
+    "2021-01-18", "vax_cat_jcvi_group='03' OR vax_cat_jcvi_group='04'", "03, 04",
     ###
     "2021-02-15", "vax_cat_jcvi_group='05' OR vax_cat_jcvi_group='06'", "05, 06",
     ###
