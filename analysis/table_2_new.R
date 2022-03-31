@@ -25,8 +25,8 @@ if(length(args)==0){
   # use for interactive testing
   population <- "vaccinated"
   #population = "electively_unvaccinated"
-  analyses <- "main_analyses"
-  #analyses <- "all_subgroups"
+  #analyses <- "main_analyses"
+  analyses <- "all_subgroups"
 }else{
   analyses <- args[[1]]
   population <- args[[2]]
@@ -208,12 +208,12 @@ table_2_subgroups_output <- function(population){
                                                              subgrp_full_name=analyses_of_interest$stratify_by_subgroup[i])
   }
   
-  write.csv(analyses_of_interest, file=paste0("output/table2_subgroups_", population,"_",analyses, ".csv"), row.names = F)
+  write.csv(analyses_of_interest, file=paste0("output/table2_", population,"_",analyses, ".csv"), row.names = F)
   input1_aer <- analyses_of_interest %>% select(c("event", "cohort_to_run", "subgroup", "strata", "unexposed_person_days"))
   names(input1_aer)[which(names(input1_aer) == "cohort_to_run")] = "cohort"
   input1_aer$event <- ifelse(startsWith(input1_aer$event,"out_"),gsub("out_date_","",input1_aer$event),input1_aer$evevent)
   write.csv(input1_aer, file=paste0("output/input1_aer_", population, "_", analyses, ".csv"), row.names=F)
-  htmlTable(analyses_of_interest, file=paste0("output/table2_subgroups_", population, "_", analyses, ".html"))
+  htmlTable(analyses_of_interest, file=paste0("output/table2_", population, "_", analyses, ".html"))
   htmlTable(input1_aer, file=paste0("output/input1_aer_", population, "_", analyses,".html"), row.names=F)
 }
 
