@@ -151,13 +151,20 @@ stage2 <- function(cohort_name, covid_history) {
   input$cov_cat_consulation_rate_group <- ifelse(input$cov_num_consulation_rate>=6, "6+", input$cov_cat_consulation_rate_group)
 
   # Populate table 1 
+  active_analyses <- read_rds("lib/active_analyses.rds")
+  active_analyses <- active_analyses %>% filter(active==TRUE)
+  covar_names<-str_split(active_analyses$covariates, ";")[[1]]
   
-  categorical_cov <- colnames(input)[grep("cov_cat", colnames(input))]
-  
-  numerical_cov <- colnames(input)[grep("cov_num", colnames(input))]
+  #categorical_cov <- colnames(input)[grep("cov_cat", colnames(input))]
+  categorical_cov <- covar_names[grep("cov_cat", covar_names)]
+  categorical_cov <- append(categorical_cov, c("cov_cat_age_group","cov_cat_consulation_rate_group"))
+                            
+  #numerical_cov <- colnames(input)[grep("cov_num", colnames(input))]
+  numerical_cov <- covar_names[grep("cov_num", covar_names)]
   numerical_cov <- numerical_cov[!numerical_cov=="cov_num_age"]
   
-  binary_cov <- colnames(input)[grep("cov_bin", colnames(input))]
+  #binary_cov <- colnames(input)[grep("cov_bin", colnames(input))]
+  binary_cov <- covar_names[grep("cov_bin", covar_names)]
   
   # Base table
   
@@ -174,8 +181,8 @@ stage2 <- function(cohort_name, covid_history) {
   
   table1 <- rename(table1, Covariate_level = Freq, Covariate = Var2)
   
-  table1 <- table1 %>% 
-    filter(!str_detect(Covariate_level, "^FALSE"))
+  #table1 <- table1 %>% 
+  #  filter(!str_detect(Covariate_level, "^FALSE"))
   
   table1  <- table1 %>% 
     dplyr::select("Covariate","Covariate_level")
@@ -191,6 +198,7 @@ stage2 <- function(cohort_name, covid_history) {
   colnames(table1_count_all) <- c("Covariate","Covariate_level")
   table1_count_all[1,] <- c("All","All")
   table1 <- rbind(table1_count_all,table1)
+  table1 <- table1[!is.na(table1$Covariate_level),]
   
   for (j in 1:nrow(pop)) {
     
@@ -230,7 +238,7 @@ stage2 <- function(cohort_name, covid_history) {
     bin_summary <- as.data.frame(summary(bin_pop))
     bin_summary[,population] <- bin_summary$Freq
     bin_summary <- rename(bin_summary, Covariate_level = Freq, Covariate = Var2)
-    bin_summary <- bin_summary %>% filter(str_detect(Covariate_level, "^TRUE"))
+    #bin_summary <- bin_summary %>% filter(str_detect(Covariate_level, "^TRUE"))
     bin_summary <- bin_summary%>% dplyr::select("Covariate","Covariate_level",population)
     
     # Population summary
@@ -257,9 +265,42 @@ stage2 <- function(cohort_name, covid_history) {
   table1$Covariate <- gsub("cov_\\D\\D\\D_", "",table1$Covariate)
   table1$Covariate <- gsub("_", " ",table1$Covariate)
   
-  # Save table 1
+  # Add in suppression controls for counts <=5 and then alter totals accordingly
+  table1_suppressed <- table1[0,]
+
+  for(i in unique(table1$Covariate[which(!startsWith(table1$Covariate_level, "Mean"))])){
+    df<- table1 %>% filter(Covariate == i)
+    df <- df %>% mutate(across(!c("Covariate","Covariate_level"),as.numeric))
+    df$No_infection <- df$Whole_population - df$COVID_exposed
+    
+    if(any(df$COVID_hospitalised <= 5 | df$COVID_non_hospitalised <= 5 | is.na(df$COVID_hospitalised)| is.na(df$COVID_non_hospitalised))){
+      df$COVID_hospitalised <- "[Redacted]"
+      df$COVID_non_hospitalised <- "[Redacted]"
+    }
+    
+    if(any(df$COVID_exposed <= 5 | df$No_infection <=5 | is.na(df$COVID_exposed) | is.na(df$No_infection))){
+      df$COVID_exposed <- "[Redacted]"
+    }
+    
+    if(any(df$Whole_population <= 5 | is.na(df$Whole_population))){
+      df$Whole_population <- "[Redacted]"
+    }
+
+    df <- df %>% mutate(across(!c("Covariate","Covariate_level"),as.character))
+    df$No_infection <- NULL
+    
+    if(i == "consulation rate group"){
+      df <- rbind(df, table1 %>% filter(startsWith(Covariate_level, "Mean")))
+    }
+    
+    table1_suppressed <- rbind(table1_suppressed,df)
+    
+  }
+  #table1_suppressed[which(startsWith(table1_suppressed$Covariate_level, "Mean")),] <- table1[startsWith(table1$Covariate_level, "Mean"),]
+  table1_suppressed <- table1_suppressed %>% filter(!str_detect(Covariate_level, "^FALSE"))
   
-  write.csv(table1, file = file.path("output", paste0("Table1_",cohort_name, "_",covid_history, ".csv")) , row.names=F)
+  # Save table 1
+  write.csv(table1_suppressed, file = file.path("output", paste0("Table1_",cohort_name, "_",covid_history, ".csv")) , row.names=F)
   
 }
 
@@ -275,3 +316,4 @@ if(cohort_name == "both"){
   stage2(cohort_name, "with_covid_history")
   stage2(cohort_name, "without_covid_history")
 }
+ 
