@@ -23,11 +23,6 @@ if(active_analyses$model=="all"){
   mdl=active_analyses$model
 }
 
-if(active_analyses$cohort=="all"){
-  cohort_to_run=c("vaccinated", "electively_unvaccinated")
-}else{
-  cohort_to_run=active_analyses$cohort
-}  
 
 ## Transpose active_analyses to single column so can filter to analysis models to run
 
@@ -40,7 +35,7 @@ analyses_to_run <- analyses_to_run %>% select(!run)
 analyses_to_run$event=event_name
 
 ## Add in  all possible combinations of the subgroups, models and cohorts
-analyses_to_run <- crossing(analyses_to_run,mdl,cohort_to_run)
+analyses_to_run <- crossing(analyses_to_run,mdl,cohort)
 
 ## Add in which covariates to stratify by
 analyses_to_run$stratify_by_subgroup=NA
@@ -67,8 +62,8 @@ analyses_to_run$strata[analyses_to_run$strata=="South_Asian"]<- "South Asian"
 ## analyses to be run in one go to save having to read in the data for each individual analysis
 ## i.e can read it in once and run all the vaccinated analyses in one go
 
-for(i in cohort_to_run){
-  assign(paste0("analyses_to_run_",i),analyses_to_run %>% filter(cohort_to_run == i) )
-}
+#for(i in cohort_to_run){
+#  assign(paste0("analyses_to_run_",i),analyses_to_run %>% filter(cohort_to_run == i) )
+#}
 
 

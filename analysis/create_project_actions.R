@@ -20,7 +20,7 @@ defaults_list <- list(
 active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses_table <- subset(active_analyses, active_analyses$active =="TRUE")
 outcomes_model <- active_analyses_table$outcome_variable %>% str_replace("out_date_", "")
-
+cohort_to_run <- c("vaccinated", "electively_unvaccinated")
 
 # create action functions ----
 
@@ -80,29 +80,42 @@ convert_comment_actions <-function(yaml.txt){
 ## Function for typical actions to analyse data #
 #################################################
 # Updated to a typical action running Cox models for one outcome
-apply_model_function <- function(outcome){
+apply_model_function <- function(outcome, cohort){
   splice(
-    comment(glue("Apply cox model for {outcome}")),
+    comment(glue("Apply cox model for {outcome} - {cohort} cohort")),
     action(
-      name = glue("Analysis_cox_{outcome}"),
+      name = glue("Analysis_cox_{outcome}_{cohort}"),
       run = "r:latest analysis/01_pipe.R",
-      arguments = c(outcome),
+      arguments = c(outcome,cohort),
       needs = list("stage1_data_cleaning_both"),
       moderately_sensitive = list(
-        compiled_hrs_html = glue("output/suppressed_compiled_HR_results_{outcome}.html"),
-        compiled_event_counts_html = glue("output/suppressed_compiled_event_counts_{outcome}.html"),
-        analyses_not_run = glue("output/analyses_not_run_{outcome}.csv"),
-        compiled_hrs_csv = glue("output/suppressed_compiled_HR_results_{outcome}.csv"),
-        compiled_event_counts_csv = glue("output/suppressed_compiled_event_counts_{outcome}.csv")
+        compiled_hrs_html = glue("output/suppressed_compiled_HR_results_{outcome}_{cohort}.html"),
+        compiled_event_counts_html = glue("output/suppressed_compiled_event_counts_{outcome}_{cohort}.html"),
+        analyses_not_run = glue("output/analyses_not_run_{outcome}_{cohort}.csv"),
+        compiled_hrs_csv = glue("output/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
+        compiled_event_counts_csv = glue("output/suppressed_compiled_event_counts_{outcome}_{cohort}.csv")
       ),
       highly_sensitive = list(
-        compiled_hrs = glue("output/compiled_HR_results_{outcome}.csv"),
-        compiled_event_counts = glue("output/compiled_event_counts_{outcome}.csv")
+        compiled_hrs = glue("output/compiled_HR_results_{outcome}_{cohort}.csv"),
+        compiled_event_counts = glue("output/compiled_event_counts_{outcome}_{cohort}.csv")
       )
     )
   )
 }
 
+apply_table2_function <- function(cohort){
+  splice(
+    action(
+      name = glue("Stage_4_Table_2_{cohort}"),
+      run = "r:latest analysis/table_2.R",
+      arguments = c(cohort),
+      needs = list("stage1_data_cleaning_both"),
+      moderately_sensitive = list(
+        table2 = glue("output/table2_{cohort}_without_covid_history.csv")
+      )
+    )
+  )
+}
 
 
 ##########################################################
@@ -221,14 +234,10 @@ actions_list <- splice(
 
   
   #comment("Stage 4 - Table 2"),
-  action(
-    name = "stage4_table2_both",
-    run = "r:latest analysis/table_2.R both",
-    needs = list("stage1_data_cleaning_both"),
-    moderately_sensitive = list(
-      table2 = glue("output/table2_*.csv")
-    )
-  ),
+  splice(
+    # over outcomes
+    unlist(lapply(cohort_to_run, function(x) apply_table2_function( cohort = x)), recursive = FALSE)
+    ),
   
   #comment("Stage 4 - Venn diagrams"),
   action(
@@ -244,9 +253,9 @@ actions_list <- splice(
   #comment("Stage 5 - Apply models"),
   splice(
     # over outcomes
-    unlist(lapply(outcomes_model, function(x) apply_model_function(outcome = x)), recursive = FALSE)
-  )
-)
+    unlist(lapply(outcomes_model, function(x) splice(unlist(lapply(cohort_to_run, function(y) apply_model_function(outcome = x, cohort = y)), recursive = FALSE))
+      ),recursive = FALSE)))
+  
 
 ## combine everything ----
 project_list <- splice(

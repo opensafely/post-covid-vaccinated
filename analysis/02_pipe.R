@@ -48,7 +48,7 @@ cuts_days_since_expo <- c(14, 28, 56, 84, 197)
 cuts_days_since_expo_reduced <- c(28,197) 
 
 #Rename input variable names (by renaming here it means that these scripts can be used for other datasets without
-## having to keep updating all the varaible names throughout the following scripts)
+## having to keep updating all the variable names throughout the following scripts)
 setnames(input, 
          old = c("death_date",  
                  "cov_cat_sex", 
@@ -57,7 +57,8 @@ setnames(input,
                  "sub_cat_covid19_hospital",
                  "cov_cat_region",
                  "index_date",
-                 "cov_cat_ethnicity"), 
+                 "cov_cat_ethnicity",
+                 c(paste0("out_date_", event_name))), 
          new = c("DATE_OF_DEATH", 
                  "sex",
                  "AGE_AT_COHORT_START", 
@@ -65,7 +66,8 @@ setnames(input,
                  "expo_pheno",
                  "region_name",
                  "follow_up_start",
-                 "ethnicity"))
+                 "ethnicity",
+                 "event_date"))
 
 
 
@@ -80,9 +82,17 @@ cohort_cols <- c("patient_id",
                  "expo_date",
                  "expo_pheno",
                  "region_name",
-                 "follow_up_start")
+                 "follow_up_start",
+                 "event_date",
+                 "follow_up_end")
  
+#-----------------Set follow up end date for outcome of interest----------------
 
+if(cohort=="vaccinated"){
+  input <- input %>% rowwise() %>% mutate(follow_up_end=min(event_date, DATE_OF_DEATH,cohort_end_date,na.rm = TRUE))
+}else if(cohort=="electively_unvaccinated"){
+  input <- input %>% rowwise() %>% mutate(follow_up_end=min(vax_date_covid_1,event_date, DATE_OF_DEATH,cohort_end_date,na.rm = TRUE))
+}
  
 #-----------------------CREATE EMPTY ANALYSES NOT RUN DF------------------------
 analyses_not_run=data.frame(matrix(nrow=0,ncol = 8))
