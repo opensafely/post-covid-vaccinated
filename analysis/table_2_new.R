@@ -217,7 +217,8 @@ table_2_subgroups_output <- function(population){
   
   # write output for table2
   write.csv(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".csv"), row.names = F)
-  htmlTable(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".html"))
+  # not sure why this html table isn't produced.
+  #htmlTable(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".html"), row.names=F)
   
   # write output fir input1_aer
   write.csv(input1_aer, file=paste0("output/input1_aer_", analyses, "_", population, ".csv"), row.names=F)
