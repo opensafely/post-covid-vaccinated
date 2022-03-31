@@ -21,6 +21,7 @@ active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses_table <- subset(active_analyses, active_analyses$active =="TRUE")
 outcomes_model <- active_analyses_table$outcome_variable %>% str_replace("out_date_", "")
 cohort_to_run <- c("vaccinated", "electively_unvaccinated")
+analyses <- c("main_analyses", "all_subgroups")
 
 # create action functions ----
 
@@ -116,18 +117,18 @@ apply_table2_function <- function(cohort){
     )
   )
 }
-apply_table2_subgroups_function <- function(cohort){
+apply_table2_subgroups_function <- function(analyses, cohort){
   splice(
     action(
-      name = glue("stage4_table_2_subgroups_{cohort}"),
+      name = glue("stage4_table_2_subgroups_{analyses}_{cohort}"),
       run = "r:latest analysis/table_2_subgroups.R",
-      arguments = c(cohort),
+      arguments = c(analyses, cohort),
       needs = list("stage4_input_for_table_2_subgroups"),
       moderately_sensitive = list(
-        table_2_subgroups_csv = glue("output/table2_subgroups_{cohort}.csv"),
-        input_1_aer_csv = glue("output/input1_aer_{cohort}.csv"),
-        table_2_subgroups_html = glue("output/table2_subgroups_{cohort}.html"),
-        input_1_aer_html = glue("output/input1_aer_{cohort}.html")
+        table_2_subgroups_csv = glue("output/table2_subgroups_{analyses}_{cohort}.csv"),
+        input_1_aer_csv = glue("output/input1_aer_{analyses}_{cohort}.csv"),
+        table_2_subgroups_html = glue("output/table2_subgroups_{analyses}_{cohort}.html"),
+        input_1_aer_html = glue("output/input1_aer_{analyses}_{cohort}.html")
       )
     )
   )
@@ -271,11 +272,16 @@ actions_list <- splice(
     )
   ),
   
-  #comment("Stage 4 - Table 2"),
+  #comment("Stage 4 - Table 2 subgroups"),
+  # splice(
+  #   # over outcomes
+  #   unlist(lapply(cohort_to_run, function(x) apply_table2_subgroups_function( cohort = x)), recursive = FALSE)
+  # ),
+  # 
   splice(
     # over outcomes
-    unlist(lapply(cohort_to_run, function(x) apply_table2_subgroups_function( cohort = x)), recursive = FALSE)
-  ),
+    unlist(lapply(cohort_to_run, function(x) splice(unlist(lapply(analyses, function(y) apply_table2_subgroups_function(analyses = y, cohort = x)), recursive = FALSE))
+    ),recursive = FALSE)),
   
   #comment("Stage 5 - Apply models"),
   splice(
