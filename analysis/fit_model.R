@@ -129,6 +129,9 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
   # To get robust variance-covariance matrix so that robust standard errots can be used in CI's
   robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
+  
+  print("Cox output")
+  print(fit_cox_model)
   print("Finished fitting cox model")
   
   # Results ----
@@ -144,6 +147,8 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
     print(paste0("Categorical covariates collapsed: ", covars_collapsed))
   }
+  print("Print results")
+  print(results)
   
   #Add in P-values to results table
   #Can only get for covariate as a whole and not for each level so left join onto main covariate name
