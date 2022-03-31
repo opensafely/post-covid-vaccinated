@@ -189,6 +189,16 @@ print("Index date and source determined successfully")
 tmp_index <- arrow::read_feather(file = "output/input_index.feather")
 tmp_other <- arrow::read_feather(file = paste0("output/input_",cohort,".feather"))
 
+# Describe data --------------------------------------------------------------
+
+sink(paste0("output/describe_tmp_index_stage0.txt"))
+print(Hmisc::describe(tmp_index))
+sink()
+
+sink(paste0("output/describe_tmp_",cohort,"_stage0.txt"))
+print(Hmisc::describe(tmp_other))
+sink()
+
 # Overwrite patient IDs for dummy data only ------------------------------------
 
 if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
@@ -289,6 +299,11 @@ sink()
 # Restrict columns and save Venn diagram input dataset -----------------------
 
 df2 <- df[,c("patient_id",colnames(df)[grepl("out_",colnames(df))])]
+
+# Describe data --------------------------------------------------------------
+sink(paste0("output/describe_venn_",cohort,".txt"))
+print(Hmisc::describe(df2))
+sink()
 
 saveRDS(df2, file = paste0("output/venn_",cohort,".rds"))
 
