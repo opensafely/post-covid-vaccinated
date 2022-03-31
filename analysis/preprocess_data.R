@@ -191,11 +191,11 @@ tmp_other <- arrow::read_feather(file = paste0("output/input_",cohort,".feather"
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/describe_tmp_index_stage0.txt"))
+sink(paste0("output/describe_tmp_index_",cohort,".txt"))
 print(Hmisc::describe(tmp_index))
 sink()
 
-sink(paste0("output/describe_tmp_",cohort,"_stage0.txt"))
+sink(paste0("output/describe_tmp_",cohort,".txt"))
 print(Hmisc::describe(tmp_other))
 sink()
 
