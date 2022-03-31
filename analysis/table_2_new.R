@@ -181,10 +181,10 @@ table_2_subgroups_output <- function(population){
   analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_ate"
   
   # if only need table2 for the main analyses
-  if(analyses == "main_analyses"){
+  if(analyses == "main"){
     analyses_of_interest <- analyses_of_interest %>% filter(stratify_by_subgroup == "sub_main") 
   }
-  if(analyses == "all_subgroups"){
+  if(analyses == "subgroups"){
     analyses_of_interest <- analyses_of_interest %>% filter(stratify_by_subgroup != "sub_main") 
   }
   
@@ -194,8 +194,8 @@ table_2_subgroups_output <- function(population){
   start = grep("unexposed_person_days", col_names)
   end = ncol(analyses_of_interest)
   
-  #for(i in 1:nrow(analyses_of_interest)){
-   for(i in 1:2){
+  for(i in 1:nrow(analyses_of_interest)){
+  #for(i in 1:2){
     d <- analyses_of_interest
     print(i)
     event_short = gsub("out_date_", "",analyses_of_interest$event[i])
