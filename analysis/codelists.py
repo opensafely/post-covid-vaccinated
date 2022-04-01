@@ -83,7 +83,7 @@ ami_snomed_clinical = codelist_from_csv(
 )
 
 ami_icd10 = codelist_from_csv(
-    "codelists/user-elsie_horne-ami_icd10.csv",
+    "codelists/user-RochelleKnight-ami_icd10.csv",
     system="icd10",
     column="code",
 )
@@ -178,7 +178,7 @@ dic_icd10 = codelist_from_csv(
 )
 
 dvt_dvt_icd10 = codelist_from_csv(
-    "codelists/user-elsie_horne-dvt_dvt_icd10.csv",
+    "codelists/user-RochelleKnight-dvt_dvt_icd10.csv",
     system="icd10",
     column="code",
 )
@@ -208,13 +208,13 @@ hf_snomed_clinical = codelist_from_csv(
 )
 
 hf_icd10 = codelist_from_csv(
-    "codelists/user-elsie_horne-hf_icd10.csv",
+    "codelists/user-RochelleKnight-hf_icd10.csv",
     system="icd10",
     column="code",
 )
 
 stroke_isch_icd10 = codelist_from_csv(
-    "codelists/user-elsie_horne-stroke_isch_icd10.csv",
+    "codelists/user-RochelleKnight-stroke_isch_icd10.csv",
     system="icd10",
     column="code",
 )
@@ -226,7 +226,7 @@ stroke_isch_snomed_clinical = codelist_from_csv(
 )
 
 stroke_sah_hs_icd10 = codelist_from_csv(
-    "codelists/user-elsie_horne-stroke_sah_hs_icd10.csv",
+    "codelists/user-RochelleKnight-stroke_sah_hs_icd10.csv",
     system="icd10",
     column="code",
 )
@@ -238,7 +238,7 @@ stroke_sah_hs_snomed_clinical = codelist_from_csv(
 )
 
 pe_icd10 = codelist_from_csv(
-    "codelists/user-elsie_horne-pe_icd10.csv",
+    "codelists/user-RochelleKnight-pe_icd10.csv",
     system="icd10",
     column="code",
 )
@@ -412,7 +412,7 @@ tia_snomed_clinical = codelist_from_csv(
 )
 
 tia_icd10 = codelist_from_csv(
-    "codelists/user-hjforbes-tia_icd10.csv",
+    "codelists/user-RochelleKnight-tia_icd10.csv",
     system="icd10",
     column="code",
 )
@@ -424,7 +424,7 @@ angina_snomed_clinical = codelist_from_csv(
 )
 
 angina_icd10 = codelist_from_csv(
-    "codelists/user-hjforbes-angina_hf_icd10.csv",
+    "codelists/user-RochelleKnight-angina_icd10.csv",
     system="icd10",
     column="code",
 )
