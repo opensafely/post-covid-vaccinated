@@ -1008,7 +1008,7 @@ def generate_common_variables(index_date_variable):
 
     ## Suicide
         # HES
-    tmp_out_date_suicide_snomed=patients.admitted_to_hospital(
+    tmp_out_date_suicide_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=suicide_icd10,
         on_or_after=f"{index_date_variable}",
@@ -1035,7 +1035,7 @@ def generate_common_variables(index_date_variable):
     ),
         # Combined
     out_date_suicide=patients.minimum_of(
-        "tmp_out_date_suicide_snomed", "tmp_out_date_suicide_death"
+        "tmp_out_date_suicide_hes", "tmp_out_date_suicide_death"
     ),     
 
     ## Addiction
