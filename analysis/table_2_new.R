@@ -17,8 +17,6 @@
 library(readr); library(dplyr); library(data.table); library(lubridate)
 library(stringr);library(tidyverse); library(htmlTable)
 
-#library(vcdExtra)
-
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
@@ -39,7 +37,7 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level, subgrp_full_name){
   data_active <- survival_data
-  # data_active$event_date <- survival_data[,event]
+  
   # filter the population according to whether the subgroup is covid_history
   if(subgrp == "covid_history"){
     data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==T)
@@ -110,7 +108,7 @@ table_2_subgroups_output <- function(population){
       analyses_to_run=active_analyses$cohort
     }  
     
-    ## Transpose active_analyses to single column so can filter to analysis models to run
+    # Transpose active_analyses to single column so can filter to analysis models to run
     analyses_to_run <- as.data.frame(t(analyses_to_run))
     analyses_to_run$subgroup <- row.names(analyses_to_run)
     colnames(analyses_to_run) <- c("run","subgroup")
@@ -120,10 +118,10 @@ table_2_subgroups_output <- function(population){
     analyses_to_run <- analyses_to_run %>% select(!run)
     analyses_to_run$event=i
     
-    ## Add in  all possible combinations of the subgroups, models and cohorts
+    # Add in  all possible combinations of the subgroups, models and cohorts
     analyses_to_run <- crossing(analyses_to_run,cohort_to_run)
     
-    ## Add in which covariates to stratify by
+    # Add in which covariates to stratify by
     analyses_to_run$stratify_by_subgroup=NA
     for(j in c("ethnicity","sex")){
       analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,i),i,analyses_to_run$stratify_by_subgroup)
@@ -132,7 +130,7 @@ table_2_subgroups_output <- function(population){
     analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,"prior_history"),active_analyses$prior_history_var[index],analyses_to_run$stratify_by_subgroup)
     analyses_to_run$stratify_by_subgroup <- ifelse(is.na(analyses_to_run$stratify_by_subgroup),analyses_to_run$subgroup,analyses_to_run$stratify_by_subgroup)
     
-    ## Add in relevant subgroup levels to specify which stratum to run for
+    # Add in relevant subgroup levels to specify which stratum to run for
     analyses_to_run$strata <- NA
     analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="main","main",analyses_to_run$strata)
     analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="covid_history","TRUE",analyses_to_run$strata)
@@ -153,7 +151,7 @@ table_2_subgroups_output <- function(population){
   analyses_of_interest <- cbind(analyses_of_interest, unexposed_person_days, unexposed_event_count, unexposed_ir, unexposed_ir_lower, unexposed_ir_upper,
                                 exposed_person_days, exposed_event_count, exposed_ir, exposed_ir_lower, exposed_ir_upper)
   
-  # # specify subgroup names
+  # specify subgroup names
   index <- grepl("agegp", analyses_of_interest$subgroup, fixed = TRUE)
   analyses_of_interest$stratify_by_subgroup[index] <- "sub_cat_age_group"
   
@@ -211,13 +209,10 @@ table_2_subgroups_output <- function(population){
   
   # write output for table2
   write.csv(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".csv"), row.names = F)
-  # not sure why this html table isn't produced.
-  #htmlTable(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".html"), row.names=F)
   rmarkdown::render("analysis/compiled_table2_results.Rmd",
                    output_file=paste0("table2_",analyses,"_", population),output_dir="output")
   #write output fir input1_aer
   write.csv(input1_aer, file=paste0("output/input1_aer_", analyses, "_", population, ".csv"), row.names=F)
-  #htmlTable(input1_aer, file=paste0("output/input1_aer_", analyses,"_", population, ".html"), row.names=F)
   rmarkdown::render("analysis/compiled_input1_aer_results.Rmd",
                    output_file=paste0("input1_aer_",analyses,"_", population),output_dir="output")
 }
