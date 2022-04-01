@@ -32,11 +32,10 @@ if(length(args)==0){
   population <- args[[2]]
 }
 
-start.time = Sys.time()
+# start.time = Sys.time()
 #delta period
 cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
-
 
 table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level, subgrp_full_name){
   data_active <- survival_data
@@ -91,7 +90,6 @@ table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level
   return(c(person_days_total_unexposed, event_count_unexposed, incidence_rate_unexposed, ir_lower_unexposed, ir_upper_unexposed, person_days_total_exposed, event_count_exposed, incidence_rate_exposed, ir_lower_exposed, ir_upper_exposed))
 }
 
-
 table_2_subgroups_output <- function(population){
   # define analyses of interests
   active_analyses <- read_rds("lib/active_analyses.rds")
@@ -106,7 +104,6 @@ table_2_subgroups_output <- function(population){
     analyses_to_run <- active_analyses %>% filter(outcome_variable==i)
     
     ##Set which cohorts are required
-    
     if(analyses_to_run$cohort=="all"){
       cohort_to_run=c("vaccinated", "electively_unvaccinated")
     }else{
@@ -114,7 +111,6 @@ table_2_subgroups_output <- function(population){
     }  
     
     ## Transpose active_analyses to single column so can filter to analysis models to run
-    
     analyses_to_run <- as.data.frame(t(analyses_to_run))
     analyses_to_run$subgroup <- row.names(analyses_to_run)
     colnames(analyses_to_run) <- c("run","subgroup")
@@ -136,7 +132,6 @@ table_2_subgroups_output <- function(population){
     analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,"prior_history"),active_analyses$prior_history_var[index],analyses_to_run$stratify_by_subgroup)
     analyses_to_run$stratify_by_subgroup <- ifelse(is.na(analyses_to_run$stratify_by_subgroup),analyses_to_run$subgroup,analyses_to_run$stratify_by_subgroup)
     
-    
     ## Add in relevant subgroup levels to specify which stratum to run for
     analyses_to_run$strata <- NA
     analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="main","main",analyses_to_run$strata)
@@ -150,7 +145,7 @@ table_2_subgroups_output <- function(population){
   }
   
   analyses_of_interest <- analyses_of_interest %>% filter(cohort_to_run == population)
-  write.csv(analyses_of_interest, file=paste0("output/analyses_of_interest", population, ".csv"))
+  write.csv(analyses_of_interest, file=paste0("output/analyses_of_interest_", population, ".csv"))
   #ir = incidence rate; ir_lower = lower bound of the 95% CI for ir; ir_upper = upper bound of the 95% CI for ir
   unexposed_person_days <- unexposed_event_count <- unexposed_ir <- unexposed_ir_lower <- unexposed_ir_upper <- rep("NA", nrow(analyses_of_interest))
   exposed_person_days <- exposed_event_count <- exposed_ir <- exposed_ir_lower <- exposed_ir_upper <- rep("NA", nrow(analyses_of_interest))
@@ -195,7 +190,7 @@ table_2_subgroups_output <- function(population){
   end = ncol(analyses_of_interest)
   
   for(i in 1:nrow(analyses_of_interest)){
-  #for(i in 1:2){
+  # for(i in 1:2){
     d <- analyses_of_interest
     print(i)
     event_short = gsub("out_date_", "",analyses_of_interest$event[i])
@@ -209,7 +204,6 @@ table_2_subgroups_output <- function(population){
                                                              subgrp_full_name=analyses_of_interest$stratify_by_subgroup[i])
   }
   
-  
   # extract input1_aer
   input1_aer <- analyses_of_interest %>% select(c("event", "cohort_to_run", "subgroup", "strata", "unexposed_person_days"))
   names(input1_aer)[which(names(input1_aer) == "cohort_to_run")] = "cohort"
@@ -219,10 +213,13 @@ table_2_subgroups_output <- function(population){
   write.csv(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".csv"), row.names = F)
   # not sure why this html table isn't produced.
   #htmlTable(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".html"), row.names=F)
-  
-  # write output fir input1_aer
+  rmarkdown::render("analysis/compiled_table2_results.Rmd",
+                   output_file=paste0("table2_",analyses,"_", population),output_dir="output")
+  #write output fir input1_aer
   write.csv(input1_aer, file=paste0("output/input1_aer_", analyses, "_", population, ".csv"), row.names=F)
-  htmlTable(input1_aer, file=paste0("output/input1_aer_", analyses,"_", population, ".html"), row.names=F)
+  #htmlTable(input1_aer, file=paste0("output/input1_aer_", analyses,"_", population, ".html"), row.names=F)
+  rmarkdown::render("analysis/compiled_input1_aer_results.Rmd",
+                   output_file=paste0("input1_aer_",analyses,"_", population),output_dir="output")
 }
 
 # Run function using specified commandArgs
@@ -233,8 +230,8 @@ if(population == "both"){
   table_2_subgroups_output(population)
 }
 
-end.time=Sys.time()
-
-run.time = end.time - start.time
-
-run.time
+# end.time=Sys.time()
+# 
+# run.time = end.time - start.time
+# 
+# run.time

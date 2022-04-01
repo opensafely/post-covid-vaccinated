@@ -127,7 +127,7 @@ apply_table2_new_function <- function(analyses, cohort){
       moderately_sensitive = list(
         table_2_csv = glue("output/table2_{analyses}_{cohort}.csv"),
         input_1_aer_csv = glue("output/input1_aer_{analyses}_{cohort}.csv"),
-        #table_2_html = glue("output/table2_{analyses}_{cohort}.html"),
+        table_2_html = glue("output/table2_{analyses}_{cohort}.html"),
         input_1_aer_html = glue("output/input1_aer_{analyses}_{cohort}.html")
       )
     )
