@@ -1,0 +1,32 @@
+---
+title: "Table 2"
+output: html_document
+---
+Table 2. Event counts, person days follow-up, incidence rate and 95% CI
+
+Event count with less than or equal to 5 events have been marked as [Redacted] and the corresponding person years and incidence rates have also been marked as [Redacted].
+
+Any results with redacted results will be at the top of the results file for easy review.
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(DT)
+library(readr)
+knitr::opts_knit$set(root.dir = gsub("/analysis","",getwd()))
+```
+
+## Compiled table2 event coutns, person days and incidence rates
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#analyses = "main"
+#population = "vaccinated"
+df=read_csv(paste0("output/table2_", analyses, "_", population, ".csv"))
+df %>%
+    datatable(extensions = 'Buttons',
+              options = list(dom = 'Blfrtip',
+                             buttons = c('copy', 'csv', 'excel', 'pdf', 'print' ),
+                             lengthMenu = list(c(50,-1),
+                                               c(50,"All"))))
+```

@@ -114,6 +114,58 @@ actions:
       moderately_sensitive:
         table2: output/table2_electively_unvaccinated_without_covid_history.csv
 
+  stage4_input_for_table_2:
+    run: r:latest analysis/table_2_create_input_by_event.R both
+    needs:
+    - stage1_data_cleaning_both
+    outputs:
+      highly_sensitive:
+        input_table_2: output/input_table_2_*_stage1.rds
+
+  stage4_table_2_main_vaccinated:
+    run: r:latest analysis/table_2_new.R main vaccinated
+    needs:
+    - stage4_input_for_table_2
+    outputs:
+      moderately_sensitive:
+        table_2_csv: output/table2_main_vaccinated.csv
+        input_1_aer_csv: output/input1_aer_main_vaccinated.csv
+        table_2_html: output/table2_main_vaccinated.html
+        input_1_aer_html: output/input1_aer_main_vaccinated.html
+
+  stage4_table_2_subgroups_vaccinated:
+    run: r:latest analysis/table_2_new.R subgroups vaccinated
+    needs:
+    - stage4_input_for_table_2
+    outputs:
+      moderately_sensitive:
+        table_2_csv: output/table2_subgroups_vaccinated.csv
+        input_1_aer_csv: output/input1_aer_subgroups_vaccinated.csv
+        table_2_html: output/table2_subgroups_vaccinated.html
+        input_1_aer_html: output/input1_aer_subgroups_vaccinated.html
+
+  stage4_table_2_main_electively_unvaccinated:
+    run: r:latest analysis/table_2_new.R main electively_unvaccinated
+    needs:
+    - stage4_input_for_table_2
+    outputs:
+      moderately_sensitive:
+        table_2_csv: output/table2_main_electively_unvaccinated.csv
+        input_1_aer_csv: output/input1_aer_main_electively_unvaccinated.csv
+        table_2_html: output/table2_main_electively_unvaccinated.html
+        input_1_aer_html: output/input1_aer_main_electively_unvaccinated.html
+
+  stage4_table_2_subgroups_electively_unvaccinated:
+    run: r:latest analysis/table_2_new.R subgroups electively_unvaccinated
+    needs:
+    - stage4_input_for_table_2
+    outputs:
+      moderately_sensitive:
+        table_2_csv: output/table2_subgroups_electively_unvaccinated.csv
+        input_1_aer_csv: output/input1_aer_subgroups_electively_unvaccinated.csv
+        table_2_html: output/table2_subgroups_electively_unvaccinated.html
+        input_1_aer_html: output/input1_aer_subgroups_electively_unvaccinated.html
+
   stage4_venn_diagram_both:
     run: r:latest analysis/venn_diagram.R both
     needs:
