@@ -11,7 +11,7 @@
 ##
 ## Content:  person days of follow up, unexposed person days, incidence rate, and 95% CI
 ##
-## Output:   CSV files: table_2_subgroups_*.csv, input1_aer_*.csv
+## Output:   CSV files: table2_*.csv, input1_aer_*.csv
 ## ====================================================================================
 
 library(readr); library(dplyr); library(data.table); library(lubridate)
