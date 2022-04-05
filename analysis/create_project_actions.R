@@ -93,6 +93,7 @@ apply_model_function <- function(outcome, cohort){
         compiled_event_counts_html = glue("output/suppressed_compiled_event_counts_{outcome}_{cohort}.html"),
         analyses_not_run = glue("output/analyses_not_run_{outcome}_{cohort}.csv"),
         compiled_hrs_csv = glue("output/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
+        compiled_hrs_csv_to_release = glue("output/suppressed_compiled_HR_results_{outcome}_{cohort}_to_release.csv"),
         compiled_event_counts_csv = glue("output/suppressed_compiled_event_counts_{outcome}_{cohort}.csv")
       ),
       highly_sensitive = list(
