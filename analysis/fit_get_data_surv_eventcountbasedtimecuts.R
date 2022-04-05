@@ -102,7 +102,8 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
                         event=event(days_to_end, event_status), tstart=days_to_start, tstop = days_to_end,
                         expo=tdc(day_to_expo)) 
     
-    with_expo <- with_expo %>% dplyr::select(!id)
+    # with_expo <- with_expo %>% dplyr::select(!id)
+    with_expo$id <- NULL
     rm(list=c("d1", "d2", "non_cases", "cases"))
     
     # ----------------------- SPLIT POST-COVID TIME------------------------------
