@@ -33,7 +33,10 @@ venn_output <- function(population){
   # Load data ------------------------------------------------------------------
   
   input <- readr::read_rds(paste0("output/venn_",population,".rds"))
+  
   input_stage1 <- readr::read_rds(paste0("output/input_", population,"_stage1.rds"))
+  input_stage1 <- input_stage1[input_stage1$sub_bin_covid19_confirmed_history==FALSE,]
+  
   input <- input[input$patient_id %in% input_stage1$patient_id,]
   
   # Create empty table ---------------------------------------------------------
@@ -46,6 +49,9 @@ venn_output <- function(population){
                    snomed_death = numeric(),
                    hes_death = numeric(),
                    snomed_hes_death = numeric(),
+                   total_snomed = numeric(),
+                   total_hes = numeric(),
+                   total_death = numeric(),
                    total = numeric(),
                    stringsAsFactors = FALSE)
   
@@ -112,21 +118,35 @@ venn_output <- function(population){
                          snomed_death = sum(tmp$snomed_death),
                          hes_death = sum(tmp$hes_death),
                          snomed_hes_death = sum(tmp$snomed_hes_death),
+                         total_snomed = nrow(tmp[!is.na(tmp[,paste0("tmp_",outcome,"_snomed")]),]),
+                         total_hes = nrow(tmp[!is.na(tmp[,paste0("tmp_",outcome,"_hes")]),]),
+                         total_death = nrow(tmp[!is.na(tmp[,paste0("tmp_",outcome,"_death")]),]),
                          total = nrow(tmp))
     
-    # Remove sources not in study definition from Venn plots -------------------
+    # Remove sources not in study definition from Venn plots and summary -------
     
-    consider <- c("snomed","hes","death","snomed_hes","snomed_death","hes_death","snomed_hes_death")
+    source_combos <- c("snomed","hes","death","snomed_hes","snomed_death","hes_death","snomed_hes_death")
+    source_consid <- source_combos
     
     if (!is.null(notused)) {
       for (i in notused) {
-        consider <- consider[!grepl(i,consider)]
+        
+        # Add variables to consider for Venn plot to vector
+        
+        source_consid <- source_combos[!grepl(i,source_combos)]
+        
+        # Replace unused sources with NA in summary table
+        
+        for (j in setdiff(source_combos,source_consid)) {
+          df[df$outcome==outcome,j] <- NA
+        }
+        
       }
     }
 
     # Proceed to create Venn diagram if all source combos exceed 5 -------------
     
-    if (min(as.numeric(df[df$outcome==outcome,consider]))>5) {
+    if (min(as.numeric(df[df$outcome==outcome,source_consid]))>5) {
       
       # Calculate contents of each Venn cell for plotting ----------------------
       
@@ -134,13 +154,13 @@ venn_output <- function(population){
       index2 <- integer(0)
       index3 <- integer(0)
       
-      if ("snomed" %in% consider) {
+      if ("snomed" %in% source_consid) {
         index1 <- which(!is.na(tmp[,paste0("tmp_",outcome,"_snomed")]))
       }
-      if ("hes" %in% consider) {
+      if ("hes" %in% source_consid) {
         index2 <- which(!is.na(tmp[,paste0("tmp_",outcome,"_hes")]))
       }
-      if ("death" %in% consider) {
+      if ("death" %in% source_consid) {
         index3 <- which(!is.na(tmp[,paste0("tmp_",outcome,"_death")]))
       }
       
