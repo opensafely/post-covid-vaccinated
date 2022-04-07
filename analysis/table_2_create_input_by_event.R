@@ -34,8 +34,7 @@ cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 input_table_2 <- function(population){
-  # read in data------------------------------------------------------------
-  
+  # read in data----------------------------------------------------------------
   input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
   active_analyses <- read_rds("lib/active_analyses.rds")
   variables_to_change = c("cov_cat_sex","cov_cat_age_group", "cov_cat_ethnicity")
@@ -52,16 +51,6 @@ input_table_2 <- function(population){
   setnames(input,
            old = variables_to_change,
            new = gsub("cov_", "sub_", variables_to_change))
-
-  # setnames(input,
-  #          old = c("cov_cat_sex",
-  #                  "cov_cat_age_group",
-  #                  "cov_cat_ethnicity",
-  #                  "cov_bin_vte"),
-  #          new = c("sub_bin_sex",
-  #                  "sub_cat_age_group",
-  #                  "sub_cat_ethnicity",
-  #                  "sub_bin_vte"))
 
   levels(input$sub_cat_ethnicity) <- c("White", "Mixed", "South_Asian", "Black", "Other", "Missing")
  
@@ -105,10 +94,11 @@ input_table_2 <- function(population){
     data_active <- data_active %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
     
     # calculate follow-up days
-    data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date)))+1)
+    data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date))))
+    index <- which(data_active$follow_up_end_unexposed > data_active$exp_date_covid19_confirmed)
+    data_active$person_days_unexposed[index] = data_active$person_days_unexposed[index] + 1
     #hist(data_active$person_days_unexposed)
     data_active = data_active %>% filter(person_days_unexposed >=0 & person_days_unexposed <= 197) # filter out follow up period
-   # person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
     
     data_active = data_active %>% mutate(person_days_exposed = as.numeric((as.Date(follow_up_end_exposed) - as.Date(index_date)))+1)
     data_active = data_active %>% filter(person_days_exposed >=0 & person_days_exposed <= 197) # filter out follow up period
@@ -116,7 +106,7 @@ input_table_2 <- function(population){
     
     event_short <- gsub("out_date_","", event)
     saveRDS(data_active, file=paste0("output/input_table_2_",population,"_", event_short,"_stage1.rds"))
-    print(paste0("input for ", event, " in ", population " population has been produced successfully!"))
+    print(paste0("input for ", event, " in ", population, " population has been produced successfully!"))
   }
 }
 # Run function using specified commandArgs

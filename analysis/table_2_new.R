@@ -192,7 +192,6 @@ table_2_subgroups_output <- function(population){
     d <- analyses_of_interest
     print(i)
     event_short = gsub("out_date_", "",analyses_of_interest$event[i])
-    # not sure why read_rds doesn't work
     survival_data <- read_rds(paste0("output/input_table_2_",population,"_", event_short,"_stage1.rds"))
     analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, 
                                                              event=analyses_of_interest$event[i],
@@ -200,6 +199,7 @@ table_2_subgroups_output <- function(population){
                                                              subgrp=analyses_of_interest$subgroup[i], 
                                                              subgrp_level=analyses_of_interest$strata[i], 
                                                              subgrp_full_name=analyses_of_interest$stratify_by_subgroup[i])
+    print(paste0("event count and person years have been produced successfully for", analyses_of_interest$event[i], " in ", population, " population!"))
   }
   
   # extract input1_aer

@@ -4,7 +4,6 @@
 library(readr); library(dplyr); library(data.table); library(lubridate)
 library(stringr);library(tidyverse)
 
-
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
@@ -16,9 +15,6 @@ if(length(args)==0){
   analyses <- args[[1]]
   population <- args[[2]]
 }
-
-# index_subgrp <- grep("covid_pheno_", table2_subgroups_vaccinated$subgroup)
-# event_names <- unique(table2_subgroups_vaccinated$event)
 
 transfer_unexposed_data_from_main_to_covid_pheno_subgrp <- function(table2_main, table2_subgroups, population)
 {
@@ -33,7 +29,7 @@ transfer_unexposed_data_from_main_to_covid_pheno_subgrp <- function(table2_main,
     table2_subgroups$unexposed_ir_lower[i] <- table2_main$unexposed_ir_lower[index_main]
     table2_subgroups$unexposed_ir_upper[i] <- table2_main$unexposed_ir_upper[index_main]
   }
-  #return(table2_subgroups)
+
   # extract input1_aer
   input1_aer <- table2_subgroups %>% select(c("event", "cohort_to_run", "subgroup", "strata", "unexposed_person_days"))
   names(input1_aer)[which(names(input1_aer) == "cohort_to_run")] = "cohort"
