@@ -105,6 +105,7 @@ apply_model_function <- function(outcome, cohort){
 
 apply_table2_function <- function(cohort){
   splice(
+    comment(glue("Table 2 dated - {cohort} cohort")),
     action(
       name = glue("Stage_4_Table_2_{cohort}"),
       run = "r:latest analysis/table_2.R",
@@ -119,6 +120,7 @@ apply_table2_function <- function(cohort){
 
 apply_table2_new_function <- function(analyses, cohort){
   splice(
+    comment(glue("Table 2 new - {cohort} cohort")),
     action(
       name = glue("stage4_table_2_{analyses}_{cohort}"),
       run = "r:latest analysis/table_2_new.R",
@@ -246,13 +248,13 @@ actions_list <- splice(
   ),
 
   #comment("Stage 3 - No action there for CVD outcomes"),  
-
   
   #comment("Stage 4 - Table 2"),
   splice(
     # over outcomes
     unlist(lapply(cohort_to_run, function(x) apply_table2_function( cohort = x)), recursive = FALSE)
     ),
+  
   
   #comment("Stage 4 - Create input for table 2"),
   action(
@@ -268,7 +270,21 @@ actions_list <- splice(
   splice(
     # over outcomes
     unlist(lapply(cohort_to_run, function(x) splice(unlist(lapply(analyses, function(y) apply_table2_new_function(analyses = y, cohort = x)), recursive = FALSE))
-    ),recursive = FALSE)),
+    ),recursive = FALSE)
+    ),
+  
+  #comment("Stage 4 - Table 2 transfer unexposed data"),
+  action(
+    name = "stage4_table_2_transfer_unexposed_data",
+    run = "r:latest analysis/table_2_transfer_unexposed_data.R subgroups both",
+    needs = list("stage4_table_2_main_vaccinated","stage4_table_2_subgroups_vaccinated", "stage4_table_2_main_electively_unvaccinated", "stage4_table_2_subgroups_electively_unvaccinated"),
+    moderately_sensitive = list(
+      table_2_csv = glue("output/table2_subgroups_*.csv"),
+      input_1_aer_csv = glue("output/input1_aer_*.csv"),
+      table_2_html = glue("output/table2_subgroups_*.html"),
+      input_1_aer_html = glue("output/input1_aer_*.html")
+    )
+  ),
   
   #comment("Stage 4 - Venn diagrams"),
   action(

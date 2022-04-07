@@ -15,7 +15,7 @@
 ## ====================================================================================
 
 library(readr); library(dplyr); library(data.table); library(lubridate)
-library(stringr);library(tidyverse); library(htmlTable)
+library(stringr);library(tidyverse)
 
 args <- commandArgs(trailingOnly=TRUE)
 

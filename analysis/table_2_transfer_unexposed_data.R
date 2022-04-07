@@ -1,7 +1,24 @@
 # Transfer unexposed data from main to covid pheno type subgroups
+# Author: Yinghui Wei
 
-index_subgrp <- grep("covid_pheno_", table2_subgroups_vaccinated$subgroup)
-event_names <- unique(table2_subgroups_vaccinated$event)
+library(readr); library(dplyr); library(data.table); library(lubridate)
+library(stringr);library(tidyverse)
+
+
+args <- commandArgs(trailingOnly=TRUE)
+
+if(length(args)==0){
+  # use for interactive testing
+  population <- "vaccinated"
+  #population = "electively_unvaccinated"
+  analyses <- "subgroups"
+}else{
+  analyses <- args[[1]]
+  population <- args[[2]]
+}
+
+# index_subgrp <- grep("covid_pheno_", table2_subgroups_vaccinated$subgroup)
+# event_names <- unique(table2_subgroups_vaccinated$event)
 
 transfer_unexposed_data_from_main_to_covid_pheno_subgrp <- function(table2_main, table2_subgroups, population)
 {
@@ -23,7 +40,7 @@ transfer_unexposed_data_from_main_to_covid_pheno_subgrp <- function(table2_main,
   input1_aer$event <- ifelse(startsWith(input1_aer$event,"out_"),gsub("out_date_","",input1_aer$event),input1_aer$event)
   
   # write output for table2 subgroups
-  write.csv(table2_subgroups_vaccinated, file=paste0("output/table2_subgroups", "_", population, ".csv"), row.names = F)
+  write.csv(table2_subgroups, file=paste0("output/table2_subgroups", "_", population, ".csv"), row.names = F)
   rmarkdown::render("analysis/compiled_table2_results.Rmd",
                     output_file=paste0("table2_subgroups","_", population),output_dir="output")
   
@@ -34,10 +51,16 @@ transfer_unexposed_data_from_main_to_covid_pheno_subgrp <- function(table2_main,
   
 }
 
-table2_main_vaccinated <- read.csv("output/table2_main_vaccinated.csv")
-table2_subgroups_vaccinated <- read.csv("output/table2_subgroups_vaccinated.csv")
-transfer_unexposed_data_from_main_to_covid_pheno_subgrp(table2_main_vaccinated, table2_subgroups_vaccinated, "vaccinated")
+table_2_transfer <- function(population){
+  table2_main <- read.csv(paste0("output/table2_main_", population, ".csv"))
+  table2_subgroups <- read.csv(paste0("output/table2_subgroups_", population, ".csv"))
+  transfer_unexposed_data_from_main_to_covid_pheno_subgrp(table2_main, table2_subgroups, population)
+}
 
-table2_main_electively_unvaccinated<- read.csv("output/table2_main_vaccinated.csv")
-table2_subgroups_electively_unvaccinated <- read.csv("output/table2_subgroups_vaccinated.csv")
-transfer_unexposed_data_from_main_to_covid_pheno_subgrp(table2_main_vaccinated, table2_subgroups_vaccinated, "electively_unvaccinated")
+# Run function using specified commandArgs
+if(population == "both"){
+  table_2_transfer("vaccinated")
+  table_2_transfer("electively_unvaccinated")
+}else{
+  table_2_transfer(population)
+}
