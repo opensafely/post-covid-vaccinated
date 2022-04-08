@@ -22,15 +22,15 @@ args <- commandArgs(trailingOnly=TRUE)
 if(length(args)==0){
   # use for interactive testing
   population <- "vaccinated"
-  population = "electively_unvaccinated"
-  analyses <- "main"
-  #analyses <- "subgroups"
+  #population = "electively_unvaccinated"
+  #analyses <- "main"
+  analyses <- "subgroups"
 }else{
   analyses <- args[[1]]
   population <- args[[2]]
 }
 
-# start.time = Sys.time()
+#start.time = Sys.time()
 #delta period
 cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
@@ -193,7 +193,7 @@ table_2_subgroups_output <- function(population){
   end = ncol(analyses_of_interest)
   
   for(i in 1:nrow(analyses_of_interest)){
-    # for(i in 1:2){
+    #for(i in 40:88){
     #d <- analyses_of_interest
     print(i)
     event_short = gsub("out_date_", "",analyses_of_interest$event[i])

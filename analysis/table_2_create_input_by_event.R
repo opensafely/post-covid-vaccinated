@@ -51,6 +51,8 @@ input_table_2 <- function(population){
   setnames(input,
            old = variables_to_change,
            new = gsub("cov_", "sub_", variables_to_change))
+  
+  setnames(input, old = "sub_cat_sex", new = "sub_bin_sex") # to match the name in active_analyses table
 
   levels(input$sub_cat_ethnicity) <- c("White", "Mixed", "South_Asian", "Black", "Other", "Missing")
  
