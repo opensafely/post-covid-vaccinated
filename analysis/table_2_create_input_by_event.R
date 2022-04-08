@@ -77,60 +77,37 @@ input_table_2 <- function(population){
   outcome_names_not_active <- outcome_names[!outcome_names %in% event_dates_names]
   
   for(event in event_dates_names){
-    
-    survival_data <- survival_data %>%rename(event_date = event)
-  
+    data_active <- survival_data
+    data_active$event_date <- survival_data[,event]
+
     # specify the cohort according to vaccination status
     if(population=="vaccinated"){
-      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
-      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_exposed=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
+      data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
+      data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_exposed=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
     }else if(population=="electively_unvaccinated"){
       #data_active <- data_active %>% left_join(data_active%>%dplyr::select(patient_id,vax_date_covid_1))
-      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
-      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_exposed = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
-      #survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
+      data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
+      data_active <- data_active %>% rowwise() %>% mutate(follow_up_end_exposed = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
+      data_active <- data_active %>% dplyr::select(!c(vax_date_covid_1))
     }
+    data_active <- data_active %>% filter(follow_up_end_unexposed >= index_date & follow_up_end_unexposed != Inf)
+    data_active <- data_active %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
     
-    #survival_data <- survival_data %>% filter(follow_up_end_unexposed >= index_date & follow_up_end_unexposed != Inf)
-    #survival_data <- survival_data %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
-   
     # calculate follow-up days
-    survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date))))
-    index <- which(survival_data$follow_up_end_unexposed > survival_data$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
-    survival_data$person_days_unexposed[index] = survival_data$person_days_unexposed[index] + 1
+    data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date))))
+    index <- which(data_active$follow_up_end_unexposed > data_active$exp_date_covid19_confirmed)
+    data_active$person_days_unexposed[index] = data_active$person_days_unexposed[index] + 1
     #hist(data_active$person_days_unexposed)
-    #survival_data = survival_data %>% filter(person_days_unexposed >=0 & person_days_unexposed <= 197) # filter out follow up period
+    data_active = data_active %>% filter(person_days_unexposed >=0 & person_days_unexposed <= 197) # filter out follow up period
     
-    survival_data = survival_data %>% mutate(person_days_exposed = as.numeric((as.Date(follow_up_end_exposed) - as.Date(index_date)))+1)
-    #survival_data = survival_data %>% filter(person_days_exposed >=0 & person_days_exposed <= 197) # filter out follow up period
-    
-    survival_data$include <- ifelse((survival_data$follow_up_end_unexposed >= survival_data$index_date & survival_data$follow_up_end_unexposed != Inf) & 
-                                      (survival_data$follow_up_end_exposed >= survival_data$index_date & survival_data$follow_up_end_exposed != Inf) &
-                                      (survival_data$person_days_unexposed >=0 & survival_data$person_days_unexposed <= 197) &
-                                      (survival_data$person_days_exposed >=0 & survival_data$person_days_exposed <= 197),1,0)
+    data_active = data_active %>% mutate(person_days_exposed = as.numeric((as.Date(follow_up_end_exposed) - as.Date(index_date)))+1)
+    data_active = data_active %>% filter(person_days_exposed >=0 & person_days_exposed <= 197) # filter out follow up period
+    data_active <- data_active %>% mutate(cohort_start_date = cohort_start,cohort_end_date = cohort_end)
     
     event_short <- gsub("out_date_","", event)
-    
-    setnames(survival_data,
-             old = c("event_date",
-                     "follow_up_end_unexposed",
-                     "follow_up_end_exposed",
-                     "person_days_unexposed",
-                     "person_days_exposed",
-                     "include"),
-             new = c(paste0("out_date_",event_short),
-                     paste0(event_short,"_follow_up_end_unexposed"),
-                     paste0(event_short,"_follow_up_end_exposed"),
-                     paste0(event_short,"_person_days_unexposed"),
-                     paste0(event_short,"_person_days_exposed"),
-                     paste0(event_short,"_include")))
-                     
-    
-    #saveRDS(data_active, file=paste0("output/input_table_2_",population,"_", event_short,"_stage1.rds"))
+    saveRDS(data_active, file=paste0("output/input_table_2_",population,"_", event_short,"_stage1.rds"))
     print(paste0("input for ", event, " in ", population, " population has been produced successfully!"))
   }
-  saveRDS(survival_data, file=paste0("output/input_table_2_",population,"_stage1.rds"))
-  rm(list=c("survival_data"))
 }
 # Run function using specified commandArgs
 if(population == "both"){
