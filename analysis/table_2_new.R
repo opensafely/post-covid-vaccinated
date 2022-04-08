@@ -37,6 +37,7 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level, subgrp_full_name){
   data_active <- survival_data
+  data_active <- data_active %>% filter(include == 1)
   
   # filter the population according to whether the subgroup is covid_history
   if(subgrp == "covid_history"){
@@ -97,6 +98,8 @@ table_2_subgroups_output <- function(population){
   
   outcomes<-active_analyses$outcome_variable
   
+  survival_data <- read_rds(paste0("output/input_table_2_",population,"_stage1.rds"))
+  
   # for testing: i="out_date_ate"
   for(i in outcomes){
     analyses_to_run <- active_analyses %>% filter(outcome_variable==i)
@@ -143,7 +146,7 @@ table_2_subgroups_output <- function(population){
   }
   
   analyses_of_interest <- analyses_of_interest %>% filter(cohort_to_run == population)
-  write.csv(analyses_of_interest, file=paste0("output/analyses_of_interest_", population, ".csv"))
+  #write.csv(analyses_of_interest, file=paste0("output/analyses_of_interest_", population, ".csv"))
   #ir = incidence rate; ir_lower = lower bound of the 95% CI for ir; ir_upper = upper bound of the 95% CI for ir
   unexposed_person_days <- unexposed_event_count <- unexposed_ir <- unexposed_ir_lower <- unexposed_ir_upper <- rep("NA", nrow(analyses_of_interest))
   exposed_person_days <- exposed_event_count <- exposed_ir <- exposed_ir_lower <- exposed_ir_upper <- rep("NA", nrow(analyses_of_interest))
@@ -170,8 +173,10 @@ table_2_subgroups_output <- function(population){
   index <- grepl("main", analyses_of_interest$subgroup, fixed = TRUE)
   analyses_of_interest$stratify_by_subgroup[index] <- "sub_main"
   
-  index <- grepl("ate", analyses_of_interest$subgroup, fixed = TRUE)
-  analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_ate"
+  analyses_of_interest$stratify_by_subgroup <- gsub("cov_bin","sub_bin",analyses_of_interest$stratify_by_subgroup)
+  
+  #index <- grepl("ate", analyses_of_interest$subgroup, fixed = TRUE)
+  #analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_ate"
   
   # if only need table2 for the main analyses
   if(analyses == "main"){
@@ -181,24 +186,53 @@ table_2_subgroups_output <- function(population){
     analyses_of_interest <- analyses_of_interest %>% filter(stratify_by_subgroup != "sub_main") 
   }
   
-  index <- grepl("cov_bin_vte", analyses_of_interest$stratify_by_subgroup, fixed = TRUE)
-  analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_vte"
+  #index <- grepl("cov_bin_vte", analyses_of_interest$stratify_by_subgroup, fixed = TRUE)
+  #analyses_of_interest$stratify_by_subgroup[index] <- "sub_bin_vte"
   col_names <- names(analyses_of_interest)
   start = grep("unexposed_person_days", col_names)
   end = ncol(analyses_of_interest)
   
   for(i in 1:nrow(analyses_of_interest)){
     # for(i in 1:2){
-    d <- analyses_of_interest
+    #d <- analyses_of_interest
     print(i)
     event_short = gsub("out_date_", "",analyses_of_interest$event[i])
-    survival_data <- read_rds(paste0("output/input_table_2_",population,"_", event_short,"_stage1.rds"))
+    setnames(survival_data,
+             old = c(paste0("out_date_",event_short),
+                     paste0(event_short,"_follow_up_end_unexposed"),
+                     paste0(event_short,"_follow_up_end_exposed"),
+                     paste0(event_short,"_person_days_unexposed"),
+                     paste0(event_short,"_person_days_exposed"),
+                     paste0(event_short,"_include")),
+    
+               new = c("event_date",
+                     "follow_up_end_unexposed",
+                     "follow_up_end_exposed",
+                     "person_days_unexposed",
+                     "person_days_exposed",
+                     "include"))
+    
     analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, 
                                                              event=analyses_of_interest$event[i],
                                                              cohort=analyses_of_interest$cohort_to_run[i],
                                                              subgrp=analyses_of_interest$subgroup[i], 
                                                              subgrp_level=analyses_of_interest$strata[i], 
                                                              subgrp_full_name=analyses_of_interest$stratify_by_subgroup[i])
+    
+    setnames(survival_data,
+             old = c("event_date",
+                     "follow_up_end_unexposed",
+                     "follow_up_end_exposed",
+                     "person_days_unexposed",
+                     "person_days_exposed",
+                     "include"),
+             new = c(paste0("out_date_",event_short),
+                     paste0(event_short,"_follow_up_end_unexposed"),
+                     paste0(event_short,"_follow_up_end_exposed"),
+                     paste0(event_short,"_person_days_unexposed"),
+                     paste0(event_short,"_person_days_exposed"),
+                     paste0(event_short,"_include")))
+    
     print(paste0("event count and person years have been produced successfully for", analyses_of_interest$event[i], " in ", population, " population!"))
   }
   
