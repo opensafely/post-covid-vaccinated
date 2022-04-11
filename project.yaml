@@ -50,6 +50,14 @@ actions:
       highly_sensitive:
         cohort: output/input_index.feather
 
+  investigation:
+    run: r:latest analysis/investigation.R
+    needs:
+    - generate_study_population_investigate
+    outputs:
+      moderately_sensitive:
+        describe: output/describe_input_investigate_*.txt
+
   preprocess_data_vaccinated:
     run: r:latest analysis/preprocess_data.R vaccinated
     needs:

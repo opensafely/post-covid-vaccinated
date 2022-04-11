@@ -178,6 +178,16 @@ actions_list <- splice(
       cohort = glue("output/input_index.feather")
     )
   ), 
+  
+  #comment("Investigation"),
+  action(
+    name = "investigation",
+    run = "r:latest analysis/investigation.R",
+    needs = list("generate_study_population_investigate"),
+    moderately_sensitive = list(
+      describe = glue("output/describe_input_investigate_*.txt")
+    ),
+  ), 
 
   #comment("Preprocess data - vaccinated"),
   action(
