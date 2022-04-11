@@ -1717,7 +1717,7 @@ def generate_common_variables(index_date_variable):
 
     ## Type 1 diabetes primary care
     cov_bin_diabetes_type1_snomed=patients.with_these_clinical_events(
-        diabetes_type1_snomed,
+        diabetes_type1_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.1},
@@ -1731,7 +1731,7 @@ def generate_common_variables(index_date_variable):
     ),
     ## Type 2 diabetes primary care
     cov_bin_diabetes_type2_snomed=patients.with_these_clinical_events(
-        diabetes_type2_snomed,
+        diabetes_type2_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.1},
@@ -1745,28 +1745,28 @@ def generate_common_variables(index_date_variable):
     ),
     ## Other or non-specific diabetes
     cov_bin_diabetes_other=patients.with_these_clinical_events(
-        diabetes_other_snomed,
+        diabetes_other_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.1},
     ),
     ## Gestational diabetes
     cov_bin_diabetes_gestational=patients.with_these_clinical_events(
-        diabetes_gestational_snomed,
+        diabetes_gestational_snomed_clinical,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.1},
     ),
     ## Diabetes medication
     tmp_cov_bin_insulin_snomed=patients.with_these_medications(
-        insulin_snomed,
+        insulin_snomed_clinical,
         returning="binary_flag",
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.05},
     ),
 
     tmp_cov_bin_antidiabetic_drugs_snomed=patients.with_these_medications(
-        antidiabetic_drugs_snomed,
+        antidiabetic_drugs_snomed_clinical,
         returning="binary_flag",
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.05},
