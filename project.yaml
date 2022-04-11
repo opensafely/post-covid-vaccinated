@@ -20,6 +20,13 @@ actions:
         vax_jcvi_groups: output/vax_jcvi_groups.csv
         vax_eligible_dates: output/vax_eligible_dates.csv
 
+  generate_study_population_investigate:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_investigate
+      --output-format feather
+    outputs:
+      highly_sensitive:
+        cohort: output/input_investigate.feather
+
   generate_study_population_electively_unvaccinated:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated
       --output-format feather

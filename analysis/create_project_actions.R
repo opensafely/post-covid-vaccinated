@@ -142,6 +142,15 @@ actions_list <- splice(
     )
   ),
   
+  #comment("Generate dummy data for study_definition - investigate"),
+  action(
+    name = "generate_study_population_investigate",
+    run = "cohortextractor:latest generate_cohort --study-definition study_definition_investigate --output-format feather",
+    highly_sensitive = list(
+      cohort = glue("output/input_investigate.feather")
+    )
+  ),
+  
   #comment("Generate dummy data for study_definition - electively_unvaccinated"),
   action(
     name = "generate_study_population_electively_unvaccinated",
