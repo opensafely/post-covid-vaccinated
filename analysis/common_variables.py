@@ -544,62 +544,278 @@ def generate_common_variables(index_date_variable):
         "tmp_out_date_vte_snomed", "tmp_out_date_vte_hes", "tmp_out_date_vte_death"
     ),
 
-    # DIABETES OUTCOMES ------------------------------------------------------
+    ## DIABETES OUTCOMES -------------------
+    
+    # Diabetes (date of first ever recording, count of number of records from each data source)
 
-    ## Type 1 diabetes
-    out_date_diabetes_type1=patients.with_these_clinical_events(
-        diabetes_type1_snomed_clinical,
+    ### Type 1 Diabetes 
+
+    ## Date of first ever recording
+
+    # Primary care
+    tmp_out_date_t1dm_snomed=patients.with_these_clinical_events(
+        diabetes_type1_snomed,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.1,
+            "incidence": 0.03,
+        },
+    ),
+    # HES APC
+    tmp_out_date_t1dm_hes=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=diabetes_type1_icd10,
+        between=["1990-01-01", "today"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+    # Combined
+    out_date_t1dm=patients.minimum_of(
+        "tmp_out_date_t1dm_snomed", "tmp_out_date_t1dm_hes"
+    ),   
+
+    ## Count of number of records
+
+    # Primary care
+    tmp_out_count_t1dm_snomed=patients.with_these_clinical_events(
+        diabetes_type1_snomed,
+        returning="number_of_matches_in_period",
+        between=["1990-01-01", "today"],
+        return_expectations={
+            "int": {"distribution": "poisson", "mean": 2},
+        },
+    ),  
+    # HES APC
+    tmp_out_count_t1dm_hes=patients.admitted_to_hospital(
+        returning="number_of_matches_in_period",
+        with_these_diagnoses=diabetes_type1_icd10,
+        between=["1990-01-01", "today"],
+        return_expectations={
+            "int": {"distribution": "poisson", "mean": 2},
+        },
+    ),
+    # Combined 
+    # tmp_out_count_t1dm=patients.minimum_of(
+    #     "tmp_out_count_t1dm_snomed", "tmp_out_count_t1dm_hes"
+    # ),   
+
+    ### Type 2 Diabetes
+
+    ## Date of first ever recording
+
+    # Primary care
+    tmp_out_date_t2dm_snomed=patients.with_these_clinical_events(
+        diabetes_type2_snomed,
+        returning="date",
+        between=["1990-01-01", "today"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+    # HES APC
+    tmp_out_date_t2dm_hes=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=diabetes_type2_icd10,
+        between=["1990-01-01", "today"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+    # Combined
+    out_date_t2dm=patients.minimum_of(
+        "tmp_out_date_t2dm_snomed", "tmp_out_date_t2dm_hes"
+    ), 
+
+    ## Count of number of records
+
+    # Primary care
+    tmp_out_count_t2dm_snomed=patients.with_these_clinical_events(
+        diabetes_type2_snomed,
+        returning="number_of_matches_in_period",
+        between=["1990-01-01", "today"],
+        return_expectations={
+            "int": {"distribution": "poisson", "mean": 2},
+        },
+    ),
+    # HES APC
+    tmp_out_count_t2dm_hes=patients.admitted_to_hospital(
+        returning="number_of_matches_in_period",
+        with_these_diagnoses=diabetes_type2_icd10,
+        between=["1990-01-01", "today"],
+        return_expectations={
+            "int": {"distribution": "poisson", "mean": 2},
+        },
+    ),
+    # # Combined
+    # tmp_out_count_t2dm=patients.minimum_of(
+    #     "tmp_out_count_t2dm_snomed", "tmp_out_count_t2dm_hes"
+    # ),     
+
+    ### Diabetes unspecified
+
+    ## Date of first ever recording
+
+    # Primary care
+    out_date_otherdm=patients.with_these_clinical_events(
+        diabetes_other_snomed,
+        returning="date",
+        between=["1990-01-01", "today"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
         },
     ),
 
-    ## Type 2 diabetes
-    out_date_diabetes_type2=patients.with_these_clinical_events(
-        diabetes_type2_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
+    # Count of number of records
+
+    # Primary care
+    tmp_out_count_otherdm=patients.with_these_clinical_events(
+        diabetes_other_snomed,
+        returning="number_of_matches_in_period",
+        between=["1990-01-01", "today"],
         return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
+            "int": {"distribution": "poisson", "mean": 2},
         },
     ),
 
-    ## Other or non-specific diabetes
-    out_date_diabetes_other=patients.with_these_clinical_events(
-        diabetes_other_snomed_clinical,
+    ### Gestational diabetes
+
+    ## Date of first ever recording
+
+    # Primary care
+    out_date_gestationaldm=patients.with_these_clinical_events(
+        diabetes_gestational_snomed,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.1,
+            "incidence": 0.03,
         },
     ),
 
-    ## Gestational diabetes
-    out_date_diabetes_gestational=patients.with_these_clinical_events(
-        diabetes_gestational_snomed_clinical,
+    ### Diabetes diagnostic codes
+
+    ## Date of first ever recording
+
+    # Primary care
+    out_date_poccdm=patients.with_these_clinical_events(
+        diabetes_diagnostic_snomed,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
             "rate": "uniform",
-            "incidence": 0.1,
+            "incidence": 0.03,
         },
+    ),
+
+    ## Count of number of records
+
+    # Primary care
+    tmp_out_count_poccdm_snomed=patients.with_these_clinical_events(
+        diabetes_diagnostic_snomed,
+        returning="number_of_matches_in_period",
+        between=["1990-01-01", "today"],
+        return_expectations={
+            "int": {"distribution": "poisson", "mean": 2},
+        },
+    ),
+
+    ### Variables needed to define diabetes
+    ### Maximum latest HbA1c measure
+    tmp_out_num_max_hba1c_mmol_mol=patients.max_recorded_value(
+        hba1c_new_codes,
+        on_most_recent_day_of_measurement=True, 
+        between=["1990-01-01", "today"],
+        date_format="YYYY-MM-DD",
+        return_expectations={
+            "float": {"distribution": "normal", "mean": 30.0, "stddev": 15},
+            "date": {"earliest": "1980-02-01", "latest": "2021-05-31"},
+            "incidence": 0.95,
+        },
+    ),
+    tmp_out_num_max_hba1c_date=patients.date_of("tmp_out_num_max_hba1c_mmol_mol", date_format="YYYY-MM-DD"),
+
+    ###  Diabetes drugs
+
+    tmp_out_date_insulin_snomed=patients.with_these_medications(
+        insulin_snomed,
+        returning="date",
+        between=["1990-01-01", "today"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
+    tmp_out_date_antidiabetic_drugs_snomed=patients.with_these_medications(
+        antidiabetic_drugs_snomed,
+        returning="date",
+        between=["1990-01-01", "today"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
+ ## Generate variable to identify earliest date any diabetes medication prescribed
+    tmp_out_date_diabetes_medication=patients.minimum_of(
+        "tmp_out_date_insulin_snomed","tmp_out_date_antidiabetic_drugs_snomed"
+    ),
+
+    tmp_out_date_nonmetform_drugs_snomed=patients.with_these_clinical_events(
+        non_metformin_dmd,
+        returning="date",
+        between=["1990-01-01", "today"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "1900-01-01", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
+
+    ## Generate variable to identify earliest date any diabetes diagnosis codes recorded
+    tmp_out_date_first_diabetes_diag=patients.minimum_of(
+         "out_date_gestationaldm",
+         "out_date_otherdm",
+         "out_date_t1dm", 
+         "out_date_t2dm", 
+         "out_date_poccdm",
+         "tmp_out_date_diabetes_medication",
+         "tmp_out_date_nonmetform_drugs_snomed"
     ),
 
     # MENTAL HEALTH OUTCOMES ------------------------------------------------------
@@ -1461,7 +1677,7 @@ def generate_common_variables(index_date_variable):
        return_expectations={"incidence": 0.1},
     ),
     ### DMD
-    tmp_cov_bin_hypertension_drugs_dmd=patients.with_these_clinical_events(
+    tmp_cov_bin_hypertension_drugs_dmd=patients.with_these_medications(
         hypertension_drugs_dmd,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
@@ -1499,41 +1715,70 @@ def generate_common_variables(index_date_variable):
     #     "tmp_cov_bin_diabetes_snomed", "tmp_cov_bin_diabetes_dmd", "tmp_cov_bin_diabetes_snomed",
     # ),
 
-    ## Type 1 diabetes
-    cov_bin_diabetes_type1=patients.with_these_clinical_events(
-        diabetes_type1_snomed_clinical,
+    ## Type 1 diabetes primary care
+    cov_bin_diabetes_type1_snomed=patients.with_these_clinical_events(
+        diabetes_type1_snomed,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.1},
     ),
-
-    ## Type 2 diabetes
-    cov_bin_diabetes_type2=patients.with_these_clinical_events(
-        diabetes_type2_snomed_clinical,
+    ## Type 1 diabetes HES
+    cov_bin_diabetes_type1_hes=patients.admitted_to_hospital(
+       returning='binary_flag',
+       with_these_diagnoses=diabetes_type1_icd10,
+       on_or_before=f"{index_date_variable}",
+       return_expectations={"incidence": 0.1},
+    ),
+    ## Type 2 diabetes primary care
+    cov_bin_diabetes_type2_snomed=patients.with_these_clinical_events(
+        diabetes_type2_snomed,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.1},
     ),
-
+    ## Type 2 diabetes HES
+    cov_bin_diabetes_type2_hes=patients.admitted_to_hospital(
+       returning='binary_flag',
+       with_these_diagnoses=diabetes_type2_icd10,
+       on_or_before=f"{index_date_variable}",
+       return_expectations={"incidence": 0.1},
+    ),
     ## Other or non-specific diabetes
     cov_bin_diabetes_other=patients.with_these_clinical_events(
-        diabetes_other_snomed_clinical,
+        diabetes_other_snomed,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.1},
     ),
-
     ## Gestational diabetes
     cov_bin_diabetes_gestational=patients.with_these_clinical_events(
-        diabetes_gestational_snomed_clinical,
+        diabetes_gestational_snomed,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
         return_expectations={"incidence": 0.1},
     ),
+    ## Diabetes medication
+    tmp_cov_bin_insulin_snomed=patients.with_these_medications(
+        insulin_snomed,
+        returning="binary_flag",
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.05},
+    ),
 
-    ## Any diabetes
+    tmp_cov_bin_antidiabetic_drugs_snomed=patients.with_these_medications(
+        antidiabetic_drugs_snomed,
+        returning="binary_flag",
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.05},
+    ),
+
+    ## Any diabetes covariate
     cov_bin_diabetes=patients.maximum_of(
-        "cov_bin_diabetes_type1", "cov_bin_diabetes_type2", "cov_bin_diabetes_other", "cov_bin_diabetes_gestational",
+        "cov_bin_diabetes_type1_snomed", "cov_bin_diabetes_type1_hes", 
+        "cov_bin_diabetes_type2_snomed", "cov_bin_diabetes_type2_hes",
+        "cov_bin_diabetes_other", 
+        "cov_bin_diabetes_gestational",
+        "tmp_cov_bin_insulin_snomed", "tmp_cov_bin_antidiabetic_drugs_snomed"
     ),
 
     ## Obesity
@@ -1577,7 +1822,7 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Lipid medications
-    cov_bin_lipid_medications=patients.with_these_clinical_events(
+    cov_bin_lipid_medications=patients.with_these_medications(
         lipid_lowering_dmd,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
@@ -1585,7 +1830,7 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Antiplatelet_medications
-    cov_bin_antiplatelet_medications=patients.with_these_clinical_events(
+    cov_bin_antiplatelet_medications=patients.with_these_medications(
         antiplatelet_dmd,
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
@@ -1593,7 +1838,7 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Anticoagulation_medications
-    cov_bin_anticoagulation_medications=patients.with_these_clinical_events(
+    cov_bin_anticoagulation_medications=patients.with_these_medications(
         anticoagulant_dmd, 
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
@@ -1602,7 +1847,7 @@ def generate_common_variables(index_date_variable):
    
     ## Combined oral contraceptive pill
     ### dmd: dictionary of medicines and devices
-    cov_bin_combined_oral_contraceptive_pill=patients.with_these_clinical_events(
+    cov_bin_combined_oral_contraceptive_pill=patients.with_these_medications(
         cocp_dmd, 
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
@@ -1610,7 +1855,7 @@ def generate_common_variables(index_date_variable):
     ),
 
     ## Hormone replacement therapy
-    cov_bin_hormone_replacement_therapy=patients.with_these_clinical_events(
+    cov_bin_hormone_replacement_therapy=patients.with_these_medications(
         hrt_dmd, 
         returning='binary_flag',
         on_or_before=f"{index_date_variable}",
