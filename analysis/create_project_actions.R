@@ -6,7 +6,6 @@ library(readr)
 #library(dplyr)
 
 
-
 ###########################
 # Load information to use #
 ###########################
@@ -21,6 +20,7 @@ active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses_table <- subset(active_analyses, active_analyses$active =="TRUE")
 outcomes_model <- active_analyses_table$outcome_variable %>% str_replace("out_date_", "")
 cohort_to_run <- c("vaccinated", "electively_unvaccinated")
+analyses <- c("main", "subgroups")
 
 # create action functions ----
 
@@ -106,6 +106,7 @@ apply_model_function <- function(outcome, cohort){
 
 apply_table2_function <- function(cohort){
   splice(
+    comment(glue("Table 2 dated - {cohort} cohort")),
     action(
       name = glue("Stage_4_Table_2_{cohort}"),
       run = "r:latest analysis/table_2.R",
@@ -118,7 +119,23 @@ apply_table2_function <- function(cohort){
   )
 }
 
-
+apply_table2_new_function <- function(analyses, cohort){
+  splice(
+    comment(glue("Table 2 new - {cohort} cohort")),
+    action(
+      name = glue("stage4_table_2_{analyses}_{cohort}"),
+      run = "r:latest analysis/table_2_new.R",
+      arguments = c(analyses, cohort),
+      needs = list("stage4_input_for_table_2"),
+      moderately_sensitive = list(
+        table_2_csv = glue("output/table2_{analyses}_{cohort}.csv"),
+        input_1_aer_csv = glue("output/input1_aer_{analyses}_{cohort}.csv"),
+        table_2_html = glue("output/table2_{analyses}_{cohort}.html"),
+        input_1_aer_html = glue("output/input1_aer_{analyses}_{cohort}.html")
+      )
+    )
+  )
+}
 ##########################################################
 ## Define and combine all actions into a list of actions #
 ##########################################################
@@ -232,13 +249,43 @@ actions_list <- splice(
   ),
 
   #comment("Stage 3 - No action there for CVD outcomes"),  
-
   
   #comment("Stage 4 - Table 2"),
   splice(
     # over outcomes
     unlist(lapply(cohort_to_run, function(x) apply_table2_function( cohort = x)), recursive = FALSE)
     ),
+  
+  
+  #comment("Stage 4 - Create input for table 2"),
+  action(
+    name = "stage4_input_for_table_2",
+    run = "r:latest analysis/table_2_create_input_by_event.R both",
+    needs = list("stage1_data_cleaning_both"),
+    highly_sensitive = list(
+      input_table_2 = glue("output/input_table_2_*_stage1.rds")
+    )
+  ),
+  
+  #comment("Stage 4 - Table 2 new"),
+  splice(
+    # over outcomes
+    unlist(lapply(cohort_to_run, function(x) splice(unlist(lapply(analyses, function(y) apply_table2_new_function(analyses = y, cohort = x)), recursive = FALSE))
+    ),recursive = FALSE)
+    ),
+  
+  #comment("Stage 4 - Table 2 transfer unexposed data"),
+  action(
+    name = "stage4_table_2_transfer_unexposed_data",
+    run = "r:latest analysis/table_2_transfer_unexposed_data.R subgroups both",
+    needs = list("stage4_table_2_main_vaccinated","stage4_table_2_subgroups_vaccinated", "stage4_table_2_main_electively_unvaccinated", "stage4_table_2_subgroups_electively_unvaccinated"),
+    moderately_sensitive = list(
+      table_2_csv = glue("output/table2_subgroups_*.csv"),
+      input_1_aer_csv = glue("output/input1_aer_*.csv"),
+      table_2_html = glue("output/table2_subgroups_*.html"),
+      input_1_aer_html = glue("output/input1_aer_*.html")
+    )
+  ),
   
   #comment("Stage 4 - Venn diagrams"),
   action(
@@ -274,4 +321,3 @@ as.yaml(project_list, indent=2) %>%
   str_replace_all("\\\n(\\w)", "\n\n\\1") %>%
   str_replace_all("\\\n\\s\\s(\\w)", "\n\n  \\1") %>%
   writeLines("project.yaml")
-
