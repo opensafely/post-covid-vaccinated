@@ -147,3 +147,9 @@ user/RochelleKnight/pe_icd10/59ac59b8
 user/RochelleKnight/stroke_isch_icd10/278d734e
 user/RochelleKnight/stroke_sah_hs_icd10/0e7e0019
 user/RochelleKnight/tia_icd10/5c5f19ae
+opensafely/insulin-medication/2020-04-26
+opensafely/antidiabetic-drugs/2020-07-16
+user/r_denholm/non-metformin-antidiabetic-drugs_bristol/7207eb58
+user/r_denholm/non-metformin-drugs/74baab4e
+user/r_denholm/non-metformin-drugs-dmd/107cde7a
+opensafely/glycated-haemoglobin-hba1c-tests-numerical-value/5134e926/
