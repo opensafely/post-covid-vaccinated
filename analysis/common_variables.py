@@ -554,7 +554,7 @@ def generate_common_variables(index_date_variable):
 
     # Primary care
     tmp_out_date_t1dm_snomed=patients.with_these_clinical_events(
-        diabetes_type1_snomed,
+        diabetes_type1_snomed_clinical,
         returning="date",
         between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
@@ -587,7 +587,7 @@ def generate_common_variables(index_date_variable):
 
     # Primary care
     tmp_out_count_t1dm_snomed=patients.with_these_clinical_events(
-        diabetes_type1_snomed,
+        diabetes_type1_snomed_clinical,
         returning="number_of_matches_in_period",
         between=["1990-01-01", "today"],
         return_expectations={
@@ -614,7 +614,7 @@ def generate_common_variables(index_date_variable):
 
     # Primary care
     tmp_out_date_t2dm_snomed=patients.with_these_clinical_events(
-        diabetes_type2_snomed,
+        diabetes_type2_snomed_clinical,
         returning="date",
         between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
@@ -647,7 +647,7 @@ def generate_common_variables(index_date_variable):
 
     # Primary care
     tmp_out_count_t2dm_snomed=patients.with_these_clinical_events(
-        diabetes_type2_snomed,
+        diabetes_type2_snomed_clinical,
         returning="number_of_matches_in_period",
         between=["1990-01-01", "today"],
         return_expectations={
@@ -674,7 +674,7 @@ def generate_common_variables(index_date_variable):
 
     # Primary care
     out_date_otherdm=patients.with_these_clinical_events(
-        diabetes_other_snomed,
+        diabetes_other_snomed_clinical,
         returning="date",
         between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
@@ -690,7 +690,7 @@ def generate_common_variables(index_date_variable):
 
     # Primary care
     tmp_out_count_otherdm=patients.with_these_clinical_events(
-        diabetes_other_snomed,
+        diabetes_other_snomed_clinical,
         returning="number_of_matches_in_period",
         between=["1990-01-01", "today"],
         return_expectations={
@@ -704,7 +704,7 @@ def generate_common_variables(index_date_variable):
 
     # Primary care
     out_date_gestationaldm=patients.with_these_clinical_events(
-        diabetes_gestational_snomed,
+        diabetes_gestational_snomed_clinical,
         returning="date",
         between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
@@ -722,7 +722,7 @@ def generate_common_variables(index_date_variable):
 
     # Primary care
     out_date_poccdm=patients.with_these_clinical_events(
-        diabetes_diagnostic_snomed,
+        diabetes_diagnostic_snomed_clinical,
         returning="date",
         between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
@@ -738,7 +738,7 @@ def generate_common_variables(index_date_variable):
 
     # Primary care
     tmp_out_count_poccdm_snomed=patients.with_these_clinical_events(
-        diabetes_diagnostic_snomed,
+        diabetes_diagnostic_snomed_clinical,
         returning="number_of_matches_in_period",
         between=["1990-01-01", "today"],
         return_expectations={
@@ -764,7 +764,7 @@ def generate_common_variables(index_date_variable):
     ###  Diabetes drugs
 
     tmp_out_date_insulin_snomed=patients.with_these_medications(
-        insulin_snomed,
+        insulin_snomed_clinical,
         returning="date",
         between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
@@ -777,7 +777,7 @@ def generate_common_variables(index_date_variable):
     ),
 
     tmp_out_date_antidiabetic_drugs_snomed=patients.with_these_medications(
-        antidiabetic_drugs_snomed,
+        antidiabetic_drugs_snomed_clinical,
         returning="date",
         between=["1990-01-01", "today"],
         date_format="YYYY-MM-DD",
