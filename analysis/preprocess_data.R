@@ -1,3 +1,5 @@
+library(dplyr)
+library(tidyverse)
 # Specify command arguments ----------------------------------------------------
 
 args <- commandArgs(trailingOnly=TRUE)
@@ -298,7 +300,9 @@ sink()
 
 # Restrict columns and save Venn diagram input dataset -----------------------
 
-df2 <- df[,c("patient_id",colnames(df)[grepl("out_",colnames(df))])]
+#df2 <- df[,c("patient_id",colnames(df)[grepl("out_",colnames(df))])]
+
+df2 <- df %>% select(starts_with(c("patient_id","tmp_out_date","out_date")))
 
 # Describe data --------------------------------------------------------------
 sink(paste0("output/describe_venn_",cohort,".txt"))
