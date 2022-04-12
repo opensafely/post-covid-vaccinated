@@ -1147,3 +1147,24 @@ anxiety_combined_hes_cov = combine_codelists(
     ocd_icd10,
     ptsd_icd10
 )
+
+# Total Cholesterol
+cholesterol_snomed = codelist_from_csv(
+    "codelists/opensafely-cholesterol-tests-numerical-value.csv",
+    system="snomed",
+    column="code",
+)
+
+# HDL Cholesterol
+hdl_cholesterol_snomed = codelist_from_csv(
+    "codelists/bristol-hdl-cholesterol.csv",
+    system="snomed",
+    column="code",
+)
+
+# Prediabetes
+prediabetes_snomed = codelist_from_csv(
+    "codelists/opensafely-prediabetes-snomed.csv",
+    system="snomed",
+    column="code",
+)

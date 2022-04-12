@@ -234,7 +234,7 @@ stage1 <- function(cohort_name){
     #cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS-CoV-2 infection recorded prior index date")
     
     # A simple check if factor reference level has changed
-    describe_vars <- tidyselect::vars_select(names(input), contains(c('_cat_', 'cov_bin','cov_cat','qa_bin','exp_cat','vax_cat', 'step_'), ignore.case = TRUE))
+    describe_vars <- tidyselect::vars_select(names(input), contains(c('_cat_', 'cov_bin','cov_cat','qa_bin','exp_cat','vax_cat', 'step'), ignore.case = TRUE))
     meta_data_factors <- lapply(input[,c(describe_vars)], table)
     
     # NB: write.csv is not feasible to output list with uneven length

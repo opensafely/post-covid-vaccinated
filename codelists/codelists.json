@@ -941,6 +941,24 @@
       "url": "https://codelists.opensafely.org/codelist/user/hjforbes/nondiagnostic-diabetes-codes/50f30a3b/",
       "downloaded_at": "2022-04-11 14:52:16.272759Z",
       "sha": "3b3bd24a816d04aeaaad93495d8c04772a12672f"
+    },
+    "opensafely-cholesterol-tests-numerical-value.csv": {
+      "id": "opensafely/cholesterol-tests-numerical-value/7e3a22f3",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/cholesterol-tests-numerical-value/7e3a22f3/",
+      "downloaded_at": "2022-04-12 13:57:42.970781Z",
+      "sha": "4e90c401f67eca3a3aa716edea013340a6164f44"
+    },
+    "opensafely-prediabetes-snomed.csv": {
+      "id": "opensafely/prediabetes-snomed/6bdbb7dd",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/prediabetes-snomed/6bdbb7dd/",
+      "downloaded_at": "2022-04-12 13:57:43.116058Z",
+      "sha": "a52da34bd7178717df884211fca799db460a6b43"
+    },
+    "bristol-hdl-cholesterol.csv": {
+      "id": "bristol/hdl-cholesterol/64775990",
+      "url": "https://codelists.opensafely.org/codelist/bristol/hdl-cholesterol/64775990/",
+      "downloaded_at": "2022-04-12 13:57:43.253303Z",
+      "sha": "ce9f10f91453a33d5de195b7d02656bf11782760"
     }
   }
 }

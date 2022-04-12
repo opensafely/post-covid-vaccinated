@@ -232,6 +232,29 @@ actions_list <- splice(
 
   #comment("Stage 3 - No action there for CVD outcomes"),  
 
+  #comment("Stage 3 - Diabetes flow - vaccinated"),  
+  
+  action(
+    name = "stage3_diabetes_flow_vaccinated",
+    run = "r:latest analysis/diabetes_flowchart.R vaccinated",
+    needs = list("stage1_data_cleaning_both"),
+    moderately_sensitive = list(
+      flow_df = glue("output/diabetes_flow_values_vaccinated.csv")
+      # flow_fig = glue("output/diabetes_flow.png"),
+    ),
+  ),
+
+  #comment("Stage 3 - Diabetes flow - electively_unvaccinated"),  
+  
+  action(
+    name = "stage3_diabetes_flow_electively_unvaccinated",
+    run = "r:latest analysis/diabetes_flowchart.R electively_unvaccinated",
+    needs = list("stage1_data_cleaning_both"),
+    moderately_sensitive = list(
+      flow_df = glue("output/diabetes_flow_values_electively_unvaccinated.csv")
+      # flow_fig = glue("output/diabetes_flow.png"),
+    ),
+  ),
   
   #comment("Stage 4 - Table 2"),
   splice(

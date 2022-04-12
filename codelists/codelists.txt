@@ -156,3 +156,6 @@ opensafely/glycated-haemoglobin-hba1c-tests-numerical-value/5134e926/
 opensafely/type-1-diabetes-secondary-care/2020-09-27
 user/r_denholm/type-2-diabetes-secondary-care-bristol/0b7f6cd4
 user/hjforbes/nondiagnostic-diabetes-codes/50f30a3b
+opensafely/cholesterol-tests-numerical-value/7e3a22f3
+opensafely/prediabetes-snomed/6bdbb7dd
+bristol/hdl-cholesterol/64775990
