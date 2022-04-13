@@ -98,6 +98,8 @@ actions:
         DateChecks: output/Check_dates_range_*.csv
         Descriptive_Table: output/Table1_*.csv
 
+  ## Table 2 dated - vaccinated cohort 
+
   Stage_4_Table_2_vaccinated:
     run: r:latest analysis/table_2.R vaccinated
     needs:
@@ -105,6 +107,8 @@ actions:
     outputs:
       moderately_sensitive:
         table2: output/table2_vaccinated_without_covid_history.csv
+
+  ## Table 2 dated - electively_unvaccinated cohort 
 
   Stage_4_Table_2_electively_unvaccinated:
     run: r:latest analysis/table_2.R electively_unvaccinated
@@ -114,18 +118,33 @@ actions:
       moderately_sensitive:
         table2: output/table2_electively_unvaccinated_without_covid_history.csv
 
-  stage4_input_for_table_2:
-    run: r:latest analysis/table_2_create_input_by_event.R both
+  ## Input for table 2 new - vaccinated cohort 
+
+  stage4_input_for_table_2_vaccinated:
+    run: r:latest analysis/table_2_create_input_by_event.R vaccinated
     needs:
     - stage1_data_cleaning_both
     outputs:
       highly_sensitive:
-        input_table_2: output/input_table_2_*_stage1.rds
+        input_table_2: output/input_table_2_vaccinated_stage1.rds
+
+  ## Input for table 2 new - electively_unvaccinated cohort 
+
+  stage4_input_for_table_2_electively_unvaccinated:
+    run: r:latest analysis/table_2_create_input_by_event.R electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    outputs:
+      highly_sensitive:
+        input_table_2: output/input_table_2_electively_unvaccinated_stage1.rds
+
+  ## Table 2 new - vaccinated cohort 
 
   stage4_table_2_main_vaccinated:
     run: r:latest analysis/table_2_new.R main vaccinated
     needs:
-    - stage4_input_for_table_2
+    - stage4_input_for_table_2_vaccinated
+    - stage4_input_for_table_2_electively_unvaccinated
     outputs:
       moderately_sensitive:
         table_2_csv: output/table2_main_vaccinated.csv
@@ -133,10 +152,13 @@ actions:
         table_2_html: output/table2_main_vaccinated.html
         input_1_aer_html: output/input1_aer_main_vaccinated.html
 
+  ## Table 2 new - vaccinated cohort 
+
   stage4_table_2_subgroups_vaccinated:
     run: r:latest analysis/table_2_new.R subgroups vaccinated
     needs:
-    - stage4_input_for_table_2
+    - stage4_input_for_table_2_vaccinated
+    - stage4_input_for_table_2_electively_unvaccinated
     outputs:
       moderately_sensitive:
         table_2_csv: output/table2_subgroups_vaccinated.csv
@@ -144,10 +166,13 @@ actions:
         table_2_html: output/table2_subgroups_vaccinated.html
         input_1_aer_html: output/input1_aer_subgroups_vaccinated.html
 
+  ## Table 2 new - electively_unvaccinated cohort 
+
   stage4_table_2_main_electively_unvaccinated:
     run: r:latest analysis/table_2_new.R main electively_unvaccinated
     needs:
-    - stage4_input_for_table_2
+    - stage4_input_for_table_2_vaccinated
+    - stage4_input_for_table_2_electively_unvaccinated
     outputs:
       moderately_sensitive:
         table_2_csv: output/table2_main_electively_unvaccinated.csv
@@ -155,10 +180,13 @@ actions:
         table_2_html: output/table2_main_electively_unvaccinated.html
         input_1_aer_html: output/input1_aer_main_electively_unvaccinated.html
 
+  ## Table 2 new - electively_unvaccinated cohort 
+
   stage4_table_2_subgroups_electively_unvaccinated:
     run: r:latest analysis/table_2_new.R subgroups electively_unvaccinated
     needs:
-    - stage4_input_for_table_2
+    - stage4_input_for_table_2_vaccinated
+    - stage4_input_for_table_2_electively_unvaccinated
     outputs:
       moderately_sensitive:
         table_2_csv: output/table2_subgroups_electively_unvaccinated.csv
