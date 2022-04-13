@@ -142,7 +142,7 @@ actions:
 
   stage4_table_2_main_vaccinated:
     run: r:latest analysis/table_2_new.R main vaccinated
-    dummy_data_file:
+    needs:
     - stage4_input_for_table_2_vaccinated
     outputs:
       moderately_sensitive:
@@ -155,7 +155,7 @@ actions:
 
   stage4_table_2_subgroups_vaccinated:
     run: r:latest analysis/table_2_new.R subgroups vaccinated
-    dummy_data_file:
+    needs:
     - stage4_input_for_table_2_vaccinated
     outputs:
       moderately_sensitive:
