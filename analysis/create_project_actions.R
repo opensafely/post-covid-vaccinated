@@ -140,8 +140,14 @@ apply_table2_new_function <- function(analyses, cohort){
     action(
       name = glue("stage4_table_2_{analyses}_{cohort}"),
       run = "r:latest analysis/table_2_new.R",
-      needs = list("stage4_input_for_table_2_vaccinated", 
-                   "stage4_input_for_table_2_electively_unvaccinated"),
+      if(cohort == "vaccinated"){
+        needs = list("stage4_input_for_table_2_vaccinated")
+      },
+      if(cohort == "electively_unvaccinated"){
+        needs = list("stage4_input_for_table_2_electively_unvaccinated")
+      },
+      # needs = list("stage4_input_for_table_2_vaccinated", 
+      #              "stage4_input_for_table_2_electively_unvaccinated"),
       arguments = c(analyses, cohort),
       moderately_sensitive = list(
         table_2_csv = glue("output/table2_{analyses}_{cohort}.csv"),

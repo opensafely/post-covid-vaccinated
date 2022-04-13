@@ -142,9 +142,8 @@ actions:
 
   stage4_table_2_main_vaccinated:
     run: r:latest analysis/table_2_new.R main vaccinated
-    needs:
+    dummy_data_file:
     - stage4_input_for_table_2_vaccinated
-    - stage4_input_for_table_2_electively_unvaccinated
     outputs:
       moderately_sensitive:
         table_2_csv: output/table2_main_vaccinated.csv
@@ -156,9 +155,8 @@ actions:
 
   stage4_table_2_subgroups_vaccinated:
     run: r:latest analysis/table_2_new.R subgroups vaccinated
-    needs:
+    dummy_data_file:
     - stage4_input_for_table_2_vaccinated
-    - stage4_input_for_table_2_electively_unvaccinated
     outputs:
       moderately_sensitive:
         table_2_csv: output/table2_subgroups_vaccinated.csv
@@ -171,7 +169,6 @@ actions:
   stage4_table_2_main_electively_unvaccinated:
     run: r:latest analysis/table_2_new.R main electively_unvaccinated
     needs:
-    - stage4_input_for_table_2_vaccinated
     - stage4_input_for_table_2_electively_unvaccinated
     outputs:
       moderately_sensitive:
@@ -185,7 +182,6 @@ actions:
   stage4_table_2_subgroups_electively_unvaccinated:
     run: r:latest analysis/table_2_new.R subgroups electively_unvaccinated
     needs:
-    - stage4_input_for_table_2_vaccinated
     - stage4_input_for_table_2_electively_unvaccinated
     outputs:
       moderately_sensitive:
