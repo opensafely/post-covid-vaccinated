@@ -138,4 +138,43 @@ study = StudyDefinition(
         },
     ),
 
+     tmp_out_date_pe_i26_hes_19_20=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=pe_i26_icd10,
+        between=["2019-04-01","2020-03-31"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.1,
+        },
+    ),
+
+    tmp_out_date_pe_i260_hes_19_20=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=pe_i260_icd10,
+        between=["2019-04-01","2020-03-31"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.1,
+        },
+    ),
+
+    tmp_out_date_pe_i269_hes_19_20=patients.admitted_to_hospital(
+        returning="date_admitted",
+        with_these_diagnoses=pe_i269_icd10,
+        between=["2019-04-01","2020-03-31"],
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.1,
+        },
+    ),
+
 )
