@@ -98,7 +98,8 @@ table_2_subgroups_output <- function(population){
   
   outcomes<-active_analyses$outcome_variable
   
-  survival_data <- read_rds(paste0("output/input_table_2_",population,"_stage1.rds"))
+  #survival_data <- read_rds(paste0("output/input_table_2_",population,"_stage1.rds"))
+  survival_data <- read_csv(paste0("output/input_table_2_",population,"_stage1.rds"))
   
   # for testing: i="out_date_ate"
   for(i in outcomes){
