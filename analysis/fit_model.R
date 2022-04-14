@@ -93,13 +93,15 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   if(mdl=="mdl_agesex"){
     surv_formula <- paste0(
       "Surv(tstart, tstop, event) ~ ",
-      paste(interval_names, collapse="+"), 
-      "+ cluster(patient_id) + strat(region_name)")
+      paste(interval_names, collapse="+"),
+      #"+ cluster(patient_id) + strat(region_name)")
+      "+ cluster(patient_id)")
   }else if (mdl=="mdl_max_adj"){
     surv_formula <- paste0(
       "Surv(tstart, tstop, event) ~ ",
       paste(covariates_excl_region_sex_age, collapse="+"), 
-      "+ cluster(patient_id) + strat(region_name)")
+      #"+ cluster(patient_id) + strat(region_name)")
+      "+ cluster(patient_id)")
   }
  
   #If subgroup is not sex then add sex into formula
