@@ -119,14 +119,30 @@ apply_table2_function <- function(cohort){
   )
 }
 
+apply_table2_input <- function(cohort){
+  splice(
+    comment(glue("Input for table 2 new - {cohort} cohort")),
+    action(
+      name = glue("stage4_input_for_table_2_{cohort}"),
+      run = "r:latest analysis/table_2_create_input_by_event.R",
+      arguments = c(cohort),
+      needs = list("stage1_data_cleaning_both"),
+      highly_sensitive = list(
+        input_table_2 = glue("output/input_table_2_{cohort}_stage1.rds")
+      )
+    )
+  )
+}
+
 apply_table2_new_function <- function(analyses, cohort){
   splice(
     comment(glue("Table 2 new - {cohort} cohort")),
     action(
       name = glue("stage4_table_2_{analyses}_{cohort}"),
       run = "r:latest analysis/table_2_new.R",
+      needs = list(ifelse(cohort == "vaccinated", "stage4_input_for_table_2_vaccinated",
+                   "stage4_input_for_table_2_electively_unvaccinated")),
       arguments = c(analyses, cohort),
-      needs = list("stage4_input_for_table_2"),
       moderately_sensitive = list(
         table_2_csv = glue("output/table2_{analyses}_{cohort}.csv"),
         input_1_aer_csv = glue("output/input1_aer_{analyses}_{cohort}.csv"),
@@ -275,17 +291,40 @@ actions_list <- splice(
     unlist(lapply(cohort_to_run, function(x) apply_table2_function( cohort = x)), recursive = FALSE)
     ),
   
-  
-  #comment("Stage 4 - Create input for table 2"),
-  action(
-    name = "stage4_input_for_table_2",
-    run = "r:latest analysis/table_2_create_input_by_event.R both",
-    needs = list("stage1_data_cleaning_both"),
-    highly_sensitive = list(
-      input_table_2 = glue("output/input_table_2_*_stage1.rds")
-    )
+  #comment("Stage 4 - Create input for table2"),
+  splice(
+    # over outcomes
+    unlist(lapply(cohort_to_run, function(x) apply_table2_input(cohort = x)), recursive = FALSE)
   ),
   
+  #comment("Stage 4 - Create input for table 2"),
+  # action(
+  #   name = "stage4_input_for_table_2",
+  #   run = "r:latest analysis/table_2_create_input_by_event.R both",
+  #   needs = list("stage1_data_cleaning_both"),
+  #   highly_sensitive = list(
+  #     input_table_2 = glue("output/input_table_2_*_stage1.rds")
+  #   )
+  # ),
+  
+  # action(
+  #   name = "stage4_input_for_table_2_vaccinated",
+  #   run = "r:latest analysis/table_2_create_input_by_event.R vaccinated",
+  #   needs = list("stage1_data_cleaning_both"),
+  #   highly_sensitive = list(
+  #     input_table_2 = glue("output/input_table_2_vaccinated_stage1.rds")
+  #   )
+  # ),
+  # 
+  # action(
+  #   name = "stage4_input_for_table_2_electively_unvaccinated",
+  #   run = "r:latest analysis/table_2_create_input_by_event.R electively_unvaccinated",
+  #   needs = list("stage1_data_cleaning_both"),
+  #   highly_sensitive = list(
+  #     input_table_2 = glue("output/input_table_2_electively_unvaccinated_stage1.rds")
+  #   )
+  # ),
+  # 
   #comment("Stage 4 - Table 2 new"),
   splice(
     # over outcomes

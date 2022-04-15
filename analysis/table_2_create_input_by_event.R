@@ -132,6 +132,7 @@ input_table_2 <- function(population){
     print(paste0("input for ", event, " in ", population, " population has been produced successfully!"))
   }
   saveRDS(survival_data, file=paste0("output/input_table_2_",population,"_stage1.rds"))
+  #write_csv(survival_data, file=paste0("output/input_table_2_",population,"_stage1.rds"))
   rm(list=c("survival_data"))
 }
 # Run function using specified commandArgs
