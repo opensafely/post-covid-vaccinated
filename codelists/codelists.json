@@ -959,6 +959,23 @@
       "url": "https://codelists.opensafely.org/codelist/bristol/hdl-cholesterol/64775990/",
       "downloaded_at": "2022-04-12 13:57:43.253303Z",
       "sha": "ce9f10f91453a33d5de195b7d02656bf11782760"
+    "bristol-pe_i26.csv": {
+      "id": "bristol/pe_i26/00398cbc",
+      "url": "https://codelists.opensafely.org/codelist/bristol/pe_i26/00398cbc/",
+      "downloaded_at": "2022-04-11 09:35:28.369970Z",
+      "sha": "066b79182d212664aff52aa293ba048295499eb9"
+    },
+    "bristol-pe_i260.csv": {
+      "id": "bristol/pe_i260/672a1986",
+      "url": "https://codelists.opensafely.org/codelist/bristol/pe_i260/672a1986/",
+      "downloaded_at": "2022-04-11 09:35:28.522289Z",
+      "sha": "badb40c49b3608c9391e0eff1b0a7731cfd6c254"
+    },
+    "bristol-pe_i269.csv": {
+      "id": "bristol/pe_i269/4e1aa651",
+      "url": "https://codelists.opensafely.org/codelist/bristol/pe_i269/4e1aa651/",
+      "downloaded_at": "2022-04-11 09:35:28.680845Z",
+      "sha": "7ec5e75887483b1918e3c2ad3ed512c4d64f452e"
     }
   }
 }

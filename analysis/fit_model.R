@@ -93,7 +93,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   if(mdl=="mdl_agesex"){
     surv_formula <- paste0(
       "Surv(tstart, tstop, event) ~ ",
-      paste(interval_names, collapse="+"), 
+      paste(interval_names, collapse="+"),
       "+ cluster(patient_id) + strat(region_name)")
   }else if (mdl=="mdl_max_adj"){
     surv_formula <- paste0(
@@ -154,11 +154,11 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   #Can only get for covariate as a whole and not for each level so left join onto main covariate name
   results$covariate=results$term
   results$covariate=sub('\\=.*', '', results$covariate)
-  #results$P="NA"
-  anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
-  anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
-  anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
-  results=results%>%left_join(anova_fit_cox_model,by="covariate")
+  results$P="NA"
+  #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
+  #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
+  #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
+  #results=results%>%left_join(anova_fit_cox_model,by="covariate")
   
   print("Finised working on cox model")
   return(results)

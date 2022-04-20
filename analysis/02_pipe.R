@@ -27,6 +27,13 @@ if(active_analyses$prior_history_var != ""){
 input <- read_rds(paste0("output/input_",cohort,"_stage1.rds"))
 input <- input %>% select(all_of(read_in_cols))
 
+#Test - remove those with missing region as the model is not always fitting on the real data
+input$cov_cat_region <- as.character(input$cov_cat_region)
+input <- input %>% filter(cov_cat_region != "Missing")
+input$cov_cat_region <- as.factor(input$cov_cat_region)
+input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
+
+
 #---------------------------SPECIFY MAIN PARAMETERS-----------------------------
 # specify study parameters
 #For all analysis aside from age stratifed, analysis is performed across all ages 

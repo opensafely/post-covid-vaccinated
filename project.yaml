@@ -20,6 +20,13 @@ actions:
         vax_jcvi_groups: output/vax_jcvi_groups.csv
         vax_eligible_dates: output/vax_eligible_dates.csv
 
+  generate_study_population_investigate:
+    run: cohortextractor:latest generate_cohort --study-definition study_definition_investigate
+      --output-format feather
+    outputs:
+      highly_sensitive:
+        cohort: output/input_investigate.feather
+
   generate_study_population_electively_unvaccinated:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated
       --output-format feather
@@ -42,6 +49,14 @@ actions:
     outputs:
       highly_sensitive:
         cohort: output/input_index.feather
+
+  investigation:
+    run: r:latest analysis/investigation.R
+    needs:
+    - generate_study_population_investigate
+    outputs:
+      moderately_sensitive:
+        describe: output/describe_input_investigate_*.txt
 
   preprocess_data_vaccinated:
     run: r:latest analysis/preprocess_data.R vaccinated
@@ -113,6 +128,7 @@ actions:
     outputs:
       moderately_sensitive:
         flow_df: output/diabetes_flow_values_electively_unvaccinated.csv
+  ## Table 2 dated - vaccinated cohort 
 
   Stage_4_Table_2_vaccinated:
     run: r:latest analysis/table_2.R vaccinated
@@ -122,6 +138,8 @@ actions:
       moderately_sensitive:
         table2: output/table2_vaccinated_without_covid_history.csv
 
+  ## Table 2 dated - electively_unvaccinated cohort 
+
   Stage_4_Table_2_electively_unvaccinated:
     run: r:latest analysis/table_2.R electively_unvaccinated
     needs:
@@ -129,6 +147,92 @@ actions:
     outputs:
       moderately_sensitive:
         table2: output/table2_electively_unvaccinated_without_covid_history.csv
+
+  ## Input for table 2 new - vaccinated cohort 
+
+  stage4_input_for_table_2_vaccinated:
+    run: r:latest analysis/table_2_create_input_by_event.R vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    outputs:
+      highly_sensitive:
+        input_table_2: output/input_table_2_vaccinated_stage1.rds
+
+  ## Input for table 2 new - electively_unvaccinated cohort 
+
+  stage4_input_for_table_2_electively_unvaccinated:
+    run: r:latest analysis/table_2_create_input_by_event.R electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    outputs:
+      highly_sensitive:
+        input_table_2: output/input_table_2_electively_unvaccinated_stage1.rds
+
+  ## Table 2 new - vaccinated cohort 
+
+  stage4_table_2_main_vaccinated:
+    run: r:latest analysis/table_2_new.R main vaccinated
+    needs:
+    - stage4_input_for_table_2_vaccinated
+    outputs:
+      moderately_sensitive:
+        table_2_csv: output/table2_main_vaccinated.csv
+        input_1_aer_csv: output/input1_aer_main_vaccinated.csv
+        table_2_html: output/table2_main_vaccinated.html
+        input_1_aer_html: output/input1_aer_main_vaccinated.html
+
+  ## Table 2 new - vaccinated cohort 
+
+  stage4_table_2_subgroups_vaccinated:
+    run: r:latest analysis/table_2_new.R subgroups vaccinated
+    needs:
+    - stage4_input_for_table_2_vaccinated
+    outputs:
+      moderately_sensitive:
+        table_2_csv: output/table2_subgroups_vaccinated.csv
+        input_1_aer_csv: output/input1_aer_subgroups_vaccinated.csv
+        table_2_html: output/table2_subgroups_vaccinated.html
+        input_1_aer_html: output/input1_aer_subgroups_vaccinated.html
+
+  ## Table 2 new - electively_unvaccinated cohort 
+
+  stage4_table_2_main_electively_unvaccinated:
+    run: r:latest analysis/table_2_new.R main electively_unvaccinated
+    needs:
+    - stage4_input_for_table_2_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        table_2_csv: output/table2_main_electively_unvaccinated.csv
+        input_1_aer_csv: output/input1_aer_main_electively_unvaccinated.csv
+        table_2_html: output/table2_main_electively_unvaccinated.html
+        input_1_aer_html: output/input1_aer_main_electively_unvaccinated.html
+
+  ## Table 2 new - electively_unvaccinated cohort 
+
+  stage4_table_2_subgroups_electively_unvaccinated:
+    run: r:latest analysis/table_2_new.R subgroups electively_unvaccinated
+    needs:
+    - stage4_input_for_table_2_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        table_2_csv: output/table2_subgroups_electively_unvaccinated.csv
+        input_1_aer_csv: output/input1_aer_subgroups_electively_unvaccinated.csv
+        table_2_html: output/table2_subgroups_electively_unvaccinated.html
+        input_1_aer_html: output/input1_aer_subgroups_electively_unvaccinated.html
+
+  stage4_table_2_transfer_unexposed_data:
+    run: r:latest analysis/table_2_transfer_unexposed_data.R subgroups both
+    needs:
+    - stage4_table_2_main_vaccinated
+    - stage4_table_2_subgroups_vaccinated
+    - stage4_table_2_main_electively_unvaccinated
+    - stage4_table_2_subgroups_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        table_2_csv: output/table2_subgroups_*.csv
+        input_1_aer_csv: output/input1_aer_*.csv
+        table_2_html: output/table2_subgroups_*.html
+        input_1_aer_html: output/input1_aer_*.html
 
   stage4_venn_diagram_both:
     run: r:latest analysis/venn_diagram.R both
@@ -153,6 +257,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_ami_vaccinated.html
         analyses_not_run: output/analyses_not_run_ami_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_ami_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_ami_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_ami_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_ami_vaccinated.csv
@@ -170,6 +275,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_ami_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_ami_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_ami_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_ami_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_ami_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_ami_electively_unvaccinated.csv
@@ -187,6 +293,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_stroke_isch_vaccinated.html
         analyses_not_run: output/analyses_not_run_stroke_isch_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_stroke_isch_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_stroke_isch_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_stroke_isch_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_stroke_isch_vaccinated.csv
@@ -204,6 +311,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_stroke_isch_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_stroke_isch_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_stroke_isch_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_stroke_isch_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_stroke_isch_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_stroke_isch_electively_unvaccinated.csv
@@ -221,6 +329,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_dvt_vaccinated.html
         analyses_not_run: output/analyses_not_run_dvt_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_dvt_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_dvt_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_dvt_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_dvt_vaccinated.csv
@@ -238,6 +347,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_dvt_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_dvt_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_dvt_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_dvt_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_dvt_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_dvt_electively_unvaccinated.csv
@@ -255,6 +365,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_pe_vaccinated.html
         analyses_not_run: output/analyses_not_run_pe_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_pe_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_pe_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_pe_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_pe_vaccinated.csv
@@ -272,6 +383,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_pe_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_pe_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_pe_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_pe_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_pe_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_pe_electively_unvaccinated.csv
@@ -289,6 +401,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_tia_vaccinated.html
         analyses_not_run: output/analyses_not_run_tia_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_tia_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_tia_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_tia_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_tia_vaccinated.csv
@@ -306,6 +419,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_tia_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_tia_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_tia_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_tia_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_tia_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_tia_electively_unvaccinated.csv
@@ -323,6 +437,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_stroke_sah_hs_vaccinated.html
         analyses_not_run: output/analyses_not_run_stroke_sah_hs_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_stroke_sah_hs_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_stroke_sah_hs_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_stroke_sah_hs_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_stroke_sah_hs_vaccinated.csv
@@ -340,6 +455,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_stroke_sah_hs_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_stroke_sah_hs_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_stroke_sah_hs_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_stroke_sah_hs_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_stroke_sah_hs_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_stroke_sah_hs_electively_unvaccinated.csv
@@ -357,6 +473,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_hf_vaccinated.html
         analyses_not_run: output/analyses_not_run_hf_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_hf_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_hf_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_hf_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_hf_vaccinated.csv
@@ -374,6 +491,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_hf_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_hf_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_hf_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_hf_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_hf_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_hf_electively_unvaccinated.csv
@@ -391,6 +509,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_angina_vaccinated.html
         analyses_not_run: output/analyses_not_run_angina_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_angina_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_angina_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_angina_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_angina_vaccinated.csv
@@ -408,6 +527,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_angina_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_angina_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_angina_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_angina_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_angina_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_angina_electively_unvaccinated.csv
@@ -425,6 +545,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_ate_vaccinated.html
         analyses_not_run: output/analyses_not_run_ate_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_ate_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_ate_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_ate_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_ate_vaccinated.csv
@@ -442,6 +563,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_ate_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_ate_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_ate_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_ate_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_ate_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_ate_electively_unvaccinated.csv
@@ -459,6 +581,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_vte_vaccinated.html
         analyses_not_run: output/analyses_not_run_vte_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_vte_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_vte_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_vte_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_vte_vaccinated.csv
@@ -476,6 +599,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_vte_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_vte_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_vte_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_vte_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_vte_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_vte_electively_unvaccinated.csv
@@ -493,6 +617,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_depression_vaccinated.html
         analyses_not_run: output/analyses_not_run_depression_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_depression_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_depression_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_depression_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_depression_vaccinated.csv
@@ -510,6 +635,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_depression_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_depression_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_depression_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_depression_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_depression_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_depression_electively_unvaccinated.csv
@@ -527,6 +653,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_anxiety_general_vaccinated.html
         analyses_not_run: output/analyses_not_run_anxiety_general_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_anxiety_general_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_anxiety_general_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_anxiety_general_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_anxiety_general_vaccinated.csv
@@ -544,6 +671,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_anxiety_general_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_anxiety_general_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_anxiety_general_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_anxiety_general_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_anxiety_general_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_anxiety_general_electively_unvaccinated.csv
@@ -561,6 +689,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_anxiety_ocd_vaccinated.html
         analyses_not_run: output/analyses_not_run_anxiety_ocd_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_anxiety_ocd_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_anxiety_ocd_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_anxiety_ocd_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_anxiety_ocd_vaccinated.csv
@@ -578,6 +707,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_anxiety_ocd_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_anxiety_ocd_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_anxiety_ocd_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_anxiety_ocd_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_anxiety_ocd_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_anxiety_ocd_electively_unvaccinated.csv
@@ -595,6 +725,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_anxiety_ptsd_vaccinated.html
         analyses_not_run: output/analyses_not_run_anxiety_ptsd_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_anxiety_ptsd_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_anxiety_ptsd_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_anxiety_ptsd_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_anxiety_ptsd_vaccinated.csv
@@ -612,6 +743,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_anxiety_ptsd_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_anxiety_ptsd_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_anxiety_ptsd_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_anxiety_ptsd_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_anxiety_ptsd_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_anxiety_ptsd_electively_unvaccinated.csv
@@ -629,6 +761,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_eating_disorders_vaccinated.html
         analyses_not_run: output/analyses_not_run_eating_disorders_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_eating_disorders_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_eating_disorders_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_eating_disorders_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_eating_disorders_vaccinated.csv
@@ -646,6 +779,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_eating_disorders_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_eating_disorders_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_eating_disorders_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_eating_disorders_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_eating_disorders_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_eating_disorders_electively_unvaccinated.csv
@@ -663,6 +797,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_serious_mental_illness_vaccinated.html
         analyses_not_run: output/analyses_not_run_serious_mental_illness_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_serious_mental_illness_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_serious_mental_illness_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_serious_mental_illness_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_serious_mental_illness_vaccinated.csv
@@ -682,6 +817,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_serious_mental_illness_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_serious_mental_illness_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_serious_mental_illness_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_serious_mental_illness_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_serious_mental_illness_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_serious_mental_illness_electively_unvaccinated.csv
@@ -699,6 +835,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_self_harm_10plus_vaccinated.html
         analyses_not_run: output/analyses_not_run_self_harm_10plus_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_self_harm_10plus_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_self_harm_10plus_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_self_harm_10plus_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_self_harm_10plus_vaccinated.csv
@@ -716,6 +853,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_self_harm_10plus_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_self_harm_10plus_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_self_harm_10plus_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_self_harm_10plus_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_self_harm_10plus_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_self_harm_10plus_electively_unvaccinated.csv
@@ -733,6 +871,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_self_harm_15plus_vaccinated.html
         analyses_not_run: output/analyses_not_run_self_harm_15plus_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_self_harm_15plus_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_self_harm_15plus_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_self_harm_15plus_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_self_harm_15plus_vaccinated.csv
@@ -750,6 +889,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_self_harm_15plus_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_self_harm_15plus_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_self_harm_15plus_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_self_harm_15plus_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_self_harm_15plus_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_self_harm_15plus_electively_unvaccinated.csv
@@ -767,6 +907,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_suicide_vaccinated.html
         analyses_not_run: output/analyses_not_run_suicide_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_suicide_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_suicide_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_suicide_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_suicide_vaccinated.csv
@@ -784,6 +925,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_suicide_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_suicide_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_suicide_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_suicide_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_suicide_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_suicide_electively_unvaccinated.csv
@@ -801,6 +943,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_addiction_vaccinated.html
         analyses_not_run: output/analyses_not_run_addiction_vaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_addiction_vaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_addiction_vaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_addiction_vaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_addiction_vaccinated.csv
@@ -818,6 +961,7 @@ actions:
         compiled_event_counts_html: output/suppressed_compiled_event_counts_addiction_electively_unvaccinated.html
         analyses_not_run: output/analyses_not_run_addiction_electively_unvaccinated.csv
         compiled_hrs_csv: output/suppressed_compiled_HR_results_addiction_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/suppressed_compiled_HR_results_addiction_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/suppressed_compiled_event_counts_addiction_electively_unvaccinated.csv
       highly_sensitive:
         compiled_hrs: output/compiled_HR_results_addiction_electively_unvaccinated.csv
