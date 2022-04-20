@@ -2,7 +2,7 @@ version: '3.0'
 
 expectations:
 
-  population_size: 400000
+  population_size: 100000
 
 actions:
 
@@ -113,6 +113,21 @@ actions:
         DateChecks: output/Check_dates_range_*.csv
         Descriptive_Table: output/Table1_*.csv
 
+  stage3_diabetes_flow_vaccinated:
+    run: r:latest analysis/diabetes_flowchart.R vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    outputs:
+      moderately_sensitive:
+        flow_df: output/diabetes_flow_values_vaccinated.csv
+
+  stage3_diabetes_flow_electively_unvaccinated:
+    run: r:latest analysis/diabetes_flowchart.R electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    outputs:
+      moderately_sensitive:
+        flow_df: output/diabetes_flow_values_electively_unvaccinated.csv
   ## Table 2 dated - vaccinated cohort 
 
   Stage_4_Table_2_vaccinated:

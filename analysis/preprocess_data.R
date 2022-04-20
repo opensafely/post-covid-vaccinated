@@ -1,3 +1,10 @@
+# Load libraries ---------------------------------------------------------------
+
+library(magrittr)
+library(dplyr)
+library(tidyverse)
+library(lubridate)
+
 # Specify command arguments ----------------------------------------------------
 
 args <- commandArgs(trailingOnly=TRUE)
@@ -12,10 +19,6 @@ if(length(args)==0){
 # Define other parameters ------------------------------------------------------
 
 study_start <- "2021-06-01"
-
-# Load libraries ---------------------------------------------------------------
-
-library(magrittr)
 
 # Create spine dataset ---------------------------------------------------------
 
@@ -216,16 +219,15 @@ tmp_other <- tmp_other[tmp_other$patient_id %in% df[df$index_source=="pat_start_
 
 tmp <- rbind(tmp_index, tmp_other)
 
-tmp <- tmp[,!grepl("tmp_exp_",colnames(tmp))]
-tmp <- tmp[,!grepl("tmp_sub_",colnames(tmp))]
-tmp <- tmp[,!grepl("tmp_cov_",colnames(tmp))]
-
 df <- merge(df, tmp, by = "patient_id")
 rm(tmp, tmp_index,tmp_other)
 
 print("Non-spine variables added to dataset successfully")
 
 # Convert dates to date format -------------------------------------------------
+
+df <- df %>%
+  dplyr::rename(tmp_out_max_hba1c_mmol_mol_date = tmp_out_num_max_hba1c_date)
 
 for (i in colnames(df)[grepl("_date",colnames(df))]) {
   df[,i] <- as.Date(df[,i])
@@ -272,6 +274,43 @@ df <- df[!is.na(df$patient_id),]
 
 print("COVID19 severity determined successfully")
 
+# Create vars -------------------------------------------------------------
+
+# vars could not be created in common vars file
+df <- df %>% mutate(tmp_out_count_t2dm = tmp_out_count_t2dm_snomed + tmp_out_count_t2dm_hes,
+                    tmp_out_count_t1dm = tmp_out_count_t1dm_snomed + tmp_out_count_t1dm_hes) %>%
+  # cholesterol ratio              
+  mutate(cov_num_tc_hdl_ratio = tmp_cov_num_cholesterol / tmp_cov_num_hdl_cholesterol) %>%
+  # remove bmi date var
+  dplyr::select(- cov_num_bmi_date_measured)
+
+print("Diabetes count variables created successfully")
+
+# define variables needed for diabetes algorithm 
+
+df <- df %>% 
+  mutate(tmp_out_year_first_diabetes_diag = format(tmp_out_date_first_diabetes_diag,"%Y")) %>%
+  mutate(tmp_out_year_first_diabetes_diag = as.integer(tmp_out_year_first_diabetes_diag),
+         age_1st_diag = tmp_out_year_first_diabetes_diag - qa_num_birth_year) %>%
+  mutate(age_1st_diag = replace(age_1st_diag, which(age_1st_diag < 0), NA)) %>% # assign negative ages to NA)
+  mutate(age_under_35_30_1st_diag = ifelse(!is.na(age_1st_diag) &
+                                             (age_1st_diag < 35 & 
+                                                (cov_cat_ethnicity == 1 | cov_cat_ethnicity == 2  | cov_cat_ethnicity == 5)) | 
+                                             (age_1st_diag < 30), "Yes", "No")) %>%
+  # HBA1C date var - earliest date for only those with >=47.5
+  mutate(hba1c_date_step7 = as_date(case_when(tmp_out_num_max_hba1c_mmol_mol >= 47.5 ~ pmin(tmp_out_max_hba1c_mmol_mol_date, na.rm = TRUE))),
+         # process codes - this is taking the first process code date in those individuals that have 5 or more process codes
+         over5_pocc_step7 = as_date(case_when(tmp_out_count_poccdm_snomed >= 5 ~ pmin(out_date_poccdm, na.rm = TRUE))))
+
+print("COVID-19 and diabetes variables needed for algorithm created successfully")
+
+# Define diabetes outcome (using Sophie Eastwood algorithm) ----------------------------
+
+scripts_dir <- "analysis"
+source(file.path(scripts_dir,"diabetes_algorithm.R"))
+df <- diabetes_algo(df)
+print("Diabetes algorithm run successfully")
+
 # Restrict columns and save analysis dataset ---------------------------------
 
 df1 <- df[,c("patient_id","death_date","index_date",
@@ -280,11 +319,12 @@ df1 <- df[,c("patient_id","death_date","index_date",
              colnames(df)[grepl("out_",colnames(df))], # Outcomes
              colnames(df)[grepl("cov_",colnames(df))], # Covariates
              colnames(df)[grepl("qa_",colnames(df))], # Quality assurance
+             colnames(df)[grepl("step",colnames(df))], # diabetes steps
              colnames(df)[grepl("vax_date_eligible",colnames(df))], # Vaccination eligibility
              colnames(df)[grepl("vax_date_covid_",colnames(df))], # Vaccination dates
              colnames(df)[grepl("vax_cat_",colnames(df))])] # Vaccination products
 
-df1[,colnames(df)[grepl("tmp_out_",colnames(df))]] <- NULL
+df1[,colnames(df)[grepl("tmp_",colnames(df))]] <- NULL
 
 saveRDS(df1, file = paste0("output/input_",cohort,".rds"))
 
@@ -298,9 +338,12 @@ sink()
 
 # Restrict columns and save Venn diagram input dataset -----------------------
 
-df2 <- df[,c("patient_id",colnames(df)[grepl("out_",colnames(df))])]
+#df2 <- df[,c("patient_id",colnames(df)[grepl("out_",colnames(df))])]
+
+df2 <- df %>% select(starts_with(c("patient_id","tmp_out_date","out_date")))
 
 # Describe data --------------------------------------------------------------
+
 sink(paste0("output/describe_venn_",cohort,".txt"))
 print(Hmisc::describe(df2))
 sink()

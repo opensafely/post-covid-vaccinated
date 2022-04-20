@@ -888,6 +888,77 @@
       "downloaded_at": "2022-04-01 12:04:53.084548Z",
       "sha": "58e84d7962edf98d855ca79dd404d638c751aef3"
     },
+    "opensafely-insulin-medication.csv": {
+      "id": "opensafely/insulin-medication/2020-04-26",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/insulin-medication/2020-04-26/",
+      "downloaded_at": "2022-04-11 13:59:51.657295Z",
+      "sha": "9d4c57c0b8738962da04b32ab43b7659cd64d774"
+    },
+    "opensafely-antidiabetic-drugs.csv": {
+      "id": "opensafely/antidiabetic-drugs/2020-07-16",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/antidiabetic-drugs/2020-07-16/",
+      "downloaded_at": "2022-04-11 13:59:52.676160Z",
+      "sha": "f0b93b0054d673e8dcfbeba8fea0cd54239f0725"
+    },
+    "user-r_denholm-non-metformin-antidiabetic-drugs_bristol.csv": {
+      "id": "user/r_denholm/non-metformin-antidiabetic-drugs_bristol/7207eb58",
+      "url": "https://codelists.opensafely.org/codelist/user/r_denholm/non-metformin-antidiabetic-drugs_bristol/7207eb58/",
+      "downloaded_at": "2022-04-11 13:59:53.233152Z",
+      "sha": "43ff2e176f22e6050f6bf92e6d30deff40e97383"
+    },
+    "user-r_denholm-non-metformin-drugs.csv": {
+      "id": "user/r_denholm/non-metformin-drugs/74baab4e",
+      "url": "https://codelists.opensafely.org/codelist/user/r_denholm/non-metformin-drugs/74baab4e/",
+      "downloaded_at": "2022-04-11 13:59:53.774712Z",
+      "sha": "762748d73dde51020504ae8fca1d81ef3de48d62"
+    },
+    "user-r_denholm-non-metformin-drugs-dmd.csv": {
+      "id": "user/r_denholm/non-metformin-drugs-dmd/107cde7a",
+      "url": "https://codelists.opensafely.org/codelist/user/r_denholm/non-metformin-drugs-dmd/107cde7a/",
+      "downloaded_at": "2022-04-11 13:59:54.374536Z",
+      "sha": "6b51e927f83c2632d2b9dd1eb03a276cac4ff0ec"
+    },
+    "opensafely-glycated-haemoglobin-hba1c-tests-numerical-value.csv": {
+      "id": "opensafely/glycated-haemoglobin-hba1c-tests-numerical-value/5134e926",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/glycated-haemoglobin-hba1c-tests-numerical-value/5134e926/",
+      "downloaded_at": "2022-04-11 13:59:54.933638Z",
+      "sha": "bc7e48efd370be65686755f0a843058f1ec767e0"
+    },
+    "opensafely-type-1-diabetes-secondary-care.csv": {
+      "id": "opensafely/type-1-diabetes-secondary-care/2020-09-27",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/type-1-diabetes-secondary-care/2020-09-27/",
+      "downloaded_at": "2022-04-11 14:30:06.517251Z",
+      "sha": "e51303ce0e7eb6ac9e0d1763bd23e49b0f273429"
+    },
+    "user-r_denholm-type-2-diabetes-secondary-care-bristol.csv": {
+      "id": "user/r_denholm/type-2-diabetes-secondary-care-bristol/0b7f6cd4",
+      "url": "https://codelists.opensafely.org/codelist/user/r_denholm/type-2-diabetes-secondary-care-bristol/0b7f6cd4/",
+      "downloaded_at": "2022-04-11 14:35:45.103408Z",
+      "sha": "64dfc55f964cd811b59f0d142d661e1ad1b26f29"
+    },
+    "user-hjforbes-nondiagnostic-diabetes-codes.csv": {
+      "id": "user/hjforbes/nondiagnostic-diabetes-codes/50f30a3b",
+      "url": "https://codelists.opensafely.org/codelist/user/hjforbes/nondiagnostic-diabetes-codes/50f30a3b/",
+      "downloaded_at": "2022-04-11 14:52:16.272759Z",
+      "sha": "3b3bd24a816d04aeaaad93495d8c04772a12672f"
+    },
+    "opensafely-cholesterol-tests-numerical-value.csv": {
+      "id": "opensafely/cholesterol-tests-numerical-value/7e3a22f3",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/cholesterol-tests-numerical-value/7e3a22f3/",
+      "downloaded_at": "2022-04-12 13:57:42.970781Z",
+      "sha": "4e90c401f67eca3a3aa716edea013340a6164f44"
+    },
+    "opensafely-prediabetes-snomed.csv": {
+      "id": "opensafely/prediabetes-snomed/6bdbb7dd",
+      "url": "https://codelists.opensafely.org/codelist/opensafely/prediabetes-snomed/6bdbb7dd/",
+      "downloaded_at": "2022-04-12 13:57:43.116058Z",
+      "sha": "a52da34bd7178717df884211fca799db460a6b43"
+    },
+    "bristol-hdl-cholesterol.csv": {
+      "id": "bristol/hdl-cholesterol/64775990",
+      "url": "https://codelists.opensafely.org/codelist/bristol/hdl-cholesterol/64775990/",
+      "downloaded_at": "2022-04-12 13:57:43.253303Z",
+      "sha": "ce9f10f91453a33d5de195b7d02656bf11782760"
     "bristol-pe_i26.csv": {
       "id": "bristol/pe_i26/00398cbc",
       "url": "https://codelists.opensafely.org/codelist/bristol/pe_i26/00398cbc/",

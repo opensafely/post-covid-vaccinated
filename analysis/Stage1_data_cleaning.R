@@ -115,14 +115,6 @@ stage1 <- function(cohort_name){
     vax_cat_product_factors <- colnames(input)[grepl("vax_cat_product_",colnames(input))]
     input[,vax_cat_product_factors] <- lapply(input[,vax_cat_product_factors], function(x) ordered(x, levels = c("Pfizer","AstraZeneca","Moderna")))
   
-    # A simple check if factor reference level has changed
-    
-    meta_data_factors <- lapply(input[,c(cat_factors)], table)
-    
-    # NB: write.csv is not feasible to output list with uneven length
-    sink(file = file.path("output", paste0("meta_data_factors_",cohort_name, ".csv")))
-    print(meta_data_factors)
-    sink()
 
     #####################
     # 2. Apply QA rules #
@@ -241,6 +233,14 @@ stage1 <- function(cohort_name){
     #input <- subset(input, input$prior_infections ==0)
     #cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Exclusion): SARS-CoV-2 infection recorded prior index date")
     
+    # A simple check if factor reference level has changed
+    describe_vars <- tidyselect::vars_select(names(input), contains(c('_cat_', 'cov_bin','cov_cat','qa_bin','exp_cat','vax_cat', 'step'), ignore.case = TRUE))
+    meta_data_factors <- lapply(input[,c(describe_vars)], table)
+    
+    # NB: write.csv is not feasible to output list with uneven length
+    sink(file = file.path("output", paste0("meta_data_factors_",cohort_name, ".csv")))
+    print(meta_data_factors)
+    sink()
     
     #-------------------------------------------------#
     # 3.c. Apply criteria specific to each sub-cohort #
