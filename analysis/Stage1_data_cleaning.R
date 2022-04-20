@@ -226,6 +226,14 @@ stage1 <- function(cohort_name){
     #input <- input # This criteria is met in study definition 
     cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 5 (Inclusion): Registered in an English GP with TPP software for at least 6 months prior to the study start date")
     
+    #Inclusion criteria 6: Known region
+    input <- input %>% mutate(cov_cat_region = as.character(cov_cat_region)) %>%
+                      filter(cov_cat_region != "Missing")%>%
+                      mutate(cov_cat_region = as.factor(cov_cat_region))
+    
+    input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
+    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Inclusion): Known region")
+    
     #Exclusion criteria 6: SARS-CoV-2 infection recorded prior to the start of follow-up
     # Removed for now as we need those with covid history for a sensitivity analysis
     #input$prior_infections <- ifelse(input$exp_date_covid19_confirmed < input$index_date, 1,0)# Determine infections prior to start date : 1-prior infection; 0 - No prior infection
