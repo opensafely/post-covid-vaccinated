@@ -37,12 +37,12 @@ transfer_unexposed_data_from_main_to_covid_pheno_subgrp <- function(table2_main,
   
   # write output for table2 subgroups
   write.csv(table2_subgroups, file=paste0("output/table2_subgroups", "_", population, ".csv"), row.names = F)
-  rmarkdown::render("analysis/compiled_table2_results.Rmd",
+  rmarkdown::render("analysis/descriptives/compiled_table2_results.Rmd",
                     output_file=paste0("table2_subgroups","_", population),output_dir="output")
   
   #write output fir input1_aer subgroups
   write.csv(input1_aer, file=paste0("output/input1_aer_subgroups", "_", population, ".csv"), row.names=F)
-  rmarkdown::render("analysis/compiled_input1_aer_results.Rmd",
+  rmarkdown::render("analysis/descriptives/compiled_input1_aer_results.Rmd",
                     output_file=paste0("input1_aer_subgroups","_", population),output_dir="output")
   
 }

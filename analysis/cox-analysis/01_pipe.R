@@ -39,7 +39,7 @@ if(length(args)==0){
 
 # Specify directories ----------------------------------------------------------
 output_dir <- "output"
-scripts_dir <- "analysis"
+scripts_dir <- "analysis/cox-analysis"
 
 # Source relevant files --------------------------------------------------------
 source(file.path(scripts_dir,"analyses_to_run.R"))

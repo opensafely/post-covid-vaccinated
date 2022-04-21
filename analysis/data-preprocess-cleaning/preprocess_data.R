@@ -306,7 +306,7 @@ print("COVID-19 and diabetes variables needed for algorithm created successfully
 
 # Define diabetes outcome (using Sophie Eastwood algorithm) ----------------------------
 
-scripts_dir <- "analysis"
+scripts_dir <- "analysis/data-preprocess-cleaning"
 source(file.path(scripts_dir,"diabetes_algorithm.R"))
 df <- diabetes_algo(df)
 print("Diabetes algorithm run successfully")

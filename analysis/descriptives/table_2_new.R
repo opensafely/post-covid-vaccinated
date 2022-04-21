@@ -244,11 +244,11 @@ table_2_subgroups_output <- function(population){
   
   # write output for table2
   write.csv(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".csv"), row.names = F)
-  rmarkdown::render("analysis/compiled_table2_results.Rmd",
+  rmarkdown::render("analysis/descriptives/compiled_table2_results.Rmd",
                     output_file=paste0("table2_",analyses,"_", population),output_dir="output")
   #write output fir input1_aer
   write.csv(input1_aer, file=paste0("output/input1_aer_", analyses, "_", population, ".csv"), row.names=F)
-  rmarkdown::render("analysis/compiled_input1_aer_results.Rmd",
+  rmarkdown::render("analysis/descriptives/compiled_input1_aer_results.Rmd",
                     output_file=paste0("input1_aer_",analyses,"_", population),output_dir="output")
 }
 
