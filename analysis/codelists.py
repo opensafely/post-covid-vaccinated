@@ -1166,6 +1166,9 @@ hdl_cholesterol_snomed = codelist_from_csv(
 prediabetes_snomed = codelist_from_csv(
     "codelists/opensafely-prediabetes-snomed.csv",
     system="snomed",
+    column="code",
+)
+
 pe_i26_icd10 = codelist_from_csv(
     "codelists/bristol-pe_i26.csv",
     system="icd10",
