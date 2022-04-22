@@ -16,6 +16,9 @@ if(length(args)==0){
   cohort <- args[[1]]
 }
 
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "for-review"))
+
 # Define other parameters ------------------------------------------------------
 
 study_start <- "2021-06-01"
@@ -194,11 +197,11 @@ tmp_other <- arrow::read_feather(file = paste0("output/input_",cohort,".feather"
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/describe_tmp_index_",cohort,".txt"))
+sink(paste0("output/not-for-review/describe_tmp_index_",cohort,".txt"))
 print(Hmisc::describe(tmp_index))
 sink()
 
-sink(paste0("output/describe_tmp_",cohort,".txt"))
+sink(paste0("output/not-for-review/describe_tmp_",cohort,".txt"))
 print(Hmisc::describe(tmp_other))
 sink()
 
@@ -326,13 +329,13 @@ df1 <- df[,c("patient_id","death_date","index_date",
 
 df1[,colnames(df)[grepl("tmp_",colnames(df))]] <- NULL
 
-saveRDS(df1, file = paste0("output/input_",cohort,".rds"))
+saveRDS(df1, file = paste0("output/not-for-review/input_",cohort,".rds"))
 
 print("Input data saved successfully")
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/describe_input_",cohort,"_stage0.txt"))
+sink(paste0("output/not-for-review/describe_input_",cohort,"_stage0.txt"))
 print(Hmisc::describe(df1))
 sink()
 
@@ -344,10 +347,10 @@ df2 <- df %>% select(starts_with(c("patient_id","tmp_out_date","out_date")))
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/describe_venn_",cohort,".txt"))
+sink(paste0("output/not-for-review/describe_venn_",cohort,".txt"))
 print(Hmisc::describe(df2))
 sink()
 
-saveRDS(df2, file = paste0("output/venn_",cohort,".rds"))
+saveRDS(df2, file = paste0("output/not-for-review/venn_",cohort,".rds"))
 
 print("Venn diagram data saved successfully")

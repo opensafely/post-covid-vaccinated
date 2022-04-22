@@ -228,14 +228,14 @@ actions_list <- splice(
     run = "r:latest analysis/data-preprocess-cleaning/preprocess_data.R vaccinated",
     needs = list("generate_study_population_index", "generate_study_population_vaccinated", "generate_study_population_electively_unvaccinated"),
     moderately_sensitive = list(
-      describe = glue("output/describe_input_vaccinated_*.txt"),
-      describe_index = glue("output/describe_tmp_index_vaccinated.txt"),
-      describe_cohort = glue("output/describe_tmp_vaccinated.txt"),
-      descrive_venn = glue("output/describe_venn_vaccinated.txt")
+      describe = glue("output/not-for-review/describe_input_vaccinated_*.txt"),
+      describe_index = glue("output/not-for-review/describe_tmp_index_vaccinated.txt"),
+      describe_cohort = glue("output/not-for-review/describe_tmp_vaccinated.txt"),
+      descrive_venn = glue("output/not-for-review/describe_venn_vaccinated.txt")
     ),
     highly_sensitive = list(
-      cohort = glue("output/input_vaccinated.rds"),
-      venn = glue("output/venn_vaccinated.rds")
+      cohort = glue("output/not-for-review/input_vaccinated.rds"),
+      venn = glue("output/not-for-review/venn_vaccinated.rds")
     )
   ), 
 
@@ -245,14 +245,14 @@ actions_list <- splice(
     run = "r:latest analysis/data-preprocess-cleaning/preprocess_data.R electively_unvaccinated",
     needs = list("generate_study_population_index", "generate_study_population_vaccinated", "generate_study_population_electively_unvaccinated"),
     moderately_sensitive = list(
-      describe = glue("output/describe_input_electively_unvaccinated_*.txt"),
-      describe_index = glue("output/describe_tmp_index_electively_unvaccinated.txt"),
-      describe_cohort = glue("output/describe_tmp_electively_unvaccinated.txt"),
-      descrive_venn = glue("output/describe_venn_electively_unvaccinated.txt")
+      describe = glue("output/not-for-review/describe_input_electively_unvaccinated_*.txt"),
+      describe_index = glue("output/not-for-review/describe_tmp_index_electively_unvaccinated.txt"),
+      describe_cohort = glue("output/not-for-review/describe_tmp_electively_unvaccinated.txt"),
+      descrive_venn = glue("output/not-for-review/describe_venn_electively_unvaccinated.txt")
     ),
     highly_sensitive = list(
-      cohort = glue("output/input_electively_unvaccinated.rds"),
-      venn = glue("output/venn_electively_unvaccinated.rds")
+      cohort = glue("output/not-for-review/input_electively_unvaccinated.rds"),
+      venn = glue("output/not-for-review/venn_electively_unvaccinated.rds")
     )
   ), 
 
@@ -262,12 +262,12 @@ actions_list <- splice(
     run = "r:latest analysis/data-preprocess-cleaning/Stage1_data_cleaning.R both",
     needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated"),
     moderately_sensitive = list(
-      refactoring = glue("output/meta_data_factors_*.csv"),
-      QA_rules = glue("output/QA_summary_*.csv"),
-      IE_criteria = glue("output/Cohort_flow_*.csv")
+      refactoring = glue("output/not-for-review/meta_data_factors_*.csv"),
+      QA_rules = glue("output/for-review/descriptives/QA_summary_*.csv"),
+      IE_criteria = glue("output/for-review/descriptives/Cohort_flow_*.csv")
     ),
     highly_sensitive = list(
-      cohort = glue("output/input_*_stage1.rds")
+      cohort = glue("output/not-for-review/input_*_stage1.rds")
     )
   ),
 

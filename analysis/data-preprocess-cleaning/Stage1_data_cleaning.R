@@ -57,9 +57,12 @@ if(length(args)==0){
   cohort_name <- args[[1]]
 }
 
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "for-review", "descriptives"))
+
 stage1 <- function(cohort_name){
 
-    input <- read_rds(file.path("output", paste0("input_",cohort_name,".rds")))
+    input <- read_rds(file.path("output/not-for-review", paste0("input_",cohort_name,".rds")))
                            
     # Define general start date and end date
     start_date = as.Date("2021-06-01")
@@ -180,7 +183,7 @@ stage1 <- function(cohort_name){
     
     
     #Save Qa summary as .csv
-    write.csv(QA_summary, file = file.path("output", paste0("QA_summary_",cohort_name, ".csv")) , row.names=F)
+    write.csv(QA_summary, file = file.path("output/for-review/descriptives", paste0("QA_summary_",cohort_name, ".csv")) , row.names=F)
     
     # Remove QA variables from dataset
     input <- input_QA[ , !names(input_QA) %in% c("qa_num_birth_year", "qa_bin_pregnancy", "qa_bin_prostate_cancer")]
@@ -246,7 +249,7 @@ stage1 <- function(cohort_name){
     meta_data_factors <- lapply(input[,c(describe_vars)], table)
     
     # NB: write.csv is not feasible to output list with uneven length
-    sink(file = file.path("output", paste0("meta_data_factors_",cohort_name, ".csv")))
+    sink(file = file.path("output/not-for-review", paste0("meta_data_factors_",cohort_name, ".csv")))
     print(meta_data_factors)
     sink()
     
@@ -316,7 +319,7 @@ stage1 <- function(cohort_name){
     #----------------------#
     # 3.d. Create csv file #
     #----------------------#
-    write.csv(cohort_flow, file = file.path("output", paste0("Cohort_flow_",cohort_name, ".csv")) , row.names=F)
+    write.csv(cohort_flow, file = file.path("output/for-review/descriptives", paste0("Cohort_flow_",cohort_name, ".csv")) , row.names=F)
     
     #-------------------------------------#
     # 4. Create the final stage 1 dataset #
@@ -324,7 +327,7 @@ stage1 <- function(cohort_name){
     # Remove inclusion/exclusion variables from dataset
     input <- input[ , !names(input) %in% c("start_alive", "vax_gap", "vax_mixed", "vax_prior_unknown", "prior_vax1")]
     
-    saveRDS(input, file = file.path("output", paste0("input_",cohort_name, "_stage1.rds")))
+    saveRDS(input, file = file.path("output/not-for-review", paste0("input_",cohort_name, "_stage1.rds")))
 
 }
 
