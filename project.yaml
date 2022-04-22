@@ -2,7 +2,7 @@ version: '3.0'
 
 expectations:
 
-  population_size: 40000
+  population_size: 400000
 
 actions:
 
@@ -237,7 +237,7 @@ actions:
         input_1_aer_html: output/input1_aer_*.html
 
   stage4_venn_diagram_both:
-    run: r:latest analysis/venn_diagram.R both
+    run: r:latest analysis/descriptives/venn_diagram.R both
     needs:
     - preprocess_data_vaccinated
     - preprocess_data_electively_unvaccinated
