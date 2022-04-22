@@ -13,7 +13,7 @@ library(readr)
 ## defaults ----
 defaults_list <- list(
   version = "3.0",
-  expectations= list(population_size=400000L)
+  expectations= list(population_size=100000L)
 )
 
 active_analyses <- read_rds("lib/active_analyses.rds")
@@ -277,9 +277,9 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/Stage2_missing_table1.R both",
     needs = list("stage1_data_cleaning_both"),
     moderately_sensitive = list(
-      Missing_RangeChecks = glue("output/Check_missing_range_*.csv"),
-      DateChecks = glue("output/Check_dates_range_*.csv"),
-      Descriptive_Table = glue("output/Table1_*.csv")
+      Missing_RangeChecks = glue("output/not-for-review/Check_missing_range_*.csv"),
+      DateChecks = glue("output/not-for-review/Check_dates_range_*.csv"),
+      Descriptive_Table = glue("output/for-review/descriptives/Table1_*.csv")
     )
   ),
 
@@ -292,7 +292,7 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/diabetes_flowchart.R vaccinated",
     needs = list("stage1_data_cleaning_both"),
     moderately_sensitive = list(
-      flow_df = glue("output/diabetes_flow_values_vaccinated.csv")
+      flow_df = glue("output/for-review/data-for-figures/diabetes_flow_values_vaccinated.csv")
       # flow_fig = glue("output/diabetes_flow.png"),
     ),
   ),
@@ -304,7 +304,7 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/diabetes_flowchart.R electively_unvaccinated",
     needs = list("stage1_data_cleaning_both"),
     moderately_sensitive = list(
-      flow_df = glue("output/diabetes_flow_values_electively_unvaccinated.csv")
+      flow_df = glue("output/for-review/data-for-figures/diabetes_flow_values_electively_unvaccinated.csv")
       # flow_fig = glue("output/diabetes_flow.png"),
     ),
   ),
@@ -375,8 +375,8 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/venn_diagram.R both",
     needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated","stage1_data_cleaning_both"),
     moderately_sensitive = list(
-      venn_diagram = glue("output/venn_diagram_*.svg"),
-      venn_diagram_number_check = glue("output/venn_diagram_number_check_*.csv")
+      venn_diagram = glue("output/venn-diagrams/venn_diagram_*.svg"),
+      venn_diagram_number_check = glue("output/venn-diagrams/venn_diagram_number_check_*.csv")
     )
   ),
 

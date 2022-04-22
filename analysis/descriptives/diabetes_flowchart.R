@@ -33,9 +33,12 @@ if(length(args)==0){
   cohort <- args[[1]]
 }
 
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "for-review", "data-for-figures"))
+
 # Load Stage 1 dataset
 
-diabetes_df <-read_rds(paste0("output/input_",cohort,"_stage1.rds"))
+diabetes_df <-read_rds(paste0("output/not-for-review/input_",cohort,"_stage1.rds"))
 
 ###############################################
 # 1. Construct flowchart -------------------- #
@@ -107,7 +110,7 @@ values_df <- ldply(values, data.frame) # convert list to df
 values_df_t <- data.table::transpose(values_df) # transpose df
 names(values_df_t) <- lapply(values_df_t[1, ], as.character) # make row 1 the column names
 values_df_t <- values_df_t[-1, ] 
-write.csv(values_df_t, file = paste0("output/diabetes_flow_values_",cohort,".csv")) # save
+write.csv(values_df_t, file = paste0("output/for-review/data-for-figures/diabetes_flow_values_",cohort,".csv")) # save
 # I have checked and using the dataframe "values_df_t" gets the exact same flow chart as when using the list. 
 
 # BUILD FLOW --------------------------------------------------------------

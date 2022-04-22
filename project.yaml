@@ -109,9 +109,9 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        Missing_RangeChecks: output/Check_missing_range_*.csv
-        DateChecks: output/Check_dates_range_*.csv
-        Descriptive_Table: output/Table1_*.csv
+        Missing_RangeChecks: output/not-for-review/Check_missing_range_*.csv
+        DateChecks: output/not-for-review/Check_dates_range_*.csv
+        Descriptive_Table: output/for-review/descriptives/Table1_*.csv
 
   stage3_diabetes_flow_vaccinated:
     run: r:latest analysis/descriptives/diabetes_flowchart.R vaccinated
@@ -119,7 +119,7 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        flow_df: output/diabetes_flow_values_vaccinated.csv
+        flow_df: output/for-review/data-for-figures/diabetes_flow_values_vaccinated.csv
 
   stage3_diabetes_flow_electively_unvaccinated:
     run: r:latest analysis/descriptives/diabetes_flowchart.R electively_unvaccinated
@@ -127,7 +127,7 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        flow_df: output/diabetes_flow_values_electively_unvaccinated.csv
+        flow_df: output/for-review/data-for-figures/diabetes_flow_values_electively_unvaccinated.csv
 
   ## Table 2 dated - vaccinated cohort 
 
@@ -244,8 +244,8 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       moderately_sensitive:
-        venn_diagram: output/venn_diagram_*.svg
-        venn_diagram_number_check: output/venn_diagram_number_check_*.csv
+        venn_diagram: output/venn-diagrams/venn_diagram_*.svg
+        venn_diagram_number_check: output/venn-diagrams/venn_diagram_number_check_*.csv
 
   ## Apply cox model for ate - vaccinated cohort 
 
