@@ -8,6 +8,8 @@
 library('tidyverse')
 library('here')
 
+dir.create("output")
+
 # create study_dates ----
 
 study_dates <-
