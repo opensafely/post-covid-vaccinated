@@ -372,7 +372,7 @@ actions_list <- splice(
   #comment("Stage 4 - Venn diagrams"),
   action(
     name = "stage4_venn_diagram_both",
-    run = "r:latest analysis/venn_diagram.R both",
+    run = "r:latest analysis/descriptives/venn_diagram.R both",
     needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated","stage1_data_cleaning_both"),
     moderately_sensitive = list(
       venn_diagram = glue("output/venn_diagram_*.svg"),
