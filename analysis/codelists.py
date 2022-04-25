@@ -1059,10 +1059,10 @@ ssri_depression_prescription = codelist_from_csv(
 )
 
 # Depression prescriptions - SNRI 
-
+# These can be found in Others
 
 # Depression prescriptions - NASSAs
-
+# These can be found in Others
 
 # Depression prescriptions - TCA 
 tca_depression_prescription = codelist_from_csv(
@@ -1072,7 +1072,7 @@ tca_depression_prescription = codelist_from_csv(
 )
 
 # Depression prescriptions - SARIs 
-
+# These can be found in Others
 
 # Depression prescriptions - MAOIs 
 maoi_depression_prescription = codelist_from_csv(
@@ -1085,6 +1085,14 @@ other_depression_prescription = codelist_from_csv(
     "codelists/opensafely-other-antidepressants-dmd.csv",
     system="snomed",
     column="dmd_id",
+)
+
+# Combined depression prescriptions: SSRI, TCA, MAOI and others 
+all_depression_prescriptions = combined_codelist(
+    ssri_depression_prescription,
+    tca_depression_prescription,
+    maoi_depression_prescription,
+    other_depression_prescription
 )
 
 # Combined depression prescriptions

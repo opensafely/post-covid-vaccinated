@@ -90,7 +90,7 @@ for (i in 1:length(outcomes)) {
                        rep("",22))
 }
 
-# Add diabetes outcomes --------------------------------------------------------
+# Add Mental Health outcomes --------------------------------------------------------
 
 outcomes <- c("Depression",
               "Anxiety - general",
