@@ -1,9 +1,9 @@
 from cohortextractor import codelist_from_csv, combine_codelists, codelist
 
 covid_codes = codelist_from_csv(
-    "codelists/opensafely-covid-identification.csv",
+    "codelists/user-RochelleKnight-confirmed-hospitalised-covid-19.csv",
     system="icd10",
-    column="icd10_code",
+    column="code",
 )
 
 covid_primary_care_positive_test = codelist_from_csv(
@@ -22,12 +22,6 @@ covid_primary_care_sequalae = codelist_from_csv(
     "codelists/opensafely-covid-identification-in-primary-care-probable-covid-sequelae.csv",
     system="ctv3",
     column="CTV3ID",
-)
-
-covid_codes = codelist_from_csv(
-    "codelists/opensafely-covid-identification.csv",
-    system="icd10",
-    column="icd10_code",
 )
 
 covid_primary_care_positive_test = codelist_from_csv(
@@ -1166,6 +1160,9 @@ hdl_cholesterol_snomed = codelist_from_csv(
 prediabetes_snomed = codelist_from_csv(
     "codelists/opensafely-prediabetes-snomed.csv",
     system="snomed",
+    column="code",
+)
+
 pe_i26_icd10 = codelist_from_csv(
     "codelists/bristol-pe_i26.csv",
     system="icd10",
