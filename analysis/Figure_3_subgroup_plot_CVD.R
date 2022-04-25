@@ -5,15 +5,16 @@ library(ggplot2)
 library(data.table)
 
 cohort=c("vaccinated","electively_unvaccinated")
+events_to_plot <- c("ate","vte")
 
 #-----------------------Determine active outcome events-------------------------
 active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses$outcome_variable <- gsub("out_date_","",active_analyses$outcome_variable)
 
 #--------Load fully adjusted main and COVID phenotype results-------------------
-hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
+hr_files=list.files(path = "output/Released/", pattern = "suppressed_compiled_HR_results_*")
 hr_files=hr_files[endsWith(hr_files,".csv")]
-hr_files=paste0("output/",hr_files)
+hr_files=paste0("output/Released/",hr_files)
 
 hr_file_paths <- pmap(list(hr_files), 
                       function(fpath){ 
@@ -26,11 +27,14 @@ combined_hr <- rbindlist(hr_file_paths, fill=TRUE)
 
 combined_hr <- combined_hr %>% filter(event %in% c("ate","vte"))
 combined_hr <- combined_hr %>% filter(model == "mdl_max_adj")
+combined_hr <- combined_hr %>% filter(subgroup != "covid_pheno_hospitalised")
+
 #combined_hr <- combined_hr %>% filter(model == "mdl_max_adj"| (model == "mdl_agesex" & subgroup == "main"))
 
 # Select HRs for time periods----------------------------------------------------
 
 combined_hr <- combined_hr %>% filter(str_detect(term, "^days"))
+
 
 # Specify time points to plot HRs at -------------------------------------------
 
@@ -113,98 +117,155 @@ combined_hr$grouping=ifelse(startsWith(combined_hr$subgroup,"Age")==T,"Age group
 combined_hr$grouping=ifelse(startsWith(combined_hr$subgroup,"Sex")==T,"Sex",combined_hr$grouping)
 combined_hr$grouping=ifelse(startsWith(combined_hr$subgroup,"Ethnicity")==T,"Ethnicity",combined_hr$grouping)
 
-# Factor variables for ordering-------------------------------------------------
-
-combined_hr$grouping <- factor(combined_hr$grouping, levels=c("Overall",
-                                                              "Hospitalised/Non-hospitalised COVID-19",
-                                                              "Prior history of event",
-                                                              "Age group",
-                                                              "Sex",
-                                                              "Ethnicity" )) 
-  
-  
-combined_hr$subgroup <- factor(combined_hr$subgroup, levels=c("No prior history of COVID-19",
-                                                              "Prior history of COVID-19",
-                                                              "Hospitalised COVID-19",
-                                                              "Non-hospitalised COVID-19",
-                                                              "Prior history of event",
-                                                              "No prior history of event",
-                                                              "Age group: 18-39",
-                                                              "Age group: 40-59",
-                                                              "Age group: 60-79",
-                                                              "Age group: 80-110",
-                                                              "Sex: Female",
-                                                              "Sex: Male",
-                                                              "Ethnicity: White",
-                                                              "Ethnicity: Black",
-                                                              "Ethnicity: South Asian",
-                                                              "Ethnicity: Other Ethnic Groups",
-                                                              "Ethnicity: Mixed",
-                                                              "Ethnicity: Missing"))
-                                                                              
-  
-combined_hr$colour <- factor(combined_hr$colour, levels=c("#000000",
-                                                          "#bababa",
-                                                          "#e31a1c",
-                                                          "#fb9a99",
-                                                          "#ff7f00",
-                                                          "#fdbf6f",
-                                                          "#006d2c",
-                                                          "#31a354",
-                                                          "#74c476",
-                                                          "#bae4b3",
-                                                          "#6a3d9a",
-                                                          "#cab2d6",
-                                                          "#08519c",
-                                                          "#2171b5",
-                                                          "#4292c6",
-                                                          "#6baed6",
-                                                          "#9ecae1",
-                                                          "#c5dfed"))
-
-
-# Plot figures------------------------------------------------------------------
-
-events_to_plot <- c("ate","vte")
-
-for(i in cohort){
-  
-  # Filter to cohort of interest
-  
-  df=combined_hr %>% filter(cohort ==i)
-  
-  # Plot -----------------------------------------------------------------------
-  
-  min_plot <- 0.25
-  max_plot <- 64
-  for(j in events_to_plot){
-    ggplot2::ggplot(data = df[df$event==j,], 
-                    mapping = ggplot2::aes(x = time, y = estimate, color = subgroup, shape = subgroup, fill = subgroup)) +
-      ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-      ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5))+
-      ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf.low<min_plot,min_plot,conf.low), 
-                                                    ymax = ifelse(conf.high>max_plot,max_plot,conf.high),  
-                                                    width = 0), 
-                             position = ggplot2::position_dodge(width = 1))+
-      ggplot2::geom_line(position = ggplot2::position_dodge(width = 0.5)) +
-      ggplot2::scale_y_continuous(lim = c(0.25,64), breaks = c(0.5,1,2,4,8,16,32,64), trans = "log") +
-      ggplot2::scale_x_continuous(lim = c(0,28), breaks = seq(0,28,4)) +
-      ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$subgroup))+ 
-      ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
-      ggplot2::scale_shape_manual(values = c(rep(21,18)), labels = levels(combined_hr$subgroup)) +
-      ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-      ggplot2::guides(fill=ggplot2::guide_legend(ncol = 6, byrow = TRUE)) +
-      ggplot2::theme_minimal() +
-      ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
-                     panel.grid.minor = ggplot2::element_blank(),
-                     panel.spacing.x = ggplot2::unit(0.5, "lines"),
-                     panel.spacing.y = ggplot2::unit(0, "lines"),
-                     legend.key = ggplot2::element_rect(colour = NA, fill = NA),
-                     legend.title = ggplot2::element_blank(),
-                     legend.position="bottom",
-                     plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
-      ggplot2::facet_wrap(grouping~.,ncol=2)
-    
-    ggplot2::ggsave(paste0("output/figure_3_",j,"_",i, ".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
-  }      
+c="vaccinated"
+outcome_name="ate"
+for(c in cohort){
+  for(outcome_name in events_to_plot){
+    df=combined_hr %>% filter(cohort == c & event==outcome_name)
+    if(nrow(df)>0){
+      group_levels <-c()
+      for(i in c("Overall","Hospitalised/Non-hospitalised COVID-19", "Prior history of event","Age group","Sex","Ethnicity" )){
+        levels_available <- unique(df$grouping)
+        if(i %in% levels_available){
+          group_levels <- append(group_levels,i)
+        }
+      }
+      
+      combined_hr$grouping <- factor(combined_hr$grouping, levels=group_levels)
+      #combined_hr$grouping <- factor(combined_hr$grouping, levels=c("Overall",
+      #                                                              "Hospitalised/Non-hospitalised COVID-19",
+      #                                                              "Prior history of event",
+      #                                                              "Age group",
+      #                                                              "Sex",
+      #                                                              "Ethnicity" )) 
+      
+      
+      sub_group_levels <-c()
+      for(i in c("No prior history of COVID-19","Prior history of COVID-19","Hospitalised COVID-19","Non-hospitalised COVID-19","Prior history of event", "No prior history of event","Age group: 18-39",
+                 "Age group: 40-59","Age group: 60-79","Age group: 80-110","Sex: Female","Sex: Male","Ethnicity: White",
+                 "Ethnicity: Black","Ethnicity: South Asian","Ethnicity: Other Ethnic Groups", "Ethnicity: Mixed","Ethnicity: Missing")){
+        levels_available <- unique(combined_hr$subgroup)
+        if(i %in% levels_available){
+          sub_group_levels <- append(sub_group_levels,i)
+        }
+      }
+      
+      combined_hr$subgroup <- factor(combined_hr$subgroup, levels=sub_group_levels)
+      #combined_hr$subgroup <- factor(combined_hr$subgroup, levels=c("No prior history of COVID-19",
+      #                                                              "Prior history of COVID-19",
+      #                                                              "Hospitalised COVID-19",
+      #                                                              "Non-hospitalised COVID-19",
+      #                                                              "Prior history of event",
+      #                                                              "No prior history of event",
+      #                                                              "Age group: 18-39",
+      #                                                              "Age group: 40-59",
+      #                                                              "Age group: 60-79",
+      #                                                              "Age group: 80-110",
+      #                                                              "Sex: Female",
+      #                                                              "Sex: Male",
+      #                                                              "Ethnicity: White",
+      #                                                              "Ethnicity: Black",
+      #                                                              "Ethnicity: South Asian",
+      #                                                              "Ethnicity: Other Ethnic Groups",
+      #                                                              "Ethnicity: Mixed",
+      #                                                              "Ethnicity: Missing"))
+      
+      colour_levels <-c()
+      for(i in c("#000000",
+                 "#bababa",
+                 "#e31a1c",
+                 "#fb9a99",
+                 "#ff7f00",
+                 "#fdbf6f",
+                 "#006d2c",
+                 "#31a354",
+                 "#74c476",
+                 "#bae4b3",
+                 "#6a3d9a",
+                 "#cab2d6",
+                 "#08519c",
+                 "#2171b5",
+                 "#4292c6",
+                 "#6baed6",
+                 "#9ecae1",
+                 "#c5dfed")){
+        levels_available <- unique(combined_hr$colour)
+        if(i %in% levels_available){
+          colour_levels <- append(colour_levels,i)
+        }
+      } 
+      
+      combined_hr$colour <- factor(combined_hr$colour, levels=colour_levels)
+      #combined_hr$colour <- factor(combined_hr$colour, levels=c("#000000",
+      #                                                          "#bababa",
+      #                                                          "#e31a1c",
+      #                                                          "#fb9a99",
+      #                                                          "#ff7f00",
+      #                                                          "#fdbf6f",
+      #                                                          "#006d2c",
+      #                                                          "#31a354",
+      #                                                          "#74c476",
+      #                                                          "#bae4b3",
+      #                                                          "#6a3d9a",
+      #                                                          "#cab2d6",
+      #                                                          "#08519c",
+      #                                                          "#2171b5",
+      #                                                          "#4292c6",
+      #                                                          "#6baed6",
+      #                                                          "#9ecae1",
+      #                                                          "#c5dfed"))
+      
+      
+      # Plot figures------------------------------------------------------------------
+      min_plot <- 0.25
+      max_plot <- 64
+      unique(df$colour)
+      unique(df$subgroup)
+      df$colour
+      df$subgroup
+      ggplot2::ggplot(data = df, 
+                      mapping = ggplot2::aes(x = time, y = estimate, color = subgroup, shape = subgroup, fill = subgroup)) +
+        ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
+        ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5))+
+        ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf.low<min_plot,min_plot,conf.low), 
+                                                      ymax = ifelse(conf.high>max_plot,max_plot,conf.high),  
+                                                      width = 0), 
+                               position = ggplot2::position_dodge(width = 1))+
+        ggplot2::geom_line(position = ggplot2::position_dodge(width = 0.5)) +
+        ggplot2::scale_y_continuous(lim = c(0.25,64), breaks = c(0.5,1,2,4,8,16,32,64), trans = "log") +
+        ggplot2::scale_x_continuous(lim = c(0,28), breaks = seq(0,28,4)) +
+        #ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$subgroup))+ 
+        #ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
+        ggplot2::scale_shape_manual(values = c(rep(21,18)), labels = levels(combined_hr$subgroup)) +
+        ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
+        ggplot2::guides(fill=ggplot2::guide_legend(ncol = 6, byrow = TRUE)) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
+                       panel.grid.minor = ggplot2::element_blank(),
+                       panel.spacing.x = ggplot2::unit(0.5, "lines"),
+                       panel.spacing.y = ggplot2::unit(0, "lines"),
+                       legend.key = ggplot2::element_rect(colour = NA, fill = NA),
+                       legend.title = ggplot2::element_blank(),
+                       legend.position="bottom",
+                       plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
+        ggplot2::facet_wrap(grouping~.,ncol=2)
+      
+      ggplot2::ggsave(paste0("output/figure_3_",outcome_name,"_",c, ".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+    }
+  }
 }
+      
+      
+    
+        
+      
+      
+      
+     
+        
+       
+        
+        
+        
+        
+  
