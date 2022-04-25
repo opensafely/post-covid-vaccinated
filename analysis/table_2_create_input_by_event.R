@@ -84,7 +84,6 @@ input_table_2 <- function(population){
   
     # specify the cohort according to vaccination status
     if(population=="vaccinated"){
-      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_exposed=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
       survival_data$follow_up_end_unexposed <- apply(survival_data[,c("event_date", "exp_date_covid19_confirmed", "death_date", "cohort_end_date")],1, min,na.rm=TRUE)
       survival_data$follow_up_end_exposed <- apply(survival_data[,c("event_date", "death_date", "cohort_end_date")],1, min, na.rm=TRUE)
       
