@@ -13,7 +13,7 @@ library(readr)
 ## defaults ----
 defaults_list <- list(
   version = "3.0",
-  expectations= list(population_size=400000L)
+  expectations= list(population_size=100000L)
 )
 
 active_analyses <- read_rds("lib/active_analyses.rds")
@@ -99,21 +99,6 @@ apply_model_function <- function(outcome, cohort){
       highly_sensitive = list(
         compiled_hrs = glue("output/compiled_HR_results_{outcome}_{cohort}.csv"),
         compiled_event_counts = glue("output/compiled_event_counts_{outcome}_{cohort}.csv")
-      )
-    )
-  )
-}
-
-apply_table2_function <- function(cohort){
-  splice(
-    comment(glue("Table 2 dated - {cohort} cohort")),
-    action(
-      name = glue("Stage_4_Table_2_{cohort}"),
-      run = "r:latest analysis/table_2.R",
-      arguments = c(cohort),
-      needs = list("stage1_data_cleaning_both"),
-      moderately_sensitive = list(
-        table2 = glue("output/table2_{cohort}_without_covid_history.csv")
       )
     )
   )
@@ -309,11 +294,6 @@ actions_list <- splice(
     ),
   ),
   
-  #comment("Stage 4 - Table 2"),
-  splice(
-    # over outcomes
-    unlist(lapply(cohort_to_run, function(x) apply_table2_function( cohort = x)), recursive = FALSE)
-    ),
   
   #comment("Stage 4 - Create input for table2"),
   splice(
@@ -321,34 +301,7 @@ actions_list <- splice(
     unlist(lapply(cohort_to_run, function(x) apply_table2_input(cohort = x)), recursive = FALSE)
   ),
   
-  #comment("Stage 4 - Create input for table 2"),
-  # action(
-  #   name = "stage4_input_for_table_2",
-  #   run = "r:latest analysis/table_2_create_input_by_event.R both",
-  #   needs = list("stage1_data_cleaning_both"),
-  #   highly_sensitive = list(
-  #     input_table_2 = glue("output/input_table_2_*_stage1.rds")
-  #   )
-  # ),
-  
-  # action(
-  #   name = "stage4_input_for_table_2_vaccinated",
-  #   run = "r:latest analysis/table_2_create_input_by_event.R vaccinated",
-  #   needs = list("stage1_data_cleaning_both"),
-  #   highly_sensitive = list(
-  #     input_table_2 = glue("output/input_table_2_vaccinated_stage1.rds")
-  #   )
-  # ),
-  # 
-  # action(
-  #   name = "stage4_input_for_table_2_electively_unvaccinated",
-  #   run = "r:latest analysis/table_2_create_input_by_event.R electively_unvaccinated",
-  #   needs = list("stage1_data_cleaning_both"),
-  #   highly_sensitive = list(
-  #     input_table_2 = glue("output/input_table_2_electively_unvaccinated_stage1.rds")
-  #   )
-  # ),
-  # 
+ 
   #comment("Stage 4 - Table 2 new"),
   splice(
     # over outcomes
