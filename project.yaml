@@ -2,7 +2,7 @@ version: '3.0'
 
 expectations:
 
-  population_size: 100000
+  population_size: 400000
 
 actions:
 
@@ -128,6 +128,7 @@ actions:
     outputs:
       moderately_sensitive:
         flow_df: output/diabetes_flow_values_electively_unvaccinated.csv
+
   ## Table 2 dated - vaccinated cohort 
 
   Stage_4_Table_2_vaccinated:

@@ -96,4 +96,4 @@ if(cohort=="vaccinated"){
  
 #-----------------------CREATE EMPTY ANALYSES NOT RUN DF------------------------
 analyses_not_run=data.frame(matrix(nrow=0,ncol = 8))
-colnames(analyses_not_run)=c("event","subgroup","cohort","model", "any exposures?", "any exposure events?", "any non exposed?", "more than 400 post exposure events?")
+colnames(analyses_not_run)=c("event","subgroup","cohort","model", "any exposures?", "any exposure events?", "any non exposed?", "more than 50 post exposure events?")
