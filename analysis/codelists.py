@@ -1088,7 +1088,7 @@ other_depression_prescription = codelist_from_csv(
 )
 
 # Combined depression prescriptions: SSRI, TCA, MAOI and others 
-all_depression_prescriptions = combine_codelist(
+all_depression_prescriptions = combine_codelists(
     ssri_depression_prescription,
     tca_depression_prescription,
     maoi_depression_prescription,
