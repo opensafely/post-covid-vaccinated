@@ -3,7 +3,7 @@
 ## 2. Calculate pre/post exposure event counts
 ## =============================================================================
 
-fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,mdl, survival_data,cuts_days_since_expo_reduced){
+fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,mdl, survival_data,cuts_days_since_expo){
   print(paste0("Starting survival data"))
   #------------------ RANDOM SAMPLE NON-CASES for IP WEIGHING ------------------
   set.seed(137)
@@ -114,7 +114,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     with_expo_postexpo <- survSplit(Surv(tstop, event)~., 
                                     with_expo_postexpo,
-                                    cut=cuts_days_since_expo_reduced,
+                                    cut=cuts_days_since_expo,
                                     episode="days_cat"
     )
     
@@ -182,12 +182,12 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     #data_surv$days_to_expo <- as.numeric(data_surv$expo_date - as.Date(cohort_start_date))
     
     interval_names <- mapply(function(x, y) ifelse(x == y, paste0("days", x), paste0("days", x, "_", y)), 
-                             lag(cuts_days_since_expo_reduced, default = 0), 
-                             cuts_days_since_expo_reduced, 
+                             lag(cuts_days_since_expo, default = 0), 
+                             cuts_days_since_expo, 
                              SIMPLIFY = FALSE)
     
     
-    intervals <- mapply(c, lag(cuts_days_since_expo_reduced, default = 0), cuts_days_since_expo_reduced, SIMPLIFY = F)
+    intervals <- mapply(c, lag(cuts_days_since_expo, default = 0), cuts_days_since_expo, SIMPLIFY = F)
     
     i<-0
     for (ls in mapply(list, interval_names, intervals, SIMPLIFY = F)){
@@ -246,7 +246,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     tbl_event_count$events_total <- as.numeric(tbl_event_count$events_total)
     
     #Any time periods with <+5 events? If yes, will reduce time periods
-    ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo_reduced, c(28, 197))))
+    ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
     
     #Are there <50 post expo events? If yes, won't run analysis
     #Can change <50 to be lower to test on dummy data
