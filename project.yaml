@@ -129,6 +129,7 @@ actions:
       moderately_sensitive:
         flow_df: output/diabetes_flow_values_electively_unvaccinated.csv
 
+
   ## Input for table 2 new - vaccinated cohort 
 
   stage4_input_for_table_2_vaccinated:
