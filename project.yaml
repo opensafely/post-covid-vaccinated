@@ -6,7 +6,7 @@ expectations:
 
 actions:
 
-  ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+  ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
   ## DO NOT EDIT project.yaml DIRECTLY 
   ## This file is created by create_project_actions.R 
   ## Edit and run create_project_actions.R to update the project.yaml 
