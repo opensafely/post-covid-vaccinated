@@ -1095,18 +1095,6 @@ all_depression_prescriptions = combine_codelists(
     other_depression_prescription
 )
 
-# Combined depression prescriptions
-# Combine: SSRI, SNRI, NASSA, TCA, SARI, MAOI, Other
-# all_depression_prescriptions = combine_codelists(
-#     ssri_depression_prescription, 
-#     snri_depression_prescription,
-#     nassa_depression_prescription,
-#     tca_depression_prescription,
-#     sari_depression_prescription,
-#     maoi_depression_prescription,
-#     other_depression_prescription
-# )
-
 # Anxiolytics 
 anxiolytic_prescription = codelist_from_csv(
     "local_codelists/uom-anxiolytics-snomed.csv", 
