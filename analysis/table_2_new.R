@@ -47,9 +47,18 @@ table_2_calculation <- function(survival_data, event,cohort,subgrp, subgrp_level
   }
   
   # filter the population according to the subgrp level
-  data_active$active_subgrp_full_name <- data_active[,subgrp_full_name]
+  setnames(data_active,
+           old = paste0(subgrp_full_name),
+           new = "active_subgrp_full_name")
+  
+  
+  #data_active$active_subgrp_full_name <- data_active[,subgrp_full_name,by=id]
   data_active <- data_active%>%filter(active_subgrp_full_name==subgrp_level)
   
+  setnames(data_active,
+           old = "active_subgrp_full_name",
+           new = paste0(subgrp_full_name),)
+
   person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
   #hist(data_active$person_days)
   person_days_total_exposed  = round(sum(data_active$person_days_exposed, na.rm = TRUE),1)
@@ -100,7 +109,7 @@ table_2_subgroups_output <- function(population){
   
   survival_data <- read_rds(paste0("output/input_table_2_",population,"_stage1.rds"))
   #survival_data <- read_csv(paste0("output/input_table_2_",population,"_stage1.rds"))
-  
+  survival_data<-setDT(survival_data)
   # for testing: i="out_date_ate"
   for(i in outcomes){
     analyses_to_run <- active_analyses %>% filter(outcome_variable==i)
@@ -192,7 +201,7 @@ table_2_subgroups_output <- function(population){
   col_names <- names(analyses_of_interest)
   start = grep("unexposed_person_days", col_names)
   end = ncol(analyses_of_interest)
-  
+
   for(i in 1:nrow(analyses_of_interest)){
     #for(i in 40:88){
     #d <- analyses_of_interest
@@ -205,7 +214,7 @@ table_2_subgroups_output <- function(population){
                      paste0(event_short,"_person_days_unexposed"),
                      paste0(event_short,"_person_days_exposed"),
                      paste0(event_short,"_include")),
-    
+             
                new = c("event_date",
                      "follow_up_end_unexposed",
                      "follow_up_end_exposed",

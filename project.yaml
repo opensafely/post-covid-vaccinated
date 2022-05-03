@@ -129,25 +129,6 @@ actions:
       moderately_sensitive:
         flow_df: output/diabetes_flow_values_electively_unvaccinated.csv
 
-  ## Table 2 dated - vaccinated cohort 
-
-  Stage_4_Table_2_vaccinated:
-    run: r:latest analysis/table_2.R vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    outputs:
-      moderately_sensitive:
-        table2: output/table2_vaccinated_without_covid_history.csv
-
-  ## Table 2 dated - electively_unvaccinated cohort 
-
-  Stage_4_Table_2_electively_unvaccinated:
-    run: r:latest analysis/table_2.R electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    outputs:
-      moderately_sensitive:
-        table2: output/table2_electively_unvaccinated_without_covid_history.csv
 
   ## Input for table 2 new - vaccinated cohort 
 
