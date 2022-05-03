@@ -2,7 +2,7 @@ version: '3.0'
 
 expectations:
 
-  population_size: 50000
+  population_size: 100000
 
 actions:
 
@@ -231,10 +231,10 @@ actions:
     - stage4_table_2_subgroups_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        table_2_csv: output/table2_subgroups_*.csv
-        input_1_aer_csv: output/input1_aer_*.csv
-        table_2_html: output/table2_subgroups_*.html
-        input_1_aer_html: output/input1_aer_*.html
+        table_2_csv: output/for-review/descriptives/table2_subgroups_*.csv
+        input_1_aer_csv: output/for-review/descriptives/input1_aer_*.csv
+        table_2_html: output/for-review/descriptives/table2_subgroups_*.html
+        input_1_aer_html: output/for-review/descriptives/input1_aer_*.html
 
   stage4_venn_diagram_both:
     run: r:latest analysis/descriptives/venn_diagram.R both

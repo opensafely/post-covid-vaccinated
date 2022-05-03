@@ -362,10 +362,10 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/table_2_transfer_unexposed_data.R subgroups both",
     needs = list("stage4_table_2_main_vaccinated","stage4_table_2_subgroups_vaccinated", "stage4_table_2_main_electively_unvaccinated", "stage4_table_2_subgroups_electively_unvaccinated"),
     moderately_sensitive = list(
-      table_2_csv = glue("output/table2_subgroups_*.csv"),
-      input_1_aer_csv = glue("output/input1_aer_*.csv"),
-      table_2_html = glue("output/table2_subgroups_*.html"),
-      input_1_aer_html = glue("output/input1_aer_*.html")
+      table_2_csv = glue("output/for-review/descriptives/table2_subgroups_*.csv"),
+      input_1_aer_csv = glue("output/for-review/descriptives/input1_aer_*.csv"),
+      table_2_html = glue("output/for-review/descriptives/table2_subgroups_*.html"),
+      input_1_aer_html = glue("output/for-review/descriptives/input1_aer_*.html")
     )
   ),
   
