@@ -145,7 +145,7 @@ if(length(event_count_done)>0){
   
 }
 
-rmarkdown::render("analysis/cox-analysis/compiled_event_counts.Rmd",output_file=paste0("/suppressed_compiled_event_counts_",event_name,"_", cohort),output_dir="output")
+rmarkdown::render("analysis/cox-analysis/compiled_event_counts.Rmd",output_file=paste0("/suppressed_compiled_event_counts_",event_name,"_", cohort),output_dir="output/for-review/cox-analysis")
 
 
 #=========================COMBINE EVENT COUNTS AND HRS==========================
@@ -222,7 +222,7 @@ if(length(results_done)>0){
   
 }
 
-rmarkdown::render("analysis/cox-analysis/compiled_HR_results.Rmd",output_file=paste0("/suppressed_compiled_HR_results_",event_name,"_", cohort),output_dir="output")
+rmarkdown::render("analysis/cox-analysis/compiled_HR_results.Rmd",output_file=paste0("/suppressed_compiled_HR_results_",event_name,"_", cohort),output_dir="output/for-review/cox-analysis")
 
 #==============================ANALYSES NOT RUN=================================
 #analyses_not_run=data.frame(matrix(nrow=0,ncol = 8))

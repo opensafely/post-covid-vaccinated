@@ -32,6 +32,9 @@ if(length(args)==0){
 cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "for-review", "descriptives"))
+
 # indicate active analyses -----------------------------------------------
 
 active_analyses <- read_rds("lib/active_analyses.rds")
@@ -39,7 +42,7 @@ active_analyses <- read_rds("lib/active_analyses.rds")
 table_2_output <- function(population, covid_history){
   # read in data------------------------------------------------------------
   
-  input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
+  input <- read_rds(paste0("output/not-for-review/input_",population,"_stage1.rds"))
   if(covid_history == "without_covid_history"){
     input <- filter(input, sub_bin_covid19_confirmed_history==F)
   }
@@ -121,7 +124,7 @@ table_2_output <- function(population, covid_history){
   table_2[which(table_2$hospitalised_sub_event_count <= 5),c(12,14,15,16)] = c("<=5", "NA", "NA", "NA")
   table_2[which(table_2$total_event_count <= 5),c(17,19,20,21)] = c("<=5", "NA", "NA", "NA")
   table_2[which(table_2$no_infection_sub_event_count == "<=5" | table_2$non_hospitalised_sub_event_count == "<=5" | table_2$hospitalised_sub_event_count == "<=5" ),c(17,19,20,21)] = c("<=5", "NA","NA","NA")
-  write.csv(table_2, file= paste0("output/", "table2_", population, "_",covid_history, ".csv"), row.names = F)
+  write.csv(table_2, file= paste0("output/for-review/descriptives/", "table2_", population, "_",covid_history, ".csv"), row.names = F)
 }
 
 # Run function using specified commandArgs

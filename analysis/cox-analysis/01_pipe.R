@@ -38,7 +38,10 @@ if(length(args)==0){
 }
 
 # Specify directories ----------------------------------------------------------
-output_dir <- "output"
+
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "for-review", "cox-analysis"))
+output_dir <- "output/for-review/cox-analysis"
 scripts_dir <- "analysis/cox-analysis"
 
 # Source relevant files --------------------------------------------------------

@@ -24,7 +24,7 @@ if(active_analyses$prior_history_var != ""){
   read_in_cols <- unique(append(read_in_cols, c(covar_names)))
 }
 
-input <- read_rds(paste0("output/input_",cohort,"_stage1.rds"))
+input <- read_rds(paste0("output/not-for-review/input_",cohort,"_stage1.rds"))
 input <- input %>% select(all_of(read_in_cols))
 
 #---------------------------SPECIFY MAIN PARAMETERS-----------------------------

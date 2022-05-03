@@ -30,6 +30,9 @@ if(length(args)==0){
   population <- args[[2]]
 }
 
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "for-review", "descriptives"))
+
 #start.time = Sys.time()
 #delta period
 cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
@@ -98,7 +101,7 @@ table_2_subgroups_output <- function(population){
   
   outcomes<-active_analyses$outcome_variable
   
-  survival_data <- read_rds(paste0("output/input_table_2_",population,"_stage1.rds"))
+  survival_data <- read_rds(paste0("output/not-for-review/input_table_2_",population,"_stage1.rds"))
   #survival_data <- read_csv(paste0("output/input_table_2_",population,"_stage1.rds"))
   
   # for testing: i="out_date_ate"
@@ -243,13 +246,13 @@ table_2_subgroups_output <- function(population){
   input1_aer$event <- ifelse(startsWith(input1_aer$event,"out_"),gsub("out_date_","",input1_aer$event),input1_aer$event)
   
   # write output for table2
-  write.csv(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".csv"), row.names = F)
+  write.csv(analyses_of_interest, file=paste0("output/for-review/descriptives/table2_", analyses, "_", population, ".csv"), row.names = F)
   rmarkdown::render("analysis/descriptives/compiled_table2_results.Rmd",
-                    output_file=paste0("table2_",analyses,"_", population),output_dir="output")
+                    output_file=paste0("table2_",analyses,"_", population),output_dir="output/for-review/descriptives")
   #write output fir input1_aer
-  write.csv(input1_aer, file=paste0("output/input1_aer_", analyses, "_", population, ".csv"), row.names=F)
+  write.csv(input1_aer, file=paste0("output/for-review/descriptives/input1_aer_", analyses, "_", population, ".csv"), row.names=F)
   rmarkdown::render("analysis/descriptives/compiled_input1_aer_results.Rmd",
-                    output_file=paste0("input1_aer_",analyses,"_", population),output_dir="output")
+                    output_file=paste0("input1_aer_",analyses,"_", population),output_dir="output/for-review/descriptives")
 }
 
 # Run function using specified commandArgs

@@ -89,16 +89,16 @@ apply_model_function <- function(outcome, cohort){
       arguments = c(outcome,cohort),
       needs = list("stage1_data_cleaning_both"),
       moderately_sensitive = list(
-        compiled_hrs_html = glue("output/suppressed_compiled_HR_results_{outcome}_{cohort}.html"),
-        compiled_event_counts_html = glue("output/suppressed_compiled_event_counts_{outcome}_{cohort}.html"),
-        analyses_not_run = glue("output/analyses_not_run_{outcome}_{cohort}.csv"),
-        compiled_hrs_csv = glue("output/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
-        compiled_hrs_csv_to_release = glue("output/suppressed_compiled_HR_results_{outcome}_{cohort}_to_release.csv"),
-        compiled_event_counts_csv = glue("output/suppressed_compiled_event_counts_{outcome}_{cohort}.csv")
+        compiled_hrs_html = glue("output/for-review/cox-analysis/suppressed_compiled_HR_results_{outcome}_{cohort}.html"),
+        compiled_event_counts_html = glue("output/for-review/cox-analysis/suppressed_compiled_event_counts_{outcome}_{cohort}.html"),
+        analyses_not_run = glue("output/for-review/cox-analysis/analyses_not_run_{outcome}_{cohort}.csv"),
+        compiled_hrs_csv = glue("output/for-review/cox-analysis/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
+        compiled_hrs_csv_to_release = glue("output/for-review/cox-analysis/suppressed_compiled_HR_results_{outcome}_{cohort}_to_release.csv"),
+        compiled_event_counts_csv = glue("output/for-review/cox-analysis/suppressed_compiled_event_counts_{outcome}_{cohort}.csv")
       ),
       highly_sensitive = list(
-        compiled_hrs = glue("output/compiled_HR_results_{outcome}_{cohort}.csv"),
-        compiled_event_counts = glue("output/compiled_event_counts_{outcome}_{cohort}.csv")
+        compiled_hrs = glue("output/for-review/cox-analysis/compiled_HR_results_{outcome}_{cohort}.csv"),
+        compiled_event_counts = glue("output/for-review/cox-analysis/compiled_event_counts_{outcome}_{cohort}.csv")
       )
     )
   )
@@ -113,7 +113,7 @@ apply_table2_function <- function(cohort){
       arguments = c(cohort),
       needs = list("stage1_data_cleaning_both"),
       moderately_sensitive = list(
-        table2 = glue("output/table2_{cohort}_without_covid_history.csv")
+        table2 = glue("output/for-review/descriptives/table2_{cohort}_without_covid_history.csv")
       )
     )
   )
@@ -128,7 +128,7 @@ apply_table2_input <- function(cohort){
       arguments = c(cohort),
       needs = list("stage1_data_cleaning_both"),
       highly_sensitive = list(
-        input_table_2 = glue("output/input_table_2_{cohort}_stage1.rds")
+        input_table_2 = glue("output/not-for-review/input_table_2_{cohort}_stage1.rds")
       )
     )
   )
@@ -144,10 +144,10 @@ apply_table2_new_function <- function(analyses, cohort){
                    "stage4_input_for_table_2_electively_unvaccinated")),
       arguments = c(analyses, cohort),
       moderately_sensitive = list(
-        table_2_csv = glue("output/table2_{analyses}_{cohort}.csv"),
-        input_1_aer_csv = glue("output/input1_aer_{analyses}_{cohort}.csv"),
-        table_2_html = glue("output/table2_{analyses}_{cohort}.html"),
-        input_1_aer_html = glue("output/input1_aer_{analyses}_{cohort}.html")
+        table_2_csv = glue("output/for-review/descriptives/table2_{analyses}_{cohort}.csv"),
+        input_1_aer_csv = glue("output/for-review/descriptives/input1_aer_{analyses}_{cohort}.csv"),
+        table_2_html = glue("output/for-review/descriptives/table2_{analyses}_{cohort}.html"),
+        input_1_aer_html = glue("output/for-review/descriptives/input1_aer_{analyses}_{cohort}.html")
       )
     )
   )
@@ -375,8 +375,8 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/venn_diagram.R both",
     needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated","stage1_data_cleaning_both"),
     moderately_sensitive = list(
-      venn_diagram = glue("output/venn-diagrams/venn_diagram_*.svg"),
-      venn_diagram_number_check = glue("output/venn-diagrams/venn_diagram_number_check_*.csv")
+      venn_diagram = glue("output/for-review/venn-diagrams/venn_diagram_*.svg"),
+      venn_diagram_number_check = glue("output/for-review/venn-diagrams/venn_diagram_number_check_*.csv")
     )
   ),
 
