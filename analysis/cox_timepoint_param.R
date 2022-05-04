@@ -6,7 +6,7 @@
 # source(file.path(scripts_dir,"fit_model.R"))
 
 get_timepoint <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names){
-  print(paste0("Working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
+  print(paste0("Getting event counts and time cut-offs for subgroup: ", subgroup, ", ",mdl,", ", cohort))
   
   #Reduce dataset to those who do NOT have a prior history of COVID unless running the subgroup
   #analysis for this with a prior history
@@ -99,9 +99,9 @@ get_timepoint <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,in
   # calculate post-exposure event
   event_count_exposed <- length(which(survival_data$event_date >= survival_data$follow_up_start &
                                         survival_data$event_date >= survival_data$expo_date & 
-                                        survival_data$event_date <= survival_data$follow_up_end))
+                                        survival_data$event_date <= survival_data$follow_up_end)) ## is "follow_up_end" what we want here? Delete this text if OK. 
   
-  if(event_count_exposed < 100){
+  if(event_count_exposed < 25){
     timepoint <- "reduced"
   }else{
     timepoint <- "normal"

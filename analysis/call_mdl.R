@@ -91,12 +91,16 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,inp
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(follow_up_end, date_expo_censor,na.rm = TRUE))
     survival_data <- survival_data %>% filter((follow_up_start != date_expo_censor)|is.na(date_expo_censor))
   }
-    
+  
   survival_data=survival_data%>%filter(follow_up_end>=follow_up_start)
   
   total_covid_cases=nrow(survival_data %>% filter(!is.na(expo_date)))
-    
-  res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
+  
+  if(analyses_to_run$subgroup == subgroup && analyses_to_run$reduced_timepoint == "reduced"){
+    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_reduced,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
+  }else{
+    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
+  }
   print(paste0("Finished working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
   return(res_vacc)
 }
