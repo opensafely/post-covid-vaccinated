@@ -977,6 +977,12 @@
       "url": "https://codelists.opensafely.org/codelist/bristol/pe_i269/4e1aa651/",
       "downloaded_at": "2022-04-21 14:09:18.041261Z",
       "sha": "7ec5e75887483b1918e3c2ad3ed512c4d64f452e"
+    },
+    "user-RochelleKnight-confirmed-hospitalised-covid-19.csv": {
+      "id": "user/RochelleKnight/confirmed-hospitalised-covid-19/1f0d2526",
+      "url": "https://codelists.opensafely.org/codelist/user/RochelleKnight/confirmed-hospitalised-covid-19/1f0d2526/",
+      "downloaded_at": "2022-04-22 11:35:44.071847Z",
+      "sha": "7b472652a66eed89b0495a2cf43cf6e894451cb8"
     }
   }
 }

@@ -1,9 +1,9 @@
 from cohortextractor import codelist_from_csv, combine_codelists, codelist
 
 covid_codes = codelist_from_csv(
-    "codelists/opensafely-covid-identification.csv",
+    "codelists/user-RochelleKnight-confirmed-hospitalised-covid-19.csv",
     system="icd10",
-    column="icd10_code",
+    column="code",
 )
 
 covid_primary_care_positive_test = codelist_from_csv(
@@ -22,12 +22,6 @@ covid_primary_care_sequalae = codelist_from_csv(
     "codelists/opensafely-covid-identification-in-primary-care-probable-covid-sequelae.csv",
     system="ctv3",
     column="CTV3ID",
-)
-
-covid_codes = codelist_from_csv(
-    "codelists/opensafely-covid-identification.csv",
-    system="icd10",
-    column="icd10_code",
 )
 
 covid_primary_care_positive_test = codelist_from_csv(
@@ -1065,10 +1059,10 @@ ssri_depression_prescription = codelist_from_csv(
 )
 
 # Depression prescriptions - SNRI 
-
+# These can be found in Others
 
 # Depression prescriptions - NASSAs
-
+# These can be found in Others
 
 # Depression prescriptions - TCA 
 tca_depression_prescription = codelist_from_csv(
@@ -1078,7 +1072,7 @@ tca_depression_prescription = codelist_from_csv(
 )
 
 # Depression prescriptions - SARIs 
-
+# These can be found in Others
 
 # Depression prescriptions - MAOIs 
 maoi_depression_prescription = codelist_from_csv(
@@ -1093,17 +1087,13 @@ other_depression_prescription = codelist_from_csv(
     column="dmd_id",
 )
 
-# Combined depression prescriptions
-# Combine: SSRI, SNRI, NASSA, TCA, SARI, MAOI, Other
-# all_depression_prescriptions = combine_codelists(
-#     ssri_depression_prescription, 
-#     snri_depression_prescription,
-#     nassa_depression_prescription,
-#     tca_depression_prescription,
-#     sari_depression_prescription,
-#     maoi_depression_prescription,
-#     other_depression_prescription
-# )
+# Combined depression prescriptions: SSRI, TCA, MAOI and others 
+all_depression_prescriptions = combine_codelists(
+    ssri_depression_prescription,
+    tca_depression_prescription,
+    maoi_depression_prescription,
+    other_depression_prescription
+)
 
 # Anxiolytics 
 anxiolytic_prescription = codelist_from_csv(

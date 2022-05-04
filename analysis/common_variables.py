@@ -861,18 +861,18 @@ def generate_common_variables(index_date_variable):
         },
     ),
         # Prescriptions
-    # tmp_out_date_depression_prescriptions=patients.with_these_clinical_events(
-    #     all_depression_prescriptions,
-    #     returning="date",
-    #     on_or_after=f"{index_date_variable}",
-    #     date_format="YYYY-MM-DD",
-    #     find_first_match_in_period=True,
-    #     return_expectations={
-    #         "date": {"earliest": "index_date", "latest" : "today"},
-    #         "rate": "uniform",
-    #         "incidence": 0.03,
-    #     },
-    # ),
+    tmp_out_date_depression_prescriptions=patients.with_these_medications(
+        all_depression_prescriptions,
+        returning="date",
+        on_or_after=f"{index_date_variable}",
+        date_format="YYYY-MM-DD",
+        find_first_match_in_period=True,
+        return_expectations={
+            "date": {"earliest": "index_date", "latest" : "today"},
+            "rate": "uniform",
+            "incidence": 0.03,
+        },
+    ),
         # Combined
     out_date_depression=patients.minimum_of(
         "tmp_out_date_depression_snomed", "tmp_out_date_depression_hes", "tmp_out_date_depression_death"

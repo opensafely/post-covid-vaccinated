@@ -80,25 +80,35 @@ input_table_2 <- function(population){
   event_dates_names <- active_analyses$outcome_variable
   outcome_names <- tidyselect::vars_select(names(survival_data), starts_with(c("out_"), ignore.case=TRUE))
   outcome_names_not_active <- outcome_names[!outcome_names %in% event_dates_names]
-  
+ 
   for(event in event_dates_names){
     
     survival_data <- survival_data %>%rename(event_date = event)
   
     # specify the cohort according to vaccination status
     if(population=="vaccinated"){
-      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
-      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_exposed=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
+      survival_data$follow_up_end_unexposed <- apply(survival_data[,c("event_date", "exp_date_covid19_confirmed", "death_date", "cohort_end_date")],1, min,na.rm=TRUE)
+      survival_data$follow_up_end_exposed <- apply(survival_data[,c("event_date", "death_date", "cohort_end_date")],1, min, na.rm=TRUE)
+      
+      survival_data <- survival_data %>% mutate(follow_up_end_unexposed = ymd(follow_up_end_unexposed))
+      survival_data <- survival_data %>% mutate(follow_up_end_exposed = ymd(follow_up_end_exposed))
+      
+      #survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed=min(event_date, exp_date_covid19_confirmed, death_date, cohort_end_date,na.rm = TRUE))
+      #survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_exposed=min(event_date, death_date, cohort_end_date,na.rm = TRUE))
     }else if(population=="electively_unvaccinated"){
-      #data_active <- data_active %>% left_join(data_active%>%dplyr::select(patient_id,vax_date_covid_1))
-      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
-      survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_exposed = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
-      #survival_data <- survival_data %>% dplyr::select(!c(vax_date_covid_1))
+      #survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_unexposed = min(vax_date_covid_1,event_date, exp_date_covid19_confirmed, death_date,cohort_end_date,na.rm = TRUE))
+      #survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end_exposed = min(vax_date_covid_1,event_date, death_date,cohort_end_date,na.rm = TRUE))
+      survival_data$follow_up_end_unexposed <- apply(survival_data[,c("vax_date_covid_1","event_date", "exp_date_covid19_confirmed", "death_date","cohort_end_date")],1, min,na.rm=TRUE)
+      survival_data$follow_up_end_exposed <- apply(survival_data[,c("vax_date_covid_1","event_date", "death_date","cohort_end_date")],1, min, na.rm=TRUE)
+      
+      survival_data <- survival_data %>% mutate(follow_up_end_unexposed = ymd(follow_up_end_unexposed))
+      survival_data <- survival_data %>% mutate(follow_up_end_exposed = ymd(follow_up_end_exposed))
     }
+      
     
-    #survival_data <- survival_data %>% filter(follow_up_end_unexposed >= index_date & follow_up_end_unexposed != Inf)
-    #survival_data <- survival_data %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
-   
+    survival_data <- survival_data %>% filter(follow_up_end_unexposed >= index_date & follow_up_end_unexposed != Inf)
+    survival_data <- survival_data %>% filter(follow_up_end_exposed >= index_date & follow_up_end_exposed != Inf)
+    
     # calculate follow-up days
     survival_data = survival_data %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date))))
     index <- which(survival_data$follow_up_end_unexposed > survival_data$exp_date_covid19_confirmed | is.na(survival_data$exp_date_covid19_confirmed))
@@ -137,6 +147,8 @@ input_table_2 <- function(population){
   saveRDS(survival_data, file=paste0("output/not-for-review/input_table_2_",population,"_stage1.rds"))
   #write_csv(survival_data, file=paste0("output/input_table_2_",population,"_stage1.rds"))
   rm(list=c("survival_data"))
+  
+  
 }
 # Run function using specified commandArgs
 if(population == "both"){
