@@ -58,6 +58,8 @@ for(i in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
 
 analyses_to_run$strata[analyses_to_run$strata=="South_Asian"]<- "South Asian"
 
+analyses_to_run$reduced_timepoint <- FALSE
+
 ## Separate into to dataframes as this will allow all the vaccinated/electively unvaccinated
 ## analyses to be run in one go to save having to read in the data for each individual analysis
 ## i.e can read it in once and run all the vaccinated analyses in one go
