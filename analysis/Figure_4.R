@@ -5,7 +5,7 @@
 
 #TO RUN OUTSIDE OPENSAFELY
 # 1. load the right input data and make sure of the file names and variable structure
-# 2. Cntrl+A run the whole script and find the results in working directory
+# 2. Cntrl+A run the whole script and find the .png graph files in working directory
 
 #USE TO RUN A SINGLE PLOT
 group <- "vaccinated"
