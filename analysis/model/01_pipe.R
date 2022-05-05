@@ -80,15 +80,15 @@ source(file.path(scripts_dir,paste0("call_mdl.R"))) # Model specification
 # ------------------------------------ LAUNCH JOBS -----------------------------
 
 lapply(split(analyses_to_run,seq(nrow(analyses_to_run))),
-       function(analyses_to_run) 
-         get_vacc_res(
-           event=analyses_to_run$event,
-           subgroup=analyses_to_run$subgroup,
-           stratify_by_subgroup=analyses_to_run$stratify_by_subgroup,
-           stratify_by=analyses_to_run$strata,
-           mdl=analyses_to_run$mdl,
-           input, cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names)
-)
+       function(analyses_to_run)
+         get_vacc_res(           
+           event=analyses_to_run$event,           
+           subgroup=analyses_to_run$subgroup,           
+           stratify_by_subgroup=analyses_to_run$stratify_by_subgroup,           
+           stratify_by=analyses_to_run$strata,           
+           mdl=analyses_to_run$mdl,   
+           time_point=analyses_to_run$reduced_timepoint,       
+           input,covar_names))
 
 #Save csv of anlayses not run
 write.csv(analyses_not_run, paste0(output_dir,"/analyses_not_run_" , event_name ,"_",cohort, ".csv"), row.names = T)
