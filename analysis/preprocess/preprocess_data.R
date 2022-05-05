@@ -16,6 +16,9 @@ if(length(args)==0){
   cohort <- args[[1]]
 }
 
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "review"))
+
 # Define other parameters ------------------------------------------------------
 
 study_start <- "2021-06-01"
@@ -194,11 +197,11 @@ tmp_other <- arrow::read_feather(file = paste0("output/input_",cohort,".feather"
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/describe_tmp_index_",cohort,".txt"))
+sink(paste0("output/not-for-review/describe_tmp_index_",cohort,".txt"))
 print(Hmisc::describe(tmp_index))
 sink()
 
-sink(paste0("output/describe_tmp_",cohort,".txt"))
+sink(paste0("output/not-for-review/describe_tmp_",cohort,".txt"))
 print(Hmisc::describe(tmp_other))
 sink()
 
@@ -306,7 +309,7 @@ print("COVID-19 and diabetes variables needed for algorithm created successfully
 
 # Define diabetes outcome (using Sophie Eastwood algorithm) ----------------------------
 
-scripts_dir <- "analysis"
+scripts_dir <- "analysis/preprocess"
 source(file.path(scripts_dir,"diabetes_algorithm.R"))
 df <- diabetes_algo(df)
 print("Diabetes algorithm run successfully")
@@ -332,7 +335,7 @@ print("Input data saved successfully")
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/describe_input_",cohort,"_stage0.txt"))
+sink(paste0("output/not-for-review/describe_input_",cohort,"_stage0.txt"))
 print(Hmisc::describe(df1))
 sink()
 
@@ -344,7 +347,7 @@ df2 <- df %>% select(starts_with(c("patient_id","tmp_out_date","out_date")))
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/describe_venn_",cohort,".txt"))
+sink(paste0("output/not-for-review/describe_venn_",cohort,".txt"))
 print(Hmisc::describe(df2))
 sink()
 

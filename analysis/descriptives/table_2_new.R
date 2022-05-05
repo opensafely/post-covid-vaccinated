@@ -30,6 +30,9 @@ if(length(args)==0){
   population <- args[[2]]
 }
 
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "review", "descriptives"))
+
 #start.time = Sys.time()
 #delta period
 cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
@@ -252,13 +255,13 @@ table_2_subgroups_output <- function(population){
   input1_aer$event <- ifelse(startsWith(input1_aer$event,"out_"),gsub("out_date_","",input1_aer$event),input1_aer$event)
   
   # write output for table2
-  write.csv(analyses_of_interest, file=paste0("output/table2_", analyses, "_", population, ".csv"), row.names = F)
-  rmarkdown::render("analysis/compiled_table2_results.Rmd",
-                    output_file=paste0("table2_",analyses,"_", population),output_dir="output")
+  write.csv(analyses_of_interest, file=paste0("output/review/descriptives/table2_", analyses, "_", population, ".csv"), row.names = F)
+  rmarkdown::render("analysis/descriptives/compiled_table2_results.Rmd",
+                    output_file=paste0("table2_",analyses,"_", population),output_dir="output/review/descriptives")
   #write output fir input1_aer
-  write.csv(input1_aer, file=paste0("output/input1_aer_", analyses, "_", population, ".csv"), row.names=F)
-  rmarkdown::render("analysis/compiled_input1_aer_results.Rmd",
-                    output_file=paste0("input1_aer_",analyses,"_", population),output_dir="output")
+  write.csv(input1_aer, file=paste0("output/review/descriptives/input1_aer_", analyses, "_", population, ".csv"), row.names=F)
+  rmarkdown::render("analysis/descriptives/compiled_input1_aer_results.Rmd",
+                    output_file=paste0("input1_aer_",analyses,"_", population),output_dir="output/review/descriptives")
 }
 
 # Run function using specified commandArgs
