@@ -4,10 +4,10 @@
 #Reviewer: Genevieve Cezard
 
 #USE TO RUN A SINGLE PLOT
-#group <- "vaccinated"
-#fit <- "mdl_max_adj"
-#outcome <- "ate"
-#strata <- "sex_Female"
+group <- "vaccinated"
+fit <- "mdl_max_adj"
+outcome <- "ate"
+strata <- "sex_Female"
 
 library(purrr)
 library(data.table)
@@ -21,19 +21,24 @@ figure4_tbl <- function(group, fit, outcome, strata){
   
   #Load data 
   #1.Input1 - 1.unexposed person days
-  input1.1 <- readr::read_csv("output/input1_aer_vaccinated.csv")
-  input1.2 <- readr::read_csv("output/input1_aer_electively_unvaccinated.csv") 
+  input1.1 <- readr::read_csv("output/input1_aer_main_vaccinated.csv")
+  input1.2 <- readr::read_csv("output/input1_aer_main_electively_unvaccinated.csv") 
+  input1.3 <- readr::read_csv("output/input1_aer_subgroups_vaccinated.csv")
+  input1.4 <- readr::read_csv("output/input1_aer_subgroups_electively_unvaccinated.csv") 
   
-  #Preprocess input1
-  input1.3 <- rbind(input1.1,input1.2)
-  input1.3$fit <- "mdl_agesex"
+  #Preprocess input1                                                             #ADDS TWO MODEL FITS WITH SAME PERSON DAYS
+  input1.5 <- rbind(input1.1,input1.2,input1.3,input1.4)                                           
+  input1.5$fit <- "mdl_agesex"                                                   
   
-  input1.4 <- input1.3
-  input1.4$fit <- "mdl_max_adj"
+  input1.6 <- input1.5                                                           
+  input1.6$fit <- "mdl_max_adj"                                                  
   
-  input1 <-rbind(input1.3,input1.4) 
-  input1 <- input1 %>% select(-strata)
-  rm(input1.1, input1.2, input1.3, input1.4)
+  input1 <-rbind(input1.5,input1.6)                                              
+  input1 <- input1 %>% select(-strata)                                           
+  rm(input1.1, input1.2, input1.3, input1.4,input1.5, input1.6)
+  
+  #structure the input
+  input1$unexposed_person_days <- as.numeric(input1$unexposed_person_days)
   
   #Input2 - 2.unexposed events, 3.total cases, 4.hr
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
@@ -321,7 +326,7 @@ for (i in 1:nrow(active)) {
   ggsave(p_line, filename = paste0("output/Figure4_delta_", active$group[i], "_", active$event[i],".png"), dpi=300,width = 10,height = 6)
   }
   
-  #Find 14 figures in the output folder, each for Vaccinated vs Un-vaccinated panels of each subgroups of 'ate' and 'vte'.
+  #Find 14 .png figures in the output folder, each for Vaccinated vs Un-vaccinated panels of each subgroups of 'ate' and 'vte'.
 
 
 
