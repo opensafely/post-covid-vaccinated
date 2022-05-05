@@ -4,10 +4,10 @@
 #Reviewer: Genevieve Cezard
 
 #USE TO RUN A SINGLE PLOT
-group <- "vaccinated"
-fit <- "mdl_max_adj"
-outcome <- "ate"
-strata <- "sex_Female"
+#group <- "vaccinated"
+#fit <- "mdl_max_adj"
+#outcome <- "ate"
+#strata <- "sex_Female"
 
 library(purrr)
 library(data.table)
