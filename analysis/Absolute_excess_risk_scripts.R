@@ -3,15 +3,15 @@
 #Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
 #Reviewer: Genevieve Cezard
 
+#TO RUN OUTSIDE OPENSAFELY
+# 1. load the right input data and make sure of variable structure
+# 2. Cntrl+A run the whole script and find the results in working directory
+
 #USE - TO CHECK SINGLE AER
 outcome <- "ate" 
 group <- "vaccinated" 
 strata <- "prior_history_FALSE"
 fit <- "mdl_max_adj"
-
-#TO RUN OUTSIDE OPENSAFELY
-# 1. load the right input data and make sure of variable structure
-# 2. Cntrl+A run the whole script and find the results in working directory
 
 library(purrr)
 library(data.table)
