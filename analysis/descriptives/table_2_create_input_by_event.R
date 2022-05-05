@@ -33,6 +33,9 @@ if(length(args)==0){
 cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "review", "descriptives"))
+
 input_table_2 <- function(population){
   # read in data----------------------------------------------------------------
   input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
@@ -142,7 +145,6 @@ input_table_2 <- function(population){
     print(paste0("input for ", event, " in ", population, " population has been produced successfully!"))
   }
   saveRDS(survival_data, file=paste0("output/input_table_2_",population,"_stage1.rds"))
-  #write_rds(survival_data, file=paste0("output/input_table_2_",population,"_stage1.rds"))
   #write_csv(survival_data, file=paste0("output/input_table_2_",population,"_stage1.rds"))
   rm(list=c("survival_data"))
   

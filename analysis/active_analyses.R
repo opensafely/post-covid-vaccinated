@@ -55,6 +55,8 @@ for (i in 1:length(outcomes)) {
                        "")
 }
 
+# for local testing of one outcome (change everything else to FALSE)
+# df[1,1] <- TRUE
 
 outcomes <- c("Arterial thrombosis event",
               "Venous thrombosis event")

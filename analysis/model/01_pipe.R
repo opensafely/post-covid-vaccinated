@@ -38,8 +38,11 @@ if(length(args)==0){
 }
 
 # Specify directories ----------------------------------------------------------
-output_dir <- "output"
-scripts_dir <- "analysis"
+
+fs::dir_create(here::here("output", "not-for-review"))
+fs::dir_create(here::here("output", "review", "model"))
+output_dir <- "output/review/model"
+scripts_dir <- "analysis/model"
 
 # Source relevant files --------------------------------------------------------
 source(file.path(scripts_dir,"analyses_to_run.R"))

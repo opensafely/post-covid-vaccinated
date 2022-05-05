@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(DT)
 library(readr)
-knitr::opts_knit$set(root.dir = gsub("/analysis","",getwd()))
+knitr::opts_knit$set(root.dir = gsub("/analysis/descriptives","",getwd()))
 ```
 
 ## Compiled table2 event coutns, person days and incidence rates
@@ -22,7 +22,7 @@ knitr::opts_knit$set(root.dir = gsub("/analysis","",getwd()))
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #analyses = "main"
 #population = "vaccinated"
-df=read_csv(paste0("output/table2_", analyses, "_", population, ".csv"))
+df=read_csv(paste0("output/review/descriptives/table2_", analyses, "_", population, ".csv"))
 df %>%
     datatable(extensions = 'Buttons',
               options = list(dom = 'Blfrtip',
