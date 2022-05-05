@@ -42,14 +42,14 @@ if(length(args)==0){
 }
 
 fs::dir_create(here::here("output", "not-for-review"))
-fs::dir_create(here::here("output", "for-review", "descriptives"))
+fs::dir_create(here::here("output", "review", "descriptives"))
 
 # Define stage2 function -------------------------------------------------------
 
 stage2 <- function(cohort_name, covid_history) {
 
   # Load relevant data
-  input <- readr::read_rds(file.path("output/not-for-review", paste0("input_",cohort_name,"_stage1.rds")))
+  input <- readr::read_rds(file.path("output", paste0("input_",cohort_name,"_stage1.rds")))
   
   # Select data depending on covid history
   if(covid_history == "without_covid_history"){
@@ -303,7 +303,7 @@ stage2 <- function(cohort_name, covid_history) {
   table1_suppressed <- table1_suppressed %>% filter(!str_detect(Covariate_level, "^FALSE"))
   
   # Save table 1
-  write.csv(table1_suppressed, file = file.path("output/for-review/descriptives", paste0("Table1_",cohort_name, "_",covid_history, ".csv")) , row.names=F)
+  write.csv(table1_suppressed, file = file.path("output/review/descriptives", paste0("Table1_",cohort_name, "_",covid_history, ".csv")) , row.names=F)
   
 }
 

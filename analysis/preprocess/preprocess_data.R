@@ -17,7 +17,7 @@ if(length(args)==0){
 }
 
 fs::dir_create(here::here("output", "not-for-review"))
-fs::dir_create(here::here("output", "for-review"))
+fs::dir_create(here::here("output", "review"))
 
 # Define other parameters ------------------------------------------------------
 
@@ -309,7 +309,7 @@ print("COVID-19 and diabetes variables needed for algorithm created successfully
 
 # Define diabetes outcome (using Sophie Eastwood algorithm) ----------------------------
 
-scripts_dir <- "analysis/data-preprocess-cleaning"
+scripts_dir <- "analysis/preprocess"
 source(file.path(scripts_dir,"diabetes_algorithm.R"))
 df <- diabetes_algo(df)
 print("Diabetes algorithm run successfully")
@@ -329,7 +329,7 @@ df1 <- df[,c("patient_id","death_date","index_date",
 
 df1[,colnames(df)[grepl("tmp_",colnames(df))]] <- NULL
 
-saveRDS(df1, file = paste0("output/not-for-review/input_",cohort,".rds"))
+saveRDS(df1, file = paste0("output/input_",cohort,".rds"))
 
 print("Input data saved successfully")
 
@@ -351,6 +351,6 @@ sink(paste0("output/not-for-review/describe_venn_",cohort,".txt"))
 print(Hmisc::describe(df2))
 sink()
 
-saveRDS(df2, file = paste0("output/not-for-review/venn_",cohort,".rds"))
+saveRDS(df2, file = paste0("output/venn_",cohort,".rds"))
 
 print("Venn diagram data saved successfully")

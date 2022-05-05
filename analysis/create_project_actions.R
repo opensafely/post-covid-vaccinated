@@ -85,20 +85,20 @@ apply_model_function <- function(outcome, cohort){
     comment(glue("Apply cox model for {outcome} - {cohort} cohort")),
     action(
       name = glue("Analysis_cox_{outcome}_{cohort}"),
-      run = "r:latest analysis/cox-analysis/01_pipe.R",
+      run = "r:latest analysis/model/01_pipe.R",
       arguments = c(outcome,cohort),
       needs = list("stage1_data_cleaning_both"),
       moderately_sensitive = list(
-        compiled_hrs_html = glue("output/for-review/cox-analysis/suppressed_compiled_HR_results_{outcome}_{cohort}.html"),
-        compiled_event_counts_html = glue("output/for-review/cox-analysis/suppressed_compiled_event_counts_{outcome}_{cohort}.html"),
-        analyses_not_run = glue("output/for-review/cox-analysis/analyses_not_run_{outcome}_{cohort}.csv"),
-        compiled_hrs_csv = glue("output/for-review/cox-analysis/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
-        compiled_hrs_csv_to_release = glue("output/for-review/cox-analysis/suppressed_compiled_HR_results_{outcome}_{cohort}_to_release.csv"),
-        compiled_event_counts_csv = glue("output/for-review/cox-analysis/suppressed_compiled_event_counts_{outcome}_{cohort}.csv")
+        compiled_hrs_html = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}.html"),
+        compiled_event_counts_html = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}.html"),
+        analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}.csv"),
+        compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
+        compiled_hrs_csv_to_release = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_to_release.csv"),
+        compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}.csv")
       ),
       highly_sensitive = list(
-        compiled_hrs = glue("output/for-review/cox-analysis/compiled_HR_results_{outcome}_{cohort}.csv"),
-        compiled_event_counts = glue("output/for-review/cox-analysis/compiled_event_counts_{outcome}_{cohort}.csv")
+        compiled_hrs = glue("output/review/model/compiled_HR_results_{outcome}_{cohort}.csv"),
+        compiled_event_counts = glue("output/review/model/compiled_event_counts_{outcome}_{cohort}.csv")
       )
     )
   )
@@ -113,7 +113,7 @@ apply_table2_input <- function(cohort){
       arguments = c(cohort),
       needs = list("stage1_data_cleaning_both"),
       highly_sensitive = list(
-        input_table_2 = glue("output/not-for-review/input_table_2_{cohort}_stage1.rds")
+        input_table_2 = glue("output/input_table_2_{cohort}_stage1.rds")
       )
     )
   )
@@ -129,10 +129,10 @@ apply_table2_new_function <- function(analyses, cohort){
                    "stage4_input_for_table_2_electively_unvaccinated")),
       arguments = c(analyses, cohort),
       moderately_sensitive = list(
-        table_2_csv = glue("output/for-review/descriptives/table2_{analyses}_{cohort}.csv"),
-        input_1_aer_csv = glue("output/for-review/descriptives/input1_aer_{analyses}_{cohort}.csv"),
-        table_2_html = glue("output/for-review/descriptives/table2_{analyses}_{cohort}.html"),
-        input_1_aer_html = glue("output/for-review/descriptives/input1_aer_{analyses}_{cohort}.html")
+        table_2_csv = glue("output/review/descriptives/table2_{analyses}_{cohort}.csv"),
+        input_1_aer_csv = glue("output/review/descriptives/input1_aer_{analyses}_{cohort}.csv"),
+        table_2_html = glue("output/review/descriptives/table2_{analyses}_{cohort}.html"),
+        input_1_aer_html = glue("output/review/descriptives/input1_aer_{analyses}_{cohort}.html")
       )
     )
   )
@@ -210,7 +210,7 @@ actions_list <- splice(
   #comment("Preprocess data - vaccinated"),
   action(
     name = "preprocess_data_vaccinated",
-    run = "r:latest analysis/data-preprocess-cleaning/preprocess_data.R vaccinated",
+    run = "r:latest analysis/preprocess/preprocess_data.R vaccinated",
     needs = list("generate_study_population_index", "generate_study_population_vaccinated", "generate_study_population_electively_unvaccinated"),
     moderately_sensitive = list(
       describe = glue("output/not-for-review/describe_input_vaccinated_*.txt"),
@@ -219,15 +219,15 @@ actions_list <- splice(
       descrive_venn = glue("output/not-for-review/describe_venn_vaccinated.txt")
     ),
     highly_sensitive = list(
-      cohort = glue("output/not-for-review/input_vaccinated.rds"),
-      venn = glue("output/not-for-review/venn_vaccinated.rds")
+      cohort = glue("output/input_vaccinated.rds"),
+      venn = glue("output/venn_vaccinated.rds")
     )
   ), 
 
   #comment("Preprocess data - electively_unvaccinated"),
   action(
     name = "preprocess_data_electively_unvaccinated",
-    run = "r:latest analysis/data-preprocess-cleaning/preprocess_data.R electively_unvaccinated",
+    run = "r:latest analysis/preprocess/preprocess_data.R electively_unvaccinated",
     needs = list("generate_study_population_index", "generate_study_population_vaccinated", "generate_study_population_electively_unvaccinated"),
     moderately_sensitive = list(
       describe = glue("output/not-for-review/describe_input_electively_unvaccinated_*.txt"),
@@ -236,23 +236,23 @@ actions_list <- splice(
       descrive_venn = glue("output/not-for-review/describe_venn_electively_unvaccinated.txt")
     ),
     highly_sensitive = list(
-      cohort = glue("output/not-for-review/input_electively_unvaccinated.rds"),
-      venn = glue("output/not-for-review/venn_electively_unvaccinated.rds")
+      cohort = glue("output/input_electively_unvaccinated.rds"),
+      venn = glue("output/venn_electively_unvaccinated.rds")
     )
   ), 
 
   #comment("Stage 1 - Data cleaning"),
   action(
     name = "stage1_data_cleaning_both",
-    run = "r:latest analysis/data-preprocess-cleaning/Stage1_data_cleaning.R both",
+    run = "r:latest analysis/preprocess/Stage1_data_cleaning.R both",
     needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated"),
     moderately_sensitive = list(
       refactoring = glue("output/not-for-review/meta_data_factors_*.csv"),
-      QA_rules = glue("output/for-review/descriptives/QA_summary_*.csv"),
-      IE_criteria = glue("output/for-review/descriptives/Cohort_flow_*.csv")
+      QA_rules = glue("output/review/descriptives/QA_summary_*.csv"),
+      IE_criteria = glue("output/review/descriptives/Cohort_flow_*.csv")
     ),
     highly_sensitive = list(
-      cohort = glue("output/not-for-review/input_*_stage1.rds")
+      cohort = glue("output/input_*_stage1.rds")
     )
   ),
 
@@ -264,7 +264,7 @@ actions_list <- splice(
     moderately_sensitive = list(
       Missing_RangeChecks = glue("output/not-for-review/Check_missing_range_*.csv"),
       DateChecks = glue("output/not-for-review/Check_dates_range_*.csv"),
-      Descriptive_Table = glue("output/for-review/descriptives/Table1_*.csv")
+      Descriptive_Table = glue("output/review/descriptives/Table1_*.csv")
     )
   ),
 
@@ -277,7 +277,7 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/diabetes_flowchart.R vaccinated",
     needs = list("stage1_data_cleaning_both"),
     moderately_sensitive = list(
-      flow_df = glue("output/for-review/data-for-figures/diabetes_flow_values_vaccinated.csv")
+      flow_df = glue("output/review/figure-data/diabetes_flow_values_vaccinated.csv")
       # flow_fig = glue("output/diabetes_flow.png"),
     ),
   ),
@@ -289,7 +289,7 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/diabetes_flowchart.R electively_unvaccinated",
     needs = list("stage1_data_cleaning_both"),
     moderately_sensitive = list(
-      flow_df = glue("output/for-review/data-for-figures/diabetes_flow_values_electively_unvaccinated.csv")
+      flow_df = glue("output/review/figure-data/diabetes_flow_values_electively_unvaccinated.csv")
       # flow_fig = glue("output/diabetes_flow.png"),
     ),
   ),
@@ -315,10 +315,10 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/table_2_transfer_unexposed_data.R subgroups both",
     needs = list("stage4_table_2_main_vaccinated","stage4_table_2_subgroups_vaccinated", "stage4_table_2_main_electively_unvaccinated", "stage4_table_2_subgroups_electively_unvaccinated"),
     moderately_sensitive = list(
-      table_2_csv = glue("output/for-review/descriptives/table2_subgroups_*.csv"),
-      input_1_aer_csv = glue("output/for-review/descriptives/input1_aer_*.csv"),
-      table_2_html = glue("output/for-review/descriptives/table2_subgroups_*.html"),
-      input_1_aer_html = glue("output/for-review/descriptives/input1_aer_*.html")
+      table_2_csv = glue("output/review/descriptives/table2_subgroups_*.csv"),
+      input_1_aer_csv = glue("output/review/descriptives/input1_aer_*.csv"),
+      table_2_html = glue("output/review/descriptives/table2_subgroups_*.html"),
+      input_1_aer_html = glue("output/review/descriptives/input1_aer_*.html")
     )
   ),
   
@@ -328,8 +328,8 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/venn_diagram.R both",
     needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated","stage1_data_cleaning_both"),
     moderately_sensitive = list(
-      venn_diagram = glue("output/for-review/venn-diagrams/venn_diagram_*.svg"),
-      venn_diagram_number_check = glue("output/for-review/venn-diagrams/venn_diagram_number_check_*.csv")
+      venn_diagram = glue("output/review/venn-diagrams/venn_diagram_*.svg"),
+      venn_diagram_number_check = glue("output/review/venn-diagrams/venn_diagram_number_check_*.csv")
     )
   ),
 

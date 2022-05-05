@@ -24,7 +24,7 @@ if(length(args)==0){
 }
 
 fs::dir_create(here::here("output", "not-for-review"))
-fs::dir_create(here::here("output", "for-review", "venn-diagrams"))
+fs::dir_create(here::here("output", "review", "venn-diagrams"))
 
 venn_output <- function(population){
   
@@ -35,9 +35,9 @@ venn_output <- function(population){
   
   # Load data ------------------------------------------------------------------
   
-  input <- readr::read_rds(paste0("output/not-for-review/venn_",population,".rds"))
+  input <- readr::read_rds(paste0("output/venn_",population,".rds"))
   
-  input_stage1 <- readr::read_rds(paste0("output/not-for-review/input_", population,"_stage1.rds"))
+  input_stage1 <- readr::read_rds(paste0("output/input_", population,"_stage1.rds"))
   input_stage1 <- input_stage1[input_stage1$sub_bin_covid19_confirmed_history==FALSE,]
   
   input <- input[input$patient_id %in% input_stage1$patient_id,]
@@ -181,7 +181,7 @@ venn_output <- function(population){
       
       # Make Venn diagram --------------------------------------------------------
       
-      svglite::svglite(file = paste0("output/for-review/venn-diagrams/venn_diagram_",population,"_",gsub("out_date_","",outcome),".svg"))
+      svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",population,"_",gsub("out_date_","",outcome),".svg"))
       g <- ggvenn::ggvenn(
         index, 
         fill_color = mycol,
@@ -200,7 +200,7 @@ venn_output <- function(population){
   
   # Save summary file ----------------------------------------------------------
   
-  write.csv(df, file = paste0("output/for-review/venn-diagrams/venn_diagram_number_check_", population,".csv"), row.names = F)
+  write.csv(df, file = paste0("output/review/venn-diagrams/venn_diagram_number_check_", population,".csv"), row.names = F)
   
 }
 

@@ -36,20 +36,20 @@ transfer_unexposed_data_from_main_to_covid_pheno_subgrp <- function(table2_main,
   input1_aer$event <- ifelse(startsWith(input1_aer$event,"out_"),gsub("out_date_","",input1_aer$event),input1_aer$event)
   
   # write output for table2 subgroups
-  write.csv(table2_subgroups, file=paste0("output/for-review/descriptives/table2_subgroups", "_", population, ".csv"), row.names = F)
+  write.csv(table2_subgroups, file=paste0("output/review/descriptives/table2_subgroups", "_", population, ".csv"), row.names = F)
   rmarkdown::render("analysis/descriptives/compiled_table2_results.Rmd",
-                    output_file=paste0("table2_subgroups","_", population),output_dir="output/for-review/descriptives")
+                    output_file=paste0("table2_subgroups","_", population),output_dir="output/review/descriptives")
   
   #write output fir input1_aer subgroups
-  write.csv(input1_aer, file=paste0("output/for-review/descriptives/input1_aer_subgroups", "_", population, ".csv"), row.names=F)
+  write.csv(input1_aer, file=paste0("output/review/descriptives/input1_aer_subgroups", "_", population, ".csv"), row.names=F)
   rmarkdown::render("analysis/descriptives/compiled_input1_aer_results.Rmd",
-                    output_file=paste0("input1_aer_subgroups","_", population),output_dir="output/for-review/descriptives")
+                    output_file=paste0("input1_aer_subgroups","_", population),output_dir="output/review/descriptives")
   
 }
 
 table_2_transfer <- function(population){
-  table2_main <- read.csv(paste0("output/for-review/descriptives/table2_main_", population, ".csv"))
-  table2_subgroups <- read.csv(paste0("output/for-review/descriptives/table2_subgroups_", population, ".csv"))
+  table2_main <- read.csv(paste0("output/review/descriptives/table2_main_", population, ".csv"))
+  table2_subgroups <- read.csv(paste0("output/review/descriptives/table2_subgroups_", population, ".csv"))
   transfer_unexposed_data_from_main_to_covid_pheno_subgrp(table2_main, table2_subgroups, population)
 }
 

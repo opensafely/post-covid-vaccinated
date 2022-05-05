@@ -34,11 +34,11 @@ cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 fs::dir_create(here::here("output", "not-for-review"))
-fs::dir_create(here::here("output", "for-review", "descriptives"))
+fs::dir_create(here::here("output", "review", "descriptives"))
 
 input_table_2 <- function(population){
   # read in data----------------------------------------------------------------
-  input <- read_rds(paste0("output/not-for-review/input_",population,"_stage1.rds"))
+  input <- read_rds(paste0("output/input_",population,"_stage1.rds"))
   active_analyses <- read_rds("lib/active_analyses.rds")
   variables_to_change = c("cov_cat_sex","cov_cat_age_group", "cov_cat_ethnicity")
   variables_to_change <- append(variables_to_change, active_analyses$prior_history_var[grep("cov_",active_analyses$prior_history_var)])
@@ -144,7 +144,7 @@ input_table_2 <- function(population){
     #saveRDS(data_active, file=paste0("output/input_table_2_",population,"_", event_short,"_stage1.rds"))
     print(paste0("input for ", event, " in ", population, " population has been produced successfully!"))
   }
-  saveRDS(survival_data, file=paste0("output/not-for-review/input_table_2_",population,"_stage1.rds"))
+  saveRDS(survival_data, file=paste0("output/input_table_2_",population,"_stage1.rds"))
   #write_csv(survival_data, file=paste0("output/input_table_2_",population,"_stage1.rds"))
   rm(list=c("survival_data"))
   
