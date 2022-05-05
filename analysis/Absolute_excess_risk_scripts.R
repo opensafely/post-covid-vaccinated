@@ -13,7 +13,7 @@ library(purrr)
 library(data.table)
 library(tidyverse)
 
-#CALCULATE THE EXCESS RISK
+#CREATE A FUNCTION TO CALCULATE THE EXCESS RISK
 excess_risk <- function(outcome, group, strata, fit) {
   
   #Load data 
@@ -173,7 +173,7 @@ input1 <- input1 %>% filter(!subgroup== "ethnicity_Missing")                    
 #----------------------
 #Step7. Output results
 #----------------------
-#1.For Loop the function.
+#1.For Loop the function INTO active analyses list.
 for (i in 1:nrow(active)) {excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])}
 #2.Compile the results
 AER_files=list.files(path = "output", pattern = "AER_*")
@@ -189,4 +189,4 @@ write.csv(AER_compiled_results, "output/AER_compiled_results.csv", row.names = F
 if (file.exists(AER_files)) { file.remove(AER_files)}
 #4.Sample the results
 print(AER_compiled_results)                                                      #-ve AERs not expected with actual data
-table(AER_compiled_results$AER_196<0)                                            #264 obs with 5 variables as per active analysis list.
+table(AER_compiled_results$AER_196<0)                                            #528 obs with 5 variables as per active analysis list.
