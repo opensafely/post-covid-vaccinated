@@ -3,6 +3,10 @@
 #Scripts: Renin Toms, Venexia Walker
 #Reviewer: Genevieve Cezard
 
+#TO RUN OUTSIDE OPENSAFELY
+# 1. load the right input data and make sure of the file names and variable structure
+# 2. Cntrl+A run the whole script and find the results in working directory
+
 #USE TO RUN A SINGLE PLOT
 group <- "vaccinated"
 fit <- "mdl_max_adj"
