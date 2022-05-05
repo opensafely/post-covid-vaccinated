@@ -9,6 +9,10 @@ group <- "vaccinated"
 strata <- "prior_history_FALSE"
 fit <- "mdl_max_adj"
 
+#TO RUN OUTSIDE OPENSAFELY
+# 1. load the right input data and make sure of variable structure
+# 2. Cntrl+A run the whole script and find the results in working directory
+
 library(purrr)
 library(data.table)
 library(tidyverse)
@@ -18,20 +22,25 @@ excess_risk <- function(outcome, group, strata, fit) {
   
   #Load data 
   #1.Input1 - 1.unexposed person days
-  input1.1 <- readr::read_csv("output/input1_aer_vaccinated.csv")
-  input1.2 <- readr::read_csv("output/input1_aer_electively_unvaccinated.csv") 
+  input1.1 <- readr::read_csv("output/input1_aer_main_vaccinated.csv")
+  input1.2 <- readr::read_csv("output/input1_aer_main_electively_unvaccinated.csv") 
+  input1.3 <- readr::read_csv("output/input1_aer_subgroups_vaccinated.csv")
+  input1.4 <- readr::read_csv("output/input1_aer_subgroups_electively_unvaccinated.csv") 
   
   #Preprocess input1                                                             #ADDS TWO MODEL FITS WITH SAME PERSON DAYS
-  input1.3 <- rbind(input1.1,input1.2)                                           
-  input1.3$fit <- "mdl_agesex"                                                   
+  input1.5 <- rbind(input1.1,input1.2,input1.3,input1.4)                                           
+  input1.5$fit <- "mdl_agesex"                                                     
   
-  input1.4 <- input1.3                                                           
-  input1.4$fit <- "mdl_max_adj"                                                  
+  input1.6 <- input1.5                                                           
+  input1.6$fit <- "mdl_max_adj"                                                  
   
-  input1 <-rbind(input1.3,input1.4)                                              
+  input1 <-rbind(input1.5,input1.6)                                              
   input1 <- input1 %>% select(-strata)                                           
-  rm(input1.1, input1.2, input1.3, input1.4)
+  rm(input1.1, input1.2, input1.3, input1.4,input1.5, input1.6)
   
+  #structure the input
+  input1$unexposed_person_days <- as.numeric(input1$unexposed_person_days)
+
   #input2 - 2.unexposed events, 3.total population cases, 4.HR                   #COMBINES THE HR TABLES
   hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
@@ -188,5 +197,5 @@ write.csv(AER_compiled_results, "output/AER_compiled_results.csv", row.names = F
 #3.Clear the folder(except compiled results)
 if (file.exists(AER_files)) { file.remove(AER_files)}
 #4.Sample the results
-print(AER_compiled_results)                                                      #-ve AERs not expected with actual data
-table(AER_compiled_results$AER_196<0)                                            #528 obs with 5 variables as per active analysis list.
+print(AER_compiled_results)                                                      #-ve AERs not expected with actual data, but possible.                                                    
+table(AER_compiled_results$AER_196<0)                                            #264 obs with 5 variables as per active analysis list.
