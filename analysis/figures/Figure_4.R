@@ -25,10 +25,10 @@ figure4_tbl <- function(group, fit, outcome, strata){
   
   #Load data 
   #1.Input1 - 1.unexposed person days
-  input1.1 <- readr::read_csv("output/input1_aer_main_vaccinated.csv")
-  input1.2 <- readr::read_csv("output/input1_aer_main_electively_unvaccinated.csv") 
-  input1.3 <- readr::read_csv("output/input1_aer_subgroups_vaccinated.csv")
-  input1.4 <- readr::read_csv("output/input1_aer_subgroups_electively_unvaccinated.csv") 
+  input1.1 <- readr::read_csv("output/review/descriptives/input1_aer_main_vaccinated.csv")
+  input1.2 <- readr::read_csv("output/review/descriptives/input1_aer_main_electively_unvaccinated.csv") 
+  input1.3 <- readr::read_csv("output/review/descriptives/input1_aer_subgroups_vaccinated.csv")
+  input1.4 <- readr::read_csv("output/review/descriptives/input1_aer_subgroups_electively_unvaccinated.csv") 
   
   #Preprocess input1                                                             #ADDS TWO MODEL FITS WITH SAME PERSON DAYS
   input1.5 <- rbind(input1.1,input1.2,input1.3,input1.4)                                           
@@ -45,9 +45,9 @@ figure4_tbl <- function(group, fit, outcome, strata){
   input1$unexposed_person_days <- as.numeric(input1$unexposed_person_days)
   
   #Input2 - 2.unexposed events, 3.total cases, 4.hr
-  hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
+  hr_files=list.files(path = "output/review/model", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
-  hr_files=paste0("output/",hr_files)
+  hr_files=paste0("output/review/model/",hr_files)
   input2 <- purrr::pmap(list(hr_files),
                         function(fpath){
                           df <- fread(fpath)
@@ -170,7 +170,7 @@ figure4_tbl <- function(group, fit, outcome, strata){
   #Step6. Output1 the csv
   #-------------------------------------------
   
-  write.csv(lifetable, paste0("output/lifetable_delta_" , group, "_", fit, "_", outcome, "_", strata,".csv"), row.names = F)
+  write.csv(lifetable, paste0("output/review/model/lifetable_delta_" , group, "_", fit, "_", outcome, "_", strata,".csv"), row.names = F)
   
   #-------------------------------------------
   #Step7. clear the environment
@@ -233,9 +233,9 @@ for (i in 1:nrow(active)) {
   figure4_tbl(active$group[i],active$fit[i],active$outcome[i],active$strata[i])
   
   #2.compile the results
-  lt_files=list.files(path = "output", pattern = "lifetable_delta_*")
+  lt_files=list.files(path = "output/review/model", pattern = "lifetable_delta_*")
   lt_files=lt_files[endsWith(lt_files,".csv")]
-  lt_files=paste0("output/",lt_files)
+  lt_files=paste0("output/review/model/",lt_files)
   f4_compiled_lifetables <- purrr::pmap(list(lt_files),
                                         function(fpath){
                                           df <- fread(fpath)
@@ -244,7 +244,7 @@ for (i in 1:nrow(active)) {
   f4_compiled_lifetables=rbindlist(f4_compiled_lifetables, fill=TRUE)
   
   #3.output the csv
-  write.csv(f4_compiled_lifetables, paste0("output/Figure4_compiled_lifetables.csv"), row.names = F)}
+  write.csv(f4_compiled_lifetables, paste0("output/review/model/Figure4_compiled_lifetables.csv"), row.names = F)}
 
 #4.Delete un used files
 if (file.exists(lt_files)) { file.remove(lt_files)}
@@ -260,7 +260,7 @@ library(ggplot2)
 library(RColorBrewer)
 
 #1.Load data
-lifetables <- readr::read_csv("output/Figure4_compiled_lifetables.csv")
+lifetables <- readr::read_csv("output/review/model/Figure4_compiled_lifetables.csv")
 
 #2.Define plotting groups and subgroups
 lifetables$group <- gsub("_.*","",lifetables$subgroup)

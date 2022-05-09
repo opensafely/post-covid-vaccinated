@@ -7,6 +7,8 @@
 # 1. load the right input data and make sure of the file names and variable structure
 # 2. Cntrl+A run the whole script and find the results in working directory
 
+fs::dir_create(here::here("output", "review", "model"))
+
 #USE - TO CHECK SINGLE AER
 outcome <- "ate" 
 group <- "vaccinated" 
@@ -22,10 +24,10 @@ excess_risk <- function(outcome, group, strata, fit) {
   
   #Load data 
   #1.Input1 - 1.unexposed person days
-  input1.1 <- readr::read_csv("output/input1_aer_main_vaccinated.csv")
-  input1.2 <- readr::read_csv("output/input1_aer_main_electively_unvaccinated.csv") 
-  input1.3 <- readr::read_csv("output/input1_aer_subgroups_vaccinated.csv")
-  input1.4 <- readr::read_csv("output/input1_aer_subgroups_electively_unvaccinated.csv") 
+  input1.1 <- readr::read_csv("output/review/descriptives/input1_aer_main_vaccinated.csv")
+  input1.2 <- readr::read_csv("output/review/descriptives/input1_aer_main_electively_unvaccinated.csv") 
+  input1.3 <- readr::read_csv("output/review/descriptives/input1_aer_subgroups_vaccinated.csv")
+  input1.4 <- readr::read_csv("output/review/descriptives/input1_aer_subgroups_electively_unvaccinated.csv") 
   
   #Preprocess input1                                                             #ADDS TWO MODEL FITS WITH SAME PERSON DAYS
   input1.5 <- rbind(input1.1,input1.2,input1.3,input1.4)                                           
@@ -42,9 +44,9 @@ excess_risk <- function(outcome, group, strata, fit) {
   input1$unexposed_person_days <- as.numeric(input1$unexposed_person_days)
 
   #input2 - 2.unexposed events, 3.total population cases, 4.HR                   #COMBINES THE HR TABLES
-  hr_files=list.files(path = "output", pattern = "compiled_HR_results_*")
+  hr_files=list.files(path = "output/review/model", pattern = "compiled_HR_results_*")
   hr_files=hr_files[endsWith(hr_files,".csv")]
-  hr_files=paste0("output/",hr_files)
+  hr_files=paste0("output/review/model/",hr_files)
   input2 <- purrr::pmap(list(hr_files),
                         function(fpath){
                           df <- fread(fpath)
@@ -146,7 +148,7 @@ excess_risk <- function(outcome, group, strata, fit) {
                         subgroup=strata,
                         model=fit,
                         AER_196=AER_196)
-  write.csv(results, paste0("output/AER_" , group, "_", fit, "_", strata, "_", outcome,".csv"), row.names = F)
+  write.csv(results, paste0("output/review/model/AER_" , group, "_", fit, "_", strata, "_", outcome,".csv"), row.names = F)
   return(results)
   #return(print(results)) 
 }
@@ -185,15 +187,15 @@ input1 <- input1 %>% filter(!subgroup== "ethnicity_Missing")                    
 #1.For Loop the function INTO active analyses list.
 for (i in 1:nrow(active)) {excess_risk(active$outcome[i], active$group[i],active$strata[i], active$fit[i])}
 #2.Compile the results
-AER_files=list.files(path = "output", pattern = "AER_*")
+AER_files=list.files(path = "output/review/model", pattern = "AER_*")
 AER_files=AER_files[endsWith(AER_files,".csv")]
-AER_files=paste0("output/",AER_files)
+AER_files=paste0("output/review/model/",AER_files)
 AER_compiled_results <- purrr::pmap(list(AER_files),
                                     function(fpath){
                                       df <- fread(fpath)
                                       return(df)})
 AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
-write.csv(AER_compiled_results, "output/AER_compiled_results.csv", row.names = F)
+write.csv(AER_compiled_results, "output/review/model/AER_compiled_results.csv", row.names = F)
 #3.Clear the folder(except compiled results)
 if (file.exists(AER_files)) { file.remove(AER_files)}
 #4.Sample the results
