@@ -44,9 +44,14 @@ if(length(args)==0){
 fs::dir_create(here::here("output", "not-for-review"))
 fs::dir_create(here::here("output", "review", "descriptives"))
 
+# Determine which outcome groups are active
+active_analyses <- read_rds("lib/active_analyses.rds")
+active_analyses <- active_analyses %>% filter(active == TRUE)
+outcome_groups <- unique(active_analyses$outcome_group)
+
 # Define stage2 function -------------------------------------------------------
 
-stage2 <- function(cohort_name, covid_history) {
+stage2 <- function(cohort_name, covid_history, group) {
 
   # Load relevant data
   input <- readr::read_rds(file.path("output", paste0("input_",cohort_name,"_stage1.rds")))
@@ -154,8 +159,7 @@ stage2 <- function(cohort_name, covid_history) {
   input$cov_cat_consulation_rate_group <- ifelse(input$cov_num_consulation_rate>=6, "6+", input$cov_cat_consulation_rate_group)
 
   # Populate table 1 
-  active_analyses <- read_rds("lib/active_analyses.rds")
-  active_analyses <- active_analyses %>% filter(active==TRUE)
+  covar_names <- active_analyses %>% filter(outcome_group==group)
   covar_names<-str_split(active_analyses$covariates, ";")[[1]]
   
   #categorical_cov <- colnames(input)[grep("cov_cat", colnames(input))]
@@ -303,20 +307,22 @@ stage2 <- function(cohort_name, covid_history) {
   table1_suppressed <- table1_suppressed %>% filter(!str_detect(Covariate_level, "^FALSE"))
   
   # Save table 1
-  write.csv(table1_suppressed, file = file.path("output/review/descriptives", paste0("Table1_",cohort_name, "_",covid_history, ".csv")) , row.names=F)
+  write.csv(table1_suppressed, file = file.path("output/review/descriptives", paste0("Table1_",cohort_name, "_",covid_history,"_",group, ".csv")) , row.names=F)
   
 }
 
 # Run function using specified commandArgs
 
-
-if(cohort_name == "both"){
-  stage2("vaccinated", "with_covid_history")
-  stage2("vaccinated", "without_covid_history")
-  stage2("electively_unvaccinated", "with_covid_history")
-  stage2("electively_unvaccinated", "without_covid_history")
-}else{
-  stage2(cohort_name, "with_covid_history")
-  stage2(cohort_name, "without_covid_history")
+for(group in outcome_groups){
+  if(cohort_name == "both"){
+    stage2("vaccinated", "with_covid_history", group)
+    stage2("vaccinated", "without_covid_history", group)
+    stage2("electively_unvaccinated", "with_covid_history", group)
+    stage2("electively_unvaccinated", "without_covid_history", group)
+  }else{
+    stage2(cohort_name, "with_covid_history", group)
+    stage2(cohort_name, "without_covid_history", group)
+  }
+  
 }
- 
+
