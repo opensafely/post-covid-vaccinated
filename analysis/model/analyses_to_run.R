@@ -71,9 +71,6 @@ analyses_to_run <- analyses_to_run %>%
     startsWith(subgroup, "sex") ~ "sex",
     TRUE ~ as.character(subgroup)))
 
-# add reduced time point column 
-
-analyses_to_run$reduced_timepoint <- NA
 
 ## Separate into to dataframes as this will allow all the vaccinated/electively unvaccinated
 ## analyses to be run in one go to save having to read in the data for each individual analysis

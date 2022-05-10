@@ -94,14 +94,15 @@ get_timepoint <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,in
     
   survival_data=survival_data%>%filter(follow_up_end>=follow_up_start)
   
-  total_covid_cases=nrow(survival_data %>% filter(!is.na(expo_date)))
   
   # calculate post-exposure event
   event_count_exposed <- length(which(survival_data$event_date >= survival_data$follow_up_start &
                                         survival_data$event_date >= survival_data$expo_date & 
-                                        survival_data$event_date <= survival_data$follow_up_end)) ## is "follow_up_end" what we want here? Delete this text if OK. 
-  
-  if(event_count_exposed < 25){
+                                        survival_data$event_date <= survival_data$follow_up_end))
+  if(event_count_exposed < 50){
+    analyses_not_run[nrow(analyses_not_run)+1,]<<- c(event,subgroup,cohort,mdl,"NA","NA","NA","FALSE")
+    timepoint <- "remove"
+  }else if(event_count_exposed >= 50 & event_count_exposed <400 ){
     timepoint <- "reduced"
   }else{
     timepoint <- "normal"
