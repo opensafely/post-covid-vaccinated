@@ -1490,7 +1490,7 @@ def generate_common_variables(index_date_variable):
     ### Combined Stroke Ischeamic
     cov_bin_stroke_isch=patients.maximum_of(
         "tmp_cov_bin_stroke_isch_hes", "tmp_cov_bin_stroke_isch_snomed",
-    )
+    ),
 
     ## Other arterial embolism
     ### Primary care
