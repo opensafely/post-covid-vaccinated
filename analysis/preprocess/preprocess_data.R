@@ -282,42 +282,50 @@ df <- df[!is.na(df$patient_id),]
 
 print("COVID19 severity determined successfully")
 
-# Create vars -------------------------------------------------------------
 
-# vars could not be created in common vars file
-df <- df %>% mutate(tmp_out_count_t2dm = tmp_out_count_t2dm_snomed + tmp_out_count_t2dm_hes,
-                    tmp_out_count_t1dm = tmp_out_count_t1dm_snomed + tmp_out_count_t1dm_hes) %>%
-  # cholesterol ratio              
-  mutate(cov_num_tc_hdl_ratio = tmp_cov_num_cholesterol / tmp_cov_num_hdl_cholesterol) %>%
-  # remove bmi date var
-  dplyr::select(- cov_num_bmi_date_measured)
+# Add diabetes variables and algorithm when relevant (i.e. diabetes outcome active)
+active_analyses <- read_rds("lib/active_analyses.rds")
+diabetes_analyses <- filter(active_analyses, startsWith(outcome_variable, "out_date_diabetes"))
 
-print("Diabetes count variables created successfully")
+if (any(diabetes_analyses$active==TRUE)){
+  
+  # Create vars for diabetes outcomes -------------------------------------------------------------
+  
+  # vars could not be created in common vars file
+  df <- df %>% mutate(tmp_out_count_t2dm = tmp_out_count_t2dm_snomed + tmp_out_count_t2dm_hes,
+                      tmp_out_count_t1dm = tmp_out_count_t1dm_snomed + tmp_out_count_t1dm_hes) %>%
+    # cholesterol ratio              
+    mutate(cov_num_tc_hdl_ratio = tmp_cov_num_cholesterol / tmp_cov_num_hdl_cholesterol) %>%
+    # remove bmi date var
+    dplyr::select(- cov_num_bmi_date_measured)
+  
+  print("Diabetes count variables created successfully")
 
-# define variables needed for diabetes algorithm 
-
-df <- df %>% 
-  mutate(tmp_out_year_first_diabetes_diag = format(tmp_out_date_first_diabetes_diag,"%Y")) %>%
-  mutate(tmp_out_year_first_diabetes_diag = as.integer(tmp_out_year_first_diabetes_diag),
-         age_1st_diag = tmp_out_year_first_diabetes_diag - qa_num_birth_year) %>%
-  mutate(age_1st_diag = replace(age_1st_diag, which(age_1st_diag < 0), NA)) %>% # assign negative ages to NA)
-  mutate(age_under_35_30_1st_diag = ifelse(!is.na(age_1st_diag) &
-                                             (age_1st_diag < 35 & 
-                                                (cov_cat_ethnicity == 1 | cov_cat_ethnicity == 2  | cov_cat_ethnicity == 5)) | 
-                                             (age_1st_diag < 30), "Yes", "No")) %>%
-  # HBA1C date var - earliest date for only those with >=47.5
-  mutate(hba1c_date_step7 = as_date(case_when(tmp_out_num_max_hba1c_mmol_mol >= 47.5 ~ pmin(tmp_out_max_hba1c_mmol_mol_date, na.rm = TRUE))),
-         # process codes - this is taking the first process code date in those individuals that have 5 or more process codes
-         over5_pocc_step7 = as_date(case_when(tmp_out_count_poccdm_snomed >= 5 ~ pmin(out_date_poccdm, na.rm = TRUE))))
-
-print("COVID-19 and diabetes variables needed for algorithm created successfully")
-
-# Define diabetes outcome (using Sophie Eastwood algorithm) ----------------------------
-
-scripts_dir <- "analysis/preprocess"
-source(file.path(scripts_dir,"diabetes_algorithm.R"))
-df <- diabetes_algo(df)
-print("Diabetes algorithm run successfully")
+  # define variables needed for diabetes algorithm 
+  
+  df <- df %>% 
+    mutate(tmp_out_year_first_diabetes_diag = format(tmp_out_date_first_diabetes_diag,"%Y")) %>%
+    mutate(tmp_out_year_first_diabetes_diag = as.integer(tmp_out_year_first_diabetes_diag),
+           age_1st_diag = tmp_out_year_first_diabetes_diag - qa_num_birth_year) %>%
+    mutate(age_1st_diag = replace(age_1st_diag, which(age_1st_diag < 0), NA)) %>% # assign negative ages to NA)
+    mutate(age_under_35_30_1st_diag = ifelse(!is.na(age_1st_diag) &
+                                               (age_1st_diag < 35 & 
+                                                  (cov_cat_ethnicity == 1 | cov_cat_ethnicity == 2  | cov_cat_ethnicity == 5)) | 
+                                               (age_1st_diag < 30), "Yes", "No")) %>%
+    # HBA1C date var - earliest date for only those with >=47.5
+    mutate(hba1c_date_step7 = as_date(case_when(tmp_out_num_max_hba1c_mmol_mol >= 47.5 ~ pmin(tmp_out_max_hba1c_mmol_mol_date, na.rm = TRUE))),
+           # process codes - this is taking the first process code date in those individuals that have 5 or more process codes
+           over5_pocc_step7 = as_date(case_when(tmp_out_count_poccdm_snomed >= 5 ~ pmin(out_date_poccdm, na.rm = TRUE))))
+  
+  print("COVID-19 and diabetes variables needed for algorithm created successfully")
+  
+  # Define diabetes outcome (using Sophie Eastwood algorithm) ----------------------------
+  
+  scripts_dir <- "analysis/preprocess"
+  source(file.path(scripts_dir,"diabetes_algorithm.R"))
+  df <- diabetes_algo(df)
+  print("Diabetes algorithm run successfully")
+}
 
 # Restrict columns and save analysis dataset ---------------------------------
 
