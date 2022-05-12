@@ -1487,7 +1487,7 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_stroke_isch_hes", "tmp_cov_bin_stroke_isch_snomed", "tmp_cov_bin_stroke_sah_hs_hes", "tmp_cov_bin_stroke_sah_hs_snomed",
     ),
 
-    ### Combined Stroke Ischeamic
+    ### Combined Stroke Ischaemic
     cov_bin_stroke_isch=patients.maximum_of(
         "tmp_cov_bin_stroke_isch_hes", "tmp_cov_bin_stroke_isch_snomed",
     ),
