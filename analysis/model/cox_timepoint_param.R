@@ -3,11 +3,10 @@
 ## 2.Stratify to relevant subgroup if necessary
 ## 3.Add follow up start and end dates
 ## =============================================================================
-source(file.path(scripts_dir,"fit_model.R"))
+# source(file.path(scripts_dir,"fit_model.R"))
 
-get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,time_point,input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced){
-  print(paste0("Working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
-  print(paste0("Using ",time_point," time point"))
+get_timepoint <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names){
+  print(paste0("Getting event counts and time cut-offs for subgroup: ", subgroup, ", ",mdl,", ", cohort))
   
   #Reduce dataset to those who do NOT have a prior history of COVID unless running the subgroup
   #analysis for this with a prior history
@@ -92,21 +91,25 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,tim
     survival_data <- survival_data %>% rowwise() %>% mutate(follow_up_end=min(follow_up_end, date_expo_censor,na.rm = TRUE))
     survival_data <- survival_data %>% filter((follow_up_start != date_expo_censor)|is.na(date_expo_censor))
   }
-  
+    
   survival_data=survival_data%>%filter(follow_up_end>=follow_up_start)
   
-  total_covid_cases=nrow(survival_data %>% filter(!is.na(expo_date)))
   
-  # add statement for reduced time cutoffs
-  if(time_point == "reduced"){
-    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_reduced,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
+  # calculate post-exposure event
+  event_count_exposed <- length(which(survival_data$event_date >= survival_data$follow_up_start &
+                                        survival_data$event_date >= survival_data$expo_date & 
+                                        survival_data$event_date <= survival_data$follow_up_end))
+  if(event_count_exposed < 50){
+    analyses_not_run[nrow(analyses_not_run)+1,]<<- c(event,subgroup,cohort,mdl,"NA","NA","NA","FALSE")
+    timepoint <- "remove"
+  }else if(event_count_exposed >= 50 & event_count_exposed <400 ){
+    timepoint <- "reduced"
   }else{
-    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo, cuts_days_since_expo_reduced,covar_names,total_covid_cases)
+    timepoint <- "normal"
   }
-
-  # res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
-  print(paste0("Finished working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
-  return(res_vacc)
-}
   
-    
+  ###  
+  # res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
+  # print(paste0("Finished working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
+  return(timepoint)
+}
