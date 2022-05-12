@@ -13,12 +13,12 @@
 ##           reporting from different data sources
 ## Output:   Venn diagrams in SVG files, venn_diagram_number_check.csv
 ## =============================================================================
-
+library(data.table)
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  population <- "electively_unvaccinated"
+  population <- "vaccinated"
 } else {
   population <- args[[1]]
 }
@@ -36,11 +36,15 @@ venn_output <- function(population){
   # Load data ------------------------------------------------------------------
   
   input <- readr::read_rds(paste0("output/venn_",population,".rds"))
+  end_dates <- read_rds(paste0("output/follow_up_end_dates_",population,".rds"))
   
   input_stage1 <- readr::read_rds(paste0("output/input_", population,"_stage1.rds"))
   input_stage1 <- input_stage1[input_stage1$sub_bin_covid19_confirmed_history==FALSE,]
   
   input <- input[input$patient_id %in% input_stage1$patient_id,]
+  input<- input %>% left_join(end_dates, by="patient_id")
+  
+  rm(input_stage1,end_dates)
   
   # Create empty table ---------------------------------------------------------
   
@@ -61,10 +65,27 @@ venn_output <- function(population){
   # Populate table and make Venn for each outcome ------------------------------
   
   for (outcome in outcomes) {
-    
+  
     # Restrict data to that relevant to the given outcome ----------------------
+    tmp <- input[!is.na(input[,outcome]),c("patient_id","index_date",paste0(gsub("out_date_","", outcome),"_follow_up_end"), colnames(input)[grepl(outcome,colnames(input))])]
+    colnames(tmp) <- gsub(paste0("tmp_",outcome,"_"),"",colnames(tmp))
+    setnames(tmp,
+             old=c(paste0(gsub("out_date_","", outcome),"_follow_up_end"),
+                   outcome),
+             new=c("follow_up_end",
+                  "event_date"))
     
-    tmp <- input[!is.na(input[,outcome]),c("patient_id",colnames(input)[grepl(outcome,colnames(input))])]
+    tmp <- tmp %>% filter(follow_up_end >= index_date)
+    
+    # Impose follow-up start and end dates on events dates
+    
+    event_cols <- c("snomed","hes","death","event_date")
+    for(colname in event_cols){
+      if(colname %in% colnames(tmp)){
+        tmp <- tmp %>% mutate(!!sym(colname) := replace(!!sym(colname), which(!!sym(colname)>follow_up_end | !!sym(colname)<index_date), NA))
+        
+      }
+    }
     
     # Identify and add missing columns -----------------------------------------
     
@@ -73,57 +94,57 @@ venn_output <- function(population){
                            hes = as.Date(NA),
                            death = as.Date(NA))
     
-    colnames(complete) <- c("patient_id",paste0("tmp_",outcome,c("_snomed","_hes","_death")))
+    #colnames(complete) <- c("patient_id",paste0("tmp_",outcome,c("_snomed","_hes","_death")))
     
     complete[,setdiff(colnames(tmp),"patient_id")] <- NULL
     notused <- NULL
     
     if (ncol(complete)>1) {
       tmp <- merge(tmp, complete, by = c("patient_id"))
-      notused <- gsub(paste0("tmp_",outcome,"_"),"",setdiff(colnames(complete),"patient_id"))
+      notused <- setdiff(colnames(complete),"patient_id")
     }
     
     # Calculate the number contributing to each source combo -------------------
     
-    tmp$snomed <- !is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
-      is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
-      is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    tmp$snomed_contributing <- !is.na(tmp$snomed) & 
+      is.na(tmp$hes) & 
+      is.na(tmp$death)
     
-    tmp$hes <- is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
-      !is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
-      is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    tmp$hes_contributing <- is.na(tmp$snomed) & 
+      !is.na(tmp$hes) & 
+      is.na(tmp$death)
     
-    tmp$death <- is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
-      is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
-      !is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    tmp$death_contributing <- is.na(tmp$snomed) & 
+      is.na(tmp$hes) & 
+      !is.na(tmp$death)
     
-    tmp$snomed_hes <- !is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
-      !is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
-      is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    tmp$snomed_hes_contributing <- !is.na(tmp$snomed) & 
+      !is.na(tmp$hes) & 
+      is.na(tmp$death)
     
-    tmp$hes_death <- is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
-      !is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
-      !is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    tmp$hes_death_contributing <- is.na(tmp$snomed) & 
+      !is.na(tmp$hes) & 
+      !is.na(tmp$death)
     
-    tmp$snomed_death <- !is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
-      is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
-      !is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    tmp$snomed_death_contributing <- !is.na(tmp$snomed) & 
+      is.na(tmp$hes) & 
+      !is.na(tmp$death)
     
-    tmp$snomed_hes_death <- !is.na(tmp[,paste0("tmp_",outcome,"_snomed")]) & 
-      !is.na(tmp[,paste0("tmp_",outcome,"_hes")]) & 
-      !is.na(tmp[,paste0("tmp_",outcome,"_death")])
+    tmp$snomed_hes_death_contributing <- !is.na(tmp$snomed) & 
+      !is.na(tmp$hes) & 
+      !is.na(tmp$death)
     
     df[nrow(df)+1,] <- c(outcome,
-                         snomed = sum(tmp$snomed),
-                         hes = sum(tmp$hes),
-                         death = sum(tmp$death),
-                         snomed_hes = sum(tmp$snomed_hes),
-                         snomed_death = sum(tmp$snomed_death),
-                         hes_death = sum(tmp$hes_death),
-                         snomed_hes_death = sum(tmp$snomed_hes_death),
-                         total_snomed = nrow(tmp[!is.na(tmp[,paste0("tmp_",outcome,"_snomed")]),]),
-                         total_hes = nrow(tmp[!is.na(tmp[,paste0("tmp_",outcome,"_hes")]),]),
-                         total_death = nrow(tmp[!is.na(tmp[,paste0("tmp_",outcome,"_death")]),]),
+                         snomed = sum(tmp$snomed_contributing),
+                         hes = sum(tmp$hes_contributing),
+                         death = sum(tmp$death_contributing),
+                         snomed_hes = sum(tmp$snomed_hes_contributing),
+                         snomed_death = sum(tmp$snomed_death_contributing),
+                         hes_death = sum(tmp$hes_death_contributing),
+                         snomed_hes_death = sum(tmp$snomed_hes_death_contributing),
+                         total_snomed = nrow(tmp[!is.na(tmp[,"snomed"]),]),
+                         total_hes = nrow(tmp[!is.na(tmp[,"hes"]),]),
+                         total_death = nrow(tmp[!is.na(tmp[,"death"]),]),
                          total = nrow(tmp))
     
     # Remove sources not in study definition from Venn plots and summary -------
@@ -148,7 +169,7 @@ venn_output <- function(population){
     }
 
     # Proceed to create Venn diagram if all source combos exceed 5 -------------
-    
+   
     if (min(as.numeric(df[df$outcome==outcome,source_consid]))>5) {
       
       # Calculate contents of each Venn cell for plotting ----------------------
@@ -158,13 +179,13 @@ venn_output <- function(population){
       index3 <- integer(0)
       
       if ("snomed" %in% source_consid) {
-        index1 <- which(!is.na(tmp[,paste0("tmp_",outcome,"_snomed")]))
+        index1 <- which(!is.na(tmp$snomed))
       }
       if ("hes" %in% source_consid) {
-        index2 <- which(!is.na(tmp[,paste0("tmp_",outcome,"_hes")]))
+        index2 <- which(!is.na(tmp$hes))
       }
       if ("death" %in% source_consid) {
-        index3 <- which(!is.na(tmp[,paste0("tmp_",outcome,"_death")]))
+        index3 <- which(!is.na(tmp$death))
       }
       
       index <- list(index1, index2, index3)
