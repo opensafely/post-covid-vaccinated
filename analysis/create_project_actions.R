@@ -113,7 +113,7 @@ table2 <- function(cohort){
       arguments = c(cohort),
       needs = list("stage1_data_cleaning_both",glue("stage1_end_date_table_{cohort}")),
       highly_sensitive = list(
-        input_table_2 = glue("output/table_2_{cohort}.csv")
+        input_table_2 = glue("output/review/descriptives/table2_{cohort}.csv")
       )
     )
   )
@@ -308,11 +308,9 @@ actions_list <- splice(
   action(
     name = "stage4_venn_diagram_both",
     run = "r:latest analysis/descriptives/venn_diagram.R both",
-    needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated","stage1_data_cleaning_both"),
+    needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated","stage1_data_cleaning_both","stage1_end_date_table_vaccinated","stage1_end_date_table_electively_unvaccinated"),
     moderately_sensitive = list(
-      venn_diagram = glue("output/review/venn-diagrams/venn_diagram_*.svg"),
-      venn_diagram_number_check = glue("output/review/venn-diagrams/venn_diagram_number_check_*.csv")
-    )
+      venn_diagram = glue("output/review/venn-diagrams/venn_diagram_*"))
   ),
 
   #comment("Stage 5 - Apply models"),

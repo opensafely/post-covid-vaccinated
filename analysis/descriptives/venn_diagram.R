@@ -14,6 +14,9 @@
 ## Output:   Venn diagrams in SVG files, venn_diagram_number_check.csv
 ## =============================================================================
 library(data.table)
+library(readr)
+library(dplyr)
+
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){

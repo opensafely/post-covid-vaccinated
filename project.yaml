@@ -158,7 +158,7 @@ actions:
     - stage1_end_date_table_vaccinated
     outputs:
       highly_sensitive:
-        input_table_2: output/table_2_vaccinated.csv
+        input_table_2: output/review/descriptives/table2_vaccinated.csv
 
   ## Stage 4 - Table 2 - electively_unvaccinated cohort 
 
@@ -169,7 +169,7 @@ actions:
     - stage1_end_date_table_electively_unvaccinated
     outputs:
       highly_sensitive:
-        input_table_2: output/table_2_electively_unvaccinated.csv
+        input_table_2: output/review/descriptives/table2_electively_unvaccinated.csv
 
   stage4_venn_diagram_both:
     run: r:latest analysis/descriptives/venn_diagram.R both
@@ -177,10 +177,11 @@ actions:
     - preprocess_data_vaccinated
     - preprocess_data_electively_unvaccinated
     - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    - stage1_end_date_table_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        venn_diagram: output/review/venn-diagrams/venn_diagram_*.svg
-        venn_diagram_number_check: output/review/venn-diagrams/venn_diagram_number_check_*.csv
+        venn_diagram: output/review/venn-diagrams/venn_diagram_*
 
   ## Apply cox model for ami - vaccinated cohort 
 
