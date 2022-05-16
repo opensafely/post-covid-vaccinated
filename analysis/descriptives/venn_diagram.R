@@ -52,9 +52,9 @@ venn_output <- function(population){
   # Create empty table ---------------------------------------------------------
   
   df <- data.frame(outcome = character(),
-                   snomed = numeric(),
-                   hes = numeric(),
-                   death = numeric(),
+                   only_snomed = numeric(),
+                   only_hes = numeric(),
+                   only_death = numeric(),
                    snomed_hes = numeric(),
                    snomed_death = numeric(),
                    hes_death = numeric(),
@@ -66,9 +66,8 @@ venn_output <- function(population){
                    stringsAsFactors = FALSE)
   
   # Populate table and make Venn for each outcome ------------------------------
-  
-  for (outcome in outcomes) {
-  
+
+    for (outcome in outcomes) {
     # Restrict data to that relevant to the given outcome ----------------------
     tmp <- input[!is.na(input[,outcome]),c("patient_id","index_date",paste0(gsub("out_date_","", outcome),"_follow_up_end"), colnames(input)[grepl(outcome,colnames(input))])]
     colnames(tmp) <- gsub(paste0("tmp_",outcome,"_"),"",colnames(tmp))
@@ -136,23 +135,22 @@ venn_output <- function(population){
     tmp$snomed_hes_death_contributing <- !is.na(tmp$snomed) & 
       !is.na(tmp$hes) & 
       !is.na(tmp$death)
-    
     df[nrow(df)+1,] <- c(outcome,
-                         snomed = sum(tmp$snomed_contributing),
-                         hes = sum(tmp$hes_contributing),
-                         death = sum(tmp$death_contributing),
-                         snomed_hes = sum(tmp$snomed_hes_contributing),
-                         snomed_death = sum(tmp$snomed_death_contributing),
-                         hes_death = sum(tmp$hes_death_contributing),
-                         snomed_hes_death = sum(tmp$snomed_hes_death_contributing),
-                         total_snomed = nrow(tmp[!is.na(tmp[,"snomed"]),]),
-                         total_hes = nrow(tmp[!is.na(tmp[,"hes"]),]),
-                         total_death = nrow(tmp[!is.na(tmp[,"death"]),]),
-                         total = nrow(tmp))
+                         only_snomed = nrow(tmp %>% filter(snomed_contributing==T)),
+                         only_hes = nrow(tmp %>% filter(hes_contributing==T)),
+                         only_death = nrow(tmp %>% filter(death_contributing==T)),
+                         snomed_hes = nrow(tmp %>% filter(snomed_hes_contributing==T)),
+                         snomed_death = nrow(tmp %>% filter(snomed_death_contributing==T)),
+                         hes_death = nrow(tmp %>% filter(hes_death_contributing==T)),
+                         snomed_hes_death = nrow(tmp %>% filter(snomed_hes_death_contributing==T)),
+                         total_snomed = nrow(tmp %>% filter(!is.na(snomed))),
+                         total_hes = nrow(tmp %>% filter(!is.na(hes))),
+                         total_death = nrow(tmp %>% filter(!is.na(death))),
+                         total = nrow(tmp %>% filter(!is.na(event_date))))
     
     # Remove sources not in study definition from Venn plots and summary -------
     
-    source_combos <- c("snomed","hes","death","snomed_hes","snomed_death","hes_death","snomed_hes_death")
+    source_combos <- c("only_snomed","only_hes","only_death","snomed_hes","snomed_death","hes_death","snomed_hes_death")
     source_consid <- source_combos
     
     if (!is.null(notused)) {
@@ -172,8 +170,7 @@ venn_output <- function(population){
     }
 
     # Proceed to create Venn diagram if all source combos exceed 5 -------------
-   
-    if (min(as.numeric(df[df$outcome==outcome,source_consid]))>5) {
+    if (min(as.numeric(df[df$outcome==outcome,source_consid]))>0) {
       
       # Calculate contents of each Venn cell for plotting ----------------------
       
@@ -192,14 +189,14 @@ venn_output <- function(population){
       }
       
       index <- list(index1, index2, index3)
-      names(index) <- c("SNOMED", "Hospital Episodes", "Deaths")
+      names(index) <- c("Primary care", "Secondary care", "Deaths")
       index <- Filter(length, index)
       
       # Fix colours --------------------------------------------------------------
       
-      mycol <- c(ifelse("SNOMED" %in% names(index),"thistle",""),
-                 ifelse("Hospital Episodes" %in% names(index),"lightcyan",""),
-                 ifelse("Deaths" %in% names(index),"lemonchiffon",""))
+      mycol <- c(ifelse("Primary care" %in% names(index),"thistle",""),
+                 ifelse("Secondary care" %in% names(index),"lightcyan",""),
+                 ifelse("Death record" %in% names(index),"lemonchiffon",""))
       
       mycol <- mycol[mycol!=""]
       

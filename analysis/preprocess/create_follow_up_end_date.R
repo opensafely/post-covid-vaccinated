@@ -130,4 +130,3 @@ if(cohort == "both"){
 }else{
   follow_up_end_dates(cohort)
 }
-

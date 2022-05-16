@@ -156,12 +156,6 @@ table_2_subgroups_output <- function(population){
                      "non_hospitalised_follow_up_end",
                      "hospitalised_date_expo_censor",
                      "non_hospitalised_date_expo_censor"))
-
-    event=analyses_of_interest$event[i]
-    cohort=analyses_of_interest$cohort_to_run[i]
-    subgroup=analyses_of_interest$subgroup[i] 
-    stratify_by=analyses_of_interest$strata[i] 
-    stratify_by_subgroup=analyses_of_interest$stratify_by_subgroup[i]
     
     analyses_of_interest[i,start:end] <- table_2_calculation(survival_data, 
                                                              event=analyses_of_interest$event[i],
@@ -249,7 +243,7 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
   
   if(subgroup=="covid_pheno_non_hospitalised"){
     data_active = data_active %>% mutate(person_days = as.numeric((as.Date(non_hospitalised_follow_up_end) - as.Date(index_date))))
-    index <- which(data_active$hospitalised_follow_up_end > data_active$non_hospitalised_date_expo_censor | is.na(data_active$non_hospitalised_date_expo_censor))
+    index <- which(data_active$non_hospitalised_follow_up_end > data_active$non_hospitalised_date_expo_censor | is.na(data_active$non_hospitalised_date_expo_censor))
     data_active$person_days[index] = data_active$person_days[index] + 1
   }
   
@@ -259,8 +253,7 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
 
   person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
   person_days_total = round(sum(data_active$person_days, na.rm = TRUE),1)
-  
-  
+ 
   if(!startsWith(subgroup,"covid_pheno_")){
     event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
                                           data_active$event_date >= data_active$exp_date_covid19_confirmed & 
