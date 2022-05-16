@@ -284,6 +284,13 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
                                            (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))))
   }
     
+  if(event_count_unexposed <= 5){
+    event_count_unexposed <- "[Redacted]"
+  }
+  
+  if(event_count_exposed <= 5){
+    event_count_exposed <- "[Redacted]"
+  }
   
   return(c(person_days_total_unexposed, event_count_unexposed, event_count_exposed,person_days_total))
 }
