@@ -47,8 +47,8 @@ rm_lowvar_covars <- function(data_surv){
 collapse_categorical_covars <- function(data_surv){
   cov_cat <-colnames(data_surv)[grepl("cov_cat", colnames(data_surv))]
   df <- data_surv %>% dplyr::select(c( "expo", "event", all_of(cov_cat), "patient_id")) %>% distinct() %>% filter((expo==1) & (event==1))
-  df <- df %>%  dplyr::select(!c("expo", "event", "patient_id",
-                                 df %>%  dplyr::select_if(is.numeric) %>% names()
+  df <- df %>%  dplyr::select(!c("expo", "event", "patient_id"
+                                 #df %>%  dplyr::select_if(is.numeric) %>% names()
                                  
   ))
   summary <- as.data.frame(summary(df,maxsum=50))
