@@ -299,6 +299,10 @@ if (any(diabetes_analyses$active==TRUE)){
     # remove bmi date var
     dplyr::select(- cov_num_bmi_date_measured)
   
+  # replace NaN and Inf with NA's (probably only an issue with dummy data)
+  df$cov_num_tc_hdl_ratio[is.nan(df$cov_num_tc_hdl_ratio)] <- NA
+  df$cov_num_tc_hdl_ratio[is.infinite(df$cov_num_tc_hdl_ratio)] <- NA
+  
   print("Diabetes count variables created successfully")
 
   # define variables needed for diabetes algorithm 
