@@ -3,7 +3,7 @@
 ## 2.Stratify to relevant subgroup if necessary
 ## 3.Add follow up start and end dates
 ## =============================================================================
-source(file.path(scripts_dir,"fit_model.R"))
+source(file.path(scripts_dir,"04_01_(a)_cox_fit_model.R"))
 
 get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,time_point,input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced){
   print(paste0("Working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
