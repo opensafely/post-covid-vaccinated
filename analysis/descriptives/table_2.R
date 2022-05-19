@@ -181,7 +181,7 @@ table_2_subgroups_output <- function(population){
                      paste0(event_short,"_hospitalised_date_expo_censor"),
                      paste0(event_short,"_non_hospitalised_date_expo_censor")))
     
-    print(paste0("event count and person years have been produced successfully for", analyses_of_interest$event[i], " in ", population, " population!"))
+    print(paste0("event count and person years have been produced successfully for ", analyses_of_interest$event[i], " in ", population, " population!"))
   }
   
   # write output for table2
