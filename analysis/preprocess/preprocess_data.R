@@ -11,9 +11,9 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  cohort <- "vaccinated"
+  cohort_name <- "vaccinated"
 } else {
-  cohort <- args[[1]]
+  cohort_name <- args[[1]]
 }
 
 fs::dir_create(here::here("output", "not-for-review"))
@@ -176,11 +176,11 @@ df <- df[,c("patient_id","death_date",
 
 df$study_start_date <- as.Date(study_start)
 
-if(cohort=="vaccinated"){
+if(cohort_name=="vaccinated"){
   df$pat_start_date <- as.Date(df$vax_date_covid_2)+14
 }
 
-if(cohort=="electively_unvaccinated"){
+if(cohort_name=="electively_unvaccinated"){
   df$pat_start_date <- as.Date(df$vax_date_eligible)+84
 }
 
@@ -193,15 +193,15 @@ print("Index date and source determined successfully")
 # Load covariate data ----------------------------------------------------------
 
 tmp_index <- arrow::read_feather(file = "output/input_index.feather")
-tmp_other <- arrow::read_feather(file = paste0("output/input_",cohort,".feather"))
+tmp_other <- arrow::read_feather(file = paste0("output/input_",cohort_name,".feather"))
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/not-for-review/describe_tmp_index_",cohort,".txt"))
+sink(paste0("output/not-for-review/describe_tmp_index_",cohort_name,".txt"))
 print(Hmisc::describe(tmp_index))
 sink()
 
-sink(paste0("output/not-for-review/describe_tmp_",cohort,".txt"))
+sink(paste0("output/not-for-review/describe_tmp_",cohort_name,".txt"))
 print(Hmisc::describe(tmp_other))
 sink()
 
@@ -299,6 +299,10 @@ if (any(diabetes_analyses$active==TRUE)){
     # remove bmi date var
     dplyr::select(- cov_num_bmi_date_measured)
   
+  # replace NaN and Inf with NA's (probably only an issue with dummy data)
+  df$cov_num_tc_hdl_ratio[is.nan(df$cov_num_tc_hdl_ratio)] <- NA
+  df$cov_num_tc_hdl_ratio[is.infinite(df$cov_num_tc_hdl_ratio)] <- NA
+  
   print("Diabetes count variables created successfully")
 
   # define variables needed for diabetes algorithm 
@@ -342,13 +346,13 @@ df1 <- df[,c("patient_id","death_date","index_date",
 
 df1[,colnames(df)[grepl("tmp_",colnames(df))]] <- NULL
 
-saveRDS(df1, file = paste0("output/input_",cohort,".rds"))
+saveRDS(df1, file = paste0("output/input_",cohort_name,".rds"))
 
 print("Input data saved successfully")
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/not-for-review/describe_input_",cohort,"_stage0.txt"))
+sink(paste0("output/not-for-review/describe_input_",cohort_name,"_stage0.txt"))
 print(Hmisc::describe(df1))
 sink()
 
@@ -360,10 +364,10 @@ df2 <- df %>% select(starts_with(c("patient_id","tmp_out_date","out_date")))
 
 # Describe data --------------------------------------------------------------
 
-sink(paste0("output/not-for-review/describe_venn_",cohort,".txt"))
+sink(paste0("output/not-for-review/describe_venn_",cohort_name,".txt"))
 print(Hmisc::describe(df2))
 sink()
 
-saveRDS(df2, file = paste0("output/venn_",cohort,".rds"))
+saveRDS(df2, file = paste0("output/venn_",cohort_name,".rds"))
 
 print("Venn diagram data saved successfully")

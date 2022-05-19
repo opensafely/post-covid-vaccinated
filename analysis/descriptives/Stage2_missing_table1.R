@@ -44,9 +44,14 @@ if(length(args)==0){
 fs::dir_create(here::here("output", "not-for-review"))
 fs::dir_create(here::here("output", "review", "descriptives"))
 
+# Determine which outcome groups are active
+active_analyses <- read_rds("lib/active_analyses.rds")
+active_analyses <- active_analyses %>% filter(active == TRUE)
+outcome_groups <- unique(active_analyses$outcome_group)
+
 # Define stage2 function -------------------------------------------------------
 
-stage2 <- function(cohort_name, covid_history) {
+stage2 <- function(cohort_name, covid_history, group) {
 
   # Load relevant data
   input <- readr::read_rds(file.path("output", paste0("input_",cohort_name,"_stage1.rds")))
@@ -154,8 +159,7 @@ stage2 <- function(cohort_name, covid_history) {
   input$cov_cat_consulation_rate_group <- ifelse(input$cov_num_consulation_rate>=6, "6+", input$cov_cat_consulation_rate_group)
 
   # Populate table 1 
-  active_analyses <- read_rds("lib/active_analyses.rds")
-  active_analyses <- active_analyses %>% filter(active==TRUE)
+  covar_names <- active_analyses %>% filter(outcome_group==group)
   covar_names<-str_split(active_analyses$covariates, ";")[[1]]
   
   #categorical_cov <- colnames(input)[grep("cov_cat", colnames(input))]
@@ -168,11 +172,13 @@ stage2 <- function(cohort_name, covid_history) {
   
   #binary_cov <- colnames(input)[grep("cov_bin", colnames(input))]
   binary_cov <- covar_names[grep("cov_bin", covar_names)]
+  binary_cov_table <- crossing(covar_names[grep("cov_bin", covar_names)], c("TRUE","FALSE"))
+  colnames(binary_cov_table) <- c("Covariate","Covariate_level")
   
   # Base table
   
   table1 <- input %>% 
-    dplyr::select(c(categorical_cov,numerical_cov,binary_cov))
+    dplyr::select(c(categorical_cov,numerical_cov))
   
   table1 <- table1 %>% 
     mutate_if(is.character,as.factor)
@@ -202,6 +208,7 @@ stage2 <- function(cohort_name, covid_history) {
   table1_count_all[1,] <- c("All","All")
   table1 <- rbind(table1_count_all,table1)
   table1 <- table1[!is.na(table1$Covariate_level),]
+  table1 <- rbind(table1, binary_cov_table)
   
   for (j in 1:nrow(pop)) {
     
@@ -243,6 +250,7 @@ stage2 <- function(cohort_name, covid_history) {
     bin_summary <- rename(bin_summary, Covariate_level = Freq, Covariate = Var2)
     #bin_summary <- bin_summary %>% filter(str_detect(Covariate_level, "^TRUE"))
     bin_summary <- bin_summary%>% dplyr::select("Covariate","Covariate_level",population)
+    bin_summary$Covariate_level <- gsub("\\s","",bin_summary$Covariate_level) #Remove spaces
     
     # Population summary
     
@@ -255,6 +263,7 @@ stage2 <- function(cohort_name, covid_history) {
 
     pop_summary[,population] <- gsub(".*:", "",pop_summary[,population])#Remove everything before:
     pop_summary <- pop_summary %>% drop_na(Covariate_level)#Remove rows with NA
+    unique(pop_summary$Covariate_level)
     
     # Left join onto base table
     
@@ -303,20 +312,22 @@ stage2 <- function(cohort_name, covid_history) {
   table1_suppressed <- table1_suppressed %>% filter(!str_detect(Covariate_level, "^FALSE"))
   
   # Save table 1
-  write.csv(table1_suppressed, file = file.path("output/review/descriptives", paste0("Table1_",cohort_name, "_",covid_history, ".csv")) , row.names=F)
+  write.csv(table1_suppressed, file = file.path("output/review/descriptives", paste0("Table1_",cohort_name, "_",covid_history,"_",group, ".csv")) , row.names=F)
   
 }
 
 # Run function using specified commandArgs
 
-
-if(cohort_name == "both"){
-  stage2("vaccinated", "with_covid_history")
-  stage2("vaccinated", "without_covid_history")
-  stage2("electively_unvaccinated", "with_covid_history")
-  stage2("electively_unvaccinated", "without_covid_history")
-}else{
-  stage2(cohort_name, "with_covid_history")
-  stage2(cohort_name, "without_covid_history")
+for(group in outcome_groups){
+  if(cohort_name == "both"){
+    stage2("vaccinated", "with_covid_history", group)
+    stage2("vaccinated", "without_covid_history", group)
+    stage2("electively_unvaccinated", "with_covid_history", group)
+    stage2("electively_unvaccinated", "without_covid_history", group)
+  }else{
+    stage2(cohort_name, "with_covid_history", group)
+    stage2(cohort_name, "without_covid_history", group)
+  }
+  
 }
- 
+
