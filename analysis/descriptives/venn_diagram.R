@@ -21,15 +21,15 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  population <- "vaccinated"
+  cohort_name <- "vaccinated"
 } else {
-  population <- args[[1]]
+  cohort_name <- args[[1]]
 }
 
 fs::dir_create(here::here("output", "not-for-review"))
 fs::dir_create(here::here("output", "review", "venn-diagrams"))
 
-venn_output <- function(population){
+venn_output <- function(cohort_name){
   
   # Identify active outcomes ---------------------------------------------------
   
@@ -38,10 +38,10 @@ venn_output <- function(population){
   
   # Load data ------------------------------------------------------------------
   
-  input <- readr::read_rds(paste0("output/venn_",population,".rds"))
-  end_dates <- read_rds(paste0("output/follow_up_end_dates_",population,".rds"))
+  input <- readr::read_rds(paste0("output/venn_",cohort_name,".rds"))
+  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort_name,".rds"))
   
-  input_stage1 <- readr::read_rds(paste0("output/input_", population,"_stage1.rds"))
+  input_stage1 <- readr::read_rds(paste0("output/input_", cohort_name,"_stage1.rds"))
   input_stage1 <- input_stage1[input_stage1$sub_bin_covid19_confirmed_history==FALSE,]
   
   input <- input[input$patient_id %in% input_stage1$patient_id,]
@@ -202,7 +202,7 @@ venn_output <- function(population){
       
       # Make Venn diagram --------------------------------------------------------
       
-      svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",population,"_",gsub("out_date_","",outcome),".svg"))
+      svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",cohort_name,"_",gsub("out_date_","",outcome),".svg"))
       g <- ggvenn::ggvenn(
         index, 
         fill_color = mycol,
@@ -221,15 +221,15 @@ venn_output <- function(population){
   
   # Save summary file ----------------------------------------------------------
   
-  write.csv(df, file = paste0("output/review/venn-diagrams/venn_diagram_number_check_", population,".csv"), row.names = F)
+  write.csv(df, file = paste0("output/review/venn-diagrams/venn_diagram_number_check_", cohort_name,".csv"), row.names = F)
   
 }
 
 # Run function using specified commandArgs -------------------------------------
 
-if(population == "both"){
+if(cohort_name == "both"){
   venn_output("electively_unvaccinated")
   venn_output("vaccinated")
 } else{
-  venn_output(population)
+  venn_output(cohort_name)
 }
