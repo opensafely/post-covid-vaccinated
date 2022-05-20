@@ -25,10 +25,10 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  population <- "vaccinated"
-  #population = "electively_unvaccinated"
+  cohort_name <- "vaccinated"
+  #cohort_name = "electively_unvaccinated"
 }else{
-  population <- args[[1]]
+  cohort_name <- args[[1]]
 }
 
 fs::dir_create(here::here("output", "not-for-review"))
@@ -41,7 +41,7 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 agebreaks <- c(0, 40, 60, 80, 111)
 agelabels <- c("18_39", "40_59", "60_79", "80_110")
 
-table_2_subgroups_output <- function(population){
+table_2_subgroups_output <- function(cohort_name){
   
   # define analyses of interests
   active_analyses <- read_rds("lib/active_analyses.rds")
@@ -51,8 +51,8 @@ table_2_subgroups_output <- function(population){
   
   outcomes<-active_analyses$outcome_variable
   
-  survival_data <- read_rds(paste0("output/input_",population,"_stage1.rds"))
-  end_dates <- read_rds(paste0("output/follow_up_end_dates_",population,".rds")) 
+  survival_data <- read_rds(paste0("output/input_",cohort_name,"_stage1.rds"))
+  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort_name,".rds")) 
   end_dates$index_date <- NULL
   
   survival_data<- survival_data %>% left_join(end_dates, by="patient_id")
@@ -122,7 +122,7 @@ table_2_subgroups_output <- function(population){
   }
   
   analyses_of_interest$strata[analyses_of_interest$strata=="South_Asian"]<- "South Asian"
-  analyses_of_interest <- analyses_of_interest %>% filter(cohort_to_run == population)
+  analyses_of_interest <- analyses_of_interest %>% filter(cohort_to_run == cohort_name)
   
 
   unexposed_person_days <- unexposed_event_count <- rep("NA", nrow(analyses_of_interest))
@@ -181,11 +181,11 @@ table_2_subgroups_output <- function(population){
                      paste0(event_short,"_hospitalised_date_expo_censor"),
                      paste0(event_short,"_non_hospitalised_date_expo_censor")))
     
-    print(paste0("event count and person years have been produced successfully for", analyses_of_interest$event[i], " in ", population, " population!"))
+    print(paste0("event count and person years have been produced successfully for", analyses_of_interest$event[i], " in ", cohort_name, " population!"))
   }
   
   # write output for table2
-  write.csv(analyses_of_interest, file=paste0("output/review/descriptives/table2_",population, ".csv"), row.names = F)
+  write.csv(analyses_of_interest, file=paste0("output/review/descriptives/table2_",cohort_name, ".csv"), row.names = F)
 }
 
 table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_by, stratify_by_subgroup){
@@ -215,7 +215,7 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
   
   # calculate unexposed follow-up days for AER script
   data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date))))
-  index <- which(data_active$follow_up_end_unexposed > data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
+  index <- which(data_active$follow_up_end_unexposed < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
   data_active$person_days_unexposed[index] = data_active$person_days_unexposed[index] + 1
   
   if(subgroup == "covid_pheno_hospitalised"){
@@ -297,10 +297,10 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
 
 
 # Run function using specified commandArgs
-if(population == "both"){
+if(cohort_name == "both"){
   table_2_subgroups_output("vaccinated")
   table_2_subgroups_output("electively_unvaccinated")
 }else{
-  table_2_subgroups_output(population)
+  table_2_subgroups_output(cohort_name)
 }
 

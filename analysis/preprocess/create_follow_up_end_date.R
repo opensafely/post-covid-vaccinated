@@ -12,9 +12,9 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  cohort <- "vaccinated"
+  cohort_name <- "vaccinated"
 } else {
-  cohort <- args[[1]]
+  cohort_name <- args[[1]]
 }
 
 #These are the study start and end dates for the Delta era
@@ -26,9 +26,9 @@ cohort_end_date <- as.Date("2021-12-14")
 active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses <- active_analyses %>% filter(active == "TRUE") %>% select(outcome_variable)
 
-follow_up_end_dates <- function(cohort){
+follow_up_end_dates <- function(cohort_name){
   # Load relevant data
-  input <- read_rds(paste0("output/input_",cohort,"_stage1.rds"))
+  input <- read_rds(paste0("output/input_",cohort_name,"_stage1.rds"))
   
   input <- input[,c("patient_id","death_date","index_date","sub_cat_covid19_hospital",active_analyses$outcome_variable,
                     colnames(input)[grepl("exp_",colnames(input))], 
@@ -47,14 +47,14 @@ follow_up_end_dates <- function(cohort){
     # Calculate follow up end dates based on cohort
     # follow_up_end_unexposed is required in Table 2 script and follow_up_end is 
     # the general follow up end date for each patient
-    if(cohort=="vaccinated"){
+    if(cohort_name=="vaccinated"){
       input$follow_up_end_unexposed <- apply(input[,c("event_date", "expo_date", "death_date", "cohort_end_date")],1, min,na.rm=TRUE)
       input$follow_up_end <- apply(input[,c("event_date", "death_date", "cohort_end_date")],1, min, na.rm=TRUE)
       
       input$follow_up_end_unexposed <- as.Date(input$follow_up_end_unexposed)
       input$follow_up_end <- as.Date(input$follow_up_end)
       
-    }else if(cohort=="electively_unvaccinated"){
+    }else if(cohort_name=="electively_unvaccinated"){
       input$follow_up_end_unexposed <- apply(input[,c("vax_date_covid_1","event_date", "expo_date", "death_date","cohort_end_date")],1, min,na.rm=TRUE)
       input$follow_up_end <- apply(input[,c("vax_date_covid_1","event_date", "death_date","cohort_end_date")],1, min, na.rm=TRUE)
       
@@ -120,13 +120,13 @@ follow_up_end_dates <- function(cohort){
                     colnames(input)[grepl("follow_up",colnames(input))],
                     colnames(input)[grepl("censor",colnames(input))])] 
   
-  saveRDS(input, paste0("output/follow_up_end_dates_",cohort,".rds"))
+  saveRDS(input, paste0("output/follow_up_end_dates_",cohort_name,".rds"))
 }
 
 # Run function using specified commandArgs
-if(cohort == "both"){
+if(cohort_name == "both"){
   follow_up_end_dates("vaccinated")
   follow_up_end_dates("electively_unvaccinated")
 }else{
-  follow_up_end_dates(cohort)
+  follow_up_end_dates(cohort_name)
 }
