@@ -87,7 +87,7 @@ apply_model_function <- function(outcome, cohort){
       name = glue("Analysis_cox_{outcome}_{cohort}"),
       run = "r:latest analysis/model/01_cox_pipeline.R",
       arguments = c(outcome,cohort),
-      needs = list("stage1_data_cleaning_both"),
+      needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}")),
       moderately_sensitive = list(
         analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}.csv"),
         compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
