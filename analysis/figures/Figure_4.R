@@ -31,7 +31,7 @@ lifetables <- readr::read_csv(paste0(aer_results_dir,"/Figure4_compiled_lifetabl
 lifetables <- lifetables %>% filter(event %in% event_of_interest & model %in% model_of_interest)
 
 #----------------------Filter to subgroups of interest--------------------------
-lifetables <- lifetables %>% filter(str_detect(subgroup, c("^main","^sex","^agegp")))
+lifetables <- lifetables %>% filter(str_detect(subgroup, c("^main","^sex","^age")))
 
 #-------------------------Make event names 'nice' ------------------------------
 lifetables <- lifetables %>% left_join(active_analyses %>% select(outcome, outcome_variable), by = c("event"="outcome_variable"))
@@ -55,6 +55,17 @@ lifetables$colour <- ifelse(lifetables$subgroup=="Age group: 60-79","#74c476",li
 lifetables$colour <- ifelse(lifetables$subgroup=="Age group: 80-110","#bae4b3",lifetables$colour)
 lifetables$colour <- ifelse(lifetables$subgroup=="Sex: Male","#cab2d6",lifetables$colour)
 lifetables$colour <- ifelse(lifetables$subgroup=="Sex: Female","#6a3d9a",lifetables$colour)
+
+# Specify line types ---------------------------------------------------------
+
+lifetables$line <- ""
+lifetables$line <- ifelse(lifetables$subgroup=="Combined","solid",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Age group: 18-39","dotted",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Age group: 40-59","dotted",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Age group: 60-79","dotted",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Age group: 80-110","dotted",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Sex: Male","longdash",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Sex: Female","longdash",lifetables$line)
 
 #--------------Option 1: Indivdual plots for each outcome and cohort------------
 
@@ -110,7 +121,7 @@ for(cohort_of_interest in cohort_name){
 
    
  
-  assign(paste0(outcome_name,"_",cohort_of_interest),plot)
+  #assign(paste0(outcome_name,"_",cohort_of_interest),plot)
   ggsave(paste0(aer_results_dir, "/figure_4_",outcome_name,"_",cohort_of_interest,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
   }
 }
@@ -144,18 +155,22 @@ for(cohort_of_interest in cohort_name){
   } 
   df$colour <- factor(df$colour, levels=colour_levels)
   
+  df$line <- factor(df$line, levels = c("solid","dotted","longdash"))
+  
   #Test to see error bars as in dummy data the CI is too small so can't see it
   #df$CIp.low<-df$AERp - 0.02
   #df$CIp.high<-df$AERp + 0.02
   
   ggplot2::ggplot(data = df, 
-                        mapping = ggplot2::aes(x = days, y = AERp, color = subgroup, shape = subgroup, fill = subgroup)) +
+                        mapping = ggplot2::aes(x = days, y = AERp, color = subgroup, shape = subgroup, fill = subgroup, linetype=subgroup)) +
     #ggplot2::geom_hline(colour = "#A9A9A9") +
     geom_ribbon(aes(ymin = CIp.low, ymax = CIp.high), alpha = 0.1)+
     ggplot2::geom_line() +
     ggplot2::scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
+    #Might need to have a think about line types as can't get it to work like colour
+    #ggplot2::scale_linetype_manual(values = c("solid","dotted","dotdash","dashed",rep("solid",2)), labels = levels(df$subgroup)) +
     ggplot2::labs(x = "Days since COVID-19 diagnosis", y = "Cumulative difference in absolute risk  (%)") +
     ggplot2::guides(fill=ggplot2::guide_legend(ncol = length(sub_group_levels), byrow = TRUE)) +
     ggplot2::theme_minimal() +

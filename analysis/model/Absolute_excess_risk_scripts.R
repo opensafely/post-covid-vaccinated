@@ -155,6 +155,6 @@ write.csv(compiled_lifetables, paste0(aer_results_dir,"/Figure4_compiled_lifetab
 #3.Clear the folder(except compiled results)
 #if (file.exists(AER_files)) { file.remove(AER_files)}
 #4.Sample the results
-print(AER_compiled_results)                                                      #-ve AERs not expected with actual data, but possible.                                                    
-table(AER_compiled_results$AER_196<0)                                            #264 obs with 5 variables as per active analysis list.
+#print(AER_compiled_results)                                                      #-ve AERs not expected with actual data, but possible.                                                    
+#table(AER_compiled_results$AER_196<0)                                            #264 obs with 5 variables as per active analysis list.
 
