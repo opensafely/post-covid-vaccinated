@@ -103,6 +103,26 @@ actions:
       highly_sensitive:
         cohort: output/input_*_stage1.rds
 
+  stage1_end_date_table_vaccinated:
+    run: r:latest analysis/preprocess/create_follow_up_end_date.R vaccinated
+    needs:
+    - preprocess_data_vaccinated
+    - preprocess_data_electively_unvaccinated
+    - stage1_data_cleaning_both
+    outputs:
+      highly_sensitive:
+        end_date_table: output/follow_up_end_dates_vaccinated.rds
+
+  stage1_end_date_table_electively_unvaccinated:
+    run: r:latest analysis/preprocess/create_follow_up_end_date.R electively_unvaccinated
+    needs:
+    - preprocess_data_vaccinated
+    - preprocess_data_electively_unvaccinated
+    - stage1_data_cleaning_both
+    outputs:
+      highly_sensitive:
+        end_date_table: output/follow_up_end_dates_electively_unvaccinated.rds
+
   stage2_missing_table1_both:
     run: r:latest analysis/descriptives/Stage2_missing_table1.R both
     needs:
@@ -129,92 +149,27 @@ actions:
       moderately_sensitive:
         flow_df: output/review/figure-data/diabetes_flow_values_electively_unvaccinated.csv
 
-  ## Input for table 2 new - vaccinated cohort 
+  ## Stage 4 - Table 2 - vaccinated cohort 
 
-  stage4_input_for_table_2_vaccinated:
-    run: r:latest analysis/descriptives/table_2_create_input_by_event.R vaccinated
+  stage4_table_2_vaccinated:
+    run: r:latest analysis/descriptives/table_2.R vaccinated
     needs:
     - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
     outputs:
       highly_sensitive:
-        input_table_2: output/input_table_2_vaccinated_stage1.rds
+        input_table_2: output/review/descriptives/table2_vaccinated.csv
 
-  ## Input for table 2 new - electively_unvaccinated cohort 
+  ## Stage 4 - Table 2 - electively_unvaccinated cohort 
 
-  stage4_input_for_table_2_electively_unvaccinated:
-    run: r:latest analysis/descriptives/table_2_create_input_by_event.R electively_unvaccinated
+  stage4_table_2_electively_unvaccinated:
+    run: r:latest analysis/descriptives/table_2.R electively_unvaccinated
     needs:
     - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
     outputs:
       highly_sensitive:
-        input_table_2: output/input_table_2_electively_unvaccinated_stage1.rds
-
-  ## Table 2 new - vaccinated cohort 
-
-  stage4_table_2_main_vaccinated:
-    run: r:latest analysis/descriptives/table_2_new.R main vaccinated
-    needs:
-    - stage4_input_for_table_2_vaccinated
-    outputs:
-      moderately_sensitive:
-        table_2_csv: output/review/descriptives/table2_main_vaccinated.csv
-        input_1_aer_csv: output/review/descriptives/input1_aer_main_vaccinated.csv
-        table_2_html: output/review/descriptives/table2_main_vaccinated.html
-        input_1_aer_html: output/review/descriptives/input1_aer_main_vaccinated.html
-
-  ## Table 2 new - vaccinated cohort 
-
-  stage4_table_2_subgroups_vaccinated:
-    run: r:latest analysis/descriptives/table_2_new.R subgroups vaccinated
-    needs:
-    - stage4_input_for_table_2_vaccinated
-    outputs:
-      moderately_sensitive:
-        table_2_csv: output/review/descriptives/table2_subgroups_vaccinated.csv
-        input_1_aer_csv: output/review/descriptives/input1_aer_subgroups_vaccinated.csv
-        table_2_html: output/review/descriptives/table2_subgroups_vaccinated.html
-        input_1_aer_html: output/review/descriptives/input1_aer_subgroups_vaccinated.html
-
-  ## Table 2 new - electively_unvaccinated cohort 
-
-  stage4_table_2_main_electively_unvaccinated:
-    run: r:latest analysis/descriptives/table_2_new.R main electively_unvaccinated
-    needs:
-    - stage4_input_for_table_2_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        table_2_csv: output/review/descriptives/table2_main_electively_unvaccinated.csv
-        input_1_aer_csv: output/review/descriptives/input1_aer_main_electively_unvaccinated.csv
-        table_2_html: output/review/descriptives/table2_main_electively_unvaccinated.html
-        input_1_aer_html: output/review/descriptives/input1_aer_main_electively_unvaccinated.html
-
-  ## Table 2 new - electively_unvaccinated cohort 
-
-  stage4_table_2_subgroups_electively_unvaccinated:
-    run: r:latest analysis/descriptives/table_2_new.R subgroups electively_unvaccinated
-    needs:
-    - stage4_input_for_table_2_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        table_2_csv: output/review/descriptives/table2_subgroups_electively_unvaccinated.csv
-        input_1_aer_csv: output/review/descriptives/input1_aer_subgroups_electively_unvaccinated.csv
-        table_2_html: output/review/descriptives/table2_subgroups_electively_unvaccinated.html
-        input_1_aer_html: output/review/descriptives/input1_aer_subgroups_electively_unvaccinated.html
-
-  stage4_table_2_transfer_unexposed_data:
-    run: r:latest analysis/descriptives/table_2_transfer_unexposed_data.R subgroups
-      both
-    needs:
-    - stage4_table_2_main_vaccinated
-    - stage4_table_2_subgroups_vaccinated
-    - stage4_table_2_main_electively_unvaccinated
-    - stage4_table_2_subgroups_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        table_2_csv: output/review/descriptives/table2_subgroups_*.csv
-        input_1_aer_csv: output/review/descriptives/input1_aer_*.csv
-        table_2_html: output/review/descriptives/table2_subgroups_*.html
-        input_1_aer_html: output/review/descriptives/input1_aer_*.html
+        input_table_2: output/review/descriptives/table2_electively_unvaccinated.csv
 
   stage4_venn_diagram_both:
     run: r:latest analysis/descriptives/venn_diagram.R both
@@ -222,10 +177,11 @@ actions:
     - preprocess_data_vaccinated
     - preprocess_data_electively_unvaccinated
     - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    - stage1_end_date_table_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        venn_diagram: output/review/venn-diagrams/venn_diagram_*.svg
-        venn_diagram_number_check: output/review/venn-diagrams/venn_diagram_number_check_*.csv
+        venn_diagram: output/review/venn-diagrams/venn_diagram_*
 
   ## Apply cox model for ami - vaccinated cohort 
 
