@@ -68,6 +68,7 @@ venn_output <- function(cohort_name){
   # Populate table and make Venn for each outcome ------------------------------
 
     for (outcome in outcomes) {
+    print(paste0("Working on ", outcome))
     # Restrict data to that relevant to the given outcome ----------------------
     tmp <- input[!is.na(input[,outcome]),c("patient_id","index_date",paste0(gsub("out_date_","", outcome),"_follow_up_end"), colnames(input)[grepl(outcome,colnames(input))])]
     colnames(tmp) <- gsub(paste0("tmp_",outcome,"_"),"",colnames(tmp))
@@ -135,6 +136,7 @@ venn_output <- function(cohort_name){
     tmp$snomed_hes_death_contributing <- !is.na(tmp$snomed) & 
       !is.na(tmp$hes) & 
       !is.na(tmp$death)
+    
     df[nrow(df)+1,] <- c(outcome,
                          only_snomed = nrow(tmp %>% filter(snomed_contributing==T)),
                          only_hes = nrow(tmp %>% filter(hes_contributing==T)),
@@ -170,7 +172,7 @@ venn_output <- function(cohort_name){
     }
 
     # Proceed to create Venn diagram if all source combos exceed 5 -------------
-    if (min(as.numeric(df[df$outcome==outcome,source_consid]))>5) {
+    #if (min(as.numeric(df[df$outcome==outcome,source_consid]))>5) {
       
       # Calculate contents of each Venn cell for plotting ----------------------
       
@@ -178,18 +180,18 @@ venn_output <- function(cohort_name){
       index2 <- integer(0)
       index3 <- integer(0)
       
-      if ("snomed" %in% source_consid) {
+      if ("only_snomed" %in% source_consid) {
         index1 <- which(!is.na(tmp$snomed))
       }
-      if ("hes" %in% source_consid) {
+      if ("only_hes" %in% source_consid) {
         index2 <- which(!is.na(tmp$hes))
       }
-      if ("death" %in% source_consid) {
+      if ("only_death" %in% source_consid) {
         index3 <- which(!is.na(tmp$death))
       }
       
       index <- list(index1, index2, index3)
-      names(index) <- c("Primary care", "Secondary care", "Deaths")
+      names(index) <- c("Primary care", "Secondary care", "Death record")
       index <- Filter(length, index)
       
       # Fix colours --------------------------------------------------------------
@@ -203,7 +205,7 @@ venn_output <- function(cohort_name){
       # Make Venn diagram --------------------------------------------------------
       
       svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",cohort_name,"_",gsub("out_date_","",outcome),".svg"))
-      g <- ggvenn::ggvenn(
+       g <- ggvenn::ggvenn(
         index, 
         fill_color = mycol,
         stroke_color = "white",
@@ -217,7 +219,7 @@ venn_output <- function(cohort_name){
       
     }
     
-  }
+  #}
   
   # Save summary file ----------------------------------------------------------
   
