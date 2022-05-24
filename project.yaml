@@ -157,7 +157,7 @@ actions:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
     outputs:
-      highly_sensitive:
+      moderately_sensitive:
         input_table_2: output/review/descriptives/table2_vaccinated.csv
 
   ## Stage 4 - Table 2 - electively_unvaccinated cohort 
@@ -168,7 +168,7 @@ actions:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
     outputs:
-      highly_sensitive:
+      moderately_sensitive:
         input_table_2: output/review/descriptives/table2_electively_unvaccinated.csv
 
   stage4_venn_diagram_both:
@@ -462,4 +462,5 @@ actions:
         compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_vte_electively_unvaccinated.csv
         compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_electively_unvaccinated.csv
+
 

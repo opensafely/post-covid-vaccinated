@@ -106,7 +106,7 @@ table2 <- function(cohort){
       run = "r:latest analysis/descriptives/table_2.R",
       arguments = c(cohort),
       needs = list("stage1_data_cleaning_both",glue("stage1_end_date_table_{cohort}")),
-      highly_sensitive = list(
+      moderately_sensitive = list(
         input_table_2 = glue("output/review/descriptives/table2_{cohort}.csv")
       )
     )
