@@ -4,7 +4,7 @@
 ## 2.Defines the cox survival formula and fits the cox model
 ## 3.Format the results table
 ## =============================================================================
-source(file.path(scripts_dir,"fit_get_data_surv_eventcountbasedtimecuts.R"))
+source(file.path(scripts_dir,"04_01_(b)_cox_format_survival_data.R"))
 
 
 #------------------FORMAT SURVIVAL DATASET AND RUN COX MODEL--------------------

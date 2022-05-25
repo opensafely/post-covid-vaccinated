@@ -85,20 +85,14 @@ apply_model_function <- function(outcome, cohort){
     comment(glue("Apply cox model for {outcome} - {cohort} cohort")),
     action(
       name = glue("Analysis_cox_{outcome}_{cohort}"),
-      run = "r:latest analysis/model/01_pipe.R",
+      run = "r:latest analysis/model/01_cox_pipeline.R",
       arguments = c(outcome,cohort),
-      needs = list("stage1_data_cleaning_both"),
+      needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}")),
       moderately_sensitive = list(
-        compiled_hrs_html = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}.html"),
-        compiled_event_counts_html = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}.html"),
         analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}.csv"),
         compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
         compiled_hrs_csv_to_release = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_to_release.csv"),
         compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}.csv")
-      ),
-      highly_sensitive = list(
-        compiled_hrs = glue("output/review/model/compiled_HR_results_{outcome}_{cohort}.csv"),
-        compiled_event_counts = glue("output/review/model/compiled_event_counts_{outcome}_{cohort}.csv")
       )
     )
   )
