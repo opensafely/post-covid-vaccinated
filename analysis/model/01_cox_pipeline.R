@@ -30,7 +30,7 @@ library(readr)
 args = commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  event_name="ami"
+  event_name="vte"
   cohort="vaccinated"
 }else{
   event_name  = args[[1]]
@@ -54,7 +54,9 @@ source(file.path(scripts_dir,"06_cox_extra_functions.R"))
 
 source(file.path(scripts_dir,"02_03_cox_timepoint_param.R")) # Prepare dataset for model
 
-analyses_to_run_timepoints <- analyses_to_run %>% filter(mdl=="mdl_max_adj")
+#analyses_to_run_timepoints <- analyses_to_run %>% filter(mdl=="mdl_max_adj")
+analyses_to_run <- analyses_to_run %>% filter(!subgroup %in% c("main","covid_history","covid_pheno_non_hospitalised") )
+analyses_to_run_timepoints <- analyses_to_run 
 
 # add reduced time point column 
 

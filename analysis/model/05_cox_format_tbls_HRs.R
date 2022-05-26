@@ -168,10 +168,12 @@ if(length(results_done)>0){
     }
   }
   
+  event_counts_to_left_join <- event_counts_to_left_join %>% filter(!expo_week %in% c("pre expo","all post expo"))
+  
   combined_hr_event_counts=df_hr%>%left_join(event_counts_to_left_join, by=c("term","event","subgroup","cohort","model"))
   
   combined_hr_event_counts=combined_hr_event_counts%>%select(term,estimate,conf.low,conf.high,std.error,robust.se,P,expo_week,events_total,
-                                                             event,subgroup,model,cohort,total_covid19_cases)
+                                                             event,subgroup,test_mdl,model,cohort,total_covid19_cases)
   
   # Add in suppression for counts <=5
   combined_hr_event_counts$redacted_results <- "NA"
