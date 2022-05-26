@@ -321,6 +321,22 @@ stage1 <- function(cohort_name){
     #----------------------#
     write.csv(cohort_flow, file = file.path("output/review/descriptives", paste0("Cohort_flow_",cohort_name, ".csv")) , row.names=F)
     
+    #--------------------------#
+    # 3.e. Generate histograms #
+    #--------------------------#
+    # generate histograms for numerical variables
+    
+    # write historgrams to PDF
+    
+    numeric_vars <- input %>% dplyr::select(contains("_num"))
+    numeric_title <- colnames(numeric_vars)
+    
+    pdf(file = file.path("output/not-for-review/", paste0("numeric_histograms_", cohort_name, ".pdf")))
+    for (col in 1:ncol(numeric_vars)) {
+      hist(numeric_vars[,col], breaks = 20, main = substitute(paste('Histogram of ', a), list(a=numeric_title[col])))
+    }
+    dev.off()
+    
     #-------------------------------------#
     # 4. Create the final stage 1 dataset #
     #-------------------------------------#
@@ -330,7 +346,6 @@ stage1 <- function(cohort_name){
     saveRDS(input, file = file.path("output", paste0("input_",cohort_name, "_stage1.rds")))
 
 }
-
 
 
 if (cohort_name == "both") {
