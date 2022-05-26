@@ -4,7 +4,7 @@
 ## 2.Defines the cox survival formula and fits the cox model
 ## 3.Format the results table
 ## =============================================================================
-source(file.path(scripts_dir,"fit_get_data_surv_eventcountbasedtimecuts.R"))
+source(file.path(scripts_dir,"04_01_(b)_cox_format_survival_data.R"))
 
 
 #------------------FORMAT SURVIVAL DATASET AND RUN COX MODEL--------------------
@@ -21,8 +21,8 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
   ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
   non_case_inverse_weight=list_data_surv_noncase_ids_interval_names[[5]]
-  less_than_400_events=list_data_surv_noncase_ids_interval_names[[6]]
-  if(less_than_400_events=="TRUE"){
+  less_than_50_events=list_data_surv_noncase_ids_interval_names[[6]]
+  if(less_than_50_events=="TRUE"){
     analyses_not_run[nrow(analyses_not_run)+1,]<<-c(event,subgroup,cohort,mdl,"TRUE","TRUE","TRUE","FALSE")
     return(fit_model_reducedcovariates)
   }

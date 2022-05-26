@@ -245,26 +245,26 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     tbl_event_count$model <- mdl
     tbl_event_count$events_total <- as.numeric(tbl_event_count$events_total)
     
-    #Any time periods with <+5 events? If yes, will reduce time periods
+    #Any time periods with <=5 events? If yes, will reduce time periods
     ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
     
-    #Are there <400 post expo events? If yes, won't run analysis
-    #Can change <400 to be lower to test on dummy data
-    less_than_400_events = any((as.numeric(tbl_event_count$events_total) <400) & (tbl_event_count$expo_week=="all post expo"))
+    #Are there <50 post expo events? If yes, won't run analysis
+    #Can change <50 to be lower to test on dummy data
+    less_than_50_events = any((as.numeric(tbl_event_count$events_total) <50) & (tbl_event_count$expo_week=="all post expo"))
     
     
     # If ind_any_zeroeventperiod==TRUE then this script will re-run again with reduced time periods and
     # we only want to save the final event count file. For reduced time periods, ind_any_zeroeventperiod will
     # always be FALSE
-    # Save events counts if less than 400 events as this script will not re-run with reduced time periods
+    # Save events counts if less than 50 events as this script will not re-run with reduced time periods
     
-    if(ind_any_zeroeventperiod==FALSE | less_than_400_events==TRUE){
+    if(ind_any_zeroeventperiod==FALSE | less_than_50_events==TRUE){
       write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",mdl,".csv"), row.names = T)
       print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",mdl,".csv"))
     }
     
     
-    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_400_events))
+    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_50_events))
     
   }else{
     analyses_not_run[nrow(analyses_not_run)+1,]<- c(event,subgroup,cohort,mdl,any_exposures,any_exposed_events,any_no_expo,"FALSE")

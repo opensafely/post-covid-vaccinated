@@ -58,6 +58,20 @@ for(i in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
 
 analyses_to_run$strata[analyses_to_run$strata=="South_Asian"]<- "South Asian"
 
+# add subgroup category
+
+analyses_to_run <- analyses_to_run %>% 
+  dplyr::mutate(subgroup_cat = case_when(
+    startsWith(subgroup, "agegp") ~ "age",
+    startsWith(subgroup, "covid_history") ~ "covid_history",
+    startsWith(subgroup, "covid_pheno") ~ "covid_pheno",
+    startsWith(subgroup, "ethnicity") ~ "ethnicity",
+    startsWith(subgroup, "main") ~ "main",
+    startsWith(subgroup, "prior_history") ~ "prior_history",
+    startsWith(subgroup, "sex") ~ "sex",
+    TRUE ~ as.character(subgroup)))
+
+
 ## Separate into to dataframes as this will allow all the vaccinated/electively unvaccinated
 ## analyses to be run in one go to save having to read in the data for each individual analysis
 ## i.e can read it in once and run all the vaccinated analyses in one go
@@ -65,5 +79,3 @@ analyses_to_run$strata[analyses_to_run$strata=="South_Asian"]<- "South Asian"
 #for(i in cohort_to_run){
 #  assign(paste0("analyses_to_run_",i),analyses_to_run %>% filter(cohort_to_run == i) )
 #}
-
-
