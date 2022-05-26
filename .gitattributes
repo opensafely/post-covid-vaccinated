@@ -1,4 +1,0 @@
-# ensure unix line endings on windows for files that need them.
-* text=auto
-*.sh eol=lf
-codelists/* eol=lf
