@@ -74,12 +74,12 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   }
   
   print("Post Exposure event counts split by covariate levels")
-  if(mdl=="mdl_agesex"){
-    print(covariate_exploration(data_surv, c()))
-  }else{
-    covars_to_print <- covar_names[!covar_names %in% covars_to_remove]
-    print(covariate_exploration(data_surv, append(covars_to_print,"ethnicity")))
-  }
+  #if(mdl=="mdl_agesex"){
+  #  print(covariate_exploration(data_surv, c()))
+  #}else{
+  #  covars_to_print <- covar_names[!covar_names %in% covars_to_remove]
+  #  print(covariate_exploration(data_surv, append(covars_to_print,"ethnicity")))
+  #}
 
   covariates <- covar_names[covar_names %in% names(data_surv)] %>% sort()
   interval_names_withpre <- c("days_pre", interval_names)
@@ -90,34 +90,65 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   knot_placement=as.numeric(quantile(data_surv$age, probs=c(0.1,0.5,0.9)))
   
   #Base formula
-  if(mdl=="mdl_agesex"){
+  
+  combined_results <- as.data.frame(matrix(ncol=9,nrow=0))
+  colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","test_mdl")
+  
+  for(test_mdl in c("unadjusted","age_adjusted","sex_adjusted","age_sex_no_region_adjusted","age_sex_region_covar")){
+    
     surv_formula <- paste0(
-      "Surv(tstart, tstop, event) ~ ",
-      paste(interval_names, collapse="+"),
-      "+ cluster(patient_id) + strat(region_name)")
-  }else if (mdl=="mdl_max_adj"){
-    surv_formula <- paste0(
-      "Surv(tstart, tstop, event) ~ ",
-      paste(covariates_excl_region_sex_age, collapse="+"), 
-      "+ cluster(patient_id) + strat(region_name)")
-  }
- 
+          "Surv(tstart, tstop, event) ~ ",
+          paste(interval_names, collapse="+"),
+          "+ cluster(patient_id)")
+    
+    if (test_mdl %in% c("age_adjusted","age_sex_no_region_adjusted","age_sex_region_covar") & startsWith(subgroup,"agegp_")==F){
+        surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
+      }else if (test_mdl %in% c("age_adjusted","age_sex_no_region_adjusted","age_sex_region_covar") & (startsWith(subgroup,"agegp_"))==T){
+        surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
+      }
+    
+    if (test_mdl %in% c("sex_adjusted","age_sex_no_region_adjusted","age_sex_region_covar") & (startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
+        surv_formula <- paste(surv_formula, "sex", sep="+")
+    }
+    
+    if (test_mdl %in% c("age_sex_region_covar")){
+      surv_formula <- paste(surv_formula, "region_name", sep="+")
+    }
+    
+  #if(mdl=="mdl_agesex"){
+  #  surv_formula <- paste0(
+  #    "Surv(tstart, tstop, event) ~ ",
+  #    paste(interval_names, collapse="+"),
+  #    "+ cluster(patient_id) + strat(region_name)")
+  #}else if (mdl=="mdl_max_adj"){
+  #  surv_formula <- paste0(
+  #    "Surv(tstart, tstop, event) ~ ",
+  #    paste(covariates_excl_region_sex_age, collapse="+"), 
+  #    "+ cluster(patient_id) + strat(region_name)")
+  #}else if(mdl=="unadjusted_models_test"){
+   # surv_formula <- paste0(
+  #    "Surv(tstart, tstop, event) ~ ",
+  #    paste(interval_names, collapse="+"),
+  #    "+ cluster(patient_id)")
+  #}
+  
+  
   #If subgroup is not sex then add sex into formula
-  if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
-    surv_formula <- paste(surv_formula, "sex", sep="+")
-  }
+  #if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
+  #  surv_formula <- paste(surv_formula, "sex", sep="+")
+  #}
   
   #If subgroup is not ethnicity then add ethnicity into formula
-  if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & mdl == "mdl_max_adj"){
-    surv_formula <- paste(surv_formula, "ethnicity", sep="+")
-  }
+  #if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & mdl == "mdl_max_adj"){
+  #  surv_formula <- paste(surv_formula, "ethnicity", sep="+")
+  #}
   
   #If subgroup is not age then add in age spline otherwise use age and age_sq
-  if ((startsWith(subgroup,"agegp_"))==F){
-    surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
-  }else if ((startsWith(subgroup,"agegp_"))==T){
-    surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
-  }
+  #if ((startsWith(subgroup,"agegp_"))==F){
+  #  surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
+  #}else if ((startsWith(subgroup,"agegp_"))==T){
+  #  surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
+  #}
   
   print(surv_formula)
   
@@ -142,6 +173,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
   results$std.error=exp(sqrt(diag(vcov(fit_cox_model))))
   results$robust.se=exp(sqrt(diag(vcov(robust_fit_cox_model))))
+  results$test_mdl <- test_mdl
   if(mdl == "mdl_max_adj"){
     results$covariates_removed=paste0(covars_to_remove, collapse = ",")
     results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
@@ -155,13 +187,15 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   results$covariate=results$term
   results$covariate=sub('\\=.*', '', results$covariate)
   results$P="NA"
+  combined_results <- rbind(combined_results,results)
   #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
   #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
   #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
   #results=results%>%left_join(anova_fit_cox_model,by="covariate")
   
   print("Finised working on cox model")
-  return(results)
+  }
+  return(combined_results)
 }
 
 

@@ -1,5 +1,4 @@
-#Project:Vaccinated delta wave population study
-#Branch:Figure4_graphical plotting of the estimated AER of ATE and VTE 
+#Project: Vaccinated delta wave population study
 #Scripts: Renin Toms, Venexia Walker
 #Reviewer: Genevieve Cezard
 
@@ -7,330 +6,191 @@
 # 1. load the right input data and make sure of the file names and variable structure
 # 2. Cntrl+A run the whole script and find the .png graph files in working directory
 
-#USE TO RUN A SINGLE PLOT
-group <- "vaccinated"
-fit <- "mdl_max_adj"
-outcome <- "ate"
-strata <- "sex_Female"
-
 library(purrr)
 library(data.table)
 library(tidyverse)
-
-#******************************************************
-#I. Create a function to out put the figure 4_tables
-#******************************************************
-
-figure4_tbl <- function(group, fit, outcome, strata){
-  
-  #Load data 
-  #1.Input1 - 1.unexposed person days
-  input1.1 <- readr::read_csv("output/review/descriptives/input1_aer_main_vaccinated.csv")
-  input1.2 <- readr::read_csv("output/review/descriptives/input1_aer_main_electively_unvaccinated.csv") 
-  input1.3 <- readr::read_csv("output/review/descriptives/input1_aer_subgroups_vaccinated.csv")
-  input1.4 <- readr::read_csv("output/review/descriptives/input1_aer_subgroups_electively_unvaccinated.csv") 
-  
-  #Preprocess input1                                                             #ADDS TWO MODEL FITS WITH SAME PERSON DAYS
-  input1.5 <- rbind(input1.1,input1.2,input1.3,input1.4)                                           
-  input1.5$fit <- "mdl_agesex"                                                   
-  
-  input1.6 <- input1.5                                                           
-  input1.6$fit <- "mdl_max_adj"                                                  
-  
-  input1 <-rbind(input1.5,input1.6)                                              
-  input1 <- input1 %>% select(-strata)                                           
-  rm(input1.1, input1.2, input1.3, input1.4,input1.5, input1.6)
-  
-  #structure the input
-  input1$unexposed_person_days <- as.numeric(input1$unexposed_person_days)
-  
-  #Input2 - 2.unexposed events, 3.total cases, 4.hr
-  hr_files=list.files(path = "output/review/model", pattern = "compiled_HR_results_*")
-  hr_files=hr_files[endsWith(hr_files,".csv")]
-  hr_files=paste0("output/review/model/",hr_files)
-  input2 <- purrr::pmap(list(hr_files),
-                        function(fpath){
-                          df <- fread(fpath)
-                          return(df)})
-  input2=rbindlist(input2, fill=TRUE)
-  
-  #Preprocess the Input2 
-  input2 <- input2 %>% select(-conf.low, -conf.high, -std.error,-robust.se, -P, -covariates_removed, -cat_covars_collapsed)
-  input2 <- input2 %>% filter(term == "days0_14" |
-                                term == "days14_28" |
-                                term == "days28_56" |
-                                term == "days56_84" |
-                                term == "days84_197"|
-                                term == "days0_28"|
-                                term == "days28_197")
-  #--------------------------------------
-  # Step1: Extract the required variables
-  #--------------------------------------
-  #1. Person days
-  fp_person_days <- input1[input1$event == outcome & input1$fit == fit  &
-                             input1$cohort == group & input1$subgroup == strata,]$unexposed_person_days
-  #2.unexposed events
-  unexposed_events <- input2[input2$event == outcome & input2$model == fit  & 
-                               input2$cohort == group & input2$subgroup == strata & 
-                               input2$expo_week== "pre expo",]$events_total
-  #3.Total cases
-  total_cases <-  input2[input2$event == outcome & input2$model == fit  & 
-                           input2$cohort == group & input2$subgroup == strata & 
-                           input2$expo_week== "pre expo",]$total_covid19_cases
-  #4.locate the estimates
-  #0-14 days
-  hr_14 <- input2[input2$event == outcome  & input2$model == fit  & 
-                    input2$cohort == group & input2$subgroup == strata & input2$term == "days0_14",]$estimate
-  #14-28 days
-  hr_28 <- input2[input2$event == outcome & input2$model == fit  & 
-                    input2$cohort == group & input2$subgroup == strata& input2$term == "days14_28",]$estimate
-  #28-56 days
-  hr_56 <- input2[input2$event == outcome & input2$model == fit  & 
-                    input2$cohort == group & input2$subgroup == strata& input2$term == "days28_56",]$estimate
-  #56-84 days
-  hr_84 <- input2[input2$event == outcome & input2$model == fit  & 
-                    input2$cohort == group & input2$subgroup == strata& input2$term == "days56_84",]$estimate
-  #84-196 days
-  hr_196 <- input2[input2$event == outcome & input2$model == fit  & 
-                     input2$cohort == group & input2$subgroup == strata& input2$term == "days84_197",]$estimate
-  #Alternative 0-28 days
-  hr0_28 <- input2[input2$event == outcome  & input2$model == fit  & 
-                     input2$cohort == group & input2$subgroup == strata& input2$term == "days0_28",]$estimate
-  #Alternative 28_196 days
-  hr28_196 <- input2[input2$event == outcome  & input2$model == fit  & 
-                       input2$cohort == group & input2$subgroup == strata& input2$term == "days28_197",]$estimate
-  #--------------------------------------------------------------------
-  #Step2.Calculate the average daily CVD incidence   - in the unexposed
-  #--------------------------------------------------------------------
-  #Number of new events / sum of person-time at risk
-  incidence_rate <- unexposed_events/fp_person_days
-  #-------------------------------------------------------------
-  #Step3. Make life table to calculate cumulative risk over time
-  #-------------------------------------------------------------
-  #Description:Use a life table approach to calculate age- and sex specific cumulative risks over time, - with and without COVID-19. 
-  lifetable <- data.frame(c(1:196))
-  colnames(lifetable) <- c("days")
-  lifetable$event <- outcome 
-  lifetable$model <- fit 
-  lifetable$cohort <- group
-  lifetable$subgroup <- strata
-  
-  lifetable$q <- incidence_rate 
-  lifetable$'1-q' <- 1 - lifetable$q 
-  lifetable$s <- cumprod(lifetable$`1-q`)
-  #----------------------------------------
-  #Step4. Calculate the daily CVD incidence
-  #----------------------------------------
-  #Description: Multiply  the average daily incidence by the maximally adjusted age- and sex-specific HR, -
-  # for that day to derive the incidence on each day after COVID-19. 
-  
-  #1.assign the hr estimates
-  lifetable$h <- ifelse(lifetable$days < 15, rep(hr_14),0)
-  lifetable$h <- ifelse(lifetable$days > 14 & lifetable$days < 29, rep(hr_28),lifetable$h)
-  lifetable$h <- ifelse(lifetable$days < 29 & is.na(lifetable$h), rep(hr0_28),lifetable$h)#alternative for 0-28 days
-  
-  lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 57, rep(hr_56),lifetable$h)
-  lifetable$h <- ifelse(lifetable$days > 56 & lifetable$days < 85, rep(hr_84),lifetable$h)
-  lifetable$h <- ifelse(lifetable$days > 84 & lifetable$days < 197, rep(hr_196),lifetable$h)
-  lifetable$h <- ifelse(lifetable$days > 28 & lifetable$days < 197 & is.na(lifetable$h), rep(hr28_196),lifetable$h)#alternative for 28-196 days
-  #2.assign qh
-  lifetable$qh <- lifetable$q*lifetable$h
-  #3.assign 1-qh
-  lifetable$'1-qh' <- 1 - lifetable$qh
-  #4.assign sc
-  lifetable$sc <- cumprod(lifetable$`1-qh`)
-  #-------------------------------------------
-  #Step5. Calculate the Absolute excess risk--
-  #-------------------------------------------
-  #Description:Subtract the latter from the former to derive the absolute excess risks over time after COVID-19, -
-  #compared with no COVID-19 diagnosis. 
-  
-  #1.AER =difference in absolute risk
-  lifetable$'s-sc' <- lifetable$s - lifetable$sc
-  
-  #2.CI of the AER
-  #Confidence Interval = Attributable risk +/- 1.96 x Square Root of [p x q (1/n1+ 1/n2)]
-  #Where, p = qh, q = 1-qh, n1= unexposed person days, n2 = exposed person days
-  #https://fhop.ucsf.edu/sites/fhop.ucsf.edu/files/wysiwyg/pg_apxIIIB.pdf
-  
-  lifetable$CI <- 1.96*lifetable$qh*lifetable$'1-qh'*(1/fp_person_days + 1/fp_person_days)#RT - input awaited for person days, currently works on dummy.
-  
-  #3.AER%
-  lifetable$AERp <-lifetable$'s-sc'*100
-  
-  #CI of AER%
-  #95% CI = ARP +/- ARP x (C.I. range from the attributable risk / the attributable risk)
-  #Where, ARP=AERp, CI range= CI, attributable risk = s-sc
-  #https://fhop.ucsf.edu/sites/fhop.ucsf.edu/files/wysiwyg/pg_apxIIIB.pdf
-  
-  lifetable$CIp <- lifetable$AERp*(lifetable$CI / lifetable$`s-sc`)
-  lifetable$CIp.low <- lifetable$AERp - lifetable$CIp
-  lifetable$CIp.high <- lifetable$AERp + lifetable$CIp
-  #-------------------------------------------
-  #Step6. Output1 the csv
-  #-------------------------------------------
-  
-  write.csv(lifetable, paste0("output/review/model/lifetable_delta_" , group, "_", fit, "_", outcome, "_", strata,".csv"), row.names = F)
-  
-  #-------------------------------------------
-  #Step7. clear the environment
-  #-------------------------------------------
-  
-  rm(list = ls())
-}
-
-#***************************************************************************************
-#II. Run the function now----------------------FOR the active analyses------------------
-#***************************************************************************************
-#1. Define the active analyses
-active <- readr::read_rds("lib/active_analyses.rds")
-active <- active[active$active==TRUE,]
-active$event <- gsub("out_date_","",active$outcome_variable)
-active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL
-
-active <- tidyr::pivot_longer(active, 
-                              cols = setdiff(colnames(active),c("event","model","cohort")), 
-                              names_to = "strata")
-
-active <- active[active$value==TRUE, c("event","model","cohort","strata")]
-
-active$model <- ifelse(active$model=="all","mdl_agesex;mdl_max_adj",active$model)
-active <- tidyr::separate_rows(active, model, sep = ";")
-
-active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort)
-active <- tidyr::separate_rows(active, cohort, sep = ";")
-
-#active$group <- gsub("_.*","",active$strata)
-#active$group <- ifelse(active$group=="covid" & grepl("covid_history",active$strata), "covid_history", active$group)
-#active$group <- ifelse(active$group=="covid" & grepl("covid_pheno",active$strata), "covid_pheno", active$group)
-#active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$strata), "prior_history", active$group)
-#active <- unique(active[,c("event","model","cohort","group")])
-
-#Preprocess to right outcomes, names and order
-#select outcomes
-active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
-
-#align the column names
-colnames(active)[colnames(active) == 'group'] <- 'strata'
-colnames(active)[colnames(active) == 'cohort'] <- 'group'
-colnames(active)[colnames(active) == 'model'] <- 'fit'
-colnames(active)[colnames(active) == 'event'] <- 'outcome'
-
-#order the column names
-active <- active %>% select(-outcome,-fit, everything())
-active <- active %>% select(-strata,-outcome, everything())
-active <- active %>% select(-strata, everything())
-active <- active %>% select(-strata, everything())
-
-#remove non existing HR rows
-active <- active[-32,]
-active <- active[-66,]
-active <- active[-66,]
-
-#2.For loop the active analysis list to the figure4 table function
-for (i in 1:nrow(active)) {
-  #1.run the function
-  figure4_tbl(active$group[i],active$fit[i],active$outcome[i],active$strata[i])
-  
-  #2.compile the results
-  lt_files=list.files(path = "output/review/model", pattern = "lifetable_delta_*")
-  lt_files=lt_files[endsWith(lt_files,".csv")]
-  lt_files=paste0("output/review/model/",lt_files)
-  f4_compiled_lifetables <- purrr::pmap(list(lt_files),
-                                        function(fpath){
-                                          df <- fread(fpath)
-                                          return(df)
-                                        })
-  f4_compiled_lifetables=rbindlist(f4_compiled_lifetables, fill=TRUE)
-  
-  #3.output the csv
-  write.csv(f4_compiled_lifetables, paste0("output/review/model/Figure4_compiled_lifetables.csv"), row.names = F)}
-
-#4.Delete un used files
-if (file.exists(lt_files)) { file.remove(lt_files)}
-69*196
-
-#****************************** 
-#III. Figure4 - plotting
-#******************************
-
 library(magrittr)
 library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
+library(gridExtra)
 
-#1.Load data
-lifetables <- readr::read_csv("output/review/model/Figure4_compiled_lifetables.csv")
+aer_results_dir <- "output/review/AER_results"
 
-#2.Define plotting groups and subgroups
-lifetables$group <- gsub("_.*","",lifetables$subgroup)
-lifetables$group <- ifelse(lifetables$group=="covid" & grepl("covid_history",lifetables$subgroup), "covid_history", lifetables$group)
-lifetables$group <- ifelse(lifetables$group=="covid" & grepl("covid_pheno",lifetables$subgroup), "covid_pheno", lifetables$group)
-lifetables$group <- ifelse(lifetables$group=="prior" & grepl("prior_history",lifetables$subgroup), "prior_history", lifetables$group)
+event_of_interest <- c("ate","vte")
+model_of_interest <- c("mdl_max_adj")
+cohort_name <- c("vaccinated","electively_unvaccinated")
 
-#3.Shape the subgroups
-table(lifetables$subgroup)#18 subgroups
-lifetables$subgroup<-factor(lifetables$subgroup,
-                            levels = c('agegp_18_39','agegp_40_59', 'agegp_60_79', 'agegp_80_110',
-                                       'sex_Male', 'sex_Female',
-                                       'ethnicity_White','ethnicity_Black', 'ethnicity_South_Asian', 'ethnicity_Mixed', 'ethnicity_Other', 'ethnicity_Missing',
-                                       'covid_pheno_hospitalised','covid_pheno_non_hospitalised',
-                                       'prior_history_FALSE','prior_history_TRUE',
-                                       'covid_history',
-                                       'main'))
-str(lifetables$subgroup)
+active_analyses <- read_rds("lib/active_analyses.rds")
+active_analyses$outcome_variable <- gsub("out_date_","",active_analyses$outcome_variable)
 
-#4. Define active plotting lines
-active <- readr::read_rds("lib/active_analyses.rds")
-active <- active[active$active==TRUE,]
-active$event <- gsub("out_date_","",active$outcome_variable)
-active[,c("active","outcome","outcome_variable","prior_history_var","covariates")] <- NULL
+#Load data
+lifetables <- readr::read_csv(paste0(aer_results_dir,"/Figure4_compiled_lifetables.csv"))
 
-active <- tidyr::pivot_longer(active, 
-                              cols = setdiff(colnames(active),c("event","model","cohort")), 
-                              names_to = "strata")
+#------------------------Filter to outcomes of interest-------------------------
+lifetables <- lifetables %>% filter(event %in% event_of_interest & model %in% model_of_interest)
 
-active <- active[active$value==TRUE, c("event","model","cohort","strata")]
+#----------------------Filter to subgroups of interest--------------------------
+lifetables <- lifetables %>% filter(str_detect(subgroup, c("^main","^sex","^age")))
 
-active$model <- ifelse(active$model=="all","mdl_agesex;mdl_max_adj",active$model)
-active <- tidyr::separate_rows(active, model, sep = ";")
+#-------------------------Make event names 'nice' ------------------------------
+lifetables <- lifetables %>% left_join(active_analyses %>% select(outcome, outcome_variable), by = c("event"="outcome_variable"))
 
-active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort)
-active <- tidyr::separate_rows(active, cohort, sep = ";")
+#-------------------------------Format subgroups names--------------------------
+lifetables$subgroup <- ifelse(lifetables$subgroup=="main","Combined",lifetables$subgroup)
+lifetables$subgroup <- ifelse(lifetables$subgroup=="agegp_18_39","Age group: 18-39",lifetables$subgroup)
+lifetables$subgroup <- ifelse(lifetables$subgroup=="agegp_40_59","Age group: 40-59",lifetables$subgroup)
+lifetables$subgroup <- ifelse(lifetables$subgroup=="agegp_60_79","Age group: 60-79",lifetables$subgroup)
+lifetables$subgroup <- ifelse(lifetables$subgroup=="agegp_80_110","Age group: 80-110",lifetables$subgroup)
+lifetables$subgroup <- ifelse(lifetables$subgroup=="sex_Male","Sex: Male",lifetables$subgroup)
+lifetables$subgroup <- ifelse(lifetables$subgroup=="sex_Female","Sex: Female",lifetables$subgroup)
 
-active$group <- gsub("_.*","",active$strata)
-active$group <- ifelse(active$group=="covid" & grepl("covid_history",active$strata), "covid_history", active$group)
-active$group <- ifelse(active$group=="covid" & grepl("covid_pheno",active$strata), "covid_pheno", active$group)
-active$group <- ifelse(active$group=="prior" & grepl("prior_history",active$strata), "prior_history", active$group)
-active <- active[active$event %in% c("ate", "vte") & active$model %in% c("mdl_max_adj"),]
-active <- unique(active[,c("event", "strata", "model","group")])
+# Specify line colours ---------------------------------------------------------
 
-#5.For loop to create outputs ----------14 figures-------------------------
+lifetables$colour <- ""
+lifetables$colour <- ifelse(lifetables$subgroup=="Combined","#000000",lifetables$colour)
+lifetables$colour <- ifelse(lifetables$subgroup=="Age group: 18-39","#006d2c",lifetables$colour)
+lifetables$colour <- ifelse(lifetables$subgroup=="Age group: 40-59","#31a354",lifetables$colour)
+lifetables$colour <- ifelse(lifetables$subgroup=="Age group: 60-79","#74c476",lifetables$colour)
+lifetables$colour <- ifelse(lifetables$subgroup=="Age group: 80-110","#bae4b3",lifetables$colour)
+lifetables$colour <- ifelse(lifetables$subgroup=="Sex: Male","#cab2d6",lifetables$colour)
+lifetables$colour <- ifelse(lifetables$subgroup=="Sex: Female","#6a3d9a",lifetables$colour)
 
-for (i in 1:nrow(active)) {
-  plot <- subset(lifetables, lifetables$event == active$event[i] & lifetables$group == active$group[i] )
+# Specify line types ---------------------------------------------------------
 
-  p_line<-ggplot(plot,
-                 aes(x=days,y=AERp,colour=subgroup)) + facet_grid(~cohort)+
-    geom_line(aes(linetype=subgroup, colour=subgroup), size=1)+
-    scale_linetype_manual(values = c(rep("solid", 18)))+
-    #scale_color_manual(values = c(brewer.pal(18, "Set3")))+
-    #scale_linetype_manual(values = c('solid','twodash','dotted','dashed','dotdash'))+
-    geom_ribbon(aes(ymin = CIp.low, ymax = CIp.high), alpha = 0.1)+
-    scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
-    #scale_y_continuous(limits = c(0,2))+
-    labs(x='Weeks since COVID-19 diagnosis',y='Cumulative difference in absolute risk  (%)',
-         title = active$event[i])+
-    theme(plot.title = element_text(hjust = 0.5))+
-    theme_bw()+
-    theme(legend.key.size = unit(1.2,'cm'), legend.key = element_blank())+
-    labs(color='Subgroup',linetype='Subgroup')
-  p_line
+lifetables$line <- ""
+lifetables$line <- ifelse(lifetables$subgroup=="Combined","solid",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Age group: 18-39","dotted",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Age group: 40-59","dotted",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Age group: 60-79","dotted",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Age group: 80-110","dotted",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Sex: Male","longdash",lifetables$line)
+lifetables$line <- ifelse(lifetables$subgroup=="Sex: Female","longdash",lifetables$line)
+
+#--------------Option 1: Indivdual plots for each outcome and cohort------------
+
+for(cohort_of_interest in cohort_name){
+  for(outcome_name in event_of_interest){
+    df=lifetables %>% filter(cohort == cohort_of_interest & event==outcome_name )
+    
+    sub_group_levels <-c()
+    for(i in c("Combined","Age group: 18-39","Age group: 40-59","Age group: 60-79","Age group: 80-110",
+               "Sex: Female","Sex: Male")){
+      levels_available <- unique(df$subgroup)
+      if(i %in% levels_available){
+        sub_group_levels <- append(sub_group_levels,i)
+      }
+    }
+    
+    df$subgroup <- factor(df$subgroup, levels=sub_group_levels)
+    
+    colour_levels <-c()
+    for(i in c("#000000","#006d2c","#31a354","#74c476","#bae4b3","#6a3d9a","#cab2d6")){
+      levels_available <- unique(df$colour)
+      if(i %in% levels_available){
+        colour_levels <- append(colour_levels,i)
+      }
+    } 
+    df$colour <- factor(df$colour, levels=colour_levels)
+    
+    #Test to see error bars as in dummy data the CI is too small so can't see it
+    #df$CIp.low<-df$AERp - 0.02
+    #df$CIp.high<-df$AERp + 0.02
+    
+    plot<-ggplot2::ggplot(data = df, 
+                    mapping = ggplot2::aes(x = days, y = AERp, color = subgroup, shape = subgroup, fill = subgroup)) +
+      #ggplot2::geom_hline(colour = "#A9A9A9") +
+      geom_ribbon(aes(ymin = CIp.low, ymax = CIp.high), alpha = 0.1)+
+      ggplot2::geom_line() +
+      ggplot2::scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
+      ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
+      ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
+      ggplot2::labs(x = "Days since COVID-19 diagnosis", y = "Cumulative difference in absolute risk  (%)", title =df$outcome[1] ) +
+      ggplot2::ggtitle(df$outcome[1])+
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol = length(sub_group_levels), byrow = TRUE)) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     panel.spacing.x = ggplot2::unit(0.5, "lines"),
+                     panel.spacing.y = ggplot2::unit(0, "lines"),
+                     legend.key = ggplot2::element_rect(colour = NA, fill = NA),
+                     legend.title = ggplot2::element_blank(),
+                     legend.position="bottom",
+                     plot.background = ggplot2::element_rect(fill = "white", colour = "white"),
+                     plot.title = element_text(hjust = 0.5)) 
+
+   
+ 
+  #assign(paste0(outcome_name,"_",cohort_of_interest),plot)
+  ggsave(paste0(aer_results_dir, "/figure_4_",outcome_name,"_",cohort_of_interest,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+  }
+}
+
+#grid.arrange(ate_vaccinated, vte_vaccinated, nrow = 1)
+#grid.arrange(ate_electively_unvaccinated, vte_electively_unvaccinated, nrow = 1)
+
+
+#-----------Option 2: Plots for each cohort containing both outcomes------------
+
+for(cohort_of_interest in cohort_name){
+  df=lifetables %>% filter(cohort == cohort_of_interest)
   
-  ggsave(p_line, filename = paste0("output/Figure4_delta_", active$group[i], "_", active$event[i],".png"), dpi=300,width = 10,height = 6)
+  sub_group_levels <-c()
+  for(i in c("Combined","Age group: 18-39","Age group: 40-59","Age group: 60-79","Age group: 80-110",
+             "Sex: Female","Sex: Male")){
+    levels_available <- unique(df$subgroup)
+    if(i %in% levels_available){
+      sub_group_levels <- append(sub_group_levels,i)
+    }
   }
   
-  #Find 14 .png figures in the output folder, each for Vaccinated vs Un-vaccinated panels of each subgroups of 'ate' and 'vte'.
+  df$subgroup <- factor(df$subgroup, levels=sub_group_levels)
+  
+  colour_levels <-c()
+  for(i in c("#000000","#006d2c","#31a354","#74c476","#bae4b3","#6a3d9a","#cab2d6")){
+    levels_available <- unique(df$colour)
+    if(i %in% levels_available){
+      colour_levels <- append(colour_levels,i)
+    }
+  } 
+  df$colour <- factor(df$colour, levels=colour_levels)
+  
+  df$line <- factor(df$line, levels = c("solid","dotted","longdash"))
+  
+  #Test to see error bars as in dummy data the CI is too small so can't see it
+  #df$CIp.low<-df$AERp - 0.02
+  #df$CIp.high<-df$AERp + 0.02
+  
+  ggplot2::ggplot(data = df, 
+                        mapping = ggplot2::aes(x = days, y = AERp, color = subgroup, shape = subgroup, fill = subgroup, linetype=subgroup)) +
+    #ggplot2::geom_hline(colour = "#A9A9A9") +
+    geom_ribbon(aes(ymin = CIp.low, ymax = CIp.high), alpha = 0.1)+
+    ggplot2::geom_line() +
+    ggplot2::scale_x_continuous(breaks = c(0,20,40,60,80,100,120,140,160,180,200),limits = c(0,200))+
+    ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
+    ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
+    #Might need to have a think about line types as can't get it to work like colour
+    #ggplot2::scale_linetype_manual(values = c("solid","dotted","dotdash","dashed",rep("solid",2)), labels = levels(df$subgroup)) +
+    ggplot2::labs(x = "Days since COVID-19 diagnosis", y = "Cumulative difference in absolute risk  (%)") +
+    ggplot2::guides(fill=ggplot2::guide_legend(ncol = length(sub_group_levels), byrow = TRUE)) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   panel.spacing.x = ggplot2::unit(0.5, "lines"),
+                   panel.spacing.y = ggplot2::unit(0, "lines"),
+                   legend.key = ggplot2::element_rect(colour = NA, fill = NA),
+                   legend.title = ggplot2::element_blank(),
+                   legend.position="bottom",
+                   plot.background = ggplot2::element_rect(fill = "white", colour = "white"))+
+    ggplot2::facet_wrap(outcome~.,ncol=2)
+  
+  ggsave(paste0(aer_results_dir, "/figure_4_",cohort_of_interest,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+}
 
 
+
+
+
+
+  
 
