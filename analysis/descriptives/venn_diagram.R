@@ -173,7 +173,7 @@ venn_output <- function(cohort_name){
 
     # Proceed to create Venn diagram if all source combos exceed 5 -------------
     #if (min(as.numeric(df[df$outcome==outcome,source_consid]))>5) {
-      
+    
       # Calculate contents of each Venn cell for plotting ----------------------
       
       index1 <- integer(0)
@@ -222,6 +222,17 @@ venn_output <- function(cohort_name){
   #}
   
   # Save summary file ----------------------------------------------------------
+  
+  # Merge any cells <= 5 to the highest cell (excluding totals) -------------
+  
+  colnamesorder <- colnames(df)
+  a <- df[-c(1,9:12)]
+  a[] <- sapply(a, as.numeric)
+  idx <- cbind(seq(nrow(a)), max.col(a))
+  a[idx] <- a[idx] + rowSums(a * (a <= 5))
+  is.na(a) <- a <= 5
+  df <- cbind(df[c(1,9:12)], a) 
+  df <- setcolorder(df, colnamesorder)
   
   write.csv(df, file = paste0("output/review/venn-diagrams/venn_diagram_number_check_", cohort_name,".csv"), row.names = F)
   
