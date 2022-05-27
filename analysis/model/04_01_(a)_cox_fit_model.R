@@ -94,6 +94,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   combined_results <- as.data.frame(matrix(ncol=9,nrow=0))
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","test_mdl")
   
+  interval_names[interval_names=="days0_1"]<-NULL
   #for(test_mdl in c("unadjusted","age_adjusted","sex_adjusted","age_sex_no_region_adjusted","age_sex_region_covar")){
   for(test_mdl in c("age_sex_region_covar")){
     
