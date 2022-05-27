@@ -182,20 +182,20 @@ if(length(results_done)>0){
   cohort <- unique(combined_hr_event_counts$cohort)
   model <- unique(combined_hr_event_counts$model)
   
-  supressed_combined_hr_event_counts <- combined_hr_event_counts[0,]
-  
-  for (i in subgroup){
-    for (j in cohort ){
-      for (k in model){
-        tmp <- combined_hr_event_counts %>% filter(subgroup == i & cohort == j & model == k)
-        tmp <- tmp %>% mutate(across(where(is.numeric), as.character))
-        redacted_counts <- tmp[which(tmp$events_total == "[Redacted]"),expo_week]
-        tmp[which(tmp$term %in% redacted_counts),2:7] = "[Redacted]"
-        tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]", na.rm = T), "Redacted results", "No redacted results")
-        supressed_combined_hr_event_counts <- rbind(supressed_combined_hr_event_counts,tmp)
-      }
-    }
-  }
+  #supressed_combined_hr_event_counts <- combined_hr_event_counts[0,]
+  supressed_combined_hr_event_counts<-combined_hr_event_counts
+  #for (i in subgroup){
+  #  for (j in cohort ){
+  #    for (k in model){
+  #      tmp <- combined_hr_event_counts %>% filter(subgroup == i & cohort == j & model == k)
+  #      tmp <- tmp %>% mutate(across(where(is.numeric), as.character))
+  #      redacted_counts <- tmp[which(tmp$events_total == "[Redacted]"),expo_week]
+  #      tmp[which(tmp$term %in% redacted_counts),2:7] = "[Redacted]"
+  #      tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]", na.rm = T), "Redacted results", "No redacted results")
+  #      supressed_combined_hr_event_counts <- rbind(supressed_combined_hr_event_counts,tmp)
+  #    }
+  #  }
+  #}
   
   supressed_combined_hr_event_counts$redacted_results <- factor(supressed_combined_hr_event_counts$redacted_results, levels = c("Redacted results",
                                                                                                                                 "No redacted results"))

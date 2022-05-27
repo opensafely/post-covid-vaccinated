@@ -30,7 +30,7 @@ library(readr)
 args = commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  event_name="vte"
+  event_name="ate"
   cohort="vaccinated"
 }else{
   event_name  = args[[1]]
