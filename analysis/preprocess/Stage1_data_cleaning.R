@@ -42,6 +42,7 @@ library(readr)
 library(dplyr)
 library(stringr)
 library(tidyr)
+library(ggplot2)
 
 
 
@@ -331,10 +332,10 @@ stage1 <- function(cohort_name){
     numeric_vars <- input %>% dplyr::select(contains("_num"))
     numeric_title <- colnames(numeric_vars)
     
-    pdf(file = file.path("output/not-for-review/", paste0("numeric_histograms_", cohort_name, ".pdf")))
-    for (col in 1:ncol(numeric_vars)) {
-      hist(numeric_vars[,col], breaks = 20, main = substitute(paste('Histogram of ', a), list(a=numeric_title[col])))
-    }
+    svglite::svglite(file = file.path("output/not-for-review/", paste0("numeric_histograms_", cohort_name, ".svg")), width = 15, height = 8)
+    ggplot(gather(numeric_vars), aes(value)) + 
+      geom_histogram(bins = 10) + 
+      facet_wrap(~key, scales = 'free_x')
     dev.off()
     
     #-------------------------------------#
