@@ -100,6 +100,7 @@ actions:
         refactoring: output/not-for-review/meta_data_factors_*.csv
         QA_rules: output/review/descriptives/QA_summary_*.csv
         IE_criteria: output/review/descriptives/Cohort_flow_*.csv
+        histograms: output/not-for-review/numeric_histograms*.pdf
       highly_sensitive:
         cohort: output/input_*_stage1.rds
 
@@ -462,5 +463,4 @@ actions:
         compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_vte_electively_unvaccinated.csv
         compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_electively_unvaccinated.csv
-
 
