@@ -327,15 +327,14 @@ stage1 <- function(cohort_name){
     #--------------------------#
     # generate histograms for numerical variables
     
-    # write historgrams to PDF
-    
     numeric_vars <- input %>% dplyr::select(contains("_num"))
     numeric_title <- colnames(numeric_vars)
     
     svglite::svglite(file = file.path("output/not-for-review/", paste0("numeric_histograms_", cohort_name, ".svg")), width = 15, height = 8)
-    ggplot(gather(numeric_vars), aes(value)) + 
+    g <- ggplot(gather(numeric_vars), aes(value)) + 
       geom_histogram(bins = 10) + 
       facet_wrap(~key, scales = 'free_x')
+    print(g)
     dev.off()
     
     #-------------------------------------#
