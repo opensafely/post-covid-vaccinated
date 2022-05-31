@@ -41,7 +41,6 @@ venn_output <- function(cohort_name){
   input <- readr::read_rds(paste0("output/venn_",cohort_name,".rds"))
   end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort_name,".rds"))
   
-  colnames(end_dates)
   input_stage1 <- readr::read_rds(paste0("output/input_", cohort_name,"_stage1.rds"))
   input_stage1 <- input_stage1[input_stage1$sub_bin_covid19_confirmed_history==FALSE,]
   
