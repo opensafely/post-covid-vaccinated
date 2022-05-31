@@ -41,6 +41,7 @@ venn_output <- function(cohort_name){
   input <- readr::read_rds(paste0("output/venn_",cohort_name,".rds"))
   end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort_name,".rds"))
   
+  colnames(end_dates)
   input_stage1 <- readr::read_rds(paste0("output/input_", cohort_name,"_stage1.rds"))
   input_stage1 <- input_stage1[input_stage1$sub_bin_covid19_confirmed_history==FALSE,]
   
@@ -66,12 +67,24 @@ venn_output <- function(cohort_name){
                    stringsAsFactors = FALSE)
   
   # Populate table and make Venn for each outcome ------------------------------
-
     for (outcome in outcomes) {
+    outcome_save_name <- outcome
+    
     print(paste0("Working on ", outcome))
     # Restrict data to that relevant to the given outcome ----------------------
-    tmp <- input[!is.na(input[,outcome]),c("patient_id","index_date",paste0(gsub("out_date_","", outcome),"_follow_up_end"), colnames(input)[grepl(outcome,colnames(input))])]
+    
+    if(grepl("_primary_position",outcome)==TRUE){
+      tmp <- input[!is.na(input[,outcome]),c("patient_id","index_date",paste0(gsub("out_date_","", outcome),"_follow_up_end"),outcome, colnames(input)[grepl(paste0("tmp_",gsub("_primary_position","", outcome)),colnames(input))])]
+      tmp[,grepl(paste0("tmp_",gsub("_primary_position","", outcome),"_hes"),colnames(tmp))] <- NULL
+      colnames(tmp) <- gsub("_primary_position","",colnames(tmp))
+    }else{
+      tmp <- input[!is.na(input[,outcome]),c("patient_id","index_date",paste0(gsub("out_date_","", outcome),"_follow_up_end"), colnames(input)[grepl(outcome,colnames(input))])]
+      tmp[,grepl("_primary_position",colnames(tmp))] <- NULL
+    }
+    
+    outcome <- gsub("_primary_position","",outcome)    
     colnames(tmp) <- gsub(paste0("tmp_",outcome,"_"),"",colnames(tmp))
+    
     setnames(tmp,
              old=c(paste0(gsub("out_date_","", outcome),"_follow_up_end"),
                    outcome),
@@ -137,7 +150,7 @@ venn_output <- function(cohort_name){
       !is.na(tmp$hes) & 
       !is.na(tmp$death)
     
-    df[nrow(df)+1,] <- c(outcome,
+    df[nrow(df)+1,] <- c(outcome_save_name,
                          only_snomed = nrow(tmp %>% filter(snomed_contributing==T)),
                          only_hes = nrow(tmp %>% filter(hes_contributing==T)),
                          only_death = nrow(tmp %>% filter(death_contributing==T)),
@@ -203,8 +216,7 @@ venn_output <- function(cohort_name){
       mycol <- mycol[mycol!=""]
       
       # Make Venn diagram --------------------------------------------------------
-      
-      svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",cohort_name,"_",gsub("out_date_","",outcome),".svg"))
+      svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",cohort_name,"_",gsub("out_date_","",outcome_save_name),".svg"))
        g <- ggvenn::ggvenn(
         index, 
         fill_color = mycol,
@@ -212,7 +224,7 @@ venn_output <- function(cohort_name){
         text_size = 5,
         set_name_size = 5, 
         fill_alpha = 0.9
-      ) +  ggplot2::ggtitle(active_analyses[active_analyses$outcome_variable==outcome,]$outcome) +
+      ) +  ggplot2::ggtitle(active_analyses[active_analyses$outcome_variable==outcome_save_name,]$outcome) +
         ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 15, face = "bold"))
       print(g)
       dev.off()
