@@ -141,7 +141,7 @@ def generate_common_variables(index_date_variable):
 
     ## Acute myocardial infarction - Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_ami_hes_primary_position=patients.admitted_to_hospital(
+    tmp_out_date_ami_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=ami_icd10,
         on_or_after=f"{index_date_variable}",
@@ -156,7 +156,7 @@ def generate_common_variables(index_date_variable):
     
     ### Combined
     out_date_ami_primary_position=patients.minimum_of(
-        "tmp_out_date_ami_snomed", "tmp_out_date_ami_hes_primary_position", "tmp_out_date_ami_death"
+        "tmp_out_date_ami_snomed", "tmp_out_date_ami_primary_position_hes", "tmp_out_date_ami_death"
     ),
 
     ## Ischaemic stroke
@@ -206,7 +206,7 @@ def generate_common_variables(index_date_variable):
 
     ## Ischaemic stroke - Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_stroke_isch_hes_primary_position=patients.admitted_to_hospital(
+    tmp_out_date_stroke_isch_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=stroke_isch_icd10,
         on_or_after=f"{index_date_variable}",
@@ -221,7 +221,7 @@ def generate_common_variables(index_date_variable):
     
     ### Combined
     out_date_stroke_isch_primary_position=patients.minimum_of(
-        "tmp_out_date_stroke_isch_snomed", "tmp_out_date_stroke_isch_hes_primary_position", "tmp_out_date_stroke_isch_death"
+        "tmp_out_date_stroke_isch_snomed", "tmp_out_date_stroke_isch_primary_position_hes", "tmp_out_date_stroke_isch_death"
     ),
 
     ## Deep vein thrombosis
@@ -271,7 +271,7 @@ def generate_common_variables(index_date_variable):
 
     ## Deep vein thrombosis - Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_dvt_hes_primary_position=patients.admitted_to_hospital(
+    tmp_out_date_dvt_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=all_dvt_codes_icd10,
         on_or_after=f"{index_date_variable}",
@@ -286,7 +286,7 @@ def generate_common_variables(index_date_variable):
     
     ### Combined
     out_date_dvt_primary_position=patients.minimum_of(
-        "tmp_out_date_dvt_snomed","tmp_out_date_dvt_hes_primary_position", "tmp_out_date_dvt_death"
+        "tmp_out_date_dvt_snomed","tmp_out_date_dvt_primary_position_hes", "tmp_out_date_dvt_death"
     ),
 
     ## Pulmonary embolism
@@ -336,7 +336,7 @@ def generate_common_variables(index_date_variable):
 
     ## Pulmonary embolism - Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_pe_hes_primary_position=patients.admitted_to_hospital(
+    tmp_out_date_pe_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=pe_icd10,
         on_or_after=f"{index_date_variable}",
@@ -351,7 +351,7 @@ def generate_common_variables(index_date_variable):
     
     ### Combined
     out_date_pe_primary_position=patients.minimum_of(
-        "tmp_out_date_pe_snomed", "tmp_out_date_pe_hes_primary_position", "tmp_out_date_pe_death"
+        "tmp_out_date_pe_snomed", "tmp_out_date_pe_primary_position_hes", "tmp_out_date_pe_death"
     ),
 
     ## Transient ischaemic attack
@@ -401,7 +401,7 @@ def generate_common_variables(index_date_variable):
 
     ## Transient ischaemic attack - Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_tia_hes_primary_postion=patients.admitted_to_hospital(
+    tmp_out_date_tia_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=tia_icd10,
         on_or_after=f"{index_date_variable}",
@@ -416,7 +416,7 @@ def generate_common_variables(index_date_variable):
     
     ### Combined
     out_date_tia_primary_position=patients.minimum_of(
-        "tmp_out_date_tia_snomed", "tmp_out_date_tia_hes_primary_postion", "tmp_out_date_tia_death"
+        "tmp_out_date_tia_snomed", "tmp_out_date_tia_primary_position_hes", "tmp_out_date_tia_death"
     ),
 
     ## Subarachnoid haemorrhage and haemorrhagic stroke
@@ -466,7 +466,7 @@ def generate_common_variables(index_date_variable):
 
     ## Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_stroke_sah_hs_hes_primary_position=patients.admitted_to_hospital(
+    tmp_out_date_stroke_sah_hs_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=stroke_sah_hs_icd10,
         on_or_after=f"{index_date_variable}",
@@ -481,7 +481,7 @@ def generate_common_variables(index_date_variable):
     
     ### Combined
     out_date_stroke_sah_hs_primary_position=patients.minimum_of(
-        "tmp_out_date_stroke_sah_hs_snomed", "tmp_out_date_stroke_sah_hs_hes_primary_position", "tmp_out_date_stroke_sah_hs_death"
+        "tmp_out_date_stroke_sah_hs_snomed", "tmp_out_date_stroke_sah_hs_primary_position_hes", "tmp_out_date_stroke_sah_hs_death"
     ),
 
     ## Heart failure
@@ -531,7 +531,7 @@ def generate_common_variables(index_date_variable):
 
     ## Heart failure - Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_hf_hes_primary_position=patients.admitted_to_hospital(
+    tmp_out_date_hf_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=hf_icd10,
         on_or_after=f"{index_date_variable}",
@@ -546,7 +546,7 @@ def generate_common_variables(index_date_variable):
     
     ### Combined
     out_date_hf_primary_position=patients.minimum_of(
-        "tmp_out_date_hf_snomed", "tmp_out_date_hf_hes_primary_position", "tmp_out_date_hf_death"
+        "tmp_out_date_hf_snomed", "tmp_out_date_hf_primary_position_hes", "tmp_out_date_hf_death"
     ),
 
 
@@ -597,7 +597,7 @@ def generate_common_variables(index_date_variable):
 
     ## Angina - Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_angina_hes_primary_position=patients.admitted_to_hospital(
+    tmp_out_date_angina_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=angina_icd10,
         on_or_after=f"{index_date_variable}",
@@ -612,7 +612,7 @@ def generate_common_variables(index_date_variable):
     
     ### Combined
     out_date_angina_primary_position=patients.minimum_of(
-        "tmp_out_date_angina_snomed", "tmp_out_date_angina_hes_primary_position", "tmp_out_date_angina_death"
+        "tmp_out_date_angina_snomed", "tmp_out_date_angina_primary_position_hes", "tmp_out_date_angina_death"
     ),
 
     ## Arterial thrombosis events (i.e., any arterial event - this combines: AMI, ischaemic stroke, other arterial embolism)
@@ -663,7 +663,7 @@ def generate_common_variables(index_date_variable):
     ## Arterial thrombosis events (i.e., any arterial event - this combines: AMI, ischaemic stroke, other arterial embolism)
     ## Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_ate_hes_primary_position=patients.admitted_to_hospital(
+    tmp_out_date_ate_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=all_ate_codes_icd10,
         on_or_after=f"{index_date_variable}",
@@ -678,7 +678,7 @@ def generate_common_variables(index_date_variable):
     
     ### Combined
     out_date_ate_primary_position=patients.minimum_of(
-        "tmp_out_date_ate_snomed", "tmp_out_date_ate_hes_primary_position", "tmp_out_date_ate_death"
+        "tmp_out_date_ate_snomed", "tmp_out_date_ate_primary_position_hes", "tmp_out_date_ate_death"
     ),
 
     ## Venous thromboembolism events (i.e., any venous event) - this combines: PE, DVT, ICVT, Portal vein thrombosism, other DVT)
@@ -729,7 +729,7 @@ def generate_common_variables(index_date_variable):
     ## Venous thromboembolism events (i.e., any venous event) - this combines: PE, DVT, ICVT, Portal vein thrombosism, other DVT)
     ### Primary position events only
     ### HES APC - Primary position events only
-    tmp_out_date_vte_hes_primary_position=patients.admitted_to_hospital(
+    tmp_out_date_vte_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=all_vte_codes_icd10,
         on_or_after=f"{index_date_variable}",
@@ -744,7 +744,7 @@ def generate_common_variables(index_date_variable):
 
     ### Combined
     out_date_vte_primary_position=patients.minimum_of(
-        "tmp_out_date_vte_snomed", "tmp_out_date_vte_hes_primary_position", "tmp_out_date_vte_death"
+        "tmp_out_date_vte_snomed", "tmp_out_date_vte_primary_position_hes", "tmp_out_date_vte_death"
     ),
 
     ## DIABETES OUTCOMES -------------------
