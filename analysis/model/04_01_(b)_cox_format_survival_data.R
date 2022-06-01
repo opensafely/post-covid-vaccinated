@@ -23,9 +23,9 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
                                       ))
   }
   
+
   print(paste0("Total number in survival data: ", nrow(survival_data)))
   print(paste0("Number of cases: ", nrow(cases)))
-  
   
   if(startsWith(subgroup,"covid_pheno_")){
     non_cases_exposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (!is.na(expo_date)))
@@ -122,12 +122,14 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     # with_expo <- with_expo %>% dplyr::select(!id)
     with_expo$id <- NULL
-    
+
     if(startsWith(subgroup,"covid_pheno_")){
       rm(list=c("d1", "d2", "non_cases_exposed","non_cases_unexposed", "cases"))
     }else{
       rm(list=c("d1", "d2", "non_cases", "cases"))
     }
+
+
     
     # ----------------------- SPLIT POST-COVID TIME------------------------------
     with_expo_postexpo <- with_expo %>% filter(expo==1)

@@ -82,6 +82,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     print(covariate_exploration(data_surv, append(covars_to_print,"ethnicity")))
   }
 
+
   covariates <- covar_names[covar_names %in% names(data_surv)] %>% sort()
   interval_names_withpre <- c("days_pre", interval_names)
   
@@ -170,7 +171,6 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     print("Print results")
     print(results)
   }
-  
   
   print("Finised working on cox model")
   return(combined_results)
