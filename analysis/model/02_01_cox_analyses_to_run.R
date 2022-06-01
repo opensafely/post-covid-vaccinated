@@ -17,13 +17,12 @@ covar_names<-covar_names[!covar_names %in% c("cov_num_age","cov_cat_ethnicity","
 
 ##Set which models and cohorts are required
 
-#if(active_analyses$model=="all"){
-#  mdl=c("mdl_agesex","mdl_max_adj")
-#}else{
-#  mdl=active_analyses$model
-#}
+if(active_analyses$model=="all"){
+  mdl=c("mdl_agesex","mdl_max_adj")
+}else{
+  mdl=active_analyses$model
+}
 
-mdl=c("unadjusted_models_test")
 
 ## Transpose active_analyses to single column so can filter to analysis models to run
 

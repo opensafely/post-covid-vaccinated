@@ -76,6 +76,7 @@ analyses_to_run <- rbind(analyses_to_run, analyses_to_run_normal_timepoint)
 
 rm(analyses_to_run_normal_timepoint)
 
+analyses_to_run <- analyses_to_run %>% filter(subgroup=="covid_pheno_hospitalised")
 # Source remainder of relevant files --------------------------------------------------------
 
 source(file.path(scripts_dir,paste0("03_01_cox_subgrouping.R"))) # Model specification
