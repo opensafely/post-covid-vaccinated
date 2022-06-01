@@ -94,27 +94,30 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   combined_results <- as.data.frame(matrix(ncol=9,nrow=0))
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","test_mdl")
   
-  interval_names[interval_names=="days0_1"]<-NULL
   #for(test_mdl in c("unadjusted","age_adjusted","sex_adjusted","age_sex_no_region_adjusted","age_sex_region_covar")){
-  for(test_mdl in c("age_sex_region_covar")){
+  for(test_mdl in c("age_sex_region_covar","age_sex_region_stratified")){
     
     surv_formula <- paste0(
           "Surv(tstart, tstop, event) ~ ",
           paste(interval_names, collapse="+"),
           "+ cluster(patient_id)")
     
-    if (test_mdl %in% c("age_adjusted","age_sex_no_region_adjusted","age_sex_region_covar") & startsWith(subgroup,"agegp_")==F){
+    if (test_mdl %in% c("age_adjusted","age_sex_no_region_adjusted","age_sex_region_covar","age_sex_region_stratified") & startsWith(subgroup,"agegp_")==F){
         surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
-      }else if (test_mdl %in% c("age_adjusted","age_sex_no_region_adjusted","age_sex_region_covar") & (startsWith(subgroup,"agegp_"))==T){
+      }else if (test_mdl %in% c("age_adjusted","age_sex_no_region_adjusted","age_sex_region_covar","age_sex_region_stratified") & (startsWith(subgroup,"agegp_"))==T){
         surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
       }
     
-    if (test_mdl %in% c("sex_adjusted","age_sex_no_region_adjusted","age_sex_region_covar") & (startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
+    if (test_mdl %in% c("sex_adjusted","age_sex_no_region_adjusted","age_sex_region_covar","age_sex_region_stratified") & (startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
         surv_formula <- paste(surv_formula, "sex", sep="+")
     }
     
     if (test_mdl %in% c("age_sex_region_covar")){
       surv_formula <- paste(surv_formula, "region_name", sep="+")
+    }
+    
+    if (test_mdl %in% c("age_sex_region_stratified")){
+      surv_formula <- paste(surv_formula, "strat(region_name)", sep="+")
     }
     
   #if(mdl=="mdl_agesex"){

@@ -23,19 +23,25 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
                                       ))
   }
   
-  non_cases <- survival_data %>% filter(!patient_id %in% cases$patient_id)
+  non_cases_exposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (!is.na(expo_date)))
+  non_cases_non_exposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (is.na(expo_date)))
   
-  if(nrow(cases)*10 < nrow(non_cases)){
-    non_cases <- non_cases[sample(1:nrow(non_cases), nrow(cases)*10,replace=FALSE), ]
-  }else if (nrow(cases)*10 >= nrow(non_cases)){
-    non_cases=non_cases
+  if(nrow(cases)*10 < nrow(non_cases_non_exposed)){
+    non_cases_non_exposed <- non_cases_non_exposed[sample(1:nrow(non_cases_non_exposed), nrow(cases)*10,replace=FALSE), ]
+  }else if (nrow(cases)*10 >= nrow(non_cases_non_exposed)){
+    non_cases_non_exposed=non_cases_non_exposed
   }
   
+  print(paste0("Total number in survival data: ", nrow(survival_data)))
   print(paste0("Number of cases: ", nrow(cases)))
-  print(paste0("Number of controls: ", nrow(non_cases)))
+  print(paste0("Number of controls (exposed): ", nrow(non_cases_exposed)))
+  print(paste0("Number of controls (non exposed): ", nrow(non_cases_non_exposed)))
   
-  non_case_inverse_weight=(nrow(survival_data)-nrow(cases))/nrow(non_cases)
-  survival_data <- bind_rows(cases,non_cases)
+
+  non_case_inverse_weight=(nrow(survival_data)-nrow(cases)-nrow(non_cases_exposed))/nrow(non_cases_non_exposed)
+  print(paste0("Controls (non exposed) weight: ", non_case_inverse_weight))
+  
+  survival_data <- bind_rows(cases,non_cases_exposed,non_cases_non_exposed)
 
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
   survival_data$days_to_end <- as.numeric(survival_data$follow_up_end-cohort_start_date)
@@ -46,7 +52,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     survival_data$days_to_end <- (survival_data$days_to_end +1) 
   }
   
-  noncase_ids <- unique(non_cases$patient_id)
+  noncase_ids <- unique(non_cases_non_exposed$patient_id)
   
   # ......................................
   # Need to add 0.001 when days_to_end==0
@@ -104,7 +110,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     # with_expo <- with_expo %>% dplyr::select(!id)
     with_expo$id <- NULL
-    rm(list=c("d1", "d2", "non_cases", "cases"))
+    rm(list=c("d1", "d2", "non_cases_exposed","non_cases_non_exposed", "cases"))
     
     # ----------------------- SPLIT POST-COVID TIME------------------------------
     with_expo_postexpo <- with_expo %>% filter(expo==1)
@@ -246,7 +252,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     tbl_event_count$events_total <- as.numeric(tbl_event_count$events_total)
     
     #Any time periods with <=5 events? If yes, will reduce time periods
-    ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(1,28, 197))))
+    ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
     
     #Are there <50 post expo events? If yes, won't run analysis
     #Can change <50 to be lower to test on dummy data

@@ -82,7 +82,7 @@ convert_comment_actions <-function(yaml.txt){
 # Updated to a typical action running Cox models for one outcome
 apply_model_function <- function(outcome, cohort){
   splice(
-    comment(glue("Apply cox model for {outcome} - {cohort} cohort")),
+    comment(glue("Cox model for {outcome} - {cohort}")),
     action(
       name = glue("Analysis_cox_{outcome}_{cohort}"),
       run = "r:latest analysis/model/01_cox_pipeline.R",
@@ -137,14 +137,6 @@ actions_list <- splice(
     )
   ),
   
-  #comment("Generate dummy data for study_definition - investigate"),
-  action(
-    name = "generate_study_population_investigate",
-    run = "cohortextractor:latest generate_cohort --study-definition study_definition_investigate --output-format feather",
-    highly_sensitive = list(
-      cohort = glue("output/input_investigate.feather")
-    )
-  ),
   
   #comment("Generate dummy data for study_definition - electively_unvaccinated"),
   action(
@@ -172,16 +164,6 @@ actions_list <- splice(
     highly_sensitive = list(
       cohort = glue("output/input_index.feather")
     )
-  ), 
-  
-  #comment("Investigation"),
-  action(
-    name = "investigation",
-    run = "r:latest analysis/investigation.R",
-    needs = list("generate_study_population_investigate"),
-    moderately_sensitive = list(
-      describe = glue("output/describe_input_investigate_*.txt")
-    ),
   ), 
 
   #comment("Preprocess data - vaccinated"),
