@@ -136,8 +136,7 @@ actions_list <- splice(
       vax_eligible_dates= ("output/vax_eligible_dates.csv")
     )
   ),
-  
-  
+
   #comment("Generate dummy data for study_definition - electively_unvaccinated"),
   action(
     name = "generate_study_population_electively_unvaccinated",
