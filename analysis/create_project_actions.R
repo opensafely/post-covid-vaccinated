@@ -82,7 +82,7 @@ convert_comment_actions <-function(yaml.txt){
 # Updated to a typical action running Cox models for one outcome
 apply_model_function <- function(outcome, cohort){
   splice(
-    comment(glue("Apply cox model for {outcome} - {cohort} cohort")),
+    comment(glue("Cox model for {outcome} - {cohort}")),
     action(
       name = glue("Analysis_cox_{outcome}_{cohort}"),
       run = "r:latest analysis/model/01_cox_pipeline.R",
@@ -136,7 +136,7 @@ actions_list <- splice(
       vax_eligible_dates= ("output/vax_eligible_dates.csv")
     )
   ),
-  
+
   #comment("Generate dummy data for study_definition - electively_unvaccinated"),
   action(
     name = "generate_study_population_electively_unvaccinated",
