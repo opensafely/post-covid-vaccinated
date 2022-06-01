@@ -6,7 +6,7 @@
 source(file.path(scripts_dir,"04_01_(a)_cox_fit_model.R"))
 
 get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_point,input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced,mdl){
-  print(paste0("Working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
+  print(paste0("Working on subgroup: ", subgroup, " ", cohort))
   print(paste0("Using ",time_point," time point"))
   
   #Reduce dataset to those who do NOT have a prior history of COVID unless running the subgroup
