@@ -1025,105 +1025,8 @@ def generate_common_variables(index_date_variable):
 
     ## Depression
         # Primary Care
-    tmp_out_date_depression_snomed=patients.with_these_clinical_events(
-        depression_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # HES
-    tmp_out_date_depression_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=depression_icd10,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # ONS
-    tmp_out_date_depression_death=patients.with_these_codes_on_death_certificate(
-        depression_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # Prescriptions
-    tmp_out_date_depression_prescriptions=patients.with_these_medications(
-        all_depression_prescriptions,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
-    ),
-        # Combined
-    out_date_depression=patients.minimum_of(
-        "tmp_out_date_depression_snomed", "tmp_out_date_depression_hes", "tmp_out_date_depression_death"
-    ),
-
-    ## Anxiety - general
-        # Primary Care
-    tmp_out_date_anxiety_general_snomed=patients.with_these_clinical_events(
-        anxiety_general_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # HES
-    tmp_out_date_anxiety_general_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=anxiety_icd10,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # ONS
-    tmp_out_date_anxiety_general_death=patients.with_these_codes_on_death_certificate(
-        anxiety_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),  
-        # Prescriptions
-    # tmp_out_date_anxiolytics_prescriptions=patients.with_these_clinical_events(
-    #     anxiolytic_prescription,
+    # tmp_out_date_depression_snomed=patients.with_these_clinical_events(
+    #     depression_snomed_clinical,
     #     returning="date",
     #     on_or_after=f"{index_date_variable}",
     #     date_format="YYYY-MM-DD",
@@ -1131,191 +1034,37 @@ def generate_common_variables(index_date_variable):
     #     return_expectations={
     #         "date": {"earliest": "index_date", "latest" : "today"},
     #         "rate": "uniform",
-    #         "incidence": 0.03,
+    #         "incidence": 0.1,
     #     },
     # ),
-        # Combined
-    out_date_anxiety_general=patients.minimum_of(
-        "tmp_out_date_anxiety_general_snomed", "tmp_out_date_anxiety_general_hes", "tmp_out_date_anxiety_general_death"
-    ),
-
-    ## Anxiety - obsessive compulsive disorder
-        # Primary care
-    tmp_out_date_anxiety_ocd_snomed=patients.with_these_clinical_events(
-        anxiety_ocd_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # HES
-    tmp_out_date_anxiety_ocd_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=ocd_icd10,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # ONS
-    tmp_out_date_anxiety_ocd_death=patients.with_these_codes_on_death_certificate(
-        ocd_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03
-        },
-    ),  
-        # Combined
-    out_date_anxiety_ocd=patients.minimum_of(
-        "tmp_out_date_anxiety_ocd_snomed", "tmp_out_date_anxiety_ocd_hes", "tmp_out_date_anxiety_ocd_death"
-    ),
-
-    ## Anxiety - post traumatic stress disorder
-        # Primary care
-    tmp_out_date_anxiety_ptsd_snomed=patients.with_these_clinical_events(
-        anxiety_ptsd_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # HES
-    tmp_out_date_anxiety_ptsd_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=ptsd_icd10,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.03,
-        },
-    ),
-        # ONS
-    tmp_out_date_anxiety_ptsd_death=patients.with_these_codes_on_death_certificate(
-        ptsd_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ), 
-        # Combined
-    out_date_anxiety_ptsd=patients.minimum_of(
-        "tmp_out_date_anxiety_ptsd_snomed", "tmp_out_date_anxiety_ptsd_hes", "tmp_out_date_anxiety_ptsd_death"
-    ),
-
-    ## Eating disorders
-        # Primary care
-    tmp_out_date_eating_disorders_snomed=patients.with_these_clinical_events(
-        eating_disorders_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # HES
-    tmp_out_date_eating_disorders_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=eating_disorder_icd10,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # ONS
-    tmp_out_date_eating_disorders_death=patients.with_these_codes_on_death_certificate(
-        eating_disorder_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ), 
-        # Combined
-    out_date_eating_disorders=patients.minimum_of(
-        "tmp_out_date_eating_disorders_snomed", "tmp_out_date_eating_disorders_hes", "tmp_out_date_eating_disorders_death"
-    ),
-
-    ## Serious mental illness
-        # Primary care
-    tmp_out_date_serious_mental_illness_snomed=patients.with_these_clinical_events(
-        serious_mental_illness_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # HES 
-    tmp_out_date_serious_mental_illness_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=serious_mental_illness_icd10,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # ONS
-    tmp_out_date_serious_mental_illness_death=patients.with_these_codes_on_death_certificate(
-        serious_mental_illness_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ), 
-        # Prescriptions
-    # tmp_out_date_serious_mental_illness_prescriptions=patients.with_these_clinical_events(
+    #     # HES
+    # tmp_out_date_depression_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=depression_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_depression_death=patients.with_these_codes_on_death_certificate(
+    #     depression_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # Prescriptions
+    # tmp_out_date_depression_prescriptions=patients.with_these_medications(
     #     all_depression_prescriptions,
     #     returning="date",
     #     on_or_after=f"{index_date_variable}",
@@ -1327,182 +1076,433 @@ def generate_common_variables(index_date_variable):
     #         "incidence": 0.03,
     #     },
     # ),
-        # Combined
-    out_date_serious_mental_illness=patients.minimum_of(
-        "tmp_out_date_serious_mental_illness_snomed", "tmp_out_date_serious_mental_illness_hes", "tmp_out_date_serious_mental_illness_death"
-    ),
+    #     # Combined
+    # out_date_depression=patients.minimum_of(
+    #     "tmp_out_date_depression_snomed", "tmp_out_date_depression_hes", "tmp_out_date_depression_death"
+    # ),
 
-    ## Self harm - aged >= 10 years
-        # Primary care
-    tmp_out_date_self_harm_10plus_snomed=patients.with_these_clinical_events(
-        self_harm_10plus_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # HES
-    tmp_out_date_self_harm_10plus_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=self_harm_intent_icd10,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # ONS
-    tmp_out_date_self_harm_10plus_death=patients.with_these_codes_on_death_certificate(
-        self_harm_intent_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ), 
-        # Combined
-    out_date_self_harm_10plus=patients.minimum_of(
-        "tmp_out_date_self_harm_10plus_snomed", "tmp_out_date_self_harm_10plus_hes", "tmp_out_date_self_harm_10plus_death"
-    ),
+    # ## Anxiety - general
+    #     # Primary Care
+    # tmp_out_date_anxiety_general_snomed=patients.with_these_clinical_events(
+    #     anxiety_general_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_anxiety_general_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=anxiety_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_anxiety_general_death=patients.with_these_codes_on_death_certificate(
+    #     anxiety_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),  
+    #     # Prescriptions
+    # # tmp_out_date_anxiolytics_prescriptions=patients.with_these_clinical_events(
+    # #     anxiolytic_prescription,
+    # #     returning="date",
+    # #     on_or_after=f"{index_date_variable}",
+    # #     date_format="YYYY-MM-DD",
+    # #     find_first_match_in_period=True,
+    # #     return_expectations={
+    # #         "date": {"earliest": "index_date", "latest" : "today"},
+    # #         "rate": "uniform",
+    # #         "incidence": 0.03,
+    # #     },
+    # # ),
+    #     # Combined
+    # out_date_anxiety_general=patients.minimum_of(
+    #     "tmp_out_date_anxiety_general_snomed", "tmp_out_date_anxiety_general_hes", "tmp_out_date_anxiety_general_death"
+    # ),
 
-    ## Self harm - aged >= 15 years
-        # Primary care
-    tmp_out_date_self_harm_15plus_snomed=patients.with_these_clinical_events(
-        combine_codelists(
-            self_harm_10plus_snomed_clinical,
-            self_harm_15plus_snomed_clinical,
-        ),
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # HES
-    tmp_out_date_self_harm_15plus_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=self_harm_15_10_combined_icd,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # ONS
-    tmp_out_date_self_harm_15plus_death=patients.with_these_codes_on_death_certificate(
-        self_harm_15_10_combined_icd,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ), 
-        # Combined
-    out_date_self_harm_15plus=patients.minimum_of(
-        "tmp_out_date_self_harm_15plus_snomed", "tmp_out_date_self_harm_15plus_hes","tmp_out_date_self_harm_15plus_death"
-    ),
+    # ## Anxiety - obsessive compulsive disorder
+    #     # Primary care
+    # tmp_out_date_anxiety_ocd_snomed=patients.with_these_clinical_events(
+    #     anxiety_ocd_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_anxiety_ocd_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=ocd_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_anxiety_ocd_death=patients.with_these_codes_on_death_certificate(
+    #     ocd_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.03
+    #     },
+    # ),  
+    #     # Combined
+    # out_date_anxiety_ocd=patients.minimum_of(
+    #     "tmp_out_date_anxiety_ocd_snomed", "tmp_out_date_anxiety_ocd_hes", "tmp_out_date_anxiety_ocd_death"
+    # ),
 
-    ## Suicide
-        # HES
-    tmp_out_date_suicide_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=suicide_icd10,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # ONS
-    tmp_out_date_suicide_death=patients.with_these_codes_on_death_certificate(
-        suicide_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # Combined
-    out_date_suicide=patients.minimum_of(
-        "tmp_out_date_suicide_hes", "tmp_out_date_suicide_death"
-    ),     
+    # ## Anxiety - post traumatic stress disorder
+    #     # Primary care
+    # tmp_out_date_anxiety_ptsd_snomed=patients.with_these_clinical_events(
+    #     anxiety_ptsd_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_anxiety_ptsd_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=ptsd_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.03,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_anxiety_ptsd_death=patients.with_these_codes_on_death_certificate(
+    #     ptsd_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Combined
+    # out_date_anxiety_ptsd=patients.minimum_of(
+    #     "tmp_out_date_anxiety_ptsd_snomed", "tmp_out_date_anxiety_ptsd_hes", "tmp_out_date_anxiety_ptsd_death"
+    # ),
 
-    ## Addiction
-        # Primary care
-    tmp_out_date_addiction_snomed=patients.with_these_clinical_events(
-        addiction_snomed_clinical,
-        returning="date",
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # HES
-    tmp_out_date_addiction_hes=patients.admitted_to_hospital(
-        returning="date_admitted",
-        with_these_diagnoses=opioid_misuse_icd10,
-        on_or_after=f"{index_date_variable}",
-        date_format="YYYY-MM-DD",
-        find_first_match_in_period=True,
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ),
-        # ONS
-    tmp_out_date_addiction_death=patients.with_these_codes_on_death_certificate(
-        opioid_misuse_icd10,
-        returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
-        match_only_underlying_cause=True,
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "date": {"earliest": "index_date", "latest" : "today"},
-            "rate": "uniform",
-            "incidence": 0.1,
-        },
-    ), 
-        # Prescription
+    # ## Eating disorders
+    #     # Primary care
+    # tmp_out_date_eating_disorders_snomed=patients.with_these_clinical_events(
+    #     eating_disorders_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_eating_disorders_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=eating_disorder_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_eating_disorders_death=patients.with_these_codes_on_death_certificate(
+    #     eating_disorder_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Combined
+    # out_date_eating_disorders=patients.minimum_of(
+    #     "tmp_out_date_eating_disorders_snomed", "tmp_out_date_eating_disorders_hes", "tmp_out_date_eating_disorders_death"
+    # ),
 
-        # Combined
-    out_date_addiction=patients.minimum_of(
-        "tmp_out_date_addiction_snomed", "tmp_out_date_addiction_hes","tmp_out_date_addiction_death"
-    ),
+    # ## Serious mental illness
+    #     # Primary care
+    # tmp_out_date_serious_mental_illness_snomed=patients.with_these_clinical_events(
+    #     serious_mental_illness_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES 
+    # tmp_out_date_serious_mental_illness_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=serious_mental_illness_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_serious_mental_illness_death=patients.with_these_codes_on_death_certificate(
+    #     serious_mental_illness_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Prescriptions
+    # # tmp_out_date_serious_mental_illness_prescriptions=patients.with_these_clinical_events(
+    # #     all_depression_prescriptions,
+    # #     returning="date",
+    # #     on_or_after=f"{index_date_variable}",
+    # #     date_format="YYYY-MM-DD",
+    # #     find_first_match_in_period=True,
+    # #     return_expectations={
+    # #         "date": {"earliest": "index_date", "latest" : "today"},
+    # #         "rate": "uniform",
+    # #         "incidence": 0.03,
+    # #     },
+    # # ),
+    #     # Combined
+    # out_date_serious_mental_illness=patients.minimum_of(
+    #     "tmp_out_date_serious_mental_illness_snomed", "tmp_out_date_serious_mental_illness_hes", "tmp_out_date_serious_mental_illness_death"
+    # ),
+
+    # ## Self harm - aged >= 10 years
+    #     # Primary care
+    # tmp_out_date_self_harm_10plus_snomed=patients.with_these_clinical_events(
+    #     self_harm_10plus_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_self_harm_10plus_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=self_harm_intent_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_self_harm_10plus_death=patients.with_these_codes_on_death_certificate(
+    #     self_harm_intent_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Combined
+    # out_date_self_harm_10plus=patients.minimum_of(
+    #     "tmp_out_date_self_harm_10plus_snomed", "tmp_out_date_self_harm_10plus_hes", "tmp_out_date_self_harm_10plus_death"
+    # ),
+
+    # ## Self harm - aged >= 15 years
+    #     # Primary care
+    # tmp_out_date_self_harm_15plus_snomed=patients.with_these_clinical_events(
+    #     combine_codelists(
+    #         self_harm_10plus_snomed_clinical,
+    #         self_harm_15plus_snomed_clinical,
+    #     ),
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_self_harm_15plus_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=self_harm_15_10_combined_icd,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_self_harm_15plus_death=patients.with_these_codes_on_death_certificate(
+    #     self_harm_15_10_combined_icd,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Combined
+    # out_date_self_harm_15plus=patients.minimum_of(
+    #     "tmp_out_date_self_harm_15plus_snomed", "tmp_out_date_self_harm_15plus_hes","tmp_out_date_self_harm_15plus_death"
+    # ),
+
+    # ## Suicide
+    #     # HES
+    # tmp_out_date_suicide_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=suicide_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_suicide_death=patients.with_these_codes_on_death_certificate(
+    #     suicide_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # Combined
+    # out_date_suicide=patients.minimum_of(
+    #     "tmp_out_date_suicide_hes", "tmp_out_date_suicide_death"
+    # ),     
+
+    # ## Addiction
+    #     # Primary care
+    # tmp_out_date_addiction_snomed=patients.with_these_clinical_events(
+    #     addiction_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_addiction_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=opioid_misuse_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_addiction_death=patients.with_these_codes_on_death_certificate(
+    #     opioid_misuse_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Prescription
+
+    #     # Combined
+    # out_date_addiction=patients.minimum_of(
+    #     "tmp_out_date_addiction_snomed", "tmp_out_date_addiction_hes","tmp_out_date_addiction_death"
+    # ),
 
     # Define covariates (other than sex, which is considered constant and needed for JCVI groupings) ------------------------------
 
@@ -2087,86 +2087,86 @@ def generate_common_variables(index_date_variable):
 
     ## History of anxiety
      ### Primary care
-    tmp_cov_bin_anxiety_general=patients.with_these_clinical_events(
-        anxiety_combined_snomed_cov,
-        returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
-    ),
-     ### HES
-    tmp_cov_bin_anxiety_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=anxiety_combined_hes_cov,
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
-    ),    
-     ### Combined
-    cov_bin_anxiety=patients.maximum_of(
-        "tmp_cov_bin_anxiety_general", "tmp_cov_bin_anxiety_icd10",
-    ),
+    # tmp_cov_bin_anxiety_general=patients.with_these_clinical_events(
+    #     anxiety_combined_snomed_cov,
+    #     returning='binary_flag',
+    #     on_or_before=f"{index_date_variable}",
+    #     return_expectations={"incidence": 0.03},
+    # ),
+    #  ### HES
+    # tmp_cov_bin_anxiety_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=anxiety_combined_hes_cov,
+    #     on_or_before=f"{index_date_variable}",
+    #     return_expectations={"incidence": 0.03},
+    # ),    
+    #  ### Combined
+    # cov_bin_anxiety=patients.maximum_of(
+    #     "tmp_cov_bin_anxiety_general", "tmp_cov_bin_anxiety_icd10",
+    # ),
 
-    ## History of Eating disorders
-        ### Primary care
-    tmp_cov_bin_eating_disorders=patients.with_these_clinical_events(
-        eating_disorders_snomed_clinical,
-        returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
-    ),
-        ### HES
-    tmp_cov_bin_eating_disorders_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=eating_disorder_icd10,
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
-    ), 
-        ### Combined
-    cov_bin_eating_disorders=patients.maximum_of(
-        "tmp_cov_bin_eating_disorders", "tmp_cov_bin_eating_disorders_icd10",
-    ),
+    # ## History of Eating disorders
+    #     ### Primary care
+    # tmp_cov_bin_eating_disorders=patients.with_these_clinical_events(
+    #     eating_disorders_snomed_clinical,
+    #     returning='binary_flag',
+    #     on_or_before=f"{index_date_variable}",
+    #     return_expectations={"incidence": 0.03},
+    # ),
+    #     ### HES
+    # tmp_cov_bin_eating_disorders_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=eating_disorder_icd10,
+    #     on_or_before=f"{index_date_variable}",
+    #     return_expectations={"incidence": 0.03},
+    # ), 
+    #     ### Combined
+    # cov_bin_eating_disorders=patients.maximum_of(
+    #     "tmp_cov_bin_eating_disorders", "tmp_cov_bin_eating_disorders_icd10",
+    # ),
 
-    ## History of Serious mental illness
-        ### Primary Care
-    tmp_cov_bin_serious_mental_illness=patients.with_these_clinical_events(
-        serious_mental_illness_snomed_clinical,
-        returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
-    ),
-        ### HES
-    tmp_cov_bin_serious_mental_illness_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=serious_mental_illness_icd10,
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
-    ), 
-        ### Combined
-    cov_bin_serious_mental_illness=patients.maximum_of(
-        "tmp_cov_bin_serious_mental_illness", "tmp_cov_bin_serious_mental_illness_icd10",
-    ),
+    # ## History of Serious mental illness
+    #     ### Primary Care
+    # tmp_cov_bin_serious_mental_illness=patients.with_these_clinical_events(
+    #     serious_mental_illness_snomed_clinical,
+    #     returning='binary_flag',
+    #     on_or_before=f"{index_date_variable}",
+    #     return_expectations={"incidence": 0.03},
+    # ),
+    #     ### HES
+    # tmp_cov_bin_serious_mental_illness_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=serious_mental_illness_icd10,
+    #     on_or_before=f"{index_date_variable}",
+    #     return_expectations={"incidence": 0.03},
+    # ), 
+    #     ### Combined
+    # cov_bin_serious_mental_illness=patients.maximum_of(
+    #     "tmp_cov_bin_serious_mental_illness", "tmp_cov_bin_serious_mental_illness_icd10",
+    # ),
 
-    ## History of Self harm 
-     ### Primary care
-    tmp_cov_bin_self_harm_snomed=patients.with_these_clinical_events(
-        combine_codelists(
-            self_harm_10plus_snomed_clinical,
-            self_harm_15plus_snomed_clinical
-        ),
-        returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
-    ),
-     ### HES
-    tmp_cov_bin_self_harm_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=self_harm_15_10_combined_icd,
-        on_or_before=f"{index_date_variable}",
-        return_expectations={"incidence": 0.03},
-    ),
-     ### Combined
-    cov_bin_self_harm=patients.maximum_of(
-        "tmp_cov_bin_self_harm_snomed", "tmp_cov_bin_self_harm_icd10",
-    ),
+    # ## History of Self harm 
+    #  ### Primary care
+    # tmp_cov_bin_self_harm_snomed=patients.with_these_clinical_events(
+    #     combine_codelists(
+    #         self_harm_10plus_snomed_clinical,
+    #         self_harm_15plus_snomed_clinical
+    #     ),
+    #     returning='binary_flag',
+    #     on_or_before=f"{index_date_variable}",
+    #     return_expectations={"incidence": 0.03},
+    # ),
+    #  ### HES
+    # tmp_cov_bin_self_harm_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=self_harm_15_10_combined_icd,
+    #     on_or_before=f"{index_date_variable}",
+    #     return_expectations={"incidence": 0.03},
+    # ),
+    #  ### Combined
+    # cov_bin_self_harm=patients.maximum_of(
+    #     "tmp_cov_bin_self_harm_snomed", "tmp_cov_bin_self_harm_icd10",
+    # ),
 
     ## Total Cholesterol
     tmp_cov_num_cholesterol=patients.max_recorded_value(
