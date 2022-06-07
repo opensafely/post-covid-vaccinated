@@ -149,7 +149,16 @@ hosp_covid_events <- function(cohort_name){
   #     TRUE ~ as.character(post_exposure_event_counts)))
   
   # write output for table2
-  write.csv(analyses_of_interest, file=paste0("output/review/descriptives/hospitalised_covid_event_counts_by_region_",cohort_name, ".csv"), row.names = F)
+  write.csv(analyses_of_interest, file=paste0("output/not-for-review/hospitalised_covid_event_counts_by_region_",cohort_name, "_non_suppressed.csv"), row.names = F)
+  
+  analyses_of_interest$unexposed_event_counts <- round(analyses_of_interest$unexposed_event_counts, -1)
+  analyses_of_interest$post_exposure_event_counts <- round(analyses_of_interest$post_exposure_event_counts, -1)
+  
+  analyses_of_interest$unexposed_event_counts <- ifelse(analyses_of_interest$unexposed_event_counts<10, "<10",analyses_of_interest$unexposed_event_counts)
+  analyses_of_interest$post_exposure_event_counts <- ifelse(analyses_of_interest$post_exposure_event_counts<10, "<10",analyses_of_interest$post_exposure_event_counts)
+  
+  
+  write.csv(analyses_of_interest, file=paste0("output/not-for-review/hospitalised_covid_event_counts_by_region_",cohort_name, "_supressed.csv"), row.names = F)
 }
 
 hosp_covid_event_counts <- function(survival_data, event, region){
@@ -179,17 +188,6 @@ hosp_covid_event_counts <- function(survival_data, event, region){
                                           data_active$event_date <= data_active$hospitalised_follow_up_end) &
                                           (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))))
   
-  
-  event_count_exposed <- round(event_count_exposed, -1)
-  event_count_unexposed <- round(event_count_unexposed, -1)
-  
-  if(event_count_unexposed < 10){
-    event_count_unexposed <- "<10"
-  }
-  
-  if(event_count_exposed < 10){
-    event_count_exposed <- "<10"
-  }
 
   return(c(event_count_unexposed, event_count_exposed))
 }
