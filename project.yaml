@@ -85,7 +85,7 @@ actions:
         refactoring: output/not-for-review/meta_data_factors_*.csv
         QA_rules: output/review/descriptives/QA_summary_*.csv
         IE_criteria: output/review/descriptives/Cohort_flow_*.csv
-        histograms: output/not-for-review/numeric_histograms*.svg
+        histograms: output/not-for-review/numeric_histograms_*.svg
       highly_sensitive:
         cohort: output/input_*_stage1.rds
 
