@@ -40,6 +40,8 @@ for(i in outcomes) {
   cols.num <- c("only_snomed", "only_hes", "only_death", "snomed_hes", "snomed_death", "hes_death","snomed_hes_death", "total_snomed",
                 "total_hes","total_death","total" )
   df[cols.num] <- sapply(df[cols.num],as.numeric)
+  #change NAs to 0
+  df[is.na(df)] <- 0
   
   # create Venn diagram with three sets
   svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_NEWTEST_",gsub("out_date_","",i),".svg"))
@@ -49,7 +51,7 @@ for(i in outcomes) {
                    category=c("Primary care","Secondary care","Death records"),
                    col="white",fill=c("thistle","lightcyan","lemonchiffon"),
                    print.mode = c("raw", "percent"),
-                   sigdigs = 1)
+                   sigdigs = 3)
 
   g <- grid.arrange(gTree(children=g), top=textGrob(active_analyses[active_analyses$outcome_variable==i,]$outcome, gp = gpar(fontsize = 18, fontface="bold")))
   print(g)
