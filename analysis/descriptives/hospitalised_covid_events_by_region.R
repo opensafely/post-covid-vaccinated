@@ -158,7 +158,7 @@ hosp_covid_events <- function(cohort_name){
   analyses_of_interest$post_exposure_event_counts <- ifelse(analyses_of_interest$post_exposure_event_counts<10, "<10",analyses_of_interest$post_exposure_event_counts)
   
   
-  write.csv(analyses_of_interest, file=paste0("output/not-for-review/hospitalised_covid_event_counts_by_region_",cohort_name, "_supressed.csv"), row.names = F)
+  write.csv(analyses_of_interest, file=paste0("output/not-for-review/hospitalised_covid_event_counts_by_region_",cohort_name, "_suppressed.csv"), row.names = F)
 }
 
 hosp_covid_event_counts <- function(survival_data, event, region){
