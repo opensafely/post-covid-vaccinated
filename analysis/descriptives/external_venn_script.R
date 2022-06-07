@@ -35,13 +35,19 @@ outcomes <- df$outcome
 for(i in outcomes) {
  
   df <- read.csv("output/review/venn-diagrams/venn_diagram_number_check_vaccinated.csv")
+  
+  # calculate totals columns
+  df <- df %>%
+    mutate(total_snomed = rowSums(select(., contains('snomed'))),
+           total_hes = rowSums(select(., contains('hes'))),
+           total_death = rowSums(select(., contains('death')))) %>%
+    mutate(total = rowSums(select(., contains('total'))))
+  
   df <- subset(df, outcome == i)
   
   cols.num <- c("only_snomed", "only_hes", "only_death", "snomed_hes", "snomed_death", "hes_death","snomed_hes_death", "total_snomed",
                 "total_hes","total_death","total" )
   df[cols.num] <- sapply(df[cols.num],as.numeric)
-  #change NAs to 0
-  df[is.na(df)] <- 0
   
   # create Venn diagram with three sets
   svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_NEWTEST_",gsub("out_date_","",i),".svg"))

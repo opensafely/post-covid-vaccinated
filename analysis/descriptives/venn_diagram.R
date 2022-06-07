@@ -233,7 +233,10 @@ venn_output <- function(cohort_name){
   is.na(a) <- a <= 5
   df <- cbind(df[c(1,9:12)], a) 
   df <- setcolorder(df, colnamesorder)
-  
+  # remove totals column as these are calculated in external_venn_script.R
+  df <- select(df, -contains("total"))
+  #change NAs to 0
+  df[is.na(df)] <- 0
   write.csv(df, file = paste0("output/review/venn-diagrams/venn_diagram_number_check_", cohort_name,".csv"), row.names = F)
   
 }
