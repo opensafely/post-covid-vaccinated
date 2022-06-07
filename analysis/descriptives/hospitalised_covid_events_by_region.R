@@ -39,7 +39,7 @@ cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
 cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 
 
-table_2_subgroups_output <- function(cohort_name){
+hosp_covid_events <- function(cohort_name){
   
   # define analyses of interests
   active_analyses <- read_rds("lib/active_analyses.rds")
@@ -97,7 +97,7 @@ table_2_subgroups_output <- function(cohort_name){
                      "hospitalised_date_expo_censor",
                      "non_hospitalised_date_expo_censor"))
     
-    analyses_of_interest[i,4:5] <- table_2_calculation(survival_data, 
+    analyses_of_interest[i,4:5] <- hosp_covid_event_counts(survival_data, 
                                                              event=analyses_of_interest$event[i],
                                                              region=analyses_of_interest$regions[i])
     
@@ -122,26 +122,26 @@ table_2_subgroups_output <- function(cohort_name){
   }
   
   
-  analyses_of_interest <- analyses_of_interest %>%
-    group_by(event) %>%
-    dplyr::mutate(unexposed_event_counts = case_when(
-      any(unexposed_event_counts == "[Redacted]") ~ "[Redacted]",
-      TRUE ~ as.character(unexposed_event_counts)))
-  
-  analyses_of_interest <- analyses_of_interest %>%
-    group_by(event) %>%
-    dplyr::mutate(post_exposure_event_counts = case_when(
-      any(post_exposure_event_counts == "[Redacted]") ~ "[Redacted]",
-      TRUE ~ as.character(post_exposure_event_counts)))
+  # analyses_of_interest <- analyses_of_interest %>%
+  #   group_by(event) %>%
+  #   dplyr::mutate(unexposed_event_counts = case_when(
+  #     any(unexposed_event_counts == "[Redacted]") ~ "[Redacted]",
+  #     TRUE ~ as.character(unexposed_event_counts)))
+  # 
+  # analyses_of_interest <- analyses_of_interest %>%
+  #   group_by(event) %>%
+  #   dplyr::mutate(post_exposure_event_counts = case_when(
+  #     any(post_exposure_event_counts == "[Redacted]") ~ "[Redacted]",
+  #     TRUE ~ as.character(post_exposure_event_counts)))
   
   # write output for table2
-  write.csv(analyses_of_interest, file=paste0("output/review/descriptives/hospitalised_covid_event_counts_by_region",cohort_name, ".csv"), row.names = F)
+  write.csv(analyses_of_interest, file=paste0("output/review/descriptives/hospitalised_covid_event_counts_by_region_",cohort_name, ".csv"), row.names = F)
 }
 
-table_2_calculation <- function(survival_data, event, region){
+hosp_covid_event_counts <- function(survival_data, event, region){
   print(paste0("Working on ",event, " ",region))
   data_active <- survival_data
-
+  
   data_active <- data_active %>% mutate(event_date = replace(event_date, which(event_date>follow_up_end | event_date<index_date), NA))
   data_active <- data_active %>% mutate(exp_date_covid19_confirmed = replace(exp_date_covid19_confirmed, which(exp_date_covid19_confirmed>follow_up_end | exp_date_covid19_confirmed<index_date), NA))
   
@@ -152,10 +152,10 @@ table_2_calculation <- function(survival_data, event, region){
   # filter the population according to the subgroup level
   data_active=data_active%>%filter_at("cov_cat_region",all_vars(.==region))
   
-  data_active$exp_date_covid19_confirmed <- as.Date(ifelse((!is.na(data_active$hospitalised_date_expo_censor)) & (data_active$exp_date_covid19_confirmed >= data_active$hospitalised_date_expo_censor), NA, data_active$exp_date_covid19_confirmed), origin='1970-01-01')
-  data_active$event_date <- as.Date(ifelse((!is.na(data_active$hospitalised_date_expo_censor)) & (data_active$event_date >= data_active$hospitalised_date_expo_censor), NA, data_active$event_date), origin='1970-01-01')
+  data_active <- data_active %>% mutate(exp_date_covid19_confirmed = replace(exp_date_covid19_confirmed, which((!is.na(hospitalised_date_expo_censor)) & (exp_date_covid19_confirmed >= hospitalised_date_expo_censor)), NA))
+  data_active <- data_active %>% mutate(event_date = replace(event_date, which((!is.na(hospitalised_date_expo_censor)) & (event_date >=hospitalised_date_expo_censor)), NA))
+  
   data_active <- data_active %>% filter((index_date != hospitalised_date_expo_censor)|is.na(hospitalised_date_expo_censor))
-
 
   event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
                                         data_active$event_date >= data_active$exp_date_covid19_confirmed & 
@@ -166,12 +166,15 @@ table_2_calculation <- function(survival_data, event, region){
                                           (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))))
   
   
-  if(event_count_unexposed <= 1){
-    event_count_unexposed <- "[Redacted]"
+  event_count_exposed <- round(event_count_exposed, -1)
+  event_count_unexposed <- round(event_count_unexposed, -1)
+  
+  if(event_count_unexposed < 10){
+    event_count_unexposed <- "<10"
   }
   
-  if(event_count_exposed <= 1){
-    event_count_exposed <- "[Redacted]"
+  if(event_count_exposed < 10){
+    event_count_exposed <- "<10"
   }
 
   return(c(event_count_unexposed, event_count_exposed))
@@ -180,9 +183,9 @@ table_2_calculation <- function(survival_data, event, region){
 
 # Run function using specified commandArgs
 if(cohort_name == "both"){
-  table_2_subgroups_output("vaccinated")
-  table_2_subgroups_output("electively_unvaccinated")
+  hosp_covid_events("vaccinated")
+  hosp_covid_events("electively_unvaccinated")
 }else{
-  table_2_subgroups_output(cohort_name)
+  hosp_covid_events(cohort_name)
 }
 
