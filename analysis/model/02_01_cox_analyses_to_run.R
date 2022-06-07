@@ -35,7 +35,7 @@ analyses_to_run <- analyses_to_run %>% select(!run)
 analyses_to_run$event=event_name
 
 ## Add in  all possible combinations of the subgroups, models and cohorts
-analyses_to_run <- crossing(analyses_to_run,mdl,cohort)
+analyses_to_run <- crossing(analyses_to_run,cohort)
 
 ## Add in which covariates to stratify by
 analyses_to_run$stratify_by_subgroup=NA

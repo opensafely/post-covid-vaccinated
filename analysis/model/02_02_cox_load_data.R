@@ -116,5 +116,5 @@ cohort_cols <- c("patient_id",
  
 
 #-----------------------CREATE EMPTY ANALYSES NOT RUN DF------------------------
-analyses_not_run=data.frame(matrix(nrow=0,ncol = 8))
-colnames(analyses_not_run)=c("event","subgroup","cohort","model", "any exposures?", "any exposure events?", "any non exposed?", "more than 50 post exposure events?")
+analyses_not_run=data.frame(matrix(nrow=0,ncol = 7))
+colnames(analyses_not_run)=c("event","subgroup","cohort", "any exposures?", "any exposure events?", "any non exposed?", "more than 50 post exposure events?")
