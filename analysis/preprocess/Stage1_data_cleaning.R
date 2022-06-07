@@ -42,6 +42,7 @@ library(readr)
 library(dplyr)
 library(stringr)
 library(tidyr)
+library(ggplot2)
 
 
 
@@ -323,6 +324,21 @@ stage1 <- function(cohort_name){
     #----------------------#
     write.csv(cohort_flow, file = file.path("output/review/descriptives", paste0("Cohort_flow_",cohort_name, ".csv")) , row.names=F)
     
+    #--------------------------#
+    # 3.e. Generate histograms #
+    #--------------------------#
+    # generate histograms for numerical variables
+    
+    numeric_vars <- input %>% dplyr::select(contains("_num"))
+    numeric_title <- colnames(numeric_vars)
+    
+    svglite::svglite(file = file.path("output/not-for-review/", paste0("numeric_histograms_", cohort_name, ".svg")), width = 15, height = 8)
+    g <- ggplot(gather(numeric_vars), aes(value)) + 
+      geom_histogram(bins = 10) + 
+      facet_wrap(~key, scales = 'free_x')
+    print(g)
+    dev.off()
+    
     #-------------------------------------#
     # 4. Create the final stage 1 dataset #
     #-------------------------------------#
@@ -332,7 +348,6 @@ stage1 <- function(cohort_name){
     saveRDS(input, file = file.path("output", paste0("input_",cohort_name, "_stage1.rds")))
 
 }
-
 
 
 if (cohort_name == "both") {
