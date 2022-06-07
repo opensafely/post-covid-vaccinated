@@ -70,6 +70,20 @@ hosp_covid_events <- function(cohort_name){
   
   setDT(survival_data)
   
+  survival_data <- survival_data %>% mutate(cov_cat_region = as.character(cov_cat_region))%>%
+    mutate(cov_cat_region = case_when(cov_cat_region=="London" ~ "South East, including London",
+                                   cov_cat_region=="South East" ~ "South East, including London",
+                                   cov_cat_region=="West Midlands" ~ "Midlands",
+                                   cov_cat_region=="East Midlands" ~ "Midlands",
+                                   cov_cat_region=="North West" ~ "North West",
+                                   cov_cat_region=="North East" ~ "North East",
+                                   cov_cat_region=="East" ~ "East",
+                                   cov_cat_region=="Yorkshire and The Humber" ~ "Yorkshire and The Humber",
+                                   cov_cat_region=="South West" ~ "South West",
+    )) %>%
+    mutate(cov_cat_region = as.factor(cov_cat_region))%>%
+    mutate(cov_cat_region = relevel(cov_cat_region,ref="South East, including London"))
+  
   regions <- as.character(levels(survival_data$cov_cat_region))
   analyses_of_interest <- crossing(event,regions)
   analyses_of_interest$subgroup <- "covid_pheno_hospitalised"
