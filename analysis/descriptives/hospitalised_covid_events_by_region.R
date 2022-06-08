@@ -1,18 +1,4 @@
-## ====================================================================================
-## Purpose:  Table 2 for all subgroups
-## 
-## Author:   Yinghui Wei
-##
-## Reviewer: Rochelle Knight
-##
-## Date:     28 Feb 2022
-##
-## Data:     Post covid vaccinated project study population
-##
-## Content:  person days of follow up, unexposed person days and event counts
-##
-## Output:   CSV files: table2_*.csv
-## ====================================================================================
+#Splits hospitalised COVID events by region
 
 library(readr)
 library(dplyr)
