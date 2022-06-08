@@ -7,14 +7,17 @@ library(data.table)
 cohort=c("vaccinated","electively_unvaccinated")
 events_to_plot <- c("ate","vte")
 
+results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release/"
+output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
+
 #-----------------------Determine active outcome events-------------------------
 active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses$outcome_variable <- gsub("out_date_","",active_analyses$outcome_variable)
 
 #--------Load fully adjusted main and COVID phenotype results-------------------
-hr_files=list.files(path = "output/Released/", pattern = "suppressed_compiled_HR_results_*")
+hr_files=list.files(path =results_dir , pattern = "suppressed_compiled_HR_results_*")
 hr_files=hr_files[endsWith(hr_files,".csv")]
-hr_files=paste0("output/Released/",hr_files)
+hr_files=paste0(results_dir,hr_files)
 
 hr_file_paths <- pmap(list(hr_files), 
                       function(fpath){ 
@@ -26,8 +29,9 @@ combined_hr <- rbindlist(hr_file_paths, fill=TRUE)
 #-------------------------Filter to active outcomes-----------------------------
 
 combined_hr <- combined_hr %>% filter(event %in% c("ate","vte"))
-combined_hr <- combined_hr %>% filter(model == "mdl_max_adj")
-combined_hr <- combined_hr %>% filter(subgroup != "covid_pheno_hospitalised")
+combined_hr <- combined_hr %>% filter(model == "mdl_max_adj" | (model=="mdl_agesex" & subgroup=="main"))
+combined_hr <- combined_hr %>% filter(subgroup != "covid_pheno_hospitalised" & subgroup !="covid_history")
+combined_hr <- combined_hr %>% mutate(across(c("estimate","conf.low","conf.high"), as.numeric))
 
 #combined_hr <- combined_hr %>% filter(model == "mdl_max_adj"| (model == "mdl_agesex" & subgroup == "main"))
 
@@ -38,15 +42,16 @@ combined_hr <- combined_hr %>% filter(str_detect(term, "^days"))
 
 # Specify time points to plot HRs at -------------------------------------------
 
-term_to_time <- data.frame(term = c("days0_14", "days14_28", "days28_56", "days56_84", "days84_197", 
+term_to_time <- data.frame(term = c("days0_7","days7_14","days14_28", "days28_56", "days56_84", "days84_197", 
                                     "days0_28","days28_197"),
-                           time = c(1,3,6,10,20,
+                           time = c(0.5,1.5,3,6,10,20,
                                     2,16))
 combined_hr <- merge(combined_hr, term_to_time, by = c("term"), all.x = TRUE)
 
 # Rename subgroup to 'nice' format------------------------------------------------
 
-combined_hr$subgroup <- ifelse(combined_hr$subgroup=="main","No prior history of COVID-19",combined_hr$subgroup)
+combined_hr$subgroup <- ifelse(combined_hr$subgroup=="main" & combined_hr$model== "mdl_max_adj","Extensive adjustment",combined_hr$subgroup)
+combined_hr$subgroup <- ifelse(combined_hr$subgroup=="main" & combined_hr$model== "mdl_agesex","Age/sex adjustment",combined_hr$subgroup)
 combined_hr$subgroup <- ifelse(combined_hr$subgroup=="covid_history" ,"Prior history of COVID-19",combined_hr$subgroup)
 combined_hr$subgroup <- ifelse(combined_hr$subgroup=="covid_pheno_non_hospitalised","Non-hospitalised COVID-19",combined_hr$subgroup)
 combined_hr$subgroup <- ifelse(combined_hr$subgroup=="covid_pheno_hospitalised","Hospitalised COVID-19",combined_hr$subgroup)
@@ -82,8 +87,8 @@ combined_hr$subgroup <- ifelse(combined_hr$subgroup=="ethnicity_Missing","Ethnic
 # Specify line colours ---------------------------------------------------------
 
 combined_hr$colour <- ""
-combined_hr$colour <- ifelse(combined_hr$subgroup=="No prior history of COVID-19","#000000",combined_hr$colour)
-combined_hr$colour <- ifelse(combined_hr$subgroup=="Prior history of COVID-19","#bababa",combined_hr$colour)
+combined_hr$colour <- ifelse(combined_hr$subgroup=="Extensive adjustment","#000000",combined_hr$colour)
+combined_hr$colour <- ifelse(combined_hr$subgroup=="Age/sex adjustment","#bababa",combined_hr$colour)
 combined_hr$colour <- ifelse(combined_hr$subgroup=="Age group: 18-39","#006d2c",combined_hr$colour)
 combined_hr$colour <- ifelse(combined_hr$subgroup=="Age group: 40-59","#31a354",combined_hr$colour)
 combined_hr$colour <- ifelse(combined_hr$subgroup=="Age group: 60-79","#74c476",combined_hr$colour)
@@ -108,12 +113,12 @@ combined_hr <- combined_hr %>% left_join(active_analyses %>% select(outcome, out
 #Add in which subgroup stratified-----------------------------------------------------------
 
 combined_hr$grouping=""
-combined_hr$grouping=ifelse(combined_hr$subgroup=="No prior history of COVID-19","Overall",combined_hr$grouping)
-combined_hr$grouping=ifelse(combined_hr$subgroup=="Prior history of COVID-19","Overall",combined_hr$grouping)
+combined_hr$grouping=ifelse(combined_hr$subgroup=="Extensive adjustment","Overall",combined_hr$grouping)
+combined_hr$grouping=ifelse(combined_hr$subgroup=="Age/sex adjustment","Overall",combined_hr$grouping)
 combined_hr$grouping=ifelse(combined_hr$subgroup=="Hospitalised COVID-19","Hospitalised/Non-hospitalised COVID-19",combined_hr$grouping)
 combined_hr$grouping=ifelse(combined_hr$subgroup=="Non-hospitalised COVID-19","Hospitalised/Non-hospitalised COVID-19",combined_hr$grouping)
 combined_hr$grouping=ifelse(endsWith(combined_hr$subgroup,"event")==T,"Prior history of event",combined_hr$grouping)
-combined_hr$grouping=ifelse(startsWith(combined_hr$subgroup,"Age")==T,"Age group",combined_hr$grouping)
+combined_hr$grouping=ifelse(startsWith(combined_hr$subgroup,"Age group")==T,"Age group",combined_hr$grouping)
 combined_hr$grouping=ifelse(startsWith(combined_hr$subgroup,"Sex")==T,"Sex",combined_hr$grouping)
 combined_hr$grouping=ifelse(startsWith(combined_hr$subgroup,"Ethnicity")==T,"Ethnicity",combined_hr$grouping)
 
@@ -131,7 +136,7 @@ for(c in cohort){
         }
       }
       
-      combined_hr$grouping <- factor(combined_hr$grouping, levels=group_levels)
+      df$grouping <- factor(df$grouping, levels=group_levels)
       #combined_hr$grouping <- factor(combined_hr$grouping, levels=c("Overall",
       #                                                              "Hospitalised/Non-hospitalised COVID-19",
       #                                                              "Prior history of event",
@@ -141,16 +146,16 @@ for(c in cohort){
       
       
       sub_group_levels <-c()
-      for(i in c("No prior history of COVID-19","Prior history of COVID-19","Hospitalised COVID-19","Non-hospitalised COVID-19","Prior history of event", "No prior history of event","Age group: 18-39",
+      for(i in c("Extensive adjustment","Age/sex adjustment","Hospitalised COVID-19","Non-hospitalised COVID-19","Prior history of event", "No prior history of event","Age group: 18-39",
                  "Age group: 40-59","Age group: 60-79","Age group: 80-110","Sex: Female","Sex: Male","Ethnicity: White",
                  "Ethnicity: Black","Ethnicity: South Asian","Ethnicity: Other Ethnic Groups", "Ethnicity: Mixed","Ethnicity: Missing")){
-        levels_available <- unique(combined_hr$subgroup)
+        levels_available <- unique(df$subgroup)
         if(i %in% levels_available){
           sub_group_levels <- append(sub_group_levels,i)
         }
       }
       
-      combined_hr$subgroup <- factor(combined_hr$subgroup, levels=sub_group_levels)
+      df$subgroup <- factor(df$subgroup, levels=sub_group_levels)
       #combined_hr$subgroup <- factor(combined_hr$subgroup, levels=c("No prior history of COVID-19",
       #                                                              "Prior history of COVID-19",
       #                                                              "Hospitalised COVID-19",
@@ -189,13 +194,13 @@ for(c in cohort){
                  "#6baed6",
                  "#9ecae1",
                  "#c5dfed")){
-        levels_available <- unique(combined_hr$colour)
+        levels_available <- unique(df$colour)
         if(i %in% levels_available){
           colour_levels <- append(colour_levels,i)
         }
       } 
       
-      combined_hr$colour <- factor(combined_hr$colour, levels=colour_levels)
+      df$colour <- factor(df$colour, levels=colour_levels)
       #combined_hr$colour <- factor(combined_hr$colour, levels=c("#000000",
       #                                                          "#bababa",
       #                                                          "#e31a1c",
@@ -219,10 +224,7 @@ for(c in cohort){
       # Plot figures------------------------------------------------------------------
       min_plot <- 0.25
       max_plot <- 64
-      unique(df$colour)
-      unique(df$subgroup)
-      df$colour
-      df$subgroup
+      
       ggplot2::ggplot(data = df, 
                       mapping = ggplot2::aes(x = time, y = estimate, color = subgroup, shape = subgroup, fill = subgroup)) +
         ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
@@ -250,7 +252,7 @@ for(c in cohort){
                        plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
         ggplot2::facet_wrap(grouping~.,ncol=2)
       
-      ggplot2::ggsave(paste0("output/figure_3_",outcome_name,"_",c, ".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+      ggplot2::ggsave(paste0(output_dir,"figure_3_",outcome_name,"_",c, ".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
     }
   }
 }

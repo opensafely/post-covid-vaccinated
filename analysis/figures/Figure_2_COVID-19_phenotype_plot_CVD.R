@@ -6,6 +6,8 @@ library(data.table)
 
 
 cohort <- c("vaccinated","electively_unvaccinated")
+results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
+output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
 
 #-----------------------Determine active outcome events-------------------------
 active_analyses <- read_rds("lib/active_analyses.rds")
@@ -13,9 +15,9 @@ events <- active_analyses %>% filter(active=="TRUE")%>%select(outcome,outcome_va
 events$outcome_variable <- gsub("out_date_","",events$outcome_variable)
 
 #--------Load fully adjusted main and COVID phenotype results-------------------
-hr_files=list.files(path = "output/Released/", pattern = "suppressed_compiled_HR_results_*")
+hr_files=list.files(path = results_dir, pattern = "suppressed_compiled_HR_results_*")
 hr_files=hr_files[endsWith(hr_files,".csv")]
-hr_files=paste0("output/Released/",hr_files)
+hr_files=paste0(results_dir,"/",hr_files)
 
 hr_file_paths <- pmap(list(hr_files), 
                       function(fpath){ 
@@ -23,6 +25,8 @@ hr_file_paths <- pmap(list(hr_files),
                         return(df)
                       })
 combined_hr <- rbindlist(hr_file_paths, fill=TRUE)
+
+combined_hr <- combined_hr %>% mutate(across(c("estimate","conf.low","conf.high"), as.numeric))
 
 #-------------------------Filter to active outcomes-----------------------------
 
@@ -39,9 +43,9 @@ combined_hr <- combined_hr %>% filter(str_detect(term, "^days"))
 
 # Specify time points to plot HRs at -------------------------------------------
 
-term_to_time <- data.frame(term = c("days0_14", "days14_28", "days28_56", "days56_84", "days84_197", 
+term_to_time <- data.frame(term = c("days0_7","days7_14","days14_28", "days28_56", "days56_84", "days84_197", 
                                     "days0_28","days28_197"),
-                           time = c(1,3,6,10,20,
+                           time = c(0.5,1.5,3,6,10,20,
                                     2,16))
 combined_hr <- merge(combined_hr, term_to_time, by = c("term"), all.x = TRUE)
 
@@ -130,7 +134,7 @@ for(i in cohort){
         ggplot2::facet_wrap(outcome~., ncol = 2)
       
       
-      ggplot2::ggsave(paste0("output/figure2_COVID_phenotype_",i,"_",j,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+      ggplot2::ggsave(paste0(output_dir,"figure2_COVID_phenotype_",i,"_",j,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
     }
   }
 }

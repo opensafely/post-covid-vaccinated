@@ -12,6 +12,9 @@ library(ggplot2)
 #dir <- "C:/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - stage 6 - Figure 1 - 2022.02"
 #setwd(dir)
 
+results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
+output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
+
 #------------------#
 # 1. Load argument #
 #------------------#
@@ -25,7 +28,7 @@ cohort=c("vaccinated","electively_unvaccinated")
 # 2. Get outcomes to plot #
 #-------------------------#
 active_analyses <- read_rds("lib/active_analyses.rds")
-active_analyses_table <- subset(active_analyses, active_analyses$active =="TRUE")
+active_analyses_table <- subset(active_analyses, active_analyses$active =="TRUE" & active_analyses$outcome_group=="CVD")
 outcome_name_table <- active_analyses_table %>% 
   select(outcome, outcome_variable,outcome_group) %>% 
   mutate(outcome_name=active_analyses_table$outcome_variable %>% str_replace("out_date_", ""))
@@ -37,9 +40,9 @@ outcome_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_na
 #---------------------------------------------#
 # 3. Load and combine all estimates in 1 file #
 #---------------------------------------------#
-hr_files=list.files(path = "output/Released/", pattern = "suppressed_compiled_HR_results_*")
+hr_files=list.files(path = results_dir, pattern = "suppressed_compiled_HR_results_*")
 hr_files=hr_files[endsWith(hr_files,".csv")]
-hr_files=paste0("output/Released/",hr_files)
+hr_files=paste0(results_dir,"/", hr_files)
 hr_file_paths <- pmap(list(hr_files),
                       function(fpath){
                         df <- fread(fpath)
@@ -49,13 +52,17 @@ estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
 # Get estimates for main analyses and list of outcomes from active analyses
 main_estimates <- subset(estimates, subgroup == "main" & event %in% outcome_to_plot & term %in% term[grepl("^days",term)])
+rm(estimates,hr_file_paths)
+
+#--------------------------Format the results-----------------------------------
+main_estimates <- main_estimates %>% mutate(across(c("estimate","conf.low","conf.high"), as.numeric))
 
 #--------------------------------------#
 # 4. Specify time in weeks (mid-point) #
 #--------------------------------------#
-term_to_time <- data.frame(term = c("days0_14", "days14_28", "days28_56", "days56_84", "days84_197", 
+term_to_time <- data.frame(term = c("days0_7","days7_14", "days14_28", "days28_56", "days56_84", "days84_197", 
                                     "days0_28","days28_197"),
-                           time = c(1,3,6,10,20,
+                           time = c(0.5,1.5,3,6,10,20,
                                     2,16))
 main_estimates <- merge(main_estimates, term_to_time, by = c("term"), all.x = TRUE)
 
@@ -83,7 +90,8 @@ main_estimates <- main_estimates %>% left_join(outcome_name_table %>% select(out
 #---------#
 # 6. Plot #
 #---------#
-
+c="electively_unvaccinated"
+group="CVD"
 for(c in cohort){
   for (group in unique(main_estimates$outcome_group)) {
     df=main_estimates %>% filter(cohort ==c & outcome_group == group)
@@ -98,7 +106,7 @@ for(c in cohort){
                              position = ggplot2::position_dodge(width = 1))+   
       ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) +    
       #    ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
-      ggplot2::scale_y_continuous(lim = c(0.25,64), breaks = c(0.5,1,2,4,8,16,32,64), trans = "log") +
+      ggplot2::scale_y_continuous(lim = c(0.25,128), breaks = c(0.5,1,2,4,8,16,32,64,128), trans = "log") +
       ggplot2::scale_x_continuous(lim = c(0,28), breaks = seq(0,28,4)) +
       ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$model))+ 
       ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$model)) +
@@ -116,7 +124,7 @@ for(c in cohort){
                      plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
       ggplot2::facet_wrap(outcome~., ncol = 2)
     
-    ggplot2::ggsave(paste0("output/Figure1","_",c,"_",group,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+    ggplot2::ggsave(paste0(output_dir,"Figure1","_",c,"_",group,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
   }
 }
     
