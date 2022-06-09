@@ -293,8 +293,26 @@ actions_list <- splice(
   splice(
     # over outcomes
     unlist(lapply(outcomes_model, function(x) splice(unlist(lapply(cohort_to_run, function(y) apply_model_function(outcome = x, cohort = y)), recursive = FALSE))
-      ),recursive = FALSE)))
-  
+      ),recursive = FALSE)),
+
+  #comment("Split hospitalised COVID by region - vaccinated"),
+  action(
+    name = "split_hosp_covid_by_region_vaccinated",
+    run = "r:latest analysis/descriptives/hospitalised_covid_events_by_region.R vaccinated",
+    needs = list("stage1_data_cleaning_both","stage1_end_date_table_vaccinated"),
+    moderately_sensitive = list(
+      hosp_events_by_region_non_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_vaccinated_non_suppressed.csv",
+      hosp_events_by_region_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_vaccinated_suppressed.csv")),
+
+  #comment("Split hospitalised COVID by region - electively unvaccinated"),
+  action(
+    name = "split_hosp_covid_by_region_electively_unvaccinated",
+    run = "r:latest analysis/descriptives/hospitalised_covid_events_by_region.R electively_unvaccinated",
+    needs = list("stage1_data_cleaning_both","stage1_end_date_table_electively_unvaccinated"),
+    moderately_sensitive = list(
+    hosp_events_by_region_non_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_non_suppressed.csv",
+    hosp_events_by_region_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_suppressed.csv")))
+
 
 ## combine everything ----
 project_list <- splice(

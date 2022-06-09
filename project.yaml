@@ -731,3 +731,23 @@ actions:
         compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_primary_position_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_primary_position_electively_unvaccinated.csv
 
+  split_hosp_covid_by_region_vaccinated:
+    run: r:latest analysis/descriptives/hospitalised_covid_events_by_region.R vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        hosp_events_by_region_non_suppressed: output/not-for-review/hospitalised_covid_event_counts_by_region_vaccinated_non_suppressed.csv
+        hosp_events_by_region_suppressed: output/not-for-review/hospitalised_covid_event_counts_by_region_vaccinated_suppressed.csv
+
+  split_hosp_covid_by_region_electively_unvaccinated:
+    run: r:latest analysis/descriptives/hospitalised_covid_events_by_region.R electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        hosp_events_by_region_non_suppressed: output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_non_suppressed.csv
+        hosp_events_by_region_suppressed: output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_suppressed.csv
+
