@@ -29,19 +29,21 @@ if(length(args)==0){
 fs::dir_create(here::here("output", "not-for-review"))
 fs::dir_create(here::here("output", "review", "venn-diagrams"))
 
-venn_output <- function(cohort_name){
+venn_output <- function(cohort_name, group){
   
   # Identify active outcomes ---------------------------------------------------
   
   active_analyses <- readr::read_rds("lib/active_analyses.rds")
   outcomes <- active_analyses[active_analyses$active==TRUE,]$outcome_variable
+  # remove t1dm and gestational dm as we only use a single source to define these
+  outcomes <- outcomes[! outcomes %in% c("out_date_t1dm", "out_date_gestationaldm")]
   
   # Load data ------------------------------------------------------------------
   
-  input <- readr::read_rds(paste0("output/venn_",cohort_name,".rds"))
-  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort_name,".rds"))
+  input <- readr::read_rds(paste0("output/venn_",cohort_name, ".rds"))
+  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort_name, ".rds"))
   
-  input_stage1 <- readr::read_rds(paste0("output/input_", cohort_name,"_stage1.rds"))
+  input_stage1 <- readr::read_rds(paste0("output/input_", cohort_name,"_stage1_", group,".rds"))
   input_stage1 <- input_stage1[input_stage1$sub_bin_covid19_confirmed_history==FALSE,]
   
   input <- input[input$patient_id %in% input_stage1$patient_id,]
@@ -215,7 +217,7 @@ venn_output <- function(cohort_name){
       mycol <- mycol[mycol!=""]
       
       # Make Venn diagram --------------------------------------------------------
-      svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",cohort_name,"_",gsub("out_date_","",outcome_save_name),".svg"))
+      svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",cohort_name,"_", group,"_", gsub("out_date_","",outcome_save_name),".svg"))
        g <- ggvenn::ggvenn(
         index, 
         fill_color = mycol,
@@ -248,15 +250,23 @@ venn_output <- function(cohort_name){
   df <- select(df, -contains("total"))
   #change NAs to 0
   df[is.na(df)] <- 0
-  write.csv(df, file = paste0("output/review/venn-diagrams/venn_diagram_number_check_", cohort_name,".csv"), row.names = F)
+  write.csv(df, file = paste0("output/review/venn-diagrams/venn_diagram_number_check_", cohort_name, "_",group, ".csv"), row.names = F)
   
 }
 
-# Run function using specified commandArgs -------------------------------------
+# Run function using specified commandArgs and active analyses for group
 
-if(cohort_name == "both"){
-  venn_output("electively_unvaccinated")
-  venn_output("vaccinated")
-} else{
-  venn_output(cohort_name)
+active_analyses <- read_rds("lib/active_analyses.rds")
+active_analyses <- active_analyses %>% filter(active==TRUE)
+group <- unique(active_analyses$outcome_group)
+
+for(i in group){
+  if (cohort_name == "both") {
+    venn_output("electively_unvaccinated", i)
+    venn_output("vaccinated", i)
+  } else{
+    venn_output(cohort_name, i)
+  }
 }
+
+

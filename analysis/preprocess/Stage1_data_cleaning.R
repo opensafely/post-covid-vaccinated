@@ -264,6 +264,7 @@ stage1 <- function(cohort_name, group){
     # Apply outcome specific exclusions criteria #
     #--------------------------------------------#
     
+    
     if (group == "diabetes"){
       # Exclude individuals with a recorded diagnosis of diabetes prior to 1st January 2020 
       input <- input %>% 
@@ -286,7 +287,14 @@ stage1 <- function(cohort_name, group){
       input <- input %>% 
         filter()
       cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input), as.numeric(cohort_flow[8,1]) - nrow(input), "Mental health: .")
+    
+    } else if (group == "CVD"){
+      # Mental health analyses exclusion criteria
+      input <- input %>% 
+        filter()
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input), as.numeric(cohort_flow[8,1]) - nrow(input), "CVD: .")
     }
+    
     
     #-------------------------------------------------#
     # 3.c. Apply criteria specific to each sub-cohort #

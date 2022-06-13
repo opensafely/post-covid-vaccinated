@@ -293,7 +293,7 @@ print("Consultation variable before QC")
 summary(df$cov_num_consulation_rate)
 
 df <- df %>%
-  mutate(cov_num_consulation_rate = replace(cov_num_consulation_rate, cov_num_tc_hdl_ratio > 365, 365))
+  mutate(cov_num_consulation_rate = replace(cov_num_consulation_rate, cov_num_consulation_rate > 365, 365))
 
 print("Consultation variable after QC")
 summary(df$cov_num_consulation_rate)
@@ -305,18 +305,9 @@ diabetes_analyses <- filter(active_analyses, startsWith(outcome_variable, "out_d
 if (any(diabetes_analyses$active==TRUE)){
   
   # Create vars for diabetes outcomes -------------------------------------------------------------
-  
-  # remove biologically implausible TC/HDL ratio values: https://doi.org/10.1093/ije/dyz099
-  # Remove TC < 1.75 or > 20 
-  # remove HDL < 0.4 or > 5
-  df <- df %>%
-    mutate(tmp_cov_num_cholesterol = replace(tmp_cov_num_cholesterol, tmp_cov_num_cholesterol < 1.75 | tmp_cov_num_cholesterol > 20, NA),
-           cov_num_tc_hdl_ratio = replace(tmp_cov_num_hdl_cholesterol, tmp_cov_num_hdl_cholesterol < 0.4 | tmp_cov_num_hdl_cholesterol > 5, NA))
-  
-  print("Cholesterol ratio after removing values")
-  summary(df$cov_num_tc_hdl_ratio)
-  
+
   # vars could not be created in common vars file
+  
   df <- df %>% mutate(tmp_out_count_t2dm = tmp_out_count_t2dm_snomed + tmp_out_count_t2dm_hes,
                       tmp_out_count_t1dm = tmp_out_count_t1dm_snomed + tmp_out_count_t1dm_hes) %>%
     # cholesterol ratio
@@ -324,6 +315,17 @@ if (any(diabetes_analyses$active==TRUE)){
     # not possible for ratio to be above 50 because of criteria above for cholesterol levels
     mutate(cov_num_tc_hdl_ratio = tmp_cov_num_cholesterol / tmp_cov_num_hdl_cholesterol) %>%
     mutate(cov_num_tc_hdl_ratio = replace(cov_num_tc_hdl_ratio, cov_num_tc_hdl_ratio > 50 | cov_num_tc_hdl_ratio < 1, NA))
+  
+  # remove biologically implausible TC/HDL ratio values: https://doi.org/10.1093/ije/dyz099
+  # Remove TC < 1.75 or > 20 
+  # remove HDL < 0.4 or > 5
+  
+  df <- df %>%
+    mutate(tmp_cov_num_cholesterol = replace(tmp_cov_num_cholesterol, tmp_cov_num_cholesterol < 1.75 | tmp_cov_num_cholesterol > 20, NA),
+           cov_num_tc_hdl_ratio = replace(tmp_cov_num_hdl_cholesterol, tmp_cov_num_hdl_cholesterol < 0.4 | tmp_cov_num_hdl_cholesterol > 5, NA))
+  
+  print("Cholesterol ratio after removing values")
+  summary(df$cov_num_tc_hdl_ratio)
   
   print("Diabetes count variables created successfully")
   

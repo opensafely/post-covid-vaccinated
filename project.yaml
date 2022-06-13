@@ -87,7 +87,7 @@ actions:
         IE_criteria: output/review/descriptives/Cohort_flow_*.csv
         histograms: output/not-for-review/numeric_histograms_*.svg
       highly_sensitive:
-        cohort: output/input_*_stage1.rds
+        cohort: output/input_*.rds
 
   stage1_end_date_table_vaccinated:
     run: r:latest analysis/preprocess/create_follow_up_end_date.R vaccinated
@@ -169,567 +169,117 @@ actions:
       moderately_sensitive:
         venn_diagram: output/review/venn-diagrams/venn_diagram_*
 
-  ## Cox model for ami - vaccinated 
+  ## Cox model for t1dm - vaccinated 
 
-  Analysis_cox_ami_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R ami vaccinated
+  Analysis_cox_t1dm_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R t1dm vaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
     outputs:
       moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_ami_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ami_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ami_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ami_vaccinated.csv
+        analyses_not_run: output/review/model/analyses_not_run_t1dm_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_t1dm_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_t1dm_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_t1dm_vaccinated.csv
 
-  ## Cox model for ami - electively_unvaccinated 
+  ## Cox model for t1dm - electively_unvaccinated 
 
-  Analysis_cox_ami_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R ami electively_unvaccinated
+  Analysis_cox_t1dm_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R t1dm electively_unvaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_ami_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ami_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ami_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ami_electively_unvaccinated.csv
+        analyses_not_run: output/review/model/analyses_not_run_t1dm_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_t1dm_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_t1dm_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_t1dm_electively_unvaccinated.csv
 
-  ## Cox model for stroke_isch - vaccinated 
+  ## Cox model for t2dm - vaccinated 
 
-  Analysis_cox_stroke_isch_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R stroke_isch vaccinated
+  Analysis_cox_t2dm_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R t2dm vaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
     outputs:
       moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_stroke_isch_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_isch_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_isch_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_isch_vaccinated.csv
+        analyses_not_run: output/review/model/analyses_not_run_t2dm_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_t2dm_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_t2dm_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_t2dm_vaccinated.csv
 
-  ## Cox model for stroke_isch - electively_unvaccinated 
+  ## Cox model for t2dm - electively_unvaccinated 
 
-  Analysis_cox_stroke_isch_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R stroke_isch electively_unvaccinated
+  Analysis_cox_t2dm_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R t2dm electively_unvaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_stroke_isch_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_isch_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_isch_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_isch_electively_unvaccinated.csv
+        analyses_not_run: output/review/model/analyses_not_run_t2dm_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_t2dm_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_t2dm_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_t2dm_electively_unvaccinated.csv
 
-  ## Cox model for dvt - vaccinated 
+  ## Cox model for otherdm - vaccinated 
 
-  Analysis_cox_dvt_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R dvt vaccinated
+  Analysis_cox_otherdm_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R otherdm vaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
     outputs:
       moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_dvt_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_dvt_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_dvt_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_dvt_vaccinated.csv
+        analyses_not_run: output/review/model/analyses_not_run_otherdm_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_otherdm_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_otherdm_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_otherdm_vaccinated.csv
 
-  ## Cox model for dvt - electively_unvaccinated 
+  ## Cox model for otherdm - electively_unvaccinated 
 
-  Analysis_cox_dvt_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R dvt electively_unvaccinated
+  Analysis_cox_otherdm_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R otherdm electively_unvaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_dvt_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_dvt_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_dvt_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_dvt_electively_unvaccinated.csv
+        analyses_not_run: output/review/model/analyses_not_run_otherdm_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_otherdm_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_otherdm_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_otherdm_electively_unvaccinated.csv
 
-  ## Cox model for pe - vaccinated 
+  ## Cox model for gestationaldm - vaccinated 
 
-  Analysis_cox_pe_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R pe vaccinated
+  Analysis_cox_gestationaldm_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R gestationaldm vaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
     outputs:
       moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_pe_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_pe_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_pe_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_pe_vaccinated.csv
+        analyses_not_run: output/review/model/analyses_not_run_gestationaldm_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_gestationaldm_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_gestationaldm_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_gestationaldm_vaccinated.csv
 
-  ## Cox model for pe - electively_unvaccinated 
+  ## Cox model for gestationaldm - electively_unvaccinated 
 
-  Analysis_cox_pe_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R pe electively_unvaccinated
+  Analysis_cox_gestationaldm_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R gestationaldm electively_unvaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_pe_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_pe_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_pe_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_pe_electively_unvaccinated.csv
-
-  ## Cox model for tia - vaccinated 
-
-  Analysis_cox_tia_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R tia vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_tia_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_tia_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_tia_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_tia_vaccinated.csv
-
-  ## Cox model for tia - electively_unvaccinated 
-
-  Analysis_cox_tia_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R tia electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_tia_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_tia_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_tia_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_tia_electively_unvaccinated.csv
-
-  ## Cox model for stroke_sah_hs - vaccinated 
-
-  Analysis_cox_stroke_sah_hs_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R stroke_sah_hs vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_sah_hs_vaccinated.csv
-
-  ## Cox model for stroke_sah_hs - electively_unvaccinated 
-
-  Analysis_cox_stroke_sah_hs_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R stroke_sah_hs electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_sah_hs_electively_unvaccinated.csv
-
-  ## Cox model for hf - vaccinated 
-
-  Analysis_cox_hf_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R hf vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_hf_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_hf_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_hf_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_hf_vaccinated.csv
-
-  ## Cox model for hf - electively_unvaccinated 
-
-  Analysis_cox_hf_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R hf electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_hf_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_hf_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_hf_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_hf_electively_unvaccinated.csv
-
-  ## Cox model for angina - vaccinated 
-
-  Analysis_cox_angina_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R angina vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_angina_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_angina_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_angina_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_angina_vaccinated.csv
-
-  ## Cox model for angina - electively_unvaccinated 
-
-  Analysis_cox_angina_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R angina electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_angina_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_angina_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_angina_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_angina_electively_unvaccinated.csv
-
-  ## Cox model for ate - vaccinated 
-
-  Analysis_cox_ate_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R ate vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_ate_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ate_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ate_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ate_vaccinated.csv
-
-  ## Cox model for ate - electively_unvaccinated 
-
-  Analysis_cox_ate_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R ate electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_ate_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ate_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ate_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ate_electively_unvaccinated.csv
-
-  ## Cox model for vte - vaccinated 
-
-  Analysis_cox_vte_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R vte vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_vte_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_vte_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_vaccinated.csv
-
-  ## Cox model for vte - electively_unvaccinated 
-
-  Analysis_cox_vte_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R vte electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_vte_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_vte_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_electively_unvaccinated.csv
-
-  ## Cox model for ami_primary_position - vaccinated 
-
-  Analysis_cox_ami_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R ami_primary_position vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_ami_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ami_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ami_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ami_primary_position_vaccinated.csv
-
-  ## Cox model for ami_primary_position - electively_unvaccinated 
-
-  Analysis_cox_ami_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R ami_primary_position electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_ami_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ami_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ami_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ami_primary_position_electively_unvaccinated.csv
-
-  ## Cox model for stroke_isch_primary_position - vaccinated 
-
-  Analysis_cox_stroke_isch_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R stroke_isch_primary_position vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_stroke_isch_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_isch_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_isch_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_isch_primary_position_vaccinated.csv
-
-  ## Cox model for stroke_isch_primary_position - electively_unvaccinated 
-
-  Analysis_cox_stroke_isch_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R stroke_isch_primary_position electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_stroke_isch_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_isch_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_isch_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_isch_primary_position_electively_unvaccinated.csv
-
-  ## Cox model for dvt_primary_position - vaccinated 
-
-  Analysis_cox_dvt_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R dvt_primary_position vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_dvt_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_dvt_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_dvt_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_dvt_primary_position_vaccinated.csv
-
-  ## Cox model for dvt_primary_position - electively_unvaccinated 
-
-  Analysis_cox_dvt_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R dvt_primary_position electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_dvt_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_dvt_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_dvt_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_dvt_primary_position_electively_unvaccinated.csv
-
-  ## Cox model for pe_primary_position - vaccinated 
-
-  Analysis_cox_pe_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R pe_primary_position vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_pe_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_pe_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_pe_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_pe_primary_position_vaccinated.csv
-
-  ## Cox model for pe_primary_position - electively_unvaccinated 
-
-  Analysis_cox_pe_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R pe_primary_position electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_pe_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_pe_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_pe_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_pe_primary_position_electively_unvaccinated.csv
-
-  ## Cox model for tia_primary_position - vaccinated 
-
-  Analysis_cox_tia_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R tia_primary_position vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_tia_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_tia_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_tia_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_tia_primary_position_vaccinated.csv
-
-  ## Cox model for tia_primary_position - electively_unvaccinated 
-
-  Analysis_cox_tia_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R tia_primary_position electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_tia_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_tia_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_tia_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_tia_primary_position_electively_unvaccinated.csv
-
-  ## Cox model for stroke_sah_hs_primary_position - vaccinated 
-
-  Analysis_cox_stroke_sah_hs_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R stroke_sah_hs_primary_position
-      vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_sah_hs_primary_position_vaccinated.csv
-
-  ## Cox model for stroke_sah_hs_primary_position - electively_unvaccinated 
-
-  Analysis_cox_stroke_sah_hs_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R stroke_sah_hs_primary_position
-      electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_sah_hs_primary_position_electively_unvaccinated.csv
-
-  ## Cox model for hf_primary_position - vaccinated 
-
-  Analysis_cox_hf_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R hf_primary_position vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_hf_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_hf_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_hf_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_hf_primary_position_vaccinated.csv
-
-  ## Cox model for hf_primary_position - electively_unvaccinated 
-
-  Analysis_cox_hf_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R hf_primary_position electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_hf_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_hf_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_hf_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_hf_primary_position_electively_unvaccinated.csv
-
-  ## Cox model for angina_primary_position - vaccinated 
-
-  Analysis_cox_angina_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R angina_primary_position vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_angina_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_angina_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_angina_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_angina_primary_position_vaccinated.csv
-
-  ## Cox model for angina_primary_position - electively_unvaccinated 
-
-  Analysis_cox_angina_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R angina_primary_position electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_angina_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_angina_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_angina_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_angina_primary_position_electively_unvaccinated.csv
-
-  ## Cox model for ate_primary_position - vaccinated 
-
-  Analysis_cox_ate_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R ate_primary_position vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_ate_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ate_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ate_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ate_primary_position_vaccinated.csv
-
-  ## Cox model for ate_primary_position - electively_unvaccinated 
-
-  Analysis_cox_ate_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R ate_primary_position electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_ate_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ate_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ate_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ate_primary_position_electively_unvaccinated.csv
-
-  ## Cox model for vte_primary_position - vaccinated 
-
-  Analysis_cox_vte_primary_position_vaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R vte_primary_position vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_vte_primary_position_vaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_vte_primary_position_vaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_primary_position_vaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_primary_position_vaccinated.csv
-
-  ## Cox model for vte_primary_position - electively_unvaccinated 
-
-  Analysis_cox_vte_primary_position_electively_unvaccinated:
-    run: r:latest analysis/model/01_cox_pipeline.R vte_primary_position electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        analyses_not_run: output/review/model/analyses_not_run_vte_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_vte_primary_position_electively_unvaccinated.csv
-        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_primary_position_electively_unvaccinated_to_release.csv
-        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_primary_position_electively_unvaccinated.csv
+        analyses_not_run: output/review/model/analyses_not_run_gestationaldm_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_gestationaldm_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_gestationaldm_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_gestationaldm_electively_unvaccinated.csv
 
   split_hosp_covid_by_region_vaccinated:
     run: r:latest analysis/descriptives/hospitalised_covid_events_by_region.R vaccinated

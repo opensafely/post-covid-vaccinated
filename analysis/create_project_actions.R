@@ -211,7 +211,7 @@ actions_list <- splice(
       histograms = glue("output/not-for-review/numeric_histograms_*.svg")
     ),
     highly_sensitive = list(
-      cohort = glue("output/input_*_stage1.rds")
+      cohort = glue("output/input_*.rds")
     )
   ),
   
@@ -221,7 +221,7 @@ actions_list <- splice(
     run = "r:latest analysis/preprocess/create_follow_up_end_date.R vaccinated",
     needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated","stage1_data_cleaning_both"),
     highly_sensitive = list(
-      end_date_table = glue("output/follow_up_end_dates_vaccinated.rds")
+      end_date_table = glue("output/follow_up_end_dates_vaccinated_.rds")
     )
   ),
   
@@ -231,7 +231,7 @@ actions_list <- splice(
     run = "r:latest analysis/preprocess/create_follow_up_end_date.R electively_unvaccinated",
     needs = list("preprocess_data_vaccinated","preprocess_data_electively_unvaccinated","stage1_data_cleaning_both"),
     highly_sensitive = list(
-      end_date_table = glue("output/follow_up_end_dates_electively_unvaccinated.rds")
+      end_date_table = glue("output/follow_up_end_dates_electively_unvaccinated_.rds")
     )
   ),
   
