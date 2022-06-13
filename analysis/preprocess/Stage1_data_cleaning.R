@@ -61,7 +61,7 @@ if(length(args)==0){
 fs::dir_create(here::here("output", "not-for-review"))
 fs::dir_create(here::here("output", "review", "descriptives"))
 
-stage1 <- function(cohort_name){
+stage1 <- function(cohort_name, group){
 
     input <- read_rds(file.path("output", paste0("input_",cohort_name,".rds")))
                            
@@ -107,6 +107,10 @@ stage1 <- function(cohort_name){
     ## cov_cat_smoking_status
     levels(input$cov_cat_smoking_status) <- list("Ever smoker" = "E", "Missing" = "M", "Never smoker" = "N", "Current smoker" = "S")
     input$cov_cat_smoking_status <- ordered(input$cov_cat_smoking_status, levels = c("Never smoker","Ever smoker","Current smoker","Missing"))
+    
+    ## cov_cat_bmi
+    
+    input$cov_cat_bmi_groups <- ordered(input$cov_cat_bmi_groups, levels = c("Healthy_weight", "Underweight", "Overweight", "Obese", "Missing"))
     
     ## cov_cat_sex
     levels(input$cov_cat_sex) <- list("Female" = "F", "Male" = "M")
@@ -184,7 +188,7 @@ stage1 <- function(cohort_name){
     
     
     #Save Qa summary as .csv
-    write.csv(QA_summary, file = file.path("output/review/descriptives", paste0("QA_summary_",cohort_name, ".csv")) , row.names=F)
+    write.csv(QA_summary, file = file.path("output/review/descriptives", paste0("QA_summary_",cohort_name, "_",group, ".csv")) , row.names=F)
     
     # Remove QA variables from dataset
     input <- input_QA[ , !names(input_QA) %in% c("qa_num_birth_year", "qa_bin_pregnancy", "qa_bin_prostate_cancer")]
@@ -252,9 +256,37 @@ stage1 <- function(cohort_name){
     meta_data_factors <- lapply(input[,c(describe_vars)], table)
     
     # NB: write.csv is not feasible to output list with uneven length
-    sink(file = file.path("output/not-for-review", paste0("meta_data_factors_",cohort_name, ".csv")))
+    sink(file = file.path("output/not-for-review", paste0("meta_data_factors_",cohort_name, "_",group, ".csv")))
     print(meta_data_factors)
     sink()
+    
+    #--------------------------------------------#
+    # Apply outcome specific exclusions criteria #
+    #--------------------------------------------#
+    
+    if (group == "diabetes"){
+      # Exclude individuals with a recorded diagnosis of diabetes prior to 1st January 2020 
+      input <- input %>% 
+        filter(! out_date_t1dm < index_date | is.na(out_date_t1dm)) %>%
+        filter(! out_date_t2dm < index_date | is.na(out_date_t2dm)) %>%
+        filter(! out_date_otherdm < index_date | is.na(out_date_otherdm))
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[8,1]) - nrow(input), "Diabetes specific criteria: Remove those with diabetes prior to study start date")
+      
+    } else if (group == "diabetes_gestational"){
+      # Exclude men from gestational diabetes analysis
+      input <- input %>% 
+        filter(! out_date_t1dm < index_date | is.na(out_date_t1dm)) %>%
+        filter(! out_date_t2dm < index_date | is.na(out_date_t2dm)) %>%
+        filter(! out_date_otherdm < index_date | is.na(out_date_otherdm)) %>%
+        filter(cov_cat_sex == "Female")
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input), as.numeric(cohort_flow[8,1]) - nrow(input), "Gestational diabetes: The study population will be restricted to women.")
+      
+    } else if (group == "mental_health"){
+      # Mental health analyses exclusion criteria
+      input <- input %>% 
+        filter()
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input), as.numeric(cohort_flow[8,1]) - nrow(input), "Mental health: .")
+    }
     
     #-------------------------------------------------#
     # 3.c. Apply criteria specific to each sub-cohort #
@@ -322,7 +354,7 @@ stage1 <- function(cohort_name){
     #----------------------#
     # 3.d. Create csv file #
     #----------------------#
-    write.csv(cohort_flow, file = file.path("output/review/descriptives", paste0("Cohort_flow_",cohort_name, ".csv")) , row.names=F)
+    write.csv(cohort_flow, file = file.path("output/review/descriptives", paste0("Cohort_flow_",cohort_name, "_",group, ".csv")) , row.names=F)
     
     #--------------------------#
     # 3.e. Generate histograms #
@@ -332,7 +364,7 @@ stage1 <- function(cohort_name){
     numeric_vars <- input %>% dplyr::select(contains("_num"))
     numeric_title <- colnames(numeric_vars)
     
-    svglite::svglite(file = file.path("output/not-for-review/", paste0("numeric_histograms_", cohort_name, ".svg")), width = 15, height = 8)
+    svglite::svglite(file = file.path("output/not-for-review/", paste0("numeric_histograms_", cohort_name, "_", group, ".svg")), width = 15, height = 8)
     g <- ggplot(gather(numeric_vars), aes(value)) + 
       geom_histogram(bins = 10) + 
       facet_wrap(~key, scales = 'free_x')
@@ -345,14 +377,20 @@ stage1 <- function(cohort_name){
     # Remove inclusion/exclusion variables from dataset
     input <- input[ , !names(input) %in% c("start_alive", "vax_gap", "vax_mixed", "vax_prior_unknown", "prior_vax1")]
     
-    saveRDS(input, file = file.path("output", paste0("input_",cohort_name, "_stage1.rds")))
+    saveRDS(input, file = file.path("output", paste0("input_",cohort_name, "_stage1_",group,".rds")))
 
 }
 
+# Run function using outcome group
+active_analyses <- read_rds("lib/active_analyses.rds")
+active_analyses <- active_analyses %>% filter(active==TRUE)
+group <- unique(active_analyses$outcome_group)
 
+for(i in group){
 if (cohort_name == "both") {
-  stage1("electively_unvaccinated")
-  stage1("vaccinated")
+  stage1("electively_unvaccinated", i)
+  stage1("vaccinated", i)
 } else{
-  stage1(cohort_name)
+  stage1(cohort_name, i)
+}
 }

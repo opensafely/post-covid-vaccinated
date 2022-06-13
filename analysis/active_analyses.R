@@ -46,7 +46,7 @@ outcomes <- c("Acute myocardial infarction",
 outcomes_short <- c("ami","stroke_isch","dvt","pe","tia","stroke_sah_hs","hf","angina")
 
 for (i in 1:length(outcomes)) {
-  df[nrow(df)+1,] <- c(TRUE,
+  df[nrow(df)+1,] <- c(FALSE,
                        outcomes[i],
                        paste0("out_date_",outcomes_short[i]),
                        "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_cat_sex",
@@ -66,7 +66,7 @@ outcomes <- c("Arterial thrombosis event",
 outcomes_short <- c("ate","vte")
 
 for (i in 1:length(outcomes)) {
-  df[nrow(df)+1,] <- c(TRUE,
+  df[nrow(df)+1,] <- c(FALSE,
                        outcomes[i],
                        paste0("out_date_",outcomes_short[i]),
                        "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_cat_sex",
@@ -93,7 +93,7 @@ outcomes <- c("Acute myocardial infarction - Primary position events",
 outcomes_short <- c("ami_primary_position","stroke_isch_primary_position","dvt_primary_position","pe_primary_position","tia_primary_position","stroke_sah_hs_primary_position","hf_primary_position","angina_primary_position")
 
 for (i in 1:length(outcomes)) {
-  df[nrow(df)+1,] <- c(TRUE,
+  df[nrow(df)+1,] <- c(FALSE,
                        outcomes[i],
                        paste0("out_date_",outcomes_short[i]),
                        "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_cat_sex",
@@ -113,7 +113,7 @@ outcomes <- c("Arterial thrombosis event - Primary position events",
 outcomes_short <- c("ate_primary_position","vte_primary_position")
 
 for (i in 1:length(outcomes)) {
-  df[nrow(df)+1,] <- c(TRUE,
+  df[nrow(df)+1,] <- c(FALSE,
                        outcomes[i],
                        paste0("out_date_",outcomes_short[i]),
                        "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_cat_sex",
@@ -128,20 +128,37 @@ df$prior_history_var <- ifelse(df$outcome=="Venous thrombosis event - Primary po
 
 # Add diabetes outcomes --------------------------------------------------------
 
-outcomes <- c("Type 1 diabetes",
-              "Type 2 diabetes",
-              "Other or non-specific diabetes",
-              "Gestational diabetes")
+outcomes <- c("type 1 diabetes",
+              "type 2 diabetes",
+              "other or non-specific diabetes",
+              "gestational diabetes")
 
-outcomes_short <- c("diabetes_type1","diabetes_type2","diabetes_other","diabetes_gestational")
+outcome_group <- "diabetes"
+
+outcomes_short <- c("t1dm","t2dm","otherdm","gestationaldm")
+outcome_venn <- c(TRUE, TRUE, FALSE, FALSE)
 
 for (i in 1:length(outcomes)) {
-  df[nrow(df)+1,] <- c(FALSE,
+  df[nrow(df)+1,] <- c(TRUE,
                        outcomes[i],
                        paste0("out_date_",outcomes_short[i]),
-                       rep("",22),
-                       "Diabetes")
+                       "cov_cat_sex;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_num_consulation_rate;cov_cat_smoking_status;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_bin_healthcare_worker;cov_bin_carehome_status;cov_num_tc_hdl_ratio;cov_cat_bmi_groups;cov_bin_prediabetes;cov_bin_diabetes_gestational",
+                       rep("all",2),
+                       rep(TRUE,4),
+                       rep(FALSE,14),
+                       "",
+                       "diabetes")
 }
+
+# change outcome group so that gestational diabetes has its own group
+
+df <- df %>% mutate(outcome_group = case_when(outcome_variable == "out_date_gestationaldm" ~ "diabetes_gestational",
+                                              TRUE ~ as.character(outcome_group)))
+
+# Remove sex as a covariate for gestational diabetes analysis
+
+df <- df %>% mutate(covariates = case_when(outcome_variable == "out_date_gestationaldm" ~ "cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_num_consulation_rate;cov_cat_smoking_status;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_bin_healthcare_worker;cov_bin_carehome_status;cov_num_tc_hdl_ratio;cov_cat_bmi_groups;cov_bin_prediabetes;cov_bin_diabetes_gestational",
+                                           TRUE ~ as.character(covariates)))
 
 # Add Mental Health outcomes --------------------------------------------------------
 
