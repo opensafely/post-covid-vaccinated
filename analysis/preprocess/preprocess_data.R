@@ -300,7 +300,7 @@ summary(df$cov_num_consulation_rate)
 
 # Add diabetes variables and algorithm when relevant (i.e. diabetes outcome active)
 active_analyses <- read_rds("lib/active_analyses.rds")
-diabetes_analyses <- filter(active_analyses, startsWith(outcome_variable, "out_date_diabetes"))
+diabetes_analyses <- filter(active_analyses, startsWith(outcome_group, "diabetes"))
 
 if (any(diabetes_analyses$active==TRUE)){
   

@@ -1984,6 +1984,14 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_insulin_snomed", "tmp_cov_bin_antidiabetic_drugs_snomed"
     ),
 
+    ## Prediabetes
+    cov_bin_prediabetes=patients.with_these_clinical_events(
+        prediabetes_snomed,
+        returning='binary_flag',
+        on_or_before=f"{index_date_variable}",
+        return_expectations={"incidence": 0.1},
+    ),
+
     ## Obesity
     ### Primary care
     tmp_cov_bin_obesity_snomed=patients.with_these_clinical_events(
@@ -2172,11 +2180,11 @@ def generate_common_variables(index_date_variable):
     tmp_cov_num_cholesterol=patients.max_recorded_value(
         cholesterol_snomed,
         on_most_recent_day_of_measurement=True, 
-        between=["2015-01-01", "today"],
+        between=["2015-01-01", f"{index_date_variable}"],
         date_format="YYYY-MM-DD",
         return_expectations={
             "float": {"distribution": "normal", "mean": 5.0, "stddev": 2.5},
-            "date": {"earliest": "1980-02-01", "latest": "2021-05-31"},
+            "date": {"earliest": "2015-01-01", "latest": f"{index_date_variable}"},
             "incidence": 0.80,
         },
     ),
@@ -2185,11 +2193,11 @@ def generate_common_variables(index_date_variable):
     tmp_cov_num_hdl_cholesterol=patients.max_recorded_value(
         hdl_cholesterol_snomed,
         on_most_recent_day_of_measurement=True, 
-        between=["2015-01-01", "today"],
+        between=["2015-01-01", f"{index_date_variable}"],
         date_format="YYYY-MM-DD",
         return_expectations={
             "float": {"distribution": "normal", "mean": 2.0, "stddev": 1.5},
-            "date": {"earliest": "1980-02-01", "latest": "2021-05-31"},
+            "date": {"earliest": "2015-01-01", "latest": f"{index_date_variable}"},
             "incidence": 0.80,
         },
     ),
@@ -2222,8 +2230,9 @@ def generate_common_variables(index_date_variable):
                 "ratios": {
                     "Underweight": 0.05, 
                     "Healthy_weight": 0.25, 
-                    "Overweight": 0.4,
-                    "Obese": 0.3, 
+                    "Overweight": 0.3,
+                    "Obese": 0.3,
+                    "Missing": 0.1, 
                 }
             },
         },

@@ -97,7 +97,7 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       highly_sensitive:
-        end_date_table: output/follow_up_end_dates_vaccinated.rds
+        end_date_table: output/follow_up_end_dates_vaccinated_*.rds
 
   stage1_end_date_table_electively_unvaccinated:
     run: r:latest analysis/preprocess/create_follow_up_end_date.R electively_unvaccinated
@@ -107,7 +107,7 @@ actions:
     - stage1_data_cleaning_both
     outputs:
       highly_sensitive:
-        end_date_table: output/follow_up_end_dates_electively_unvaccinated.rds
+        end_date_table: output/follow_up_end_dates_electively_unvaccinated_*.rds
 
   stage2_missing_table1_both:
     run: r:latest analysis/descriptives/Stage2_missing_table1.R both
