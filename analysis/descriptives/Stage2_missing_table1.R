@@ -54,7 +54,7 @@ outcome_groups <- unique(active_analyses$outcome_group)
 stage2 <- function(cohort_name, covid_history, group) {
 
   # Load relevant data
-  input <- readr::read_rds(file.path("output", paste0("input_",cohort_name,"_stage1.rds")))
+  input <- readr::read_rds(file.path("output", paste0("input_",cohort_name,"_stage1_",group,".rds")))
   
   # Select data depending on covid history
   if(covid_history == "without_covid_history"){
