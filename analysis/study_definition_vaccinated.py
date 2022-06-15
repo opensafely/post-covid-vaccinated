@@ -146,7 +146,7 @@ study = StudyDefinition(
         ## Oxford AZ 
         ## NB: may be patient's first COVID vaccine dose or their second if mixed types are given
         vax_date_AstraZeneca_1=patients.with_tpp_vaccination_record(
-            product_name_matches="COVID-19 AZD2816 AstraZeneca (ChAdOx1 nCOV-19) 3.5x10*9 viral particles/0.5ml dose sol for inj MDV",
+            product_name_matches="COVID-19 Vaccine Vaxzevria 0.5ml inj multidose vials (AstraZeneca)",
             on_or_after="2020-12-08",
             find_first_match_in_period=True,
             returning="date",
@@ -157,7 +157,7 @@ study = StudyDefinition(
             },
         ),
         vax_date_AstraZeneca_2=patients.with_tpp_vaccination_record(
-            product_name_matches="COVID-19 AZD2816 AstraZeneca (ChAdOx1 nCOV-19) 3.5x10*9 viral particles/0.5ml dose sol for inj MDV",
+            product_name_matches="COVID-19 Vaccine Vaxzevria 0.5ml inj multidose vials (AstraZeneca)",
             on_or_after="vax_date_AstraZeneca_1 + 1 day",  
             find_first_match_in_period=True,
             returning="date",
@@ -168,7 +168,7 @@ study = StudyDefinition(
             },
         ),
         vax_date_AstraZeneca_3=patients.with_tpp_vaccination_record(
-            product_name_matches="COVID-19 AZD2816 AstraZeneca (ChAdOx1 nCOV-19) 3.5x10*9 viral particles/0.5ml dose sol for inj MDV",
+            product_name_matches="COVID-19 Vaccine Vaxzevria 0.5ml inj multidose vials (AstraZeneca)",
             on_or_after="vax_date_AstraZeneca_2 + 1 day",  
             find_first_match_in_period=True,
             returning="date",
