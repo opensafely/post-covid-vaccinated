@@ -2184,7 +2184,7 @@ def generate_common_variables(index_date_variable):
         date_format="YYYY-MM-DD",
         return_expectations={
             "float": {"distribution": "normal", "mean": 5.0, "stddev": 2.5},
-            "date": {"earliest": "2015-01-01", "latest": f"{index_date_variable}"},
+            "date": {"earliest": "2015-01-01", "latest": "2022-02-01"},
             "incidence": 0.80,
         },
     ),
@@ -2197,7 +2197,7 @@ def generate_common_variables(index_date_variable):
         date_format="YYYY-MM-DD",
         return_expectations={
             "float": {"distribution": "normal", "mean": 2.0, "stddev": 1.5},
-            "date": {"earliest": "2015-01-01", "latest": f"{index_date_variable}"},
+            "date": {"earliest": "2015-01-01", "latest": "2022-02-01"},
             "incidence": 0.80,
         },
     ),
