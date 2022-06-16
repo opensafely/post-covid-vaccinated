@@ -1,5 +1,5 @@
 ## =============================================================================
-## Purpose:  Create incidence plots
+## Purpose:  Create data for incidence plots
 ## 
 ## Author:   Kurt Taylor
 ##
@@ -9,16 +9,15 @@
 ##
 ## Data:     Post covid events study population
 ##
-## Content: Create a plot of the incidence and cumulative incidence of COVID by week from the beginning of follow up to the end of follow-up for each cohort.
+## Content: Create datasets of the incidence and cumulative incidence of COVID by week from the beginning of follow up to the end of follow-up for each cohort ready for plotting outside OS.
 ## Output:  
 ## =============================================================================
 
-library(outbreaks)
 library(ggplot2)
 library(incidence)
 library(readr)
-library(dplyr)
-library(cowplot)
+library(tidyverse)
+library(janitor)
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -29,18 +28,14 @@ if(length(args)==0){
   cohort_name <- args[[1]]
 }
 
-group <- "diabetes"
-
 fs::dir_create(here::here("output", "not-for-review"))
-fs::dir_create(here::here("output", "review", "venn-diagrams"))
+fs::dir_create(here::here("output", "review", "figure-data", "incidence"))
 
 incidence_output <- function(cohort_name, group) {
   
   # Read input dataset 
   input_stage1 <- readr::read_rds(paste0("output/input_", cohort_name,"_stage1_", group,".rds"))
   
-  end_date <- read_rds(paste0("output/follow_up_end_dates_electively_unvaccinated_diabetes.rds"))
-    
   ##------------------------------
   # GENERATE DATA FOR WEEKLY INCIDENCE PLOTS --------------------------------------------------------------------
   ##------------------------------
@@ -66,15 +61,20 @@ incidence_output <- function(cohort_name, group) {
   input_stage1$cov_cat_age_group <- ifelse(input_stage1$cov_num_age>=80 & input_stage1$cov_num_age<=89, "80-89", input_stage1$cov_cat_age_group)
   input_stage1$cov_cat_age_group <- ifelse(input_stage1$cov_num_age>=90, "90+", input_stage1$cov_cat_age_group)
   
-  incidence_object_age <- incidence(covid_cases, interval = "1 week: saturday", group =  input_stage1$cov_cat_sex)
+  incidence_object_age <- incidence(covid_cases, interval = "1 week: saturday", group =  input_stage1$cov_cat_age_group)
   
   # convert incidence object to a dataframe so that it can be exported from OpenSAFELY
   incidence_object_df <- as.data.frame(incidence_object)
-  incidence_object_age_df <- as.data.frame(incidence_object_sex)
-  incidence_object_sex_df <- as.data.frame(incidence_object_age)
+  
+  incidence_object_age_df <- as.data.frame(incidence_object_age)
+  incidence_object_age_df <- clean_names(incidence_object_age_df)
+  colnames(incidence_object_age_df)<-gsub("x","Age",colnames(incidence_object_age_df))
+  incidence_object_age_df <- incidence_object_age_df %>% dplyr::rename(Age90_plus = Age90)
+  
+  incidence_object_sex_df <- as.data.frame(incidence_object_sex)
 
   ##------------------------------
-  # GENERATE DATA FOR WEEKLY INCIDENCE PLOTS --------------------------------------------------------------------
+  # GENERATE DATA FOR CUMULATIVE INCIDENCE PLOTS --------------------------------------------------------------------
   ##------------------------------
   
   # Make COVID event variable yes no
@@ -106,16 +106,6 @@ incidence_output <- function(cohort_name, group) {
     # long format 
     pivot_longer(cols = -1, names_to = "All", values_to = "Cumsum")
   
-  # BY SEX
-  
-  df_sex <- df %>%
-    dplyr::select(exp_date_covid19_confirmed, covid_event, Sex) %>%
-    .[complete.cases(df),] %>%
-    arrange(exp_date_covid19_confirmed) %>%
-    pivot_wider(names_from = Sex,names_glue = "{Sex}", values_from = covid_event, values_fn = length, values_fill = 0) %>% 
-    mutate_at(-1,cumsum) %>%
-    pivot_longer(cols = -1, names_to = "Sex", values_to = "Cumsum")
-  
   # BY AGE 
   
   df_age <- df %>%
@@ -126,80 +116,45 @@ incidence_output <- function(cohort_name, group) {
     mutate_at(-1,cumsum) %>%
     pivot_longer(cols = -1, names_to = "Age_Group", values_to = "Cumsum")
   
+  # BY SEX
+  
+  df_sex <- df %>%
+    dplyr::select(exp_date_covid19_confirmed, covid_event, Sex) %>%
+    .[complete.cases(df),] %>%
+    arrange(exp_date_covid19_confirmed) %>%
+    pivot_wider(names_from = Sex,names_glue = "{Sex}", values_from = covid_event, values_fn = length, values_fill = 0) %>% 
+    mutate_at(-1,cumsum) %>%
+    pivot_longer(cols = -1, names_to = "Sex", values_to = "Cumsum")
+  
   ##------------------------------
   # SAVE OUTPUTS  --------------------------------------------------------------------
   ##------------------------------
   
+  # WEEKLY
   
+  write.csv(incidence_object_df, paste0("output/review/figure-data/incidence/weekly_incidence_all_", cohort_name,"_", group,".csv"), row.names = FALSE)
+  write.csv(incidence_object_age_df, paste0("output/review/figure-data/incidence/weekly_incidence_age_", cohort_name,"_", group,".csv"), row.names = FALSE)
+  write.csv(incidence_object_sex_df, paste0("output/review/figure-data/incidence/weekly_incidence_sex_", cohort_name,"_", group,".csv"), row.names = FALSE)
+  
+  # CUMULATIVE 
+  
+  write.csv(df_all, paste0("output/review/figure-data/incidence/cum_incidence_all_", cohort_name,"_", group,".csv"), row.names = FALSE)
+  write.csv(df_age, paste0("output/review/figure-data/incidence/cum_incidence_age_", cohort_name,"_", group,".csv"), row.names = FALSE)
+  write.csv(df_sex, paste0("output/review/figure-data/incidence/cum_incidence_sex_", cohort_name,"_", group,".csv"), row.names = FALSE)
   
 }
 
+# Run function using specified commandArgs and active analyses for group
 
+active_analyses <- read_rds("lib/active_analyses.rds")
+active_analyses <- active_analyses %>% filter(active==TRUE)
+group <- unique(active_analyses$outcome_group)
 
-##------------------------------
-# PLOT WEEKLY INCIDENCE ---------------------------------------------------
-##------------------------------
-
-# ALL 
-
-
-# i
-# plot(i, color = "darkred")
-
-i_df <- as.data.frame(i)
-incidence::plot(i_df)
-
-# SEX
-
-i.sex <- incidence(onset, interval = "1 week: saturday", group =  input$cov_cat_age_group)
-i.sex
-incidence_plot <- plot(i.sex)
-
-##------------------------------
-# CUMULATIVE INCIDENCE ----------------------------------------------------
-##------------------------------
-
-# Make COVID event variable yes no
-
-input_stage1 <- input_stage1 %>% 
-  mutate(covid_event = ifelse(is.na(exp_date_covid19_confirmed), 0, 1))
-
-# Prepare dataframe 
-
-df <- input_stage1 %>%
-  dplyr::select(exp_date_covid19_confirmed, covid_event, cov_cat_sex) %>%
-  dplyr::rename(Sex = cov_cat_sex)
-
-df$All <- "all"
-df$Sex <- NULL
-
-df <- df %>%
-  #removing NAs
-  .[complete.cases(df),] %>%
-  # Arrange by data
-  arrange(exp_date_covid19_confirmed) %>%
-  #wide format df with the count of each groups events at each time 
-  #(some dates have more than on event)(NA of dates mismatch, replace by 0)
-  pivot_wider(names_from = All,names_glue = "{All}", values_from = covid_event, values_fn = length, values_fill = 0) %>% 
-  #changing groups event per date to cumsum
-  mutate_at(-1,cumsum) %>%
-  # long format 
-  pivot_longer(cols = -1, names_to = "All", values_to = "Cumsum")
-
-df_no_strat <- df %>%
-  dplyr::select(-Sex) %>%
-  mutate(Cumsum = )
-  
-cumulative_plot <- df %>% ggplot() + 
-geom_line(aes(x = exp_date_covid19_confirmed, y = Cumsum, linetype = Sex)) + 
-labs(y = "Cumulative cases of COVID-19", x = "Months")
-
-# GENERATE FINAL PLOT -----------------------------------------------------
-
-png("output/review/incidence_plots.png",
-    width = 15, height = 10, units = "in", res = 400)
-plot_grid(incidence_plot, cumulative_plot, ncol=2, nrow = 1,
-          labels = c("A: Weekly incidence of COVID-19 cases", "B: Cumulative incidence of COVID-19 cases"),
-          label_x = -0.2,
-          hjust = -0.5, scale = 0.93)
-dev.off()
+for(i in group){
+  if (cohort_name == "both") {
+    incidence_output("electively_unvaccinated", i)
+    incidence_output("vaccinated", i)
+  } else{
+    incidence_output(cohort_name, i)
+  }
+}
