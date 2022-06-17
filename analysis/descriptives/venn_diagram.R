@@ -35,8 +35,8 @@ venn_output <- function(cohort_name, group){
   
   active_analyses <- readr::read_rds("lib/active_analyses.rds")
   outcomes <- active_analyses[active_analyses$active==TRUE,]$outcome_variable
-  # remove t1dm and gestational dm as we only use a single source to define these
-  outcomes <- outcomes[! outcomes %in% c("out_date_t1dm", "out_date_gestationaldm")]
+  # remove otherdm and gestational dm as we only use a single source to define these
+  outcomes <- outcomes[! outcomes %in% c("out_date_otherdm", "out_date_gestationaldm")]
   
   # Load data ------------------------------------------------------------------
   
@@ -259,6 +259,8 @@ venn_output <- function(cohort_name, group){
 active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses <- active_analyses %>% filter(active==TRUE)
 group <- unique(active_analyses$outcome_group)
+# remove gestational dm as we only use a single source to define this and so dont need venn diagram
+group <- group[! group %in% c("diabetes_gestational")]
 
 for(i in group){
   if (cohort_name == "both") {

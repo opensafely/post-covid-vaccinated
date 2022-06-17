@@ -41,7 +41,7 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 agebreaks <- c(0, 40, 60, 80, 111)
 agelabels <- c("18_39", "40_59", "60_79", "80_110")
 
-table_2_subgroups_output <- function(cohort_name){
+table_2_subgroups_output <- function(cohort_name, group){
   
   # define analyses of interests
   active_analyses <- read_rds("lib/active_analyses.rds")
@@ -51,8 +51,8 @@ table_2_subgroups_output <- function(cohort_name){
   
   outcomes<-active_analyses$outcome_variable
   
-  survival_data <- read_rds(paste0("output/input_",cohort_name,"_stage1.rds"))
-  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort_name,".rds")) 
+  survival_data <- read_rds(paste0("output/input_", cohort_name,"_stage1_", group,".rds"))
+  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort_name,"_",group,".rds")) 
   end_dates$index_date <- NULL
   
   survival_data<- survival_data %>% left_join(end_dates, by="patient_id")
@@ -185,7 +185,7 @@ table_2_subgroups_output <- function(cohort_name){
   }
   
   # write output for table2
-  write.csv(analyses_of_interest, file=paste0("output/review/descriptives/table2_",cohort_name, ".csv"), row.names = F)
+  write.csv(analyses_of_interest, file=paste0("output/review/descriptives/table2_",cohort_name,"_",group, ".csv"), row.names = F)
 }
 
 table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_by, stratify_by_subgroup){
@@ -296,11 +296,18 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
 }
 
 
-# Run function using specified commandArgs
-if(cohort_name == "both"){
-  table_2_subgroups_output("vaccinated")
-  table_2_subgroups_output("electively_unvaccinated")
-}else{
-  table_2_subgroups_output(cohort_name)
-}
+# Run function using specified commandArgs and active analyses for group
 
+active_analyses <- read_rds("lib/active_analyses.rds")
+active_analyses <- active_analyses %>% filter(active==TRUE)
+group <- unique(active_analyses$outcome_group)
+
+
+for(i in group){
+  if (cohort_name == "both") {
+    table_2_subgroups_output("electively_unvaccinated", i)
+    table_2_subgroups_output("vaccinated", i)
+  } else{
+    table_2_subgroups_output(cohort_name, i)
+  }
+}

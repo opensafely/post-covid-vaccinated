@@ -24,10 +24,36 @@ if(active_analyses$prior_history_var != ""){
   read_in_cols <- unique(append(read_in_cols, c(covar_names)))
 }
 
-input <- read_rds(paste0("output/input_",cohort,"_stage1.rds"))
+if(event_name == "out_date_ami" | event_name == "out_date_stroke_isch" | event_name == "out_date_dvt" |
+   event_name == "out_date_pe" | event_name == "out_date_tia" | event_name == "out_date_stroke_sah_hs" |
+   event_name == "out_date_hf" | event_name == "out_date_angina" | event_name == "out_date_ate" |
+   event_name == "out_date_vte" | event_name == "out_date_ami_primary_position" | event_name == "out_date_stroke_isch_primary_position" |
+   event_name == "out_date_dvt_primary_position" | event_name == "out_date_pe_primary_position" | event_name == "out_date_tia_primary_position" |
+   event_name == "out_date_stroke_sah_hs_primary_position" | event_name == "out_date_hf_primary_position" | event_name == "out_date_angina_primary_position" |
+   event_name == "out_date_ate_primary_position" | event_name == "out_date_vte_primary_position"){
+  input <- read_rds(paste0("output/input_",cohort,"_stage1_CVD.rds"))
+  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort,"_CVD.rds"))
+  
+} else if(event_name == "t1dm" | event_name == "t2dm" | event_name == "otherdm"){
+  input <- read_rds(paste0("output/input_",cohort,"_stage1_diabetes.rds"))
+  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort,"_diabetes.rds"))
+  
+} else if (event_name == "gestationaldm"){
+  input <- read_rds(paste0("output/input_",cohort,"_stage1_diabetes_gestational.rds"))
+  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort,"_diabetes_gestational.rds"))
+  
+} else if (event_name == "depression" | event_name == "anxiety_general" | event_name == "anxiety_ocd" |
+           event_name == "anxiety_ptsd" | event_name == "eating_disorders" | event_name == "serious_mental_illness" |
+           event_name == "self_harm_10plus" | event_name == "self_harm_15plus" | event_name == "suicide" | event_name == "addiction"){
+  input <- read_rds(paste0("output/input_",cohort,"stage1_mental_health.rds"))
+  end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort,"_mental_health.rds"))
+  
+} 
+
 input <- input %>% select(all_of(read_in_cols))
 
-end_dates <- read_rds(paste0("output/follow_up_end_dates_",cohort,".rds"))
+# ADD END DATES -----------------------------------------------------------
+
 end_dates <- end_dates[,c("patient_id",
                           colnames(end_dates)[grepl(paste0(event_name,"_follow_up_end"),colnames(end_dates))],
                           colnames(end_dates)[grepl(paste0(event_name,"_hospitalised_follow_up_end"),colnames(end_dates))],
@@ -35,8 +61,8 @@ end_dates <- end_dates[,c("patient_id",
                           colnames(end_dates)[grepl(paste0(event_name,"_hospitalised_date_expo_censor"),colnames(end_dates))],
                           colnames(end_dates)[grepl(paste0(event_name,"_non_hospitalised_date_expo_censor"),colnames(end_dates))])] 
 
-
 input <- input %>% left_join(end_dates, by = "patient_id")
+
 rm(end_dates)
 
 #---------------------------SPECIFY MAIN PARAMETERS-----------------------------
