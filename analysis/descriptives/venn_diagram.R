@@ -184,53 +184,54 @@ venn_output <- function(cohort_name, group){
         
       }
     }
+    }
 
     # Proceed to create Venn diagram if all source combos exceed 5 -------------
     #if (min(as.numeric(df[df$outcome==outcome,source_consid]))>5) {
     
       # Calculate contents of each Venn cell for plotting ----------------------
       
-      index1 <- integer(0)
-      index2 <- integer(0)
-      index3 <- integer(0)
-      
-      if ("only_snomed" %in% source_consid) {
-        index1 <- which(!is.na(tmp$snomed))
-      }
-      if ("only_hes" %in% source_consid) {
-        index2 <- which(!is.na(tmp$hes))
-      }
-      if ("only_death" %in% source_consid) {
-        index3 <- which(!is.na(tmp$death))
-      }
-      
-      index <- list(index1, index2, index3)
-      names(index) <- c("Primary care", "Secondary care", "Death record")
-      index <- Filter(length, index)
-      
-      # Fix colours --------------------------------------------------------------
-      
-      mycol <- c(ifelse("Primary care" %in% names(index),"thistle",""),
-                 ifelse("Secondary care" %in% names(index),"lightcyan",""),
-                 ifelse("Death record" %in% names(index),"lemonchiffon",""))
-      
-      mycol <- mycol[mycol!=""]
-      
-      # Make Venn diagram --------------------------------------------------------
-      svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",cohort_name,"_", group,"_", gsub("out_date_","",outcome_save_name),".svg"))
-       g <- ggvenn::ggvenn(
-        index, 
-        fill_color = mycol,
-        stroke_color = "white",
-        text_size = 5,
-        set_name_size = 5, 
-        fill_alpha = 0.9
-      ) +  ggplot2::ggtitle(active_analyses[active_analyses$outcome_variable==outcome_save_name,]$outcome) +
-        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 15, face = "bold"))
-      print(g)
-      dev.off()
-      
-    }
+    #   index1 <- integer(0)
+    #   index2 <- integer(0)
+    #   index3 <- integer(0)
+    #   
+    #   if ("only_snomed" %in% source_consid) {
+    #     index1 <- which(!is.na(tmp$snomed))
+    #   }
+    #   if ("only_hes" %in% source_consid) {
+    #     index2 <- which(!is.na(tmp$hes))
+    #   }
+    #   if ("only_death" %in% source_consid) {
+    #     index3 <- which(!is.na(tmp$death))
+    #   }
+    #   
+    #   index <- list(index1, index2, index3)
+    #   names(index) <- c("Primary care", "Secondary care", "Death record")
+    #   index <- Filter(length, index)
+    #   
+    #   # Fix colours --------------------------------------------------------------
+    #   
+    #   mycol <- c(ifelse("Primary care" %in% names(index),"thistle",""),
+    #              ifelse("Secondary care" %in% names(index),"lightcyan",""),
+    #              ifelse("Death record" %in% names(index),"lemonchiffon",""))
+    #   
+    #   mycol <- mycol[mycol!=""]
+    #   
+    #   # Make Venn diagram --------------------------------------------------------
+    #   svglite::svglite(file = paste0("output/review/venn-diagrams/venn_diagram_",cohort_name,"_", group,"_", gsub("out_date_","",outcome_save_name),".svg"))
+    #    g <- ggvenn::ggvenn(
+    #     index, 
+    #     fill_color = mycol,
+    #     stroke_color = "white",
+    #     text_size = 5,
+    #     set_name_size = 5, 
+    #     fill_alpha = 0.9
+    #   ) +  ggplot2::ggtitle(active_analyses[active_analyses$outcome_variable==outcome_save_name,]$outcome) +
+    #     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5, size = 15, face = "bold"))
+    #   print(g)
+    #   dev.off()
+    #   
+    # 
     
   #}
   
