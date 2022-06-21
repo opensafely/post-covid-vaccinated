@@ -21,7 +21,7 @@ library(tidyverse)
 library(cowplot)
 library(scales)
 
-cov_incidence_plot <- function(cohort_name, group) {
+cov_incidence_plot <- function(cohort_name) {
   
   ##------------------------------
   # WEEKLY INCIDENCE ---------------------------------------------------
@@ -29,9 +29,9 @@ cov_incidence_plot <- function(cohort_name, group) {
   
   # Read in the files outputted from OS
   
-  weekly_all <- read.csv(paste0("output/review/figure-data/incidence/weekly_incidence_all_", cohort_name,"_", group,".csv"))
-  weekly_age <- read.csv(paste0("output/review/figure-data/incidence/weekly_incidence_age_", cohort_name,"_", group,".csv"))
-  weekly_sex <- read.csv(paste0("output/review/figure-data/incidence/weekly_incidence_sex_", cohort_name,"_", group,".csv"))
+  weekly_all <- read.csv(paste0("output/review/figure-data/incidence/weekly_incidence_all_", cohort_name,".csv"))
+  weekly_age <- read.csv(paste0("output/review/figure-data/incidence/weekly_incidence_age_", cohort_name,".csv"))
+  weekly_sex <- read.csv(paste0("output/review/figure-data/incidence/weekly_incidence_sex_", cohort_name,".csv"))
   
   # Turn data frames back into incidence objects 
   
@@ -61,11 +61,11 @@ cov_incidence_plot <- function(cohort_name, group) {
   
   # Read in the files outputted from OS and change date var to date class
   
-  cum_all <- read.csv(paste0("output/review/figure-data/incidence/cum_incidence_all_", cohort_name,"_", group,".csv"))
+  cum_all <- read.csv(paste0("output/review/figure-data/incidence/cum_incidence_all_", cohort_name,".csv"))
   cum_all$exp_date_covid19_confirmed <- as.Date(cum_all$exp_date_covid19_confirmed)
-  cum_age <- read.csv(paste0("output/review/figure-data/incidence/cum_incidence_age_", cohort_name,"_", group,".csv"))
+  cum_age <- read.csv(paste0("output/review/figure-data/incidence/cum_incidence_age_", cohort_name,".csv"))
   cum_age$exp_date_covid19_confirmed <- as.Date(cum_age$exp_date_covid19_confirmed)
-  cum_sex <- read.csv(paste0("output/review/figure-data/incidence/cum_incidence_sex_", cohort_name,"_", group,".csv"))
+  cum_sex <- read.csv(paste0("output/review/figure-data/incidence/cum_incidence_sex_", cohort_name,".csv"))
   cum_sex$exp_date_covid19_confirmed <- as.Date(cum_sex$exp_date_covid19_confirmed)
   
   # Plotting
@@ -159,13 +159,20 @@ group <- "diabetes"
 # change file path to where you want to save the figures
 local_file_output <- "/Users/kt17109/OneDrive - University of Bristol/Documents - grp-EHR/Projects/post-covid-diabetes/incidence-plots/"
 
-for(i in group){
   if (cohort_name == "both") {
-    cov_incidence_plot("electively_unvaccinated", i)
-    cov_incidence_plot("vaccinated", i)
+    cov_incidence_plot("electively_unvaccinated")
+    cov_incidence_plot("vaccinated")
   } else{
-    cov_incidence_plot(cohort_name, i)
+    cov_incidence_plot(cohort_name)
   }
-}
+
+# for(i in group){
+#   if (cohort_name == "both") {
+#     cov_incidence_plot("electively_unvaccinated", i)
+#     cov_incidence_plot("vaccinated", i)
+#   } else{
+#     cov_incidence_plot(cohort_name, i)
+#   }
+# }
 
 ### END

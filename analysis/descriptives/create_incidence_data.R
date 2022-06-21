@@ -31,10 +31,10 @@ if(length(args)==0){
 fs::dir_create(here::here("output", "not-for-review"))
 fs::dir_create(here::here("output", "review", "figure-data", "incidence"))
 
-incidence_output <- function(cohort_name, group) {
+incidence_output <- function(cohort_name) {
   
   # Read input dataset 
-  input_stage1 <- readr::read_rds(paste0("output/input_", cohort_name,"_stage1_", group,".rds"))
+  input_stage1 <- readr::read_rds(paste0("output/input_", cohort_name,"_stage1.rds"))
   
   ##------------------------------
   # GENERATE DATA FOR WEEKLY INCIDENCE PLOTS --------------------------------------------------------------------
@@ -132,29 +132,36 @@ incidence_output <- function(cohort_name, group) {
   
   # WEEKLY
   
-  write.csv(incidence_object_df, paste0("output/review/figure-data/incidence/weekly_incidence_all_", cohort_name,"_", group,".csv"), row.names = FALSE)
-  write.csv(incidence_object_age_df, paste0("output/review/figure-data/incidence/weekly_incidence_age_", cohort_name,"_", group,".csv"), row.names = FALSE)
-  write.csv(incidence_object_sex_df, paste0("output/review/figure-data/incidence/weekly_incidence_sex_", cohort_name,"_", group,".csv"), row.names = FALSE)
+  write.csv(incidence_object_df, paste0("output/review/figure-data/incidence/weekly_incidence_all_", cohort_name,".csv"), row.names = FALSE)
+  write.csv(incidence_object_age_df, paste0("output/review/figure-data/incidence/weekly_incidence_age_", cohort_name,".csv"), row.names = FALSE)
+  write.csv(incidence_object_sex_df, paste0("output/review/figure-data/incidence/weekly_incidence_sex_", cohort_name,".csv"), row.names = FALSE)
   
   # CUMULATIVE 
   
-  write.csv(df_all, paste0("output/review/figure-data/incidence/cum_incidence_all_", cohort_name,"_", group,".csv"), row.names = FALSE)
-  write.csv(df_age, paste0("output/review/figure-data/incidence/cum_incidence_age_", cohort_name,"_", group,".csv"), row.names = FALSE)
-  write.csv(df_sex, paste0("output/review/figure-data/incidence/cum_incidence_sex_", cohort_name,"_", group,".csv"), row.names = FALSE)
+  write.csv(df_all, paste0("output/review/figure-data/incidence/cum_incidence_all_", cohort_name,".csv"), row.names = FALSE)
+  write.csv(df_age, paste0("output/review/figure-data/incidence/cum_incidence_age_", cohort_name,".csv"), row.names = FALSE)
+  write.csv(df_sex, paste0("output/review/figure-data/incidence/cum_incidence_sex_", cohort_name,".csv"), row.names = FALSE)
   
 }
 
 # Run function using specified commandArgs and active analyses for group
 
-active_analyses <- read_rds("lib/active_analyses.rds")
-active_analyses <- active_analyses %>% filter(active==TRUE)
-group <- unique(active_analyses$outcome_group)
+# active_analyses <- read_rds("lib/active_analyses.rds")
+# active_analyses <- active_analyses %>% filter(active==TRUE)
+# group <- unique(active_analyses$outcome_group)
 
-for(i in group){
   if (cohort_name == "both") {
-    incidence_output("electively_unvaccinated", i)
-    incidence_output("vaccinated", i)
+    incidence_output("electively_unvaccinated")
+    incidence_output("vaccinated")
   } else{
-    incidence_output(cohort_name, i)
+    incidence_output(cohort_name)
   }
-}
+
+# for(i in group){
+#   if (cohort_name == "both") {
+#     incidence_output("electively_unvaccinated", i)
+#     incidence_output("vaccinated", i)
+#   } else{
+#     incidence_output(cohort_name, i)
+#   }
+# }
