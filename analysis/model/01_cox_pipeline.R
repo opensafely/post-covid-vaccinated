@@ -55,6 +55,7 @@ source(file.path(scripts_dir,"06_cox_extra_functions.R"))
 source(file.path(scripts_dir,"02_03_cox_timepoint_param.R")) # Prepare dataset for model
 
 # add reduced time point column 
+analyses_to_run <- analyses_to_run %>% filter(subgroup=="covid_pheno_hospitalised")
 
 analyses_to_run$reduced_timepoint <- lapply(split(analyses_to_run,seq(nrow(analyses_to_run))),
                                             function(analyses_to_run) 
@@ -76,7 +77,6 @@ analyses_to_run <- rbind(analyses_to_run, analyses_to_run_normal_timepoint)
 
 rm(analyses_to_run_normal_timepoint)
 
-analyses_to_run <- analyses_to_run %>% filter(subgroup=="covid_pheno_hospitalised")
 # Source remainder of relevant files --------------------------------------------------------
 
 source(file.path(scripts_dir,paste0("03_01_cox_subgrouping.R"))) # Model specification

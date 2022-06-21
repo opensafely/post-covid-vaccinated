@@ -94,19 +94,94 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   combined_results <- as.data.frame(matrix(ncol=9,nrow=0))
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","mdl")
   
-  for(model in mdl){
+  for(test_model in c("no_region_mdl_max_adj","region_covar_mdl_max_adj","region_strata_mdl_max_adj","region_strata_option_1_mdl_max_adj","region_strata_option_2_mdl_max_adj")){
+    
+    if(test_model %in% c("no_region_mdl_max_adj","region_covar_mdl_max_adj","region_strata_mdl_max_adj","region_strata_option_1_mdl_max_adj","region_strata_option_2_mdl_max_adj")){
+      model="mdl_max_adj"
+    }
+    
     #Base formula
-    if(model=="mdl_agesex"){
+    if(test_model=="no_region_mdl_max_adj"){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
-        paste(interval_names, collapse="+"),
-        "+ cluster(patient_id) + strat(region_name)")
-    }else if (model=="mdl_max_adj"){
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id)")
+    }else if(test_model=="region_covar_mdl_max_adj"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id) + region_name")
+    }else if(test_model=="region_strata_mdl_max_adj"){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
         paste(covariates_excl_region_sex_age, collapse="+"), 
         "+ cluster(patient_id) + strat(region_name)")
+    }else if(test_model == "region_strata_option_1_mdl_max_adj"){
+      data_surv$region_name_option_1 <- data_surv$region_name
+      data_surv <- data_surv %>% mutate(region_name_option_1 = as.character(region_name_option_1))%>%
+        mutate(region_name_option_1 = case_when(region_name_option_1=="Yorkshire and The Humber" ~ "Northern England",
+                                                region_name_option_1=="North West" ~ "Northern England",
+                                                region_name_option_1=="North East" ~ "Northern England",
+                                                region_name_option_1=="Midlands" ~ "Midlands",
+                                                region_name_option_1=="East" ~ "Southern England",
+                                                region_name_option_1=="South West" ~ "Southern England",
+                                                region_name_option_1=="South East, including London" ~ "Southern England"
+        )) 
+      u <- unique(data_surv$region_name_option_1)
+      tab <- tabulate(match(data_surv$region_name_option_1, u))
+      relevel_with <- u[tab == max(tab)]
+      
+      data_surv <- data_surv %>% mutate(region_name_option_1 = as.factor(region_name_option_1))%>%
+        mutate(region_name_option_1 = relevel(region_name_option_1,ref=relevel_with))
+      
+      print(paste0("Region releveled with: ",relevel_with))
+      
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id) + strat(region_name_option_1)")
+      
+      
+    }else if(test_model == "region_strata_option_2_mdl_max_adj"){
+      data_surv$region_name_option_2 <- data_surv$region_name
+      
+      data_surv <- data_surv %>% mutate(region_name_option_2 = as.character(region_name_option_2))%>%
+        mutate(region_name_option_2 = case_when(region_name_option_2=="Yorkshire and The Humber" ~ "North",
+                                                region_name_option_2=="North West" ~ "North",
+                                                region_name_option_2=="North East" ~ "North",
+                                                region_name_option_2=="Midlands" ~ "North",
+                                                region_name_option_2=="East" ~ "South",
+                                                region_name_option_2=="South West" ~ "South",
+                                                region_name_option_2=="South East, including London" ~ "South"
+        )) 
+      u <- unique(data_surv$region_name_option_2)
+      tab <- tabulate(match(data_surv$region_name_option_2, u))
+      relevel_with <- u[tab == max(tab)]
+      
+      data_surv <- data_surv %>% mutate(region_name_option_2 = as.factor(region_name_option_2))%>%
+        mutate(region_name_option_2 = relevel(region_name_option_2,ref=relevel_with))
+      
+      print(paste0("Region releveled with: ",relevel_with))
+      
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id) + strat(region_name_option_2)")
     }
+    
+    
+    # if(model=="mdl_agesex"){
+    #   surv_formula <- paste0(
+    #     "Surv(tstart, tstop, event) ~ ",
+    #     paste(interval_names, collapse="+"),
+    #     "+ cluster(patient_id) + strat(region_name)")
+    # }else if (model=="mdl_max_adj"){
+    #   surv_formula <- paste0(
+    #     "Surv(tstart, tstop, event) ~ ",
+    #     paste(covariates_excl_region_sex_age, collapse="+"), 
+    #     "+ cluster(patient_id) + strat(region_name)")
+    # }
+    # 
     
     #If subgroup is not sex then add sex into formula
     if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
@@ -164,7 +239,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
     #results=results%>%left_join(anova_fit_cox_model,by="covariate")
     
-    results$model <- model
+    results$model <- test_model
     
     combined_results <- rbind(combined_results,results)
     
