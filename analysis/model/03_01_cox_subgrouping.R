@@ -115,10 +115,17 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_po
                                      region_name=="East" ~ "East",
                                      region_name=="Yorkshire and The Humber" ~ "Yorkshire and The Humber",
                                      region_name=="South West" ~ "South West",
-      )) %>%
-      mutate(region_name = as.factor(region_name))%>%
-      mutate(region_name = relevel(region_name,ref="South East, including London"))
-  }
+      )) 
+    u <- unique(survival_data$region_name)
+    tab <- tabulate(match(survival_data$region_name, u))
+    relevel_with <- u[tab == max(tab)]
+    
+    survival_data <- survival_data %>% mutate(region_name = as.factor(region_name))%>%
+      mutate(region_name = relevel(region_name,ref=relevel_with))
+    
+    print(paste0("Region releveled with: ",relevel_with))
+    
+    }
   
   # add statement for reduced time cutoffs
   if(time_point == "reduced"){

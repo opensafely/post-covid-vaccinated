@@ -169,33 +169,40 @@ if(length(results_done)>0){
                                                              event,subgroup,model,cohort,time_points,total_covid19_cases)
 
   # Add in suppression for counts <=5
-  combined_hr_event_counts$redacted_results <- "NA"
+  # combined_hr_event_counts$redacted_results <- "NA"
+  # 
+  # supressed_combined_hr_event_counts <- combined_hr_event_counts[0,]
+  # 
+  # for(i in 1:nrow(analyses_to_run)){
+  #   subgroup_of_interest=analyses_to_run$subgroup[i]
+  #   cohort_of_interest=analyses_to_run$cohort[i]
+  #   time_points_of_interest=analyses_to_run$reduced_timepoint[i]
+  #   for(model_of_interest in mdl){
+  #     tmp <- combined_hr_event_counts %>% filter(subgroup==subgroup_of_interest & cohort == cohort_of_interest & time_points == time_points_of_interest, model==model_of_interest)
+  #     tmp <- tmp %>% mutate(across(where(is.numeric), as.character))
+  #     redacted_counts <- tmp[which(tmp$events_total == "[Redacted]"),expo_week]
+  #     tmp[which(tmp$term %in% redacted_counts),2:7] = "[Redacted]"
+  #     tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]", na.rm = T), "Redacted results", "No redacted results")
+  #     supressed_combined_hr_event_counts <- rbind(supressed_combined_hr_event_counts,tmp)
+  #   }
+  # }
+  # 
+  # supressed_combined_hr_event_counts$redacted_results <- factor(supressed_combined_hr_event_counts$redacted_results, levels = c("Redacted results",
+  #                                                                                                                               "No redacted results"))
+  # supressed_combined_hr_event_counts <- supressed_combined_hr_event_counts[order(supressed_combined_hr_event_counts$redacted_results),]
+  # 
   
-  supressed_combined_hr_event_counts <- combined_hr_event_counts[0,]
-
-  for(i in 1:nrow(analyses_to_run)){
-    subgroup_of_interest=analyses_to_run$subgroup[i]
-    cohort_of_interest=analyses_to_run$cohort[i]
-    time_points_of_interest=analyses_to_run$reduced_timepoint[i]
-    for(model_of_interest in mdl){
-      tmp <- combined_hr_event_counts %>% filter(subgroup==subgroup_of_interest & cohort == cohort_of_interest & time_points == time_points_of_interest, model==model_of_interest)
-      tmp <- tmp %>% mutate(across(where(is.numeric), as.character))
-      redacted_counts <- tmp[which(tmp$events_total == "[Redacted]"),expo_week]
-      tmp[which(tmp$term %in% redacted_counts),2:7] = "[Redacted]"
-      tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]", na.rm = T), "Redacted results", "No redacted results")
-      supressed_combined_hr_event_counts <- rbind(supressed_combined_hr_event_counts,tmp)
-    }
-  }
- 
-  supressed_combined_hr_event_counts$redacted_results <- factor(supressed_combined_hr_event_counts$redacted_results, levels = c("Redacted results",
-                                                                                                                                "No redacted results"))
-  supressed_combined_hr_event_counts <- supressed_combined_hr_event_counts[order(supressed_combined_hr_event_counts$redacted_results),]
-  
-  write.csv(supressed_combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv") , row.names=F)
+  write.csv(combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv") , row.names=F)
   print(paste0("Supressed HR with event counts saved: ", output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv"))
   
-  supressed_combined_hr_event_counts <- supressed_combined_hr_event_counts %>% select(!c("expo_week","events_total"))
-  write.csv(supressed_combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,"_to_release.csv") , row.names=F)
+  combined_hr_event_counts <- combined_hr_event_counts %>% select(!c("expo_week","events_total"))
+  write.csv(combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,"_to_release.csv") , row.names=F)
+  
+  #write.csv(supressed_combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv") , row.names=F)
+  #print(paste0("Supressed HR with event counts saved: ", output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv"))
+  
+  #supressed_combined_hr_event_counts <- supressed_combined_hr_event_counts %>% select(!c("expo_week","events_total"))
+  #write.csv(supressed_combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,"_to_release.csv") , row.names=F)
   
   
 }else{
