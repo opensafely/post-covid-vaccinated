@@ -42,6 +42,45 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     covar_names = names(covars)[ names(covars) != "patient_id"]
     data_surv <- data_surv %>% left_join(covars)
   }
+  
+  # Merge missing ethnicity into white ethnicity
+  if(subgroup == "covid_pheno_hospitalised"){
+    data_surv <- data_surv %>% mutate(ethnicity = as.character(ethnicity))%>%
+      mutate(ethnicity = case_when(ethnicity=="White" ~ "White, including missing",
+                                   ethnicity=="Mixed" ~ "Mixed",
+                                   ethnicity=="South Asian" ~ "South Asian",
+                                   ethnicity=="Black" ~ "Black",
+                                   ethnicity=="Other" ~ "Other",
+                                   ethnicity=="Missing" ~ "White, including missing"
+      ))
+    
+    relevel_with <- get_mode(data_surv,"ethnicity")
+    
+    data_surv <- data_surv %>% mutate(ethnicity = as.factor(ethnicity))%>%
+      mutate(ethnicity = relevel(ethnicity,ref=relevel_with))
+    
+    print(paste0("Ethnicity releveled with: ",relevel_with))
+    print(unique(data_surv$ethnicity))
+  }
+  
+  # Merge missing smoking into ever smoker
+  if(subgroup == "covid_pheno_hospitalised"){
+    data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status))%>%
+      mutate(cov_cat_smoking_status = case_when(cov_cat_smoking_status=="Never smoker" ~ "Never smoker",
+                                                cov_cat_smoking_status=="Ever smoker" ~ "Ever smoker",
+                                                cov_cat_smoking_status=="Current smoker" ~ "Current smoker",
+                                                cov_cat_smoking_status=="Missing" ~ "Ever smoker"
+      ))
+    
+    
+    relevel_with <- get_mode(data_surv,"cov_cat_smoking_status")
+    
+    data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status))%>%
+      mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=relevel_with))
+    
+    print(paste0("Smoking status releveled with: ",relevel_with))
+    print(unique(data_surv$cov_cat_smoking_status))
+  }
  
   #Add inverse probablity weights for non-cases
   data_surv$cox_weights <- ifelse(data_surv$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
@@ -67,7 +106,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     covars_to_remove <- rm_lowvar_covars(data_surv)[!is.na((rm_lowvar_covars(data_surv)))]
     print(paste0("Covariates removed: ", covars_to_remove))
     data_surv <- data_surv %>% dplyr::select(!all_of(covars_to_remove))
-    collapse_covars_list=collapse_categorical_covars(data_surv)
+    collapse_covars_list=collapse_categorical_covars(data_surv,subgroup)
     data_surv=collapse_covars_list[[1]]
     covars_collapsed=collapse_covars_list[[2]]
     covars_collapsed=unique(covars_collapsed[covars_collapsed %in% c("cov_cat_deprivation","cov_cat_smoking_status")])
