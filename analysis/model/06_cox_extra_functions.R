@@ -36,7 +36,7 @@ rm_lowvar_covars <- function(data_surv){
   summary <- summary %>% filter(startsWith(Freq,"Mode")==F)
   summary$Freq=gsub(".*:", "",summary$Freq)#Remove everything before:
   summary$Freq <- as.numeric(summary$Freq)
-  covars_to_remove=as.character(summary$Var2[summary$Freq <=10])
+  covars_to_remove=as.character(summary$Var2[summary$Freq <=5])
   summary <- summary(summary$Var2)
   covars_to_remove <- append(covars_to_remove,names(summary)[summary==1])
   return(covars_to_remove)
@@ -44,7 +44,7 @@ rm_lowvar_covars <- function(data_surv){
 
 
 
-collapse_categorical_covars <- function(data_surv){
+collapse_categorical_covars <- function(data_surv,subgroup){
   cov_cat <-colnames(data_surv)[grepl("cov_cat", colnames(data_surv))]
   df <- data_surv %>% dplyr::select(c( "expo", "event", all_of(cov_cat), "patient_id")) %>% distinct() %>% filter((expo==1) & (event==1))
   df <- df %>%  dplyr::select(!c("expo", "event", "patient_id"))
@@ -54,7 +54,7 @@ collapse_categorical_covars <- function(data_surv){
   summary$Var2 <- gsub("\\s","",summary$Var2)
   summary$Freq <- as.numeric(summary$Freq)
   
-  cat_cov_to_remove=unique(as.character(summary$Var2[summary$Freq <=10]))
+  cat_cov_to_remove=unique(as.character(summary$Var2[summary$Freq <=5]))
   
   if("cov_cat_deprivation" %in% cat_cov_to_remove){
     data_surv=data_surv %>% mutate(cov_cat_deprivation= 
@@ -63,16 +63,32 @@ collapse_categorical_covars <- function(data_surv){
                                                cov_cat_deprivation=="5-6"~"5-6",
                                                cov_cat_deprivation=="7-8"~"7-10",
                                                cov_cat_deprivation=="9-10 (least deprived)"~"7-10"))
+    
     data_surv$cov_cat_deprivation <- ordered(data_surv$cov_cat_deprivation, levels = c("1-4","5-6","7-10"))
   }
   
   if("cov_cat_smoking_status" %in% cat_cov_to_remove){
-    data_surv=data_surv %>% mutate(cov_cat_smoking_status=
-                                     case_when(cov_cat_smoking_status=="Never smoker"~"Never smoker",
-                                               cov_cat_smoking_status=="Ever smoker"~"Ever smoker",
-                                               cov_cat_smoking_status=="Current smoker"~"Ever smoker",
-                                               cov_cat_smoking_status=="Missing"~"Missing"))
-    data_surv$cov_cat_smoking_status <- ordered(data_surv$cov_cat_smoking_status, levels = c("Never smoker","Ever smoker","Missing"))
+    if(subgroup != "covid_pheno_hospitalised"){
+      data_surv=data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status)) %>%
+        mutate(cov_cat_smoking_status= case_when(cov_cat_smoking_status=="Never smoker"~"Never smoker",
+                                                 cov_cat_smoking_status=="Ever smoker"~"Ever smoker",
+                                                 cov_cat_smoking_status=="Current smoker"~"Ever smoker",
+                                                 cov_cat_smoking_status=="Missing"~"Missing"))
+      
+      smoking_status_mode <- get_mode(data_surv,"cov_cat_smoking_status")
+      data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status)) %>%
+        mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=smoking_status_mode))
+    }else if (subgroup == "covid_pheno_hospitalised"){
+      data_surv=data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status)) %>%
+        mutate(cov_cat_smoking_status= case_when(cov_cat_smoking_status=="Never smoker"~"Never smoker",
+                                                 cov_cat_smoking_status=="Ever smoker"~"Ever smoker",
+                                                 cov_cat_smoking_status=="Current smoker"~"Ever smoker"))
+      
+      smoking_status_mode <- get_mode(data_surv,"cov_cat_smoking_status")
+      data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status)) %>%
+        mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=smoking_status_mode))
+    }
+    
   }
   return(list(data_surv,cat_cov_to_remove))
 }
@@ -91,6 +107,13 @@ covariate_exploration <- function(data_surv, covars){
   summary$Count=gsub(".*:", "",summary$Count)#Remove everything before
   summary$Var2 <- gsub("\\s","",summary$Var2)
   return(summary)
+}
+
+get_mode <- function(dataset, covariate){
+  u <- unique(dataset[[covariate]])
+  tab <- tabulate(match(dataset[[covariate]], u))
+  relevel_with <- u[tab == max(tab)]
+  return(relevel_with)
 }
 
 
