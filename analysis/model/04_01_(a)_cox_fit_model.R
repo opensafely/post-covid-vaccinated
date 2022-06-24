@@ -134,11 +134,10 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","mdl")
   
   #for(test_model in c("no_region_mdl_max_adj","region_covar_mdl_max_adj","region_strata_mdl_max_adj","region_strata_option_1_mdl_max_adj","region_strata_option_2_mdl_max_adj")){
-  for(test_model in c("region_covar_mdl_max_adj","region_strata_mdl_max_adj")){
+  for(test_model in c("region_covar_no_hist_covar")){
       
-    if(test_model %in% c("no_region_mdl_max_adj","region_covar_mdl_max_adj","region_strata_mdl_max_adj","region_strata_option_1_mdl_max_adj","region_strata_option_2_mdl_max_adj")){
-      model="mdl_max_adj"
-    }
+    model="mdl_max_adj"
+    
     
     #Base formula
     if(test_model=="no_region_mdl_max_adj"){
@@ -207,6 +206,11 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
         "Surv(tstart, tstop, event) ~ ",
         paste(covariates_excl_region_sex_age, collapse="+"), 
         "+ cluster(patient_id) + strat(region_name_option_2)")
+    }else if(test_model == "region_covar_no_hist_covar"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id) + region_name")
     }
     
     
