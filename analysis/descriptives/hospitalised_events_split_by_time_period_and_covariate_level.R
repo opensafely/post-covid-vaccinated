@@ -1,17 +1,6 @@
 ## ====================================================================================
-## Purpose:  Table 2 for all subgroups
+## Purpose: Split hospitalised event counts by covariate level and time period
 ## 
-## Author:   Yinghui Wei
-##
-## Reviewer: Rochelle Knight
-##
-## Date:     28 Feb 2022
-##
-## Data:     Post covid vaccinated project study population
-##
-## Content:  person days of follow up, unexposed person days and event counts
-##
-## Output:   CSV files: table2_*.csv
 ## ====================================================================================
 
 library(readr)
