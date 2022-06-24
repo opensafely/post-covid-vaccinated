@@ -134,14 +134,13 @@ hosp_event_by_covariate_level_counts <- function(survival_data, event,covar_name
   
   data_active <- data_active %>% filter(!is.na(event_date))
   
-  print(1)
+
   data_active$event_expo_status <- NA
-  print(2)
+  
   data_active$event_expo_status <- ifelse((data_active$event_date >= data_active$index_date & 
                                             data_active$event_date <= data_active$hospitalised_follow_up_end) &
     (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed)),"pre_exposure","post_exposure")
   
-  print(3)
   data_active$time_from_expo_to_event <- as.numeric(data_active$event_date - data_active$exp_date_covid19_confirmed)
   
   data_active$event_time_period <- ifelse(data_active$event_expo_status == "post_exposure" & (data_active$time_from_expo_to_event >=0 & data_active$time_from_expo_to_event < 28), "days0_28", "days28_197" )
