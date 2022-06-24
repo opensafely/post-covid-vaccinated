@@ -1,6 +1,6 @@
 # Example function input:
 # filename = "cohorts_ami"
-# prevax = NULL
+# prevax = "~/OneDrive - University of Bristol/grp-EHR/Projects/CCU002_01/estimates_Acute myocardial infarction.csv"
 # vax = "~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_ami_vaccinated_to_release.csv"
 # unvax = "~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_ami_electively_unvaccinated_to_release.csv"
 
