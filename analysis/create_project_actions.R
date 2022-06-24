@@ -113,6 +113,24 @@ table2 <- function(cohort){
   )
 }
 
+hosp_event_counts_by_covariate_level <- function(cohort){
+  splice(
+    comment(glue("Hospitalised event counts by covariate - {cohort}")),
+    action(
+      name = glue("hosp_event_counts_by_covariate_level_{cohort}"),
+      run = "r:latest analysis/descriptives/hospitalised_events_split_by_time_period_and_covariate_level.R",
+      arguments = c(cohort),
+      needs = list("stage1_data_cleaning_both",glue("stage1_end_date_table_{cohort}")),
+      moderately_sensitive = list(
+        hosp_counts_by_covariate = glue("output/not-for-review/hospitalised_event_counts_by_covariate_level_{cohort}.csv")
+      )
+    )
+  )
+}
+
+
+
+
 
 ##########################################################
 ## Define and combine all actions into a list of actions #
@@ -311,7 +329,15 @@ actions_list <- splice(
     needs = list("stage1_data_cleaning_both","stage1_end_date_table_electively_unvaccinated"),
     moderately_sensitive = list(
     hosp_events_by_region_non_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_non_suppressed.csv",
-    hosp_events_by_region_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_suppressed.csv")))
+    hosp_events_by_region_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_suppressed.csv")),
+  
+  #comment("Hospitalised event counts by covariate level"),
+  splice(
+    # over cohort
+    unlist(lapply(cohort_to_run, function(x) hosp_event_counts_by_covariate_level(cohort = x)), recursive = FALSE)
+  )
+  
+  )
 
 
 ## combine everything ----
