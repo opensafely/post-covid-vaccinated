@@ -132,7 +132,7 @@ plot_cohorts <- function(outcome, prevax = NULL, vax = NULL, unvax = NULL) {
 
 # Make and save plots using plot_cohorts function ------------------------------
 
-for (i in c("ami","angina","ate","dvt","hf","stroke_isch","vte")) {
+for (i in c("ami","angina","ate","dvt","hf","stroke_isch")) {
   
   plot_cohorts(outcome = i,
                prevax = paste0("~/OneDrive - University of Bristol/grp-EHR/Projects/CCU002_01/estimates-",i,".csv"), 
@@ -141,7 +141,7 @@ for (i in c("ami","angina","ate","dvt","hf","stroke_isch","vte")) {
   
 }
 
-for (i in c("pe", "stroke_sah_hs", "tia")) {
+for (i in c("pe", "stroke_sah_hs", "tia","vte")) {
   
   plot_cohorts(outcome = i,
                prevax = paste0("~/OneDrive - University of Bristol/grp-EHR/Projects/CCU002_01/estimates-",i,".csv"), 
