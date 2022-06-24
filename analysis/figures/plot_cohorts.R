@@ -1,12 +1,8 @@
-# Example function input:
-# filename = "cohorts_ami"
-# prevax = "~/OneDrive - University of Bristol/grp-EHR/Projects/CCU002_01/estimates_Acute myocardial infarction.csv"
-# vax = "~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_ami_vaccinated_to_release.csv"
-# unvax = "~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_ami_electively_unvaccinated_to_release.csv"
+# Define plot_cohorts function -------------------------------------------------
 
-plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = NULL) {
+plot_cohorts <- function(outcome, prevax = NULL, vax = NULL, unvax = NULL) {
   
-  # Load and filter prevax data ------------------------------------------------
+  ## Load and filter prevax data -----------------------------------------------
   
   if (!is.null(prevax)) {
     
@@ -29,7 +25,7 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
     
   }
   
-  # Load and filter vax data ---------------------------------------------------
+  ## Load and filter vax data --------------------------------------------------
   
   if (!is.null(vax)) {
     
@@ -52,7 +48,7 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
     
   }
   
-  # Load and filter unvax data -------------------------------------------------
+  ## Load and filter unvax data ------------------------------------------------
   
   if (!is.null(unvax)) {
     
@@ -75,19 +71,27 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
     
   }
   
-  # Make single dataset for plotting -------------------------------------------
+  ## Make single dataset for plotting ------------------------------------------
   
   df <- rbind(df_prevax, df_vax, df_unvax)
   
-  # Assign time for plotting ---------------------------------------------------
+  ## Assign time for plotting --------------------------------------------------
   
   df$start <- as.numeric(gsub("days","",sub('\\_.*', '', df$term)))
   df$stop <- as.numeric(gsub(".*_", "",df$term))
   df$time <- df$start + ((df$stop-df$start)/2)
   
-  max_weeks <- max(df$stop)/7
+  ## Make variables numeric ----------------------------------------------------
   
-  # Plot -----------------------------------------------------------------------
+  df$time <- as.numeric(df$time)
+  df$estimate <- as.numeric(df$estimate)
+  df$conf.low <- as.numeric(df$conf.low)
+  df$conf.high <- as.numeric(df$conf.high)
+  
+  ## Plot ----------------------------------------------------------------------
+  
+  max_weeks <- max(df$stop)/7
+  max_hr <- max(df$conf.high)
   
   ggplot2::ggplot(data=df, 
                   mapping = ggplot2::aes(x=time/7, y = estimate, color = model, fill=model)) + 
@@ -98,7 +102,7 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
                                                   width = 0), 
                            position = ggplot2::position_dodge(width = 1)) +   
     ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) +    
-    ggplot2::scale_y_continuous(lim = c(0.5,32), breaks = c(0.5,1,2,4,8,16,32), trans = "log") +
+    ggplot2::scale_y_continuous(lim = c(0.5,max_hr), breaks = 2^seq(-1,10), trans = "log") +
     ggplot2::scale_x_continuous(lim = c(0,max_weeks), breaks = seq(0,400,4)) +
     ggplot2::scale_fill_manual(values = c("#bababa","#000000"), 
                                breaks = c("mdl_agesex","mdl_max_adj"), 
@@ -118,10 +122,30 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
     ggplot2::facet_wrap(cohort~., nrow = 1)
   
-  # Save plot ------------------------------------------------------------------
+  ## Save plot -----------------------------------------------------------------
   
   cohorts <- sum(!is.null(prevax), !is.null(vax), !is.null(unvax))
   
-  ggplot2::ggsave(paste0("output/",filename,".png"), height = 210/2, width = 297*(cohorts/3), unit = "mm", dpi = 600, scale = 1)
+  ggplot2::ggsave(paste0("output/cohorts_",outcome,".png"), height = 210/2, width = 297*(cohorts/3), unit = "mm", dpi = 600, scale = 1)
+  
+}
+
+# Make and save plots using plot_cohorts function ------------------------------
+
+for (i in c("ami","angina","ate","dvt","hf","stroke_isch","vte")) {
+  
+  plot_cohorts(outcome = i,
+               prevax = paste0("~/OneDrive - University of Bristol/grp-EHR/Projects/CCU002_01/estimates-",i,".csv"), 
+               vax = paste0("~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_",i,"_vaccinated_to_release.csv"), 
+               unvax = paste0("~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_",i,"_electively_unvaccinated_to_release.csv"))
+  
+}
+
+for (i in c("pe", "stroke_sah_hs", "tia")) {
+  
+  plot_cohorts(outcome = i,
+               prevax = paste0("~/OneDrive - University of Bristol/grp-EHR/Projects/CCU002_01/estimates-",i,".csv"), 
+               vax = paste0("~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_",i,"_vaccinated_to_release.csv"), 
+               unvax = NULL)
   
 }
