@@ -1,12 +1,12 @@
 # Example function input:
 # filename = "cohorts_ami"
-# prevax = "~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_ami_vaccinated_to_release.csv"
+# prevax = NULL
 # vax = "~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_ami_vaccinated_to_release.csv"
 # unvax = "~/OneDrive - University of Bristol/grp-EHR/Projects/post-covid-cardiovascular/OS output/Hazard ratios/suppressed_compiled_HR_results_ami_electively_unvaccinated_to_release.csv"
 
 plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = NULL) {
   
-  # Load and filter prevax data --------------------------------------------------
+  # Load and filter prevax data ------------------------------------------------
   
   if (!is.null(prevax)) {
     
@@ -29,7 +29,7 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
     
   }
   
-  # Load and filter vax data -----------------------------------------------------
+  # Load and filter vax data ---------------------------------------------------
   
   if (!is.null(vax)) {
     
@@ -52,7 +52,7 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
     
   }
   
-  # Load and filter unvax data ---------------------------------------------------
+  # Load and filter unvax data -------------------------------------------------
   
   if (!is.null(unvax)) {
     
@@ -75,11 +75,11 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
     
   }
   
-  # Make single dataset for plotting ---------------------------------------------
+  # Make single dataset for plotting -------------------------------------------
   
   df <- rbind(df_prevax, df_vax, df_unvax)
   
-  # Handle time ------------------------------------------------------------------
+  # Assign time for plotting ---------------------------------------------------
   
   df$start <- as.numeric(gsub("days","",sub('\\_.*', '', df$term)))
   df$stop <- as.numeric(gsub(".*_", "",df$term))
@@ -87,7 +87,7 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
   
   max_weeks <- max(df$stop)/7
   
-  # Plot -------------------------------------------------------------------------
+  # Plot -----------------------------------------------------------------------
   
   ggplot2::ggplot(data=df, 
                   mapping = ggplot2::aes(x=time/7, y = estimate, color = model, fill=model)) + 
@@ -102,10 +102,10 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
     ggplot2::scale_x_continuous(lim = c(0,max_weeks), breaks = seq(0,400,4)) +
     ggplot2::scale_fill_manual(values = c("#bababa","#000000"), 
                                breaks = c("mdl_agesex","mdl_max_adj"), 
-                               labels = c("Age/sex adjustment","Extensive adjusted"))+ 
+                               labels = c("Age and sex adjustment","Extensive adjustment"))+ 
     ggplot2::scale_color_manual(values = c("#bababa","#000000"), 
                                 breaks = c("mdl_agesex","mdl_max_adj"), 
-                                labels = c("Age/sex adjustment","Extensive adjusted")) +
+                                labels = c("Age and sex adjustment","Extensive adjustment")) +
     ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
     ggplot2::theme_minimal() +
     ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
@@ -118,6 +118,10 @@ plot_cohorts <- function(filename = "plot", prevax = NULL, vax = NULL, unvax = N
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
     ggplot2::facet_wrap(cohort~., nrow = 1)
   
-  ggplot2::ggsave(paste0("output/",filename,".png"), height = 210/2, width = 297, unit = "mm", dpi = 600, scale = 1)
+  # Save plot ------------------------------------------------------------------
+  
+  cohorts <- sum(!is.null(prevax), !is.null(vax), !is.null(unvax))
+  
+  ggplot2::ggsave(paste0("output/",filename,".png"), height = 210/2, width = 297*(cohorts/3), unit = "mm", dpi = 600, scale = 1)
   
 }
