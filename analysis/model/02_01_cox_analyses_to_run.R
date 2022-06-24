@@ -15,16 +15,6 @@ covar_names<-str_split(active_analyses$covariates, ";")[[1]]
 covar_names<-append(covar_names,"patient_id")
 covar_names<-covar_names[!covar_names %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
 
-if(event_name %in% c("vte","dvt","pe")){
-  history_covariate <- "cov_bin_vte"
-  covar_names<-covar_names[covar_names != history_covariate]
-}
-
-if(event_name %in% c("stroke_isch")){
-  history_covariate <- "cov_bin_all_stroke"
-  covar_names<-covar_names[covar_names != history_covariate]
-}
-
 ##Set which models and cohorts are required
 
 if(active_analyses$model=="all"){
