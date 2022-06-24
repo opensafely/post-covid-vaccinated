@@ -754,8 +754,7 @@ actions:
   ## Hospitalised event counts by covariate - vaccinated 
 
   hosp_event_counts_by_covariate_level_vaccinated:
-    run: r:latest analysis/descriptives/hospitalised_events_split_by_time_period_and_covariate_level.R
-      vaccinated
+    run: r:latest analysis/descriptives/hospitalised_events_split_by_time_period_and_covariate_level.R vaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
