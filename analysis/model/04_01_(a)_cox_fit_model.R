@@ -135,78 +135,42 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   
   #-------------Format region if running COVID subgroup analysis----------------
   
-  data_surv$region_name_1 <- data_surv$region_name
-  data_surv <- data_surv %>% mutate(region_name_1 = as.character(region_name_1))%>%
-    mutate(region_name_1 = case_when(region_name_1=="London" ~ "Southern England",
-                                     region_name_1=="South East" ~ "Southern England",
-                                     region_name_1=="West Midlands" ~ "Midlands",
-                                     region_name_1=="East Midlands" ~ "Midlands",
-                                     region_name_1=="North West" ~ "Northern England",
-                                     region_name_1=="North East" ~ "Northern England",
-                                     region_name_1=="East" ~ "Southern England",
-                                     region_name_1=="Yorkshire and The Humber" ~ "Northern England",
-                                     region_name_1=="South West" ~ "Southern England",
-    ))
-  relevel_with <- get_mode(data_surv,"region_name_1")
-  
-  data_surv <- data_surv %>% mutate(region_name_1 = as.factor(region_name_1))%>%
-    mutate(region_name_1 = relevel(region_name_1,ref=relevel_with))
-  
-  print(paste0("Region_1 releveled with: ",relevel_with))
-
-  #for(test_model in c("no_region_mdl_max_adj","region_covar_mdl_max_adj","region_strata_mdl_max_adj","region_strata_option_1_mdl_max_adj","region_strata_option_2_mdl_max_adj")){
-
-  for(test_model in c("age_sex_region","age_sex_region_option_1", "age_sex_ethnicity_region","age_sex_ethnicity_region_option_1", "age_sex_region_max_adjust","age_sex_region_option_1_max_adjust","age_sex_region_max_adjust_no_ethnicity","age_sex_region_option_1_max_adjust_no_ethnicity" )){
+  # data_surv$region_name_1 <- data_surv$region_name
+  # data_surv <- data_surv %>% mutate(region_name_1 = as.character(region_name_1))%>%
+  #   mutate(region_name_1 = case_when(region_name_1=="London" ~ "Southern England",
+  #                                    region_name_1=="South East" ~ "Southern England",
+  #                                    region_name_1=="West Midlands" ~ "Midlands",
+  #                                    region_name_1=="East Midlands" ~ "Midlands",
+  #                                    region_name_1=="North West" ~ "Northern England",
+  #                                    region_name_1=="North East" ~ "Northern England",
+  #                                    region_name_1=="East" ~ "Southern England",
+  #                                    region_name_1=="Yorkshire and The Humber" ~ "Northern England",
+  #                                    region_name_1=="South West" ~ "Southern England",
+  #   ))
+  # relevel_with <- get_mode(data_surv,"region_name_1")
+  # 
+  # data_surv <- data_surv %>% mutate(region_name_1 = as.factor(region_name_1))%>%
+  #   mutate(region_name_1 = relevel(region_name_1,ref=relevel_with))
+  # 
+  # print(paste0("Region_1 releveled with: ",relevel_with))
+ 
+  for(ethnicity in c("don't inlcude","include")){
+    for(covariate_name in covariates){
     
-    if(test_model %in% c("age_sex_region","age_sex_region_option_1","age_sex_region_max_adjust_no_ethnicity","age_sex_region_option_1_max_adjust_no_ethnicity")){
-      model="mdl_agsex"
-    }else{
-      model="mdl_max_adj"
+    model="mdl_agsex"
+    
+    if(ethnicity == "don't inlcude"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(c(interval_names,covariate_name), collapse="+"), 
+        "+ cluster(patient_id) + region_name")
+    }else if(ethnicity == "inlcude"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(c(interval_names,covariate_name), collapse="+"), 
+        "+ cluster(patient_id) + region_name + ethnicity")
     }
     
-    
-    #Base formula
-    if(test_model=="age_sex_region"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(interval_names, collapse="+"), 
-        "+ cluster(patient_id) + region_name")
-    }else if(test_model=="age_sex_region_option_1"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(interval_names, collapse="+"), 
-        "+ cluster(patient_id) + region_name_1")
-    }else if(test_model=="age_sex_ethnicity_region"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(interval_names, collapse="+"), 
-        "+ cluster(patient_id) + region_name")
-    }else if(test_model == "age_sex_ethnicity_region_option_1"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(interval_names, collapse="+"), 
-        "+ cluster(patient_id) + region_name_1")
-    }else if(test_model == "age_sex_region_max_adjust"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(covariates_excl_region_sex_age, collapse="+"), 
-        "+ cluster(patient_id) + region_name")
-    }else if(test_model == "age_sex_region_option_1_max_adjust"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(covariates_excl_region_sex_age, collapse="+"), 
-        "+ cluster(patient_id) + region_name_1")
-    }else if(test_model == "age_sex_region_max_adjust_no_ethnicity"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(covariates_excl_region_sex_age, collapse="+"), 
-        "+ cluster(patient_id) + region_name")
-    }else if(test_model == "age_sex_region_option_1_max_adjust_no_ethnicity"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(covariates_excl_region_sex_age, collapse="+"), 
-        "+ cluster(patient_id) + region_name_1")
-    }
     
     
     # if(model=="mdl_agesex"){
@@ -272,18 +236,19 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     #Can only get for covariate as a whole and not for each level so left join onto main covariate name
     results$covariate=results$term
     results$covariate=sub('\\=.*', '', results$covariate)
-    results$P="NA"
+    results$P=ifelse(all(results$estimate<200 & results$std.error<10 & results$robust.se<10),"fitted successfully","fitted unsuccessfully")
     #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
     #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
     #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
     #results=results%>%left_join(anova_fit_cox_model,by="covariate")
     
-    results$model <- test_model
+    results$model <- paste0("age/sex/region/",covariate_name,"/",ethnicity," ethnicity")
     
     combined_results <- rbind(combined_results,results)
     
     print("Print results")
     print(results)
+    }
   }
   
   print("Finised working on cox model")
