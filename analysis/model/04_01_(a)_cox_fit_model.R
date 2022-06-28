@@ -134,7 +134,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","mdl")
   
   #for(test_model in c("no_region_mdl_max_adj","region_covar_mdl_max_adj","region_strata_mdl_max_adj","region_strata_option_1_mdl_max_adj","region_strata_option_2_mdl_max_adj")){
-  for(test_model in c("age_sex_region_covar", "age_sex_ethnicity_region_covar","age_sex_ethnicity_deprivation_region_covar" )){
+  for(test_model in c("age_sex_region_covar", "age_sex_ethnicity_region_covar","age_sex_max_adjust_no_region_no_ethnicity" )){
       
     if(test_model == "age_sex_region_covar"){
       model = "mdl_agesex"
@@ -230,6 +230,11 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
         "Surv(tstart, tstop, event) ~ ",
         paste(interval_names, collapse="+"),
         "+ cluster(patient_id) + region_name + cov_cat_deprivation")
+    }else if(test_model == "age_sex_max_adjust_no_region"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id)")
     }
     
     
@@ -252,7 +257,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     }
     
     #If subgroup is not ethnicity then add ethnicity into formula
-    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj"){
+    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj" & test_model != "age_sex_max_adjust_no_region"){
       surv_formula <- paste(surv_formula, "ethnicity", sep="+")
     }
     
