@@ -134,14 +134,12 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","mdl")
   
   #for(test_model in c("no_region_mdl_max_adj","region_covar_mdl_max_adj","region_strata_mdl_max_adj","region_strata_option_1_mdl_max_adj","region_strata_option_2_mdl_max_adj")){
+
   for(test_model in c("age_sex_region_covar", "age_sex_ethnicity_region_covar","age_sex_max_adjust_no_region_no_ethnicity" )){
+
       
-    if(test_model == "age_sex_region_covar"){
-      model = "mdl_agesex"
-    }else{
-      model="mdl_max_adj"
-    }
-   
+    model="mdl_max_adj"
+    
     
     #Base formula
     if(test_model=="no_region_mdl_max_adj"){
