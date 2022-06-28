@@ -335,9 +335,19 @@ actions_list <- splice(
   splice(
     # over cohort
     unlist(lapply(cohort_to_run, function(x) hosp_event_counts_by_covariate_level(cohort = x)), recursive = FALSE)
-  )
+  ),
   
+  #comment("Select covariates for hosp COVID)
+  action(
+    name = "select_covariates_for_hosp_covid",
+    run = "r:latest analysis/descriptives/determine_covariates_for_hosp_covid.R both",
+    needs = list("hosp_event_counts_by_covariate_level_vaccinated","hosp_event_counts_by_covariate_level_electively_unvaccinated"),
+    moderately_sensitive = list(
+      covariates_for_hosp_covid_vacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_vaccinated.csv",
+      covariates_for_hosp_covid_electively_unvacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv")
+
   )
+)
 
 
 ## combine everything ----
