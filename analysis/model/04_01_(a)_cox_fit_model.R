@@ -228,7 +228,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
         "Surv(tstart, tstop, event) ~ ",
         paste(interval_names, collapse="+"),
         "+ cluster(patient_id) + region_name + cov_cat_deprivation")
-    }else if(test_model == "age_sex_max_adjust_no_region"){
+    }else if(test_model == "age_sex_max_adjust_no_region_no_ethnicity"){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
         paste(covariates_excl_region_sex_age, collapse="+"), 
@@ -255,7 +255,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     }
     
     #If subgroup is not ethnicity then add ethnicity into formula
-    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj" & test_model != "age_sex_max_adjust_no_region"){
+    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj" & test_model != "age_sex_max_adjust_no_region_no_ethnicity"){
       surv_formula <- paste(surv_formula, "ethnicity", sep="+")
     }
     
