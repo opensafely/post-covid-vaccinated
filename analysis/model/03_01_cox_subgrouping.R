@@ -116,7 +116,7 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_po
                                      region_name=="Yorkshire and The Humber" ~ "Northern England",
                                      region_name=="South West" ~ "Southern England",
       ))
-    relevel_with <- get_mode(survival_data,region_name)
+    relevel_with <- get_mode(survival_data,"region_name")
     
     survival_data <- survival_data %>% mutate(region_name = as.factor(region_name))%>%
       mutate(region_name = relevel(region_name,ref=relevel_with))
