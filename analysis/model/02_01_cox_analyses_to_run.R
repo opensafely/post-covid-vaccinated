@@ -11,8 +11,13 @@ active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses <- active_analyses %>%dplyr::filter(outcome_variable==paste0("out_date_",event_name) & active == "TRUE")
 
 ## Select covariates of interest 
-covar_names<-str_split(active_analyses$covariates, ";")[[1]]
-covar_names<-append(covar_names,"patient_id")
+covar_names <- read_csv(paste0("output/not-for-review/covariates_to_adjust_for_hosp_covid_",cohort,".csv"))
+covar_names <- covar_names %>% filter(outcome_event == paste0("out_date_",event_name))
+covar_names <- str_split(covar_names$covariates, ";")[[1]]
+covar_names <- append(covar_names, "patient_id")
+
+#covar_names<-str_split(active_analyses$covariates, ";")[[1]]
+#covar_names<-append(covar_names,"patient_id")
 covar_names<-covar_names[!covar_names %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
 
 ##Set which models and cohorts are required
