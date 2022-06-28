@@ -133,106 +133,79 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   combined_results <- as.data.frame(matrix(ncol=9,nrow=0))
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","mdl")
   
+  #-------------Format region if running COVID subgroup analysis----------------
+  
+  data_surv$region_name_1 <- data_surv$region_name
+  data_surv <- data_surv %>% mutate(region_name_1 = as.character(region_name_1))%>%
+    mutate(region_name_1 = case_when(region_name_1=="London" ~ "Southern England",
+                                     region_name_1=="South East" ~ "Southern England",
+                                     region_name_1=="West Midlands" ~ "Midlands",
+                                     region_name_1=="East Midlands" ~ "Midlands",
+                                     region_name_1=="North West" ~ "Northern England",
+                                     region_name_1=="North East" ~ "Northern England",
+                                     region_name_1=="East" ~ "Southern England",
+                                     region_name_1=="Yorkshire and The Humber" ~ "Northern England",
+                                     region_name_1=="South West" ~ "Southern England",
+    ))
+  relevel_with <- get_mode(data_surv,"region_name_1")
+  
+  data_surv <- data_surv %>% mutate(region_name_1 = as.factor(region_name_1))%>%
+    mutate(region_name_1 = relevel(region_name_1,ref=relevel_with))
+  
+  print(paste0("Region_1 releveled with: ",relevel_with))
+
   #for(test_model in c("no_region_mdl_max_adj","region_covar_mdl_max_adj","region_strata_mdl_max_adj","region_strata_option_1_mdl_max_adj","region_strata_option_2_mdl_max_adj")){
 
-  for(test_model in c("age_sex_region_covar", "age_sex_ethnicity_region_covar","age_sex_max_adjust_no_region_no_ethnicity" )){
-
-      
-    model="mdl_max_adj"
+  for(test_model in c("age_sex_region","age_sex_region_option_1", "age_sex_ethnicity_region","age_sex_ethnicity_region_option_1", "age_sex_region_max_adjust","age_sex_region_option_1_max_adjust","age_sex_region_max_adjust_no_ethnicity","age_sex_region_option_1_max_adjust_no_ethnicity" )){
+    
+    if(test_model %in% c("age_sex_region","age_sex_region_option_1","age_sex_region_max_adjust_no_ethnicity","age_sex_region_option_1_max_adjust_no_ethnicity")){
+      model="mdl_agsex"
+    }else{
+      model="mdl_max_adj"
+    }
     
     
     #Base formula
-    if(test_model=="no_region_mdl_max_adj"){
+    if(test_model=="age_sex_region"){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
-        paste(covariates_excl_region_sex_age, collapse="+"), 
-        "+ cluster(patient_id)")
-    }else if(test_model=="region_covar_mdl_max_adj"){
+        paste(interval_names, collapse="+"), 
+        "+ cluster(patient_id) + region_name")
+    }else if(test_model=="age_sex_region_option_1"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(interval_names, collapse="+"), 
+        "+ cluster(patient_id) + region_name_1")
+    }else if(test_model=="age_sex_ethnicity_region"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(interval_names, collapse="+"), 
+        "+ cluster(patient_id) + region_name")
+    }else if(test_model == "age_sex_ethnicity_region_option_1"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(interval_names, collapse="+"), 
+        "+ cluster(patient_id) + region_name_1")
+    }else if(test_model == "age_sex_region_max_adjust"){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
         paste(covariates_excl_region_sex_age, collapse="+"), 
         "+ cluster(patient_id) + region_name")
-    }else if(test_model=="region_strata_mdl_max_adj"){
+    }else if(test_model == "age_sex_region_option_1_max_adjust"){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
         paste(covariates_excl_region_sex_age, collapse="+"), 
-        "+ cluster(patient_id) + strat(region_name)")
-    }else if(test_model == "region_strata_option_1_mdl_max_adj"){
-      data_surv$region_name_option_1 <- data_surv$region_name
-      data_surv <- data_surv %>% mutate(region_name_option_1 = as.character(region_name_option_1))%>%
-        mutate(region_name_option_1 = case_when(region_name_option_1=="Yorkshire and The Humber" ~ "Northern England",
-                                                region_name_option_1=="North West" ~ "Northern England",
-                                                region_name_option_1=="North East" ~ "Northern England",
-                                                region_name_option_1=="Midlands" ~ "Midlands",
-                                                region_name_option_1=="East" ~ "Southern England",
-                                                region_name_option_1=="South West" ~ "Southern England",
-                                                region_name_option_1=="South East, including London" ~ "Southern England"
-        )) 
-      u <- unique(data_surv$region_name_option_1)
-      tab <- tabulate(match(data_surv$region_name_option_1, u))
-      relevel_with <- u[tab == max(tab)]
-      
-      data_surv <- data_surv %>% mutate(region_name_option_1 = as.factor(region_name_option_1))%>%
-        mutate(region_name_option_1 = relevel(region_name_option_1,ref=relevel_with))
-      
-      print(paste0("Region releveled with: ",relevel_with))
-      
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(covariates_excl_region_sex_age, collapse="+"), 
-        "+ cluster(patient_id) + strat(region_name_option_1)")
-      
-      
-    }else if(test_model == "region_strata_option_2_mdl_max_adj"){
-      data_surv$region_name_option_2 <- data_surv$region_name
-      
-      data_surv <- data_surv %>% mutate(region_name_option_2 = as.character(region_name_option_2))%>%
-        mutate(region_name_option_2 = case_when(region_name_option_2=="Yorkshire and The Humber" ~ "North",
-                                                region_name_option_2=="North West" ~ "North",
-                                                region_name_option_2=="North East" ~ "North",
-                                                region_name_option_2=="Midlands" ~ "North",
-                                                region_name_option_2=="East" ~ "South",
-                                                region_name_option_2=="South West" ~ "South",
-                                                region_name_option_2=="South East, including London" ~ "South"
-        )) 
-      u <- unique(data_surv$region_name_option_2)
-      tab <- tabulate(match(data_surv$region_name_option_2, u))
-      relevel_with <- u[tab == max(tab)]
-      
-      data_surv <- data_surv %>% mutate(region_name_option_2 = as.factor(region_name_option_2))%>%
-        mutate(region_name_option_2 = relevel(region_name_option_2,ref=relevel_with))
-      
-      print(paste0("Region releveled with: ",relevel_with))
-      
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(covariates_excl_region_sex_age, collapse="+"), 
-        "+ cluster(patient_id) + strat(region_name_option_2)")
-    }else if(test_model == "region_covar_no_hist_covar"){
+        "+ cluster(patient_id) + region_name_1")
+    }else if(test_model == "age_sex_region_max_adjust_no_ethnicity"){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
         paste(covariates_excl_region_sex_age, collapse="+"), 
         "+ cluster(patient_id) + region_name")
-    }else if(test_model =="age_sex_region_covar"){
-      surv_formula <- paste0(
-             "Surv(tstart, tstop, event) ~ ",
-             paste(interval_names, collapse="+"),
-             "+ cluster(patient_id) + region_name")
-    }else if(test_model == "age_sex_ethnicity_region_covar"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(interval_names, collapse="+"),
-        "+ cluster(patient_id) + region_name")
-    }else if(test_model == "age_sex_ethnicity_deprivation_region_covar"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(interval_names, collapse="+"),
-        "+ cluster(patient_id) + region_name + cov_cat_deprivation")
-    }else if(test_model == "age_sex_max_adjust_no_region_no_ethnicity"){
+    }else if(test_model == "age_sex_region_option_1_max_adjust_no_ethnicity"){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
         paste(covariates_excl_region_sex_age, collapse="+"), 
-        "+ cluster(patient_id)")
+        "+ cluster(patient_id) + region_name_1")
     }
     
     
@@ -255,7 +228,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     }
     
     #If subgroup is not ethnicity then add ethnicity into formula
-    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj" & test_model != "age_sex_max_adjust_no_region_no_ethnicity"){
+    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj"){
       surv_formula <- paste(surv_formula, "ethnicity", sep="+")
     }
     

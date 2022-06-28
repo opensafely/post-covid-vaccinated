@@ -103,27 +103,28 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_po
   total_covid_cases=nrow(survival_data %>% filter(!is.na(expo_date)))
   
   
-  #-------------Format region if running COVID subgroup analysis----------------
-  if(startsWith(subgroup,"covid_pheno_")){
-    survival_data <- survival_data %>% mutate(region_name = as.character(region_name))%>%
-      mutate(region_name = case_when(region_name=="London" ~ "Southern England",
-                                     region_name=="South East" ~ "Southern England",
-                                     region_name=="West Midlands" ~ "Midlands",
-                                     region_name=="East Midlands" ~ "Midlands",
-                                     region_name=="North West" ~ "Northern England",
-                                     region_name=="North East" ~ "Northern England",
-                                     region_name=="East" ~ "Southern England",
-                                     region_name=="Yorkshire and The Humber" ~ "Northern England",
-                                     region_name=="South West" ~ "Southern England",
-      ))
-    relevel_with <- get_mode(survival_data,"region_name")
-    
-    survival_data <- survival_data %>% mutate(region_name = as.factor(region_name))%>%
-      mutate(region_name = relevel(region_name,ref=relevel_with))
-
-    print(paste0("Region releveled with: ",relevel_with))
-
-    }
+  # #-------------Format region if running COVID subgroup analysis----------------
+  # if(startsWith(subgroup,"covid_pheno_")){
+  #   survival_data$region_name_1 <- survival_data$region_name
+  #   survival_data <- survival_data %>% mutate(region_name_1 = as.character(region_name_1))%>%
+  #     mutate(region_name_1 = case_when(region_name_1=="London" ~ "Southern England",
+  #                                    region_name_1=="South East" ~ "Southern England",
+  #                                    region_name_1=="West Midlands" ~ "Midlands",
+  #                                    region_name_1=="East Midlands" ~ "Midlands",
+  #                                    region_name_1=="North West" ~ "Northern England",
+  #                                    region_name_1=="North East" ~ "Northern England",
+  #                                    region_name_1=="East" ~ "Southern England",
+  #                                    region_name_1=="Yorkshire and The Humber" ~ "Northern England",
+  #                                    region_name_1=="South West" ~ "Southern England",
+  #     ))
+  #   relevel_with <- get_mode(survival_data,"region_name_1")
+  # 
+  #   survival_data <- survival_data %>% mutate(region_name_1 = as.factor(region_name_1))%>%
+  #     mutate(region_name_1 = relevel(region_name_1,ref=relevel_with))
+  # 
+  #   print(paste0("Region_1 releveled with: ",relevel_with))
+  # 
+  #   }
   
   # add statement for reduced time cutoffs
   if(time_point == "reduced"){

@@ -74,7 +74,7 @@ analyses_to_run_normal_timepoint <- analyses_to_run %>% filter(reduced_timepoint
 
 analyses_to_run$reduced_timepoint <- "reduced"
 analyses_to_run <- rbind(analyses_to_run, analyses_to_run_normal_timepoint)
-
+analyses_to_run <- analyses_to_run %>% filter(reduced_timepoint != "normal")
 rm(analyses_to_run_normal_timepoint)
 
 # Source remainder of relevant files --------------------------------------------------------
