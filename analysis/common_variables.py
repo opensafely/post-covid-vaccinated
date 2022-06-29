@@ -1,15 +1,5 @@
 # Based on script developed by Alex Walker and Robin Park (https://github.com/opensafely/long-covid-sick-notes/blob/master/analysis/common_variables.py)
 
-## function to add days to a string date
-from datetime import datetime, timedelta
-def days(datestring, days):
-  
-  dt = datetime.strptime(datestring, "%Y-%m-%d").date()
-  dt_add = dt + timedelta(days)
-  datestring_add = datetime.strftime(dt_add, "%Y-%m-%d")
-
-  return datestring_add
-
 # Import statements
 
 ## Cohort extractor
@@ -32,7 +22,7 @@ import study_definition_helper_functions as helpers
 
 # Define common variables function
 
-def generate_common_variables(index_date_variable):
+def generate_common_variables(index_date_variable, add_days, sub_6m):
 
     dynamic_variables = dict(
 
@@ -45,7 +35,7 @@ def generate_common_variables(index_date_variable):
         returning="date",
         find_first_match_in_period=True,
         date_format="YYYY-MM-DD",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         return_expectations={
             "date": {"earliest": "index_date", "latest" : "today"},
             "rate": "uniform",
@@ -60,7 +50,7 @@ def generate_common_variables(index_date_variable):
             covid_primary_care_sequalae,
         ),
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -73,7 +63,7 @@ def generate_common_variables(index_date_variable):
     tmp_exp_date_covid19_confirmed_hes=patients.admitted_to_hospital(
         with_these_diagnoses=covid_codes,
         returning="date_admitted",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -86,7 +76,7 @@ def generate_common_variables(index_date_variable):
     tmp_exp_date_covid19_confirmed_death=patients.with_these_codes_on_death_certificate(
         covid_codes,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -109,7 +99,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_ami_snomed=patients.with_these_clinical_events(
         ami_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -122,7 +112,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_ami_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=ami_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -135,7 +125,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_ami_death=patients.with_these_codes_on_death_certificate(
         ami_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -154,7 +144,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_ami_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=ami_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -174,7 +164,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_stroke_isch_snomed=patients.with_these_clinical_events(
         stroke_isch_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -187,7 +177,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_stroke_isch_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=stroke_isch_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -200,7 +190,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_stroke_isch_death=patients.with_these_codes_on_death_certificate(
         stroke_isch_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -219,7 +209,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_stroke_isch_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=stroke_isch_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -239,7 +229,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_dvt_snomed=patients.with_these_clinical_events(
         all_dvt_codes_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -252,7 +242,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_dvt_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=all_dvt_codes_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -265,7 +255,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_dvt_death=patients.with_these_codes_on_death_certificate(
         all_dvt_codes_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -284,7 +274,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_dvt_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=all_dvt_codes_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -304,7 +294,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_pe_snomed=patients.with_these_clinical_events(
         pe_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -317,7 +307,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_pe_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=pe_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -330,7 +320,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_pe_death=patients.with_these_codes_on_death_certificate(
         pe_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -349,7 +339,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_pe_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=pe_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -369,7 +359,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_tia_snomed=patients.with_these_clinical_events(
         tia_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -382,7 +372,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_tia_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=tia_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -395,7 +385,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_tia_death=patients.with_these_codes_on_death_certificate(
         tia_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -414,7 +404,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_tia_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=tia_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -434,7 +424,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_stroke_sah_hs_snomed=patients.with_these_clinical_events(
         stroke_sah_hs_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -447,7 +437,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_stroke_sah_hs_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=stroke_sah_hs_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -460,7 +450,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_stroke_sah_hs_death=patients.with_these_codes_on_death_certificate(
         stroke_sah_hs_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -479,7 +469,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_stroke_sah_hs_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=stroke_sah_hs_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -499,7 +489,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_hf_snomed=patients.with_these_clinical_events(
         hf_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -512,7 +502,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_hf_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=hf_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -525,7 +515,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_hf_death=patients.with_these_codes_on_death_certificate(
         hf_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -544,7 +534,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_hf_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=hf_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -565,7 +555,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_angina_snomed=patients.with_these_clinical_events(
         angina_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -578,7 +568,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_angina_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=angina_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -591,7 +581,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_angina_death=patients.with_these_codes_on_death_certificate(
         angina_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -610,7 +600,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_angina_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=angina_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -630,7 +620,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_ate_snomed=patients.with_these_clinical_events(
         all_ate_codes_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -643,7 +633,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_ate_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=all_ate_codes_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -656,7 +646,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_ate_death=patients.with_these_codes_on_death_certificate(
         all_ate_codes_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -676,7 +666,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_ate_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=all_ate_codes_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -696,7 +686,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_vte_snomed=patients.with_these_clinical_events(
         all_vte_codes_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -709,7 +699,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_vte_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=all_vte_codes_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -722,7 +712,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_vte_death=patients.with_these_codes_on_death_certificate(
         all_vte_codes_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -742,7 +732,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_vte_primary_position_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_primary_diagnoses=all_vte_codes_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1038,7 +1028,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_depression_snomed=patients.with_these_clinical_events(
         depression_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1051,7 +1041,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_depression_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=depression_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1064,7 +1054,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_depression_death=patients.with_these_codes_on_death_certificate(
         depression_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1077,7 +1067,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_depression_prescriptions=patients.with_these_medications(
         all_depression_prescriptions,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1096,7 +1086,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_anxiety_general_snomed=patients.with_these_clinical_events(
         anxiety_general_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1109,7 +1099,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_anxiety_general_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=anxiety_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1122,7 +1112,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_anxiety_general_death=patients.with_these_codes_on_death_certificate(
         anxiety_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1135,7 +1125,7 @@ def generate_common_variables(index_date_variable):
     # tmp_out_date_anxiolytics_prescriptions=patients.with_these_clinical_events(
     #     anxiolytic_prescription,
     #     returning="date",
-    #     on_or_after=f"{index_date_variable}",
+    #     on_or_after=f"{index_date_variable} + {add_days} days",
     #     date_format="YYYY-MM-DD",
     #     find_first_match_in_period=True,
     #     return_expectations={
@@ -1154,7 +1144,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_anxiety_ocd_snomed=patients.with_these_clinical_events(
         anxiety_ocd_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1167,7 +1157,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_anxiety_ocd_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=ocd_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1180,7 +1170,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_anxiety_ocd_death=patients.with_these_codes_on_death_certificate(
         ocd_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1199,7 +1189,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_anxiety_ptsd_snomed=patients.with_these_clinical_events(
         anxiety_ptsd_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1212,7 +1202,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_anxiety_ptsd_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=ptsd_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1225,7 +1215,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_anxiety_ptsd_death=patients.with_these_codes_on_death_certificate(
         ptsd_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1244,7 +1234,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_eating_disorders_snomed=patients.with_these_clinical_events(
         eating_disorders_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1257,7 +1247,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_eating_disorders_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=eating_disorder_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1270,7 +1260,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_eating_disorders_death=patients.with_these_codes_on_death_certificate(
         eating_disorder_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1289,7 +1279,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_serious_mental_illness_snomed=patients.with_these_clinical_events(
         serious_mental_illness_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1302,7 +1292,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_serious_mental_illness_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=serious_mental_illness_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1315,7 +1305,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_serious_mental_illness_death=patients.with_these_codes_on_death_certificate(
         serious_mental_illness_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1328,7 +1318,7 @@ def generate_common_variables(index_date_variable):
     # tmp_out_date_serious_mental_illness_prescriptions=patients.with_these_clinical_events(
     #     all_depression_prescriptions,
     #     returning="date",
-    #     on_or_after=f"{index_date_variable}",
+    #     on_or_after=f"{index_date_variable} + {add_days} days",
     #     date_format="YYYY-MM-DD",
     #     find_first_match_in_period=True,
     #     return_expectations={
@@ -1347,7 +1337,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_self_harm_10plus_snomed=patients.with_these_clinical_events(
         self_harm_10plus_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1360,7 +1350,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_self_harm_10plus_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=self_harm_intent_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1373,7 +1363,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_self_harm_10plus_death=patients.with_these_codes_on_death_certificate(
         self_harm_intent_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1395,7 +1385,7 @@ def generate_common_variables(index_date_variable):
             self_harm_15plus_snomed_clinical,
         ),
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1408,7 +1398,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_self_harm_15plus_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=self_harm_15_10_combined_icd,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1421,7 +1411,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_self_harm_15plus_death=patients.with_these_codes_on_death_certificate(
         self_harm_15_10_combined_icd,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1440,7 +1430,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_suicide_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=suicide_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1453,7 +1443,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_suicide_death=patients.with_these_codes_on_death_certificate(
         suicide_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1472,7 +1462,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_addiction_snomed=patients.with_these_clinical_events(
         addiction_snomed_clinical,
         returning="date",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1485,7 +1475,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_addiction_hes=patients.admitted_to_hospital(
         returning="date_admitted",
         with_these_diagnoses=opioid_misuse_icd10,
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         date_format="YYYY-MM-DD",
         find_first_match_in_period=True,
         return_expectations={
@@ -1498,7 +1488,7 @@ def generate_common_variables(index_date_variable):
     tmp_out_date_addiction_death=patients.with_these_codes_on_death_certificate(
         opioid_misuse_icd10,
         returning="date_of_death",
-        on_or_after=f"{index_date_variable}",
+        on_or_after=f"{index_date_variable} + {add_days} days",
         match_only_underlying_cause=True,
         date_format="YYYY-MM-DD",
         return_expectations={
@@ -1518,7 +1508,7 @@ def generate_common_variables(index_date_variable):
 
     ## Age
     cov_num_age = patients.age_as_of(
-        f"{index_date_variable}",
+        f"{index_date_variable} + {add_days} days",
         return_expectations = {
         "rate": "universal",
         "int": {"distribution": "population_ages"},
@@ -1534,25 +1524,25 @@ def generate_common_variables(index_date_variable):
         ),
         cov_ethnicity_gp_opensafely=patients.with_these_clinical_events(
             opensafely_ethnicity_codes_6,
-            on_or_before=f"{index_date_variable}",
+            on_or_before=f"{index_date_variable} + {add_days} days",
             returning="category",
             find_last_match_in_period=True,
         ),
         cov_ethnicity_gp_primis=patients.with_these_clinical_events(
             primis_covid19_vacc_update_ethnicity,
-            on_or_before=f"{index_date_variable}",
+            on_or_before=f"{index_date_variable} + {add_days} days",
             returning="category",
             find_last_match_in_period=True,
         ),
         cov_ethnicity_gp_opensafely_date=patients.with_these_clinical_events(
             opensafely_ethnicity_codes_6,
-            on_or_before=f"{index_date_variable}",
+            on_or_before=f"{index_date_variable} + {add_days} days",
             returning="category",
             find_last_match_in_period=True,
         ),
         cov_ethnicity_gp_primis_date=patients.with_these_clinical_events(
             primis_covid19_vacc_update_ethnicity,
-            on_or_before=f"{index_date_variable}",
+            on_or_before=f"{index_date_variable} + {add_days} days",
             returning="category",
             find_last_match_in_period=True,
         ),
@@ -1563,7 +1553,7 @@ def generate_common_variables(index_date_variable):
     cov_cat_deprivation=patients.categorised_as(
         helpers.generate_deprivation_ntile_dictionary(10),
         index_of_multiple_deprivation=patients.address_as_of(
-            f"{index_date_variable}",
+            f"{index_date_variable} + {add_days} days",
             returning="index_of_multiple_deprivation",
             round_to_nearest=100,
         ),
@@ -1572,7 +1562,7 @@ def generate_common_variables(index_date_variable):
 
     ## Region
     cov_cat_region=patients.registered_practice_as_of(
-        f"{index_date_variable}",
+        f"{index_date_variable} + {add_days} days",
         returning="nuts1_region_name",
         return_expectations={
             "rate": "universal",
@@ -1610,18 +1600,18 @@ def generate_common_variables(index_date_variable):
         most_recent_smoking_code=patients.with_these_clinical_events(
             smoking_clear,
             find_last_match_in_period=True,
-            on_or_before=f"{index_date_variable}",
+            on_or_before=f"{index_date_variable} + {add_days} days",
             returning="category",
         ),
         ever_smoked=patients.with_these_clinical_events(
             filter_codes_by_category(smoking_clear, include=["S", "E"]),
-            on_or_before=f"{index_date_variable}",
+            on_or_before=f"{index_date_variable} + {add_days} days",
         ),
     ),
 
     ## Care home status
     cov_bin_carehome_status=patients.care_home_status_as_of(
-        f"{index_date_variable}", 
+        f"{index_date_variable} + {add_days} days", 
         categorised_as={
             "TRUE": """
               IsPotentialCareHome
@@ -1647,20 +1637,20 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_ami_snomed=patients.with_these_clinical_events(
         ami_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_ami_prior_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ami_prior_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     tmp_cov_bin_ami_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ami_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1673,26 +1663,26 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_stroke_isch_snomed=patients.with_these_clinical_events(
         stroke_isch_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     tmp_cov_bin_stroke_sah_hs_snomed=patients.with_these_clinical_events(
         stroke_sah_hs_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_stroke_isch_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=stroke_isch_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     tmp_cov_bin_stroke_sah_hs_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=stroke_sah_hs_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1710,14 +1700,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_other_arterial_embolism_snomed=patients.with_these_clinical_events(
         other_arterial_embolism_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_other_arterial_embolism_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ami_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1730,14 +1720,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_vte_snomed=patients.with_these_clinical_events(
         all_vte_codes_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_vte_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=all_vte_codes_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1750,14 +1740,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_hf_snomed=patients.with_these_clinical_events(
         hf_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_hf_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=hf_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1770,14 +1760,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_angina_snomed=patients.with_these_clinical_events(
         angina_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_angina_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=angina_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1790,28 +1780,28 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_dementia_snomed=patients.with_these_clinical_events(
         dementia_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC (Hospital Episode Statistics Admitted Patient Care)
     tmp_cov_bin_dementia_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=dementia_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Primary care - vascular
     tmp_cov_bin_dementia_vascular_snomed=patients.with_these_clinical_events(
         dementia_vascular_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC - vascular
     tmp_cov_bin_dementia_vascular_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=dementia_vascular_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1824,14 +1814,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_liver_disease_snomed=patients.with_these_clinical_events(
         liver_disease_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_liver_disease_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=liver_disease_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1844,14 +1834,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_chronic_kidney_disease_snomed=patients.with_these_clinical_events(
         ckd_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_chronic_kidney_disease_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=ckd_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1864,14 +1854,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_cancer_snomed=patients.with_these_clinical_events(
         cancer_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_cancer_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=cancer_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1884,21 +1874,21 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_hypertension_snomed=patients.with_these_clinical_events(
         hypertension_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_hypertension_hes=patients.admitted_to_hospital(
        returning='binary_flag',
        with_these_diagnoses=hypertension_icd10,
-       on_or_before=f"{index_date_variable}",
+       on_or_before=f"{index_date_variable} + {add_days} days",
        return_expectations={"incidence": 0.1},
     ),
     ### DMD
     tmp_cov_bin_hypertension_drugs_dmd=patients.with_these_medications(
         hypertension_drugs_dmd,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -1911,21 +1901,21 @@ def generate_common_variables(index_date_variable):
     # tmp_cov_bin_diabetes_snomed=patients.with_these_clinical_events(
     #     diabetes_snomed_clinical,
     #     returning='binary_flag',
-    #     on_or_before=f"{index_date_variable}",
+    #     on_or_before=f"{index_date_variable} + {add_days} days",
     #     return_expectations={"incidence": 0.1},
     # ),
     # ### HES APC
     # tmp_cov_bin_diabetes_hes=patients.admitted_to_hospital(
     #    returning='binary_flag',
     #    with_these_diagnoses=diabetes_icd10,
-    #    on_or_before=f"{index_date_variable}",
+    #    on_or_before=f"{index_date_variable} + {add_days} days",
     #    return_expectations={"incidence": 0.1},
     # ),
     # ### DMD
     # tmp_cov_bin_diabetes_dmd=patients.with_these_clinical_events(
     #     diabetes_drugs_dmd,
     #     returning='binary_flag',
-    #     on_or_before=f"{index_date_variable}",
+    #     on_or_before=f"{index_date_variable} + {add_days} days",
     #     return_expectations={"incidence": 0.1},
     # ),
     # ### Combined
@@ -1937,56 +1927,56 @@ def generate_common_variables(index_date_variable):
     cov_bin_diabetes_type1_snomed=patients.with_these_clinical_events(
         diabetes_type1_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ## Type 1 diabetes HES
     cov_bin_diabetes_type1_hes=patients.admitted_to_hospital(
        returning='binary_flag',
        with_these_diagnoses=diabetes_type1_icd10,
-       on_or_before=f"{index_date_variable}",
+       on_or_before=f"{index_date_variable} + {add_days} days",
        return_expectations={"incidence": 0.1},
     ),
     ## Type 2 diabetes primary care
     cov_bin_diabetes_type2_snomed=patients.with_these_clinical_events(
         diabetes_type2_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ## Type 2 diabetes HES
     cov_bin_diabetes_type2_hes=patients.admitted_to_hospital(
        returning='binary_flag',
        with_these_diagnoses=diabetes_type2_icd10,
-       on_or_before=f"{index_date_variable}",
+       on_or_before=f"{index_date_variable} + {add_days} days",
        return_expectations={"incidence": 0.1},
     ),
     ## Other or non-specific diabetes
     cov_bin_diabetes_other=patients.with_these_clinical_events(
         diabetes_other_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ## Gestational diabetes
     cov_bin_diabetes_gestational=patients.with_these_clinical_events(
         diabetes_gestational_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ## Diabetes medication
     tmp_cov_bin_insulin_snomed=patients.with_these_medications(
         insulin_snomed_clinical,
         returning="binary_flag",
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.05},
     ),
 
     tmp_cov_bin_antidiabetic_drugs_snomed=patients.with_these_medications(
         antidiabetic_drugs_snomed_clinical,
         returning="binary_flag",
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.05},
     ),
 
@@ -2004,14 +1994,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_obesity_snomed=patients.with_these_clinical_events(
         bmi_obesity_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_obesity_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=bmi_obesity_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -2024,14 +2014,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_chronic_obstructive_pulmonary_disease_snomed=patients.with_these_clinical_events(
         copd_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### HES APC
     tmp_cov_bin_chronic_obstructive_pulmonary_disease_hes=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses= copd_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Combined
@@ -2043,7 +2033,7 @@ def generate_common_variables(index_date_variable):
     cov_bin_lipid_medications=patients.with_these_medications(
         lipid_lowering_dmd,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
 
@@ -2051,7 +2041,7 @@ def generate_common_variables(index_date_variable):
     cov_bin_antiplatelet_medications=patients.with_these_medications(
         antiplatelet_dmd,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
 
@@ -2059,7 +2049,7 @@ def generate_common_variables(index_date_variable):
     cov_bin_anticoagulation_medications=patients.with_these_medications(
         anticoagulant_dmd, 
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
    
@@ -2068,7 +2058,7 @@ def generate_common_variables(index_date_variable):
     cov_bin_combined_oral_contraceptive_pill=patients.with_these_medications(
         cocp_dmd, 
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
 
@@ -2076,7 +2066,7 @@ def generate_common_variables(index_date_variable):
     cov_bin_hormone_replacement_therapy=patients.with_these_medications(
         hrt_dmd, 
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
 
@@ -2085,14 +2075,14 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_depression_snomed=patients.with_these_clinical_events(
         depression_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.03},
     ),
      ### HES
     tmp_cov_bin_depression_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=depression_icd10,
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.03},
     ),
      ### Combined Depression
@@ -2105,219 +2095,219 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_recent_depression_snomed=patients.with_these_clinical_events(
         depression_snomed_clinical,
         returning='binary_flag',
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
+        between=[f"{index_date_variable} - {sub_6m} days", f"{index_date_variable} + {add_days} days"],
         return_expectations={"incidence": 0.1},
     ),
      ### HES
     tmp_cov_bin_recent_depression_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=depression_icd10,
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
+        between=[f"{index_date_variable} - {sub_6m} days", f"{index_date_variable} + {add_days} days"],
         return_expectations={"incidence": 0.1},
     ),
      ### Combined Recent Episode of depression
      cov_bin_recent_depression=patients.maximum_of(
         "tmp_cov_bin_recent_depression_snomed", "tmp_cov_bin_recent_depression_icd10",
     ), 
+    
+    # ## History of depression 
+    #  ### Primary care
+    # tmp_cov_bin_history_depression_snomed=patients.with_these_clinical_events(
+    #     depression_snomed_clinical,
+    #     returning='binary_flag',
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #  ### HES
+    # tmp_cov_bin_history_depression_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=depression_icd10,
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #  ### Combined History of depression
+    # cov_bin_history_depression=patients.maximum_of(
+    #     "tmp_cov_bin_history_depression_snomed", "tmp_cov_bin_history_depression_icd10",
+    # ),   
 
-    ## History of depression 
-     ### Primary care
-    tmp_cov_bin_history_depression_snomed=patients.with_these_clinical_events(
-        depression_snomed_clinical,
-        returning='binary_flag',
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ),
-     ### HES
-    tmp_cov_bin_history_depression_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=depression_icd10,
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ),
-     ### Combined History of depression
-    cov_bin_history_depression=patients.maximum_of(
-        "tmp_cov_bin_history_depression_snomed", "tmp_cov_bin_history_depression_icd10",
-    ),   
+    # # Recent Episode of anxiety
+    #  ### Primary care
+    # tmp_cov_bin_recent_anxiety_general=patients.with_these_clinical_events(
+    #     anxiety_combined_snomed_cov,
+    #     returning='binary_flag',
+    #     between=[days(f"{index_date_variable} + {add_days} days", -182), days(f"{index_date_variable} + {add_days} days", -1)], 
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #  ### HES
+    # tmp_cov_bin_recent_anxiety_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=anxiety_combined_hes_cov,
+    #     between=[days(f"{index_date_variable} + {add_days} days", -182), days(f"{index_date_variable} + {add_days} days", -1)],
+    #     return_expectations={"incidence": 0.1},
+    # ),    
+    #  ### Combined Recent Episode of of anxiety
+    # cov_bin_recent_anxiety=patients.maximum_of(
+    #     "tmp_cov_bin_recent_anxiety_general", "tmp_cov_bin_recent_anxiety_icd10",
+    # ),
 
-    # Recent Episode of anxiety
-     ### Primary care
-    tmp_cov_bin_recent_anxiety_general=patients.with_these_clinical_events(
-        anxiety_combined_snomed_cov,
-        returning='binary_flag',
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
-        return_expectations={"incidence": 0.1},
-    ),
-     ### HES
-    tmp_cov_bin_recent_anxiety_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=anxiety_combined_hes_cov,
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
-        return_expectations={"incidence": 0.1},
-    ),    
-     ### Combined Recent Episode of of anxiety
-    cov_bin_recent_anxiety=patients.maximum_of(
-        "tmp_cov_bin_recent_anxiety_general", "tmp_cov_bin_recent_anxiety_icd10",
-    ),
+    # ## History of anxiety
+    #  ### Primary care
+    # tmp_cov_bin_history_anxiety_general=patients.with_these_clinical_events(
+    #     anxiety_combined_snomed_cov,
+    #     returning='binary_flag',
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #  ### HES
+    # tmp_cov_bin_history_anxiety_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=anxiety_combined_hes_cov,
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ),    
+    #  ### Combined History of anxiety
+    # cov_bin_history_anxiety=patients.maximum_of(
+    #     "tmp_cov_bin_history_anxiety_general", "tmp_cov_bin_history_anxiety_icd10",
+    # ),
 
-    ## History of anxiety
-     ### Primary care
-    tmp_cov_bin_history_anxiety_general=patients.with_these_clinical_events(
-        anxiety_combined_snomed_cov,
-        returning='binary_flag',
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ),
-     ### HES
-    tmp_cov_bin_history_anxiety_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=anxiety_combined_hes_cov,
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ),    
-     ### Combined History of anxiety
-    cov_bin_history_anxiety=patients.maximum_of(
-        "tmp_cov_bin_history_anxiety_general", "tmp_cov_bin_history_anxiety_icd10",
-    ),
+    # ## Recent Diagnosis of eating disorders
+    #     ### Primary care
+    # tmp_cov_bin_recent_eating_disorders=patients.with_these_clinical_events(
+    #     eating_disorders_snomed_clinical,
+    #     returning='binary_flag',
+    #     between=[days(f"{index_date_variable} + {add_days} days", -182), days(f"{index_date_variable} + {add_days} days", -1)],
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #     ### HES
+    # tmp_cov_bin_recent_eating_disorders_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=eating_disorder_icd10,
+    #     between=[days(f"{index_date_variable} + {add_days} days", -182), days(f"{index_date_variable} + {add_days} days", -1)],
+    #     return_expectations={"incidence": 0.1},
+    # ), 
+    #     ### Combined History of eating disorders
+    # cov_bin_recent_eating_disorders=patients.maximum_of(
+    #     "tmp_cov_bin_recent_eating_disorders", "tmp_cov_bin_recent_eating_disorders_icd10",
+    # ),
 
-    ## Recent Diagnosis of eating disorders
-        ### Primary care
-    tmp_cov_bin_recent_eating_disorders=patients.with_these_clinical_events(
-        eating_disorders_snomed_clinical,
-        returning='binary_flag',
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
-        return_expectations={"incidence": 0.1},
-    ),
-        ### HES
-    tmp_cov_bin_recent_eating_disorders_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=eating_disorder_icd10,
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
-        return_expectations={"incidence": 0.1},
-    ), 
-        ### Combined History of eating disorders
-    cov_bin_recent_eating_disorders=patients.maximum_of(
-        "tmp_cov_bin_recent_eating_disorders", "tmp_cov_bin_recent_eating_disorders_icd10",
-    ),
+    # ## History of Eating disorders
+    #     ### Primary care
+    # tmp_cov_bin_history_eating_disorders=patients.with_these_clinical_events(
+    #     eating_disorders_snomed_clinical,
+    #     returning='binary_flag',
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #     ### HES
+    # tmp_cov_bin_history_eating_disorders_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=eating_disorder_icd10,
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ), 
+    #     ### Combined History of eating disorders
+    # cov_bin_history_eating_disorders=patients.maximum_of(
+    #     "tmp_cov_bin_history_eating_disorders", "tmp_cov_bin_history_eating_disorders_icd10",
+    # ),
 
-    ## History of Eating disorders
-        ### Primary care
-    tmp_cov_bin_history_eating_disorders=patients.with_these_clinical_events(
-        eating_disorders_snomed_clinical,
-        returning='binary_flag',
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ),
-        ### HES
-    tmp_cov_bin_history_eating_disorders_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=eating_disorder_icd10,
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ), 
-        ### Combined History of eating disorders
-    cov_bin_history_eating_disorders=patients.maximum_of(
-        "tmp_cov_bin_history_eating_disorders", "tmp_cov_bin_history_eating_disorders_icd10",
-    ),
+    # ## Recent Report of a serious mental illness
+    #     ### Primary Care
+    # tmp_cov_bin_recent_serious_mental_illness=patients.with_these_clinical_events(
+    #     serious_mental_illness_snomed_clinical,
+    #     returning='binary_flag',
+    #     between=[days(f"{index_date_variable} + {add_days} days", -182), days(f"{index_date_variable} + {add_days} days", -1)], 
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #     ### HES
+    # tmp_cov_bin_recent_serious_mental_illness_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=serious_mental_illness_icd10,
+    #     between=[days(f"{index_date_variable} + {add_days} days", -182), days(f"{index_date_variable} + {add_days} days", -1)], 
+    #     return_expectations={"incidence": 0.1},
+    # ), 
+    #     ### Combined Report of a Serious mental illness
+    # cov_bin_recent_serious_mental_illness=patients.maximum_of(
+    #     "tmp_cov_bin_recent_serious_mental_illness", "tmp_cov_bin_recent_serious_mental_illness_icd10",
+    # ),
 
-    ## Recent Report of a serious mental illness
-        ### Primary Care
-    tmp_cov_bin_recent_serious_mental_illness=patients.with_these_clinical_events(
-        serious_mental_illness_snomed_clinical,
-        returning='binary_flag',
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
-        return_expectations={"incidence": 0.1},
-    ),
-        ### HES
-    tmp_cov_bin_recent_serious_mental_illness_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=serious_mental_illness_icd10,
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
-        return_expectations={"incidence": 0.1},
-    ), 
-        ### Combined Report of a Serious mental illness
-    cov_bin_recent_serious_mental_illness=patients.maximum_of(
-        "tmp_cov_bin_recent_serious_mental_illness", "tmp_cov_bin_recent_serious_mental_illness_icd10",
-    ),
+    # ## History of Serious mental illness
+    #     ### Primary Care
+    # tmp_cov_bin_history_serious_mental_illness=patients.with_these_clinical_events(
+    #     serious_mental_illness_snomed_clinical,
+    #     returning='binary_flag',
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #     ### HES
+    # tmp_cov_bin_history_serious_mental_illness_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=serious_mental_illness_icd10,
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ), 
+    #     ### Combined History of Serious mental illness
+    # cov_bin_history_serious_mental_illness=patients.maximum_of(
+    #     "tmp_cov_bin_history_serious_mental_illness", "tmp_cov_bin_history_serious_mental_illness_icd10",
+    # ),
 
-    ## History of Serious mental illness
-        ### Primary Care
-    tmp_cov_bin_history_serious_mental_illness=patients.with_these_clinical_events(
-        serious_mental_illness_snomed_clinical,
-        returning='binary_flag',
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ),
-        ### HES
-    tmp_cov_bin_history_serious_mental_illness_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=serious_mental_illness_icd10,
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ), 
-        ### Combined History of Serious mental illness
-    cov_bin_history_serious_mental_illness=patients.maximum_of(
-        "tmp_cov_bin_history_serious_mental_illness", "tmp_cov_bin_history_serious_mental_illness_icd10",
-    ),
+    # ## Recent Report of of Self harm
+    #  ### Primary care
+    # tmp_cov_bin_recent_self_harm_snomed=patients.with_these_clinical_events(
+    #     combine_codelists(
+    #         self_harm_10plus_snomed_clinical,
+    #         self_harm_15plus_snomed_clinical
+    #     ),
+    #     returning='binary_flag',
+    #     between=[days(f"{index_date_variable} + {add_days} days", -182), days(f"{index_date_variable} + {add_days} days", -1)], 
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #  ### HES
+    # tmp_cov_bin_recent_self_harm_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=self_harm_15_10_combined_icd,
+    #     between=[days(f"{index_date_variable} + {add_days} days", -182), days(f"{index_date_variable} + {add_days} days", -1)], 
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #  ### Combined Recent Report of Self harm
+    # cov_bin_recent_self_harm=patients.maximum_of(
+    #     "tmp_cov_bin_recent_self_harm_snomed", "tmp_cov_bin_recent_self_harm_icd10",
+    # ),
 
-    ## Recent Report of of Self harm
-     ### Primary care
-    tmp_cov_bin_recent_self_harm_snomed=patients.with_these_clinical_events(
-        combine_codelists(
-            self_harm_10plus_snomed_clinical,
-            self_harm_15plus_snomed_clinical
-        ),
-        returning='binary_flag',
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
-        return_expectations={"incidence": 0.1},
-    ),
-     ### HES
-    tmp_cov_bin_recent_self_harm_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=self_harm_15_10_combined_icd,
-        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
-        return_expectations={"incidence": 0.1},
-    ),
-     ### Combined Recent Report of Self harm
-    cov_bin_recent_self_harm=patients.maximum_of(
-        "tmp_cov_bin_recent_self_harm_snomed", "tmp_cov_bin_recent_self_harm_icd10",
-    ),
+    # ## History of Self harm 
+    #  ### Primary care
+    # tmp_cov_bin_history_self_harm_snomed=patients.with_these_clinical_events(
+    #     combine_codelists(
+    #         self_harm_10plus_snomed_clinical,
+    #         self_harm_15plus_snomed_clinical
+    #     ),
+    #     returning='binary_flag',
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #  ### HES
+    # tmp_cov_bin_history_self_harm_icd10=patients.admitted_to_hospital(
+    #     returning='binary_flag',
+    #     with_these_diagnoses=self_harm_15_10_combined_icd,
+    #     on_or_before=[days(f"{index_date_variable} + {add_days} days", -182)],
+    #     return_expectations={"incidence": 0.1},
+    # ),
+    #  ### Combined History of Self harm
+    # cov_bin_history_self_harm=patients.maximum_of(
+    #     "tmp_cov_bin_history_self_harm_snomed", "tmp_cov_bin_history_self_harm_icd10",
+    # ),
 
-    ## History of Self harm 
-     ### Primary care
-    tmp_cov_bin_history_self_harm_snomed=patients.with_these_clinical_events(
-        combine_codelists(
-            self_harm_10plus_snomed_clinical,
-            self_harm_15plus_snomed_clinical
-        ),
-        returning='binary_flag',
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ),
-     ### HES
-    tmp_cov_bin_history_self_harm_icd10=patients.admitted_to_hospital(
-        returning='binary_flag',
-        with_these_diagnoses=self_harm_15_10_combined_icd,
-        on_or_before=[days(f"{index_date_variable}", -182)],
-        return_expectations={"incidence": 0.1},
-    ),
-     ### Combined History of Self harm
-    cov_bin_history_self_harm=patients.maximum_of(
-        "tmp_cov_bin_history_self_harm_snomed", "tmp_cov_bin_history_self_harm_icd10",
-    ),
-
-    ## Total Cholesterol
-    tmp_cov_num_cholesterol=patients.max_recorded_value(
-        cholesterol_snomed,
-        on_most_recent_day_of_measurement=True, 
-        between=["2015-01-01", "today"],
-        date_format="YYYY-MM-DD",
-        return_expectations={
-            "float": {"distribution": "normal", "mean": 5.0, "stddev": 2.5},
-            "date": {"earliest": "1980-02-01", "latest": "2021-05-31"},
-            "incidence": 0.80,
-        },
-    ),
+    # ## Total Cholesterol
+    # tmp_cov_num_cholesterol=patients.max_recorded_value(
+    #     cholesterol_snomed,
+    #     on_most_recent_day_of_measurement=True, 
+    #     between=["2015-01-01", "today"],
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "float": {"distribution": "normal", "mean": 5.0, "stddev": 2.5},
+    #         "date": {"earliest": "1980-02-01", "latest": "2021-05-31"},
+    #         "incidence": 0.80,
+    #     },
+    # ),
 
     ## HDL Cholesterol
     tmp_cov_num_hdl_cholesterol=patients.max_recorded_value(
@@ -2335,7 +2325,7 @@ def generate_common_variables(index_date_variable):
     ## BMI
     # taken from: https://github.com/opensafely/BMI-and-Metabolic-Markers/blob/main/analysis/common_variables.py 
     cov_num_bmi=patients.most_recent_bmi(
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         minimum_age_at_measurement=18,
         include_measurement_date=True,
         date_format="YYYY-MM",
@@ -2394,7 +2384,7 @@ def generate_common_variables(index_date_variable):
         pathogen="SARS-CoV-2",
         test_result="positive",
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### COVID-19 code (diagnosis, positive test or sequalae) in primary care
@@ -2405,14 +2395,14 @@ def generate_common_variables(index_date_variable):
             covid_primary_care_sequalae,
         ),
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ### Hospital episode with confirmed diagnosis in any position
     tmp_sub_bin_covid19_confirmed_history_hes=patients.admitted_to_hospital(
         with_these_diagnoses=covid_codes,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable}",
+        on_or_before=f"{index_date_variable} + {add_days} days",
         return_expectations={"incidence": 0.1},
     ),
     ## Generate variable to identify first date of confirmed COVID

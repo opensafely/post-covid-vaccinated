@@ -24,10 +24,11 @@ from datetime import date
 import study_definition_helper_functions as helpers
 
 ## Import common variables function
+### N.B. Specify 'sub_6m' as the number of days to subtract for a 6 months lookback based on the value of 'add_days'. For instance, 98 = abs(84 - 182).
 from common_variables import generate_common_variables
 (
     dynamic_variables
-) = generate_common_variables(index_date_variable="vax_date_eligible + 84 day")
+) = generate_common_variables(index_date_variable="vax_date_eligible", add_days=84, sub_6m=98) 
 
 ## Variables for deriving JCVI groups
 from grouping_variables import (
