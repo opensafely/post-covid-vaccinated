@@ -86,7 +86,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   data_surv$cox_weights <- ifelse(data_surv$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
   
   # Fit model and prep output csv
-  fit_model <- coxfit(data_surv, interval_names, covar_names, subgroup, mdl,event)
+  fit_model <- coxfit(data_surv, interval_names, covar_names, subgroup, mdl)
   fit_model$subgroup <- subgroup
   fit_model$event <- event
   fit_model$cohort <- cohort
@@ -99,7 +99,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
 
 
 #------------------------ GET SURV FORMULA & COXPH() ---------------------------
-coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl,event){
+coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   print("Working on cox model")
   
   if("mdl_max_adj" %in% mdl){
@@ -123,7 +123,6 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl,event){
 
 
   covariates <- covar_names[covar_names %in% names(data_surv)] %>% sort()
-  
   interval_names_withpre <- c("days_pre", interval_names)
   
   # get Survival formula ----
@@ -134,251 +133,80 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl,event){
   combined_results <- as.data.frame(matrix(ncol=9,nrow=0))
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","mdl")
   
+  #-------------Format region if running COVID subgroup analysis----------------
+  
+  data_surv$region_name_1 <- data_surv$region_name
+  data_surv <- data_surv %>% mutate(region_name_1 = as.character(region_name_1))%>%
+    mutate(region_name_1 = case_when(region_name_1=="London" ~ "Southern England",
+                                     region_name_1=="South East" ~ "Southern England",
+                                     region_name_1=="West Midlands" ~ "Midlands",
+                                     region_name_1=="East Midlands" ~ "Midlands",
+                                     region_name_1=="North West" ~ "Northern England",
+                                     region_name_1=="North East" ~ "Northern England",
+                                     region_name_1=="East" ~ "Southern England",
+                                     region_name_1=="Yorkshire and The Humber" ~ "Northern England",
+                                     region_name_1=="South West" ~ "Southern England",
+    ))
+  relevel_with <- get_mode(data_surv,"region_name_1")
+  
+  data_surv <- data_surv %>% mutate(region_name_1 = as.factor(region_name_1))%>%
+    mutate(region_name_1 = relevel(region_name_1,ref=relevel_with))
+  
+  print(paste0("Region_1 releveled with: ",relevel_with))
 
-  if(event == "ami"){
-    for(test_model in c("all_covars_no_smoking_no_consultation_no_ethnicity","all_covars_with_smoking_no_consultation_no_ethnicity","all_covars_no_smoking_with_consultation_no_ethnicity","all_covars_with_smoking_with_consultation_no_ethnicity","all_covars_with_smoking_with_consultation_with_ethnicity")){
-      
-      if(test_model == "all_covars_no_smoking_no_consultation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_smoking_status","cov_num_consulation_rate")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_no_consultation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_num_consulation_rate")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_no_smoking_with_consultation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_smoking_status")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_with_consultation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_with_consultation_with_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name + ethnicity")
-        
-      }
-      
-      #If subgroup is not sex then add sex into formula
-      if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
-        surv_formula <- paste(surv_formula, "sex", sep="+")
-      }
-      
-      #If subgroup is not ethnicity then add ethnicity into formula
-      if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj"){
-        surv_formula <- paste(surv_formula, "ethnicity", sep="+")
-      }
-      
-      #If subgroup is not age then add in age spline otherwise use age and age_sq
-      if ((startsWith(subgroup,"agegp_"))==F){
-        surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
-      }else if ((startsWith(subgroup,"agegp_"))==T){
-        surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
-      }
-      
-      print(surv_formula)
-      
-      # fit cox model
-      dd <<- datadist(data_surv)
-      #options(datadist="dd")
-      options(datadist="dd", contrasts=c("contr.treatment", "contr.treatment"))
-      print("Fitting cox model")
-      fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
-      # To get robust variance-covariance matrix so that robust standard errots can be used in CI's
-      robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
-      
-      print("Cox output")
-      print(fit_cox_model)
-      print("Finished fitting cox model")
-      
-      # Results ----
-      results=as.data.frame(names(fit_cox_model$coefficients))
-      colnames(results)="term"
-      results$estimate=exp(fit_cox_model$coefficients)
-      results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
-      results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
-      results$std.error=exp(sqrt(diag(vcov(fit_cox_model))))
-      results$robust.se=exp(sqrt(diag(vcov(robust_fit_cox_model))))
-      
-      #if(model == "mdl_max_adj"){
-      #  results$covariates_removed=paste0(covars_to_remove, collapse = ",")
-      #  results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
-      #}
-      
-      #Add in P-values to results table
-      #Can only get for covariate as a whole and not for each level so left join onto main covariate name
-      results$covariate=results$term
-      results$covariate=sub('\\=.*', '', results$covariate)
-      results$P=ifelse(all(results$estimate<200 & results$std.error<10 & results$robust.se<10),"fitted successfully","fitted unsuccessfully")
-      #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
-      #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
-      #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
-      #results=results%>%left_join(anova_fit_cox_model,by="covariate")
-      
-      results$model <- test_model
-      
-      combined_results <- rbind(combined_results,results)
-      
-      print("Print results")
-      print(results)
-      
-    }
-  }
-  
-  if(event == "dvt"){
-    for(test_model in c("all_covars_no_smoking_no_deprivation_no_ethnicity","all_covars_with_smoking_no_deprivation_no_ethnicity","all_covars_no_smoking_with_deprivation_no_ethnicity","all_covars_with_smoking_with_deprivation_no_ethnicity","all_covars_with_smoking_with_deprivation_with_ethnicity")){
-      
-      if(test_model == "all_covars_no_smoking_no_deprivation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_smoking_status","cov_cat_deprivation")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_no_deprivation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_deprivation")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_no_smoking_with_deprivation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_smoking_status")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_with_deprivation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_with_deprivation_with_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name + ethnicity")
-        
-      }
-      
-      #If subgroup is not sex then add sex into formula
-      if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
-        surv_formula <- paste(surv_formula, "sex", sep="+")
-      }
-      
-      #If subgroup is not ethnicity then add ethnicity into formula
-      if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj"){
-        surv_formula <- paste(surv_formula, "ethnicity", sep="+")
-      }
-      
-      #If subgroup is not age then add in age spline otherwise use age and age_sq
-      if ((startsWith(subgroup,"agegp_"))==F){
-        surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
-      }else if ((startsWith(subgroup,"agegp_"))==T){
-        surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
-      }
-      
-      print(surv_formula)
-      
-      # fit cox model
-      dd <<- datadist(data_surv)
-      #options(datadist="dd")
-      options(datadist="dd", contrasts=c("contr.treatment", "contr.treatment"))
-      print("Fitting cox model")
-      fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
-      # To get robust variance-covariance matrix so that robust standard errots can be used in CI's
-      robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
-      
-      print("Cox output")
-      print(fit_cox_model)
-      print("Finished fitting cox model")
-      
-      # Results ----
-      results=as.data.frame(names(fit_cox_model$coefficients))
-      colnames(results)="term"
-      results$estimate=exp(fit_cox_model$coefficients)
-      results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
-      results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
-      results$std.error=exp(sqrt(diag(vcov(fit_cox_model))))
-      results$robust.se=exp(sqrt(diag(vcov(robust_fit_cox_model))))
-      
-      #if(model == "mdl_max_adj"){
-      #  results$covariates_removed=paste0(covars_to_remove, collapse = ",")
-      #  results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
-      #}
-      
-      #Add in P-values to results table
-      #Can only get for covariate as a whole and not for each level so left join onto main covariate name
-      results$covariate=results$term
-      results$covariate=sub('\\=.*', '', results$covariate)
-      results$P=ifelse(all(results$estimate<200 & results$std.error<10 & results$robust.se<10),"fitted successfully","fitted unsuccessfully")
-      #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
-      #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
-      #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
-      #results=results%>%left_join(anova_fit_cox_model,by="covariate")
-      
-      results$model <- test_model
-      
-      combined_results <- rbind(combined_results,results)
-      
-      print("Print results")
-      print(results)
-      
-    }
-  }
-  
- 
+  #for(test_model in c("no_region_mdl_max_adj","region_covar_mdl_max_adj","region_strata_mdl_max_adj","region_strata_option_1_mdl_max_adj","region_strata_option_2_mdl_max_adj")){
+
+  for(test_model in c("age_sex_region","age_sex_region_option_1", "age_sex_ethnicity_region","age_sex_ethnicity_region_option_1", "age_sex_region_max_adjust","age_sex_region_option_1_max_adjust","age_sex_region_max_adjust_no_ethnicity","age_sex_region_option_1_max_adjust_no_ethnicity" )){
     
+    if(test_model %in% c("age_sex_region","age_sex_region_option_1","age_sex_region_max_adjust_no_ethnicity","age_sex_region_option_1_max_adjust_no_ethnicity")){
+      model="mdl_agsex"
+    }else{
+      model="mdl_max_adj"
+    }
+    
+    
+    #Base formula
+    if(test_model=="age_sex_region"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(interval_names, collapse="+"), 
+        "+ cluster(patient_id) + region_name")
+    }else if(test_model=="age_sex_region_option_1"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(interval_names, collapse="+"), 
+        "+ cluster(patient_id) + region_name_1")
+    }else if(test_model=="age_sex_ethnicity_region"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(interval_names, collapse="+"), 
+        "+ cluster(patient_id) + region_name")
+    }else if(test_model == "age_sex_ethnicity_region_option_1"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(interval_names, collapse="+"), 
+        "+ cluster(patient_id) + region_name_1")
+    }else if(test_model == "age_sex_region_max_adjust"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id) + region_name")
+    }else if(test_model == "age_sex_region_option_1_max_adjust"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id) + region_name_1")
+    }else if(test_model == "age_sex_region_max_adjust_no_ethnicity"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id) + region_name")
+    }else if(test_model == "age_sex_region_option_1_max_adjust_no_ethnicity"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"), 
+        "+ cluster(patient_id) + region_name_1")
+    }
     
     
     # if(model=="mdl_agesex"){
@@ -394,9 +222,69 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl,event){
     # }
     # 
     
+    #If subgroup is not sex then add sex into formula
+    if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
+      surv_formula <- paste(surv_formula, "sex", sep="+")
+    }
     
+    #If subgroup is not ethnicity then add ethnicity into formula
+    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj"){
+      surv_formula <- paste(surv_formula, "ethnicity", sep="+")
+    }
     
-  
+    #If subgroup is not age then add in age spline otherwise use age and age_sq
+    if ((startsWith(subgroup,"agegp_"))==F){
+      surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
+    }else if ((startsWith(subgroup,"agegp_"))==T){
+      surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
+    }
+    
+    print(surv_formula)
+    
+    # fit cox model
+    dd <<- datadist(data_surv)
+    #options(datadist="dd")
+    options(datadist="dd", contrasts=c("contr.treatment", "contr.treatment"))
+    print("Fitting cox model")
+    fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
+    # To get robust variance-covariance matrix so that robust standard errots can be used in CI's
+    robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
+    
+    print("Cox output")
+    print(fit_cox_model)
+    print("Finished fitting cox model")
+    
+    # Results ----
+    results=as.data.frame(names(fit_cox_model$coefficients))
+    colnames(results)="term"
+    results$estimate=exp(fit_cox_model$coefficients)
+    results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
+    results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
+    results$std.error=exp(sqrt(diag(vcov(fit_cox_model))))
+    results$robust.se=exp(sqrt(diag(vcov(robust_fit_cox_model))))
+    
+    #if(model == "mdl_max_adj"){
+    #  results$covariates_removed=paste0(covars_to_remove, collapse = ",")
+    #  results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
+    #}
+    
+    #Add in P-values to results table
+    #Can only get for covariate as a whole and not for each level so left join onto main covariate name
+    results$covariate=results$term
+    results$covariate=sub('\\=.*', '', results$covariate)
+    results$P="NA"
+    #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
+    #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
+    #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
+    #results=results%>%left_join(anova_fit_cox_model,by="covariate")
+    
+    results$model <- test_model
+    
+    combined_results <- rbind(combined_results,results)
+    
+    print("Print results")
+    print(results)
+  }
   
   print("Finised working on cox model")
   return(combined_results)
