@@ -11,19 +11,23 @@ active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses <- active_analyses %>%dplyr::filter(outcome_variable==paste0("out_date_",event_name) & active == "TRUE")
 
 ## Select covariates of interest 
-covar_names<-str_split(active_analyses$covariates, ";")[[1]]
-covar_names<-append(covar_names,"patient_id")
+covar_names <- read_csv(paste0("output/not-for-review/covariates_to_adjust_for_hosp_covid_",cohort,".csv"))
+covar_names <- covar_names %>% filter(outcome_event == paste0("out_date_",event_name))
+covar_names <- str_split(covar_names$covariates, ";")[[1]]
+covar_names <- append(covar_names, "patient_id")
+
+#covar_names<-str_split(active_analyses$covariates, ";")[[1]]
+#covar_names<-append(covar_names,"patient_id")
 covar_names<-covar_names[!covar_names %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
 
 ##Set which models and cohorts are required
 
-#if(active_analyses$model=="all"){
-#  mdl=c("mdl_agesex","mdl_max_adj")
-#}else{
-#  mdl=active_analyses$model
-#}
+if(active_analyses$model=="all"){
+  mdl=c("mdl_agesex","mdl_max_adj")
+}else{
+  mdl=active_analyses$model
+}
 
-mdl=c("unadjusted_models_test")
 
 ## Transpose active_analyses to single column so can filter to analysis models to run
 
@@ -36,7 +40,7 @@ analyses_to_run <- analyses_to_run %>% select(!run)
 analyses_to_run$event=event_name
 
 ## Add in  all possible combinations of the subgroups, models and cohorts
-analyses_to_run <- crossing(analyses_to_run,mdl,cohort)
+analyses_to_run <- crossing(analyses_to_run,cohort)
 
 ## Add in which covariates to stratify by
 analyses_to_run$stratify_by_subgroup=NA

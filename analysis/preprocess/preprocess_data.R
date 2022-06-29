@@ -59,6 +59,7 @@ tmp2 <- arrow::read_feather(file = "output/input_vaccinated.feather",
 if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
   tmp1$patient_id <- df$patient_id
   tmp2$patient_id <- df$patient_id
+  print("Patient ID's overwritten successfully")
 }
 
 # Make single spine dataset ----------------------------------------------------
@@ -79,6 +80,7 @@ for (i in colnames(df)[grepl("_date",colnames(df))]) {
 
 if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
   source("analysis/modify_dummy_vax_data.R")
+  print("Vaccine information overwritten successfully")
 }
 
 # Identify all vaccinations for a given product --------------------------------
@@ -210,6 +212,7 @@ sink()
 if(Sys.getenv("OPENSAFELY_BACKEND") %in% c("", "expectations")) {
   tmp_index$patient_id <- df$patient_id
   tmp_other$patient_id <- df$patient_id
+  print("Patient ID's overwritten successfully")
 }
 
 # Make and merge covariate dataset ---------------------------------------------
@@ -235,7 +238,8 @@ df[,c("cov_num_bmi")] <- NULL
 # Convert dates to date format -------------------------------------------------
 
 df <- df %>%
-  dplyr::rename(tmp_out_max_hba1c_mmol_mol_date = tmp_out_num_max_hba1c_date)
+  dplyr::rename(tmp_out_max_hba1c_mmol_mol_date = tmp_out_num_max_hba1c_date,
+                tmp_out_bmi_date_measured = cov_num_bmi_date_measured)
 
 for (i in colnames(df)[grepl("_date",colnames(df))]) {
   df[,i] <- as.Date(df[,i])

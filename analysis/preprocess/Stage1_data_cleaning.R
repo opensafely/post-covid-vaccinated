@@ -42,6 +42,7 @@ library(readr)
 library(dplyr)
 library(stringr)
 library(tidyr)
+library(ggplot2)
 
 
 
@@ -196,10 +197,12 @@ stage1 <- function(cohort_name){
     
     # Define the cohort flow
     cohort_flow <- data.frame(N = numeric(),
+                              N_removed = numeric(),
                               Description = character(),
                               stringsAsFactors = FALSE)
-    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Study defined sample size")
     
+    cohort_flow[nrow(cohort_flow)+1,] <- c(as.numeric(as.numeric(nrow(input)) + as.numeric(QA_summary[8,2])), 0, "Study defined sample size before QA checks")
+    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input), as.numeric(QA_summary[8,2]) ,"Study defined sample size after QA checks")
     
     #----------------------------------------------------------------#
     # 3.a. Apply the 6 common criteria applicable to both sub-cohort #
@@ -209,25 +212,25 @@ stage1 <- function(cohort_name){
     input$start_alive <- ifelse(input$death_date < input$index_date, 0, 1) # Determine the living status on start date: 1- alive; 0 - died
     input$start_alive[is.na(input$start_alive)] <- 1
     input <- subset(input, input$start_alive == 1) # Subset input based on alive status on day 1 of follow up.
-    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 1 (Inclusion): Alive on the first day of follow up") # Feed into the cohort flow
+    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[2,1]) - nrow(input), "Criteria 1 (Inclusion): Alive on the first day of follow up") # Feed into the cohort flow
     
     #Inclusion criteria 2: Known age between 18 and 110 on 01/06/2021 
     #input <- input[!is.na(input$cov_num_age),] # Commented out this code line since it should be dealt with in the next code line
     input <- subset(input, input$cov_num_age >= 18 & input$cov_num_age <= 110) # Subset input if age between 18 and 110 on 01/06/2021.
-    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 2 (Inclusion): Known age between 18 and 110 on 01/06/2021") # Feed into the cohort flow
+    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[3,1]) - nrow(input), "Criteria 2 (Inclusion): Known age between 18 and 110 on 01/06/2021") # Feed into the cohort flow
     
     #Inclusion criteria 3: Known sex
     input <- input[!is.na(input$cov_cat_sex),] # removes NAs, if any
-    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 3 (Inclusion): Known sex")
+    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[4,1]) - nrow(input), "Criteria 3 (Inclusion): Known sex")
     
     #Inclusion criteria 4: Known deprivation 
     input <- input[!is.na(input$cov_cat_deprivation),] # removes NAs, if any
-    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 4 (Inclusion): Known deprivation")
+    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[5,1]) - nrow(input), "Criteria 4 (Inclusion): Known deprivation")
     
     #Inclusion criteria 5: Registered in an English GP with TPP software for at least 6 months prior to the study start date
     # NOTE: Dealt with in Study definition
     #input <- input # This criteria is met in study definition 
-    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 5 (Inclusion): Registered in an English GP with TPP software for at least 6 months prior to the study start date")
+    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[6,1]) - nrow(input), "Criteria 5 (Inclusion): Registered in an English GP with TPP software for at least 6 months prior to the study start date")
     
     #Inclusion criteria 6: Known region
     input <- input %>% mutate(cov_cat_region = as.character(cov_cat_region)) %>%
@@ -235,7 +238,7 @@ stage1 <- function(cohort_name){
                       mutate(cov_cat_region = as.factor(cov_cat_region))
     
     input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
-    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 6 (Inclusion): Known region")
+    cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[7,1]) - nrow(input), "Criteria 6 (Inclusion): Known region")
     
     #Exclusion criteria 6: SARS-CoV-2 infection recorded prior to the start of follow-up
     # Removed for now as we need those with covid history for a sensitivity analysis
@@ -262,19 +265,19 @@ stage1 <- function(cohort_name){
       #Exclusion criteria 7: Do not have a record of two vaccination doses prior to the study end date
       input$vax_gap <- input$vax_date_covid_2 - input$vax_date_covid_1 #Determine the vaccination gap in days : gap is NA if any vaccine date is missing
       input <- input[!is.na(input$vax_gap),] # Subset the fully vaccinated group
-      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): No record of two vaccination doses prior to the study end date") # Feed into the cohort flow
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[8,1]) - nrow(input), "Criteria 7 (Exclusion): No record of two vaccination doses prior to the study end date") # Feed into the cohort flow
       
       #Exclusion criteria 8: Received a vaccination prior to 08-12-2020 (i.e., the start of the vaccination program)
       input <- subset(input, input$vax_date_covid_1 >= as.Date("2020-12-08")&input$vax_date_covid_2 >= as.Date("2020-12-08"))
-      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 8 (Exclusion): Recorded vaccination prior to the start date of vaccination program")
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[9,1]) - nrow(input), "Criteria 8 (Exclusion): Recorded vaccination prior to the start date of vaccination program")
       
       #Exclusion criteria 9: Received a second dose vaccination before their first dose vaccination
       input <- subset(input, input$vax_gap >= 0) # Keep those with positive vaccination gap
-      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 9 (Exclusion): Second dose vaccination recorded before the first dose vaccination")
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[10,1]) - nrow(input), "Criteria 9 (Exclusion): Second dose vaccination recorded before the first dose vaccination")
       
       #Exclusion criteria 10: Received a second dose vaccination less than three weeks after their first dose
       input <- subset(input, input$vax_gap >= 21) # Keep those with at least 3 weeks vaccination gap
-      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 10 (Exclusion): Second dose vaccination recorded less than three weeks after the first dose")
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[11,1]) - nrow(input), "Criteria 10 (Exclusion): Second dose vaccination recorded less than three weeks after the first dose")
       
       #Exclusion criteria 11: Mixed vaccine products received before 07-05-2021
       # Trick to run the mixed vaccine code on dummy data with limited levels -> To ensure that the levels are the same in vax_cat_product variables
@@ -291,7 +294,7 @@ stage1 <- function(cohort_name){
       input$vax_prior_unknown <- ifelse(is.na(input$vax_date_covid_2), 1,input$vax_prior_unknown) #unknown vaccination 2 date
       input$vax_prior_unknown <- ifelse(input$vax_prior_unknown==1 & input$vax_date_covid_2 < as.Date ("2021-05-07"),1,0)#Remove if vaccination products are mixed or not known, prior to "2021-05-07"
       input <- subset(input, input$vax_mixed==0 | input$vax_prior_unknown==0)
-      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 11 (Exclusion): Received mixed vaccine products before 07-05-2021")
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[12,1]) - nrow(input), "Criteria 11 (Exclusion): Received mixed vaccine products before 07-05-2021")
     
         
     } else if (cohort_name == "electively_unvaccinated"){
@@ -309,17 +312,32 @@ stage1 <- function(cohort_name){
       #Note NAs don't have any vaccination date, hence move to '0' or unvaccinated category
       #input$prior_vax[is.na(input$prior_vax)] <- 0
       input <- subset(input, input$prior_vax1 == 0) #Exclude people with prior vaccination
-      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 7 (Exclusion): Have a record of a first vaccination prior index date")
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[8,1]) - nrow(input), "Criteria 7 (Exclusion): Have a record of a first vaccination prior index date")
       
       #Exclusion criteria 8: Missing JCVI group
       input <- subset(input, is.na(input$vax_cat_jcvi_group)== FALSE)
-      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),"Criteria 8 (Exclusion): Missing JCVI group")
+      cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[9,1]) - nrow(input), "Criteria 8 (Exclusion): Missing JCVI group")
     }
     
     #----------------------#
     # 3.d. Create csv file #
     #----------------------#
     write.csv(cohort_flow, file = file.path("output/review/descriptives", paste0("Cohort_flow_",cohort_name, ".csv")) , row.names=F)
+    
+    #--------------------------#
+    # 3.e. Generate histograms #
+    #--------------------------#
+    # generate histograms for numerical variables
+    
+    numeric_vars <- input %>% dplyr::select(contains("_num"))
+    numeric_title <- colnames(numeric_vars)
+    
+    svglite::svglite(file = file.path("output/not-for-review/", paste0("numeric_histograms_", cohort_name, ".svg")), width = 15, height = 8)
+    g <- ggplot(gather(numeric_vars), aes(value)) + 
+      geom_histogram(bins = 10) + 
+      facet_wrap(~key, scales = 'free_x')
+    print(g)
+    dev.off()
     
     #-------------------------------------#
     # 4. Create the final stage 1 dataset #
@@ -330,7 +348,6 @@ stage1 <- function(cohort_name){
     saveRDS(input, file = file.path("output", paste0("input_",cohort_name, "_stage1.rds")))
 
 }
-
 
 
 if (cohort_name == "both") {

@@ -54,38 +54,28 @@ source(file.path(scripts_dir,"06_cox_extra_functions.R"))
 
 source(file.path(scripts_dir,"02_03_cox_timepoint_param.R")) # Prepare dataset for model
 
-#analyses_to_run_timepoints <- analyses_to_run %>% filter(mdl=="mdl_max_adj")
-analyses_to_run <- analyses_to_run %>% filter(!subgroup %in% c("main","covid_history","covid_pheno_non_hospitalised") )
-analyses_to_run_timepoints <- analyses_to_run 
-
 # add reduced time point column 
+analyses_to_run <- analyses_to_run %>% filter(subgroup=="covid_pheno_hospitalised")
 
-analyses_to_run_timepoints$reduced_timepoint <- NA
-
-analyses_to_run_timepoints$reduced_timepoint <- lapply(split(analyses_to_run_timepoints,seq(nrow(analyses_to_run_timepoints))),
-                                            function(analyses_to_run_timepoints) 
+analyses_to_run$reduced_timepoint <- lapply(split(analyses_to_run,seq(nrow(analyses_to_run))),
+                                            function(analyses_to_run) 
                                               get_timepoint(
-                                                event=analyses_to_run_timepoints$event,
-                                                subgroup=analyses_to_run_timepoints$subgroup,
-                                                stratify_by_subgroup=analyses_to_run_timepoints$stratify_by_subgroup,
-                                                stratify_by=analyses_to_run_timepoints$strata,
-                                                mdl=analyses_to_run_timepoints$mdl,
+                                                event=analyses_to_run$event,
+                                                subgroup=analyses_to_run$subgroup,
+                                                stratify_by_subgroup=analyses_to_run$stratify_by_subgroup,
+                                                stratify_by=analyses_to_run$strata,
                                                 input, cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names)
 )
 
-analyses_to_run_timepoints <- analyses_to_run_timepoints %>% select(subgroup, reduced_timepoint)
-
-analyses_to_run <- analyses_to_run %>% left_join(analyses_to_run_timepoints, by="subgroup")
+analyses_to_run$reduced_timepoint <-  as.character(analyses_to_run$reduced_timepoint)
 analyses_to_run <- analyses_to_run %>% filter(reduced_timepoint != "remove")
+analyses_to_run_normal_timepoint <- analyses_to_run %>% filter(reduced_timepoint == "normal")
 
-# If one subgroup category is "reduced" then make sure all of the subgroup categories are "reduced" for comparison purposes
 
-analyses_to_run <- analyses_to_run %>%
-  group_by(subgroup_cat) %>%
-  dplyr::mutate(reduced_timepoint = case_when(
-    any(reduced_timepoint == "reduced") ~ "reduced",
-    TRUE ~ as.character(reduced_timepoint)))
-
+analyses_to_run$reduced_timepoint <- "reduced"
+analyses_to_run <- rbind(analyses_to_run, analyses_to_run_normal_timepoint)
+analyses_to_run <- analyses_to_run %>% filter(reduced_timepoint != "normal")
+rm(analyses_to_run_normal_timepoint)
 
 # Source remainder of relevant files --------------------------------------------------------
 
@@ -100,9 +90,8 @@ if(nrow(analyses_to_run>0)){
              subgroup=analyses_to_run$subgroup,           
              stratify_by_subgroup=analyses_to_run$stratify_by_subgroup,           
              stratify_by=analyses_to_run$strata,           
-             mdl=analyses_to_run$mdl,   
              time_point=analyses_to_run$reduced_timepoint,       
-             input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced))
+             input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced,mdl))
 }
 
 #Save csv of anlayses not run

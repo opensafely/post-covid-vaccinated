@@ -1131,7 +1131,7 @@ def generate_common_variables(index_date_variable, add_days, sub_6m):
     #     return_expectations={
     #         "date": {"earliest": "index_date", "latest" : "today"},
     #         "rate": "uniform",
-    #         "incidence": 0.03,
+    #         "incidence": 0.1,
     #     },
     # ),
         # Combined
@@ -1327,10 +1327,10 @@ def generate_common_variables(index_date_variable, add_days, sub_6m):
     #         "incidence": 0.03,
     #     },
     # ),
-        # Combined
-    out_date_serious_mental_illness=patients.minimum_of(
-        "tmp_out_date_serious_mental_illness_snomed", "tmp_out_date_serious_mental_illness_hes", "tmp_out_date_serious_mental_illness_death"
-    ),
+    #     # Combined
+    # out_date_depression=patients.minimum_of(
+    #     "tmp_out_date_depression_snomed", "tmp_out_date_depression_hes", "tmp_out_date_depression_death"
+    # ),
 
     ## Self harm - aged >= 10 years
         # Primary care
@@ -1499,10 +1499,235 @@ def generate_common_variables(index_date_variable, add_days, sub_6m):
     ), 
         # Prescription
 
-        # Combined
-    out_date_addiction=patients.minimum_of(
-        "tmp_out_date_addiction_snomed", "tmp_out_date_addiction_hes","tmp_out_date_addiction_death"
-    ),
+    # ## Serious mental illness
+    #     # Primary care
+    # tmp_out_date_serious_mental_illness_snomed=patients.with_these_clinical_events(
+    #     serious_mental_illness_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES 
+    # tmp_out_date_serious_mental_illness_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=serious_mental_illness_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_serious_mental_illness_death=patients.with_these_codes_on_death_certificate(
+    #     serious_mental_illness_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Prescriptions
+    # # tmp_out_date_serious_mental_illness_prescriptions=patients.with_these_clinical_events(
+    # #     all_depression_prescriptions,
+    # #     returning="date",
+    # #     on_or_after=f"{index_date_variable}",
+    # #     date_format="YYYY-MM-DD",
+    # #     find_first_match_in_period=True,
+    # #     return_expectations={
+    # #         "date": {"earliest": "index_date", "latest" : "today"},
+    # #         "rate": "uniform",
+    # #         "incidence": 0.03,
+    # #     },
+    # # ),
+    #     # Combined
+    # out_date_serious_mental_illness=patients.minimum_of(
+    #     "tmp_out_date_serious_mental_illness_snomed", "tmp_out_date_serious_mental_illness_hes", "tmp_out_date_serious_mental_illness_death"
+    # ),
+
+    # ## Self harm - aged >= 10 years
+    #     # Primary care
+    # tmp_out_date_self_harm_10plus_snomed=patients.with_these_clinical_events(
+    #     self_harm_10plus_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_self_harm_10plus_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=self_harm_intent_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_self_harm_10plus_death=patients.with_these_codes_on_death_certificate(
+    #     self_harm_intent_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Combined
+    # out_date_self_harm_10plus=patients.minimum_of(
+    #     "tmp_out_date_self_harm_10plus_snomed", "tmp_out_date_self_harm_10plus_hes", "tmp_out_date_self_harm_10plus_death"
+    # ),
+
+    # ## Self harm - aged >= 15 years
+    #     # Primary care
+    # tmp_out_date_self_harm_15plus_snomed=patients.with_these_clinical_events(
+    #     combine_codelists(
+    #         self_harm_10plus_snomed_clinical,
+    #         self_harm_15plus_snomed_clinical,
+    #     ),
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_self_harm_15plus_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=self_harm_15_10_combined_icd,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_self_harm_15plus_death=patients.with_these_codes_on_death_certificate(
+    #     self_harm_15_10_combined_icd,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Combined
+    # out_date_self_harm_15plus=patients.minimum_of(
+    #     "tmp_out_date_self_harm_15plus_snomed", "tmp_out_date_self_harm_15plus_hes","tmp_out_date_self_harm_15plus_death"
+    # ),
+
+    # ## Suicide
+    #     # HES
+    # tmp_out_date_suicide_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=suicide_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_suicide_death=patients.with_these_codes_on_death_certificate(
+    #     suicide_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # Combined
+    # out_date_suicide=patients.minimum_of(
+    #     "tmp_out_date_suicide_hes", "tmp_out_date_suicide_death"
+    # ),     
+
+    # ## Addiction
+    #     # Primary care
+    # tmp_out_date_addiction_snomed=patients.with_these_clinical_events(
+    #     addiction_snomed_clinical,
+    #     returning="date",
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # HES
+    # tmp_out_date_addiction_hes=patients.admitted_to_hospital(
+    #     returning="date_admitted",
+    #     with_these_diagnoses=opioid_misuse_icd10,
+    #     on_or_after=f"{index_date_variable}",
+    #     date_format="YYYY-MM-DD",
+    #     find_first_match_in_period=True,
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ),
+    #     # ONS
+    # tmp_out_date_addiction_death=patients.with_these_codes_on_death_certificate(
+    #     opioid_misuse_icd10,
+    #     returning="date_of_death",
+    #     on_or_after=f"{index_date_variable}",
+    #     match_only_underlying_cause=True,
+    #     date_format="YYYY-MM-DD",
+    #     return_expectations={
+    #         "date": {"earliest": "index_date", "latest" : "today"},
+    #         "rate": "uniform",
+    #         "incidence": 0.1,
+    #     },
+    # ), 
+    #     # Prescription
+
+    #     # Combined
+    # out_date_addiction=patients.minimum_of(
+    #     "tmp_out_date_addiction_snomed", "tmp_out_date_addiction_hes","tmp_out_date_addiction_death"
+    # ),
 
     # Define covariates (other than sex, which is considered constant and needed for JCVI groupings) ------------------------------
 

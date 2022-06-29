@@ -5,8 +5,8 @@
 ## =============================================================================
 source(file.path(scripts_dir,"04_01_(a)_cox_fit_model.R"))
 
-get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,time_point,input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced){
-  print(paste0("Working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
+get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_point,input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced,mdl){
+  print(paste0("Working on subgroup: ", subgroup, " ", cohort))
   print(paste0("Using ",time_point," time point"))
   
   #Reduce dataset to those who do NOT have a prior history of COVID unless running the subgroup
@@ -102,11 +102,35 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl,tim
   
   total_covid_cases=nrow(survival_data %>% filter(!is.na(expo_date)))
   
+  
+  # #-------------Format region if running COVID subgroup analysis----------------
+  # if(startsWith(subgroup,"covid_pheno_")){
+  #   survival_data$region_name_1 <- survival_data$region_name
+  #   survival_data <- survival_data %>% mutate(region_name_1 = as.character(region_name_1))%>%
+  #     mutate(region_name_1 = case_when(region_name_1=="London" ~ "Southern England",
+  #                                    region_name_1=="South East" ~ "Southern England",
+  #                                    region_name_1=="West Midlands" ~ "Midlands",
+  #                                    region_name_1=="East Midlands" ~ "Midlands",
+  #                                    region_name_1=="North West" ~ "Northern England",
+  #                                    region_name_1=="North East" ~ "Northern England",
+  #                                    region_name_1=="East" ~ "Southern England",
+  #                                    region_name_1=="Yorkshire and The Humber" ~ "Northern England",
+  #                                    region_name_1=="South West" ~ "Southern England",
+  #     ))
+  #   relevel_with <- get_mode(survival_data,"region_name_1")
+  # 
+  #   survival_data <- survival_data %>% mutate(region_name_1 = as.factor(region_name_1))%>%
+  #     mutate(region_name_1 = relevel(region_name_1,ref=relevel_with))
+  # 
+  #   print(paste0("Region_1 releveled with: ",relevel_with))
+  # 
+  #   }
+  
   # add statement for reduced time cutoffs
   if(time_point == "reduced"){
-    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_reduced,cuts_days_since_expo_reduced,covar_names,total_covid_cases)
+    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_reduced,cuts_days_since_expo_reduced,covar_names,total_covid_cases,time_point)
   }else{
-    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo, cuts_days_since_expo_reduced,covar_names,total_covid_cases)
+    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo, cuts_days_since_expo_reduced,covar_names,total_covid_cases,time_point)
   }
 
   # res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases)

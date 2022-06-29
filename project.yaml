@@ -85,6 +85,7 @@ actions:
         refactoring: output/not-for-review/meta_data_factors_*.csv
         QA_rules: output/review/descriptives/QA_summary_*.csv
         IE_criteria: output/review/descriptives/Cohort_flow_*.csv
+        histograms: output/not-for-review/numeric_histograms_*.svg
       highly_sensitive:
         cohort: output/input_*_stage1.rds
 
@@ -175,6 +176,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_depression_vaccinated.csv
@@ -189,6 +191,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_depression_electively_unvaccinated.csv
@@ -203,6 +206,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_anxiety_general_vaccinated.csv
@@ -217,6 +221,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_anxiety_general_electively_unvaccinated.csv
@@ -231,6 +236,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_anxiety_ocd_vaccinated.csv
@@ -245,6 +251,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_anxiety_ocd_electively_unvaccinated.csv
@@ -259,6 +266,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_anxiety_ptsd_vaccinated.csv
@@ -273,6 +281,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_anxiety_ptsd_electively_unvaccinated.csv
@@ -287,6 +296,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_eating_disorders_vaccinated.csv
@@ -301,6 +311,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_eating_disorders_electively_unvaccinated.csv
@@ -315,6 +326,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_serious_mental_illness_vaccinated.csv
@@ -329,6 +341,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_serious_mental_illness_electively_unvaccinated.csv
@@ -343,6 +356,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_self_harm_10plus_vaccinated.csv
@@ -357,6 +371,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_self_harm_10plus_electively_unvaccinated.csv
@@ -371,6 +386,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_self_harm_15plus_vaccinated.csv
@@ -385,6 +401,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_self_harm_15plus_electively_unvaccinated.csv
@@ -399,6 +416,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_suicide_vaccinated.csv
@@ -413,6 +431,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_suicide_electively_unvaccinated.csv
@@ -427,6 +446,7 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_addiction_vaccinated.csv
@@ -441,10 +461,65 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
+    - select_covariates_for_hosp_covid
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_addiction_electively_unvaccinated.csv
         compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_addiction_electively_unvaccinated.csv
         compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_addiction_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_addiction_electively_unvaccinated.csv
+
+  split_hosp_covid_by_region_vaccinated:
+    run: r:latest analysis/descriptives/hospitalised_covid_events_by_region.R vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        hosp_events_by_region_non_suppressed: output/not-for-review/hospitalised_covid_event_counts_by_region_vaccinated_non_suppressed.csv
+        hosp_events_by_region_suppressed: output/not-for-review/hospitalised_covid_event_counts_by_region_vaccinated_suppressed.csv
+
+  split_hosp_covid_by_region_electively_unvaccinated:
+    run: r:latest analysis/descriptives/hospitalised_covid_events_by_region.R electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        hosp_events_by_region_non_suppressed: output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_non_suppressed.csv
+        hosp_events_by_region_suppressed: output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_suppressed.csv
+
+  ## Hospitalised event counts by covariate - vaccinated 
+
+  hosp_event_counts_by_covariate_level_vaccinated:
+    run: r:latest analysis/descriptives/hospitalised_events_split_by_time_period_and_covariate_level.R
+      vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        hosp_counts_by_covariate: output/not-for-review/hospitalised_event_counts_by_covariate_level_vaccinated.csv
+
+  ## Hospitalised event counts by covariate - electively_unvaccinated 
+
+  hosp_event_counts_by_covariate_level_electively_unvaccinated:
+    run: r:latest analysis/descriptives/hospitalised_events_split_by_time_period_and_covariate_level.R
+      electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        hosp_counts_by_covariate: output/not-for-review/hospitalised_event_counts_by_covariate_level_electively_unvaccinated.csv
+
+  select_covariates_for_hosp_covid:
+    run: r:latest analysis/descriptives/determine_covariates_for_hosp_covid.R both
+    needs:
+    - hosp_event_counts_by_covariate_level_vaccinated
+    - hosp_event_counts_by_covariate_level_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        covariates_for_hosp_covid_vacc: output/not-for-review/covariates_to_adjust_for_hosp_covid_vaccinated.csv
+        covariates_for_hosp_covid_electively_unvacc: output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv
 
