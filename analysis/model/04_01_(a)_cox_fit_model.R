@@ -134,54 +134,53 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl,event){
   combined_results <- as.data.frame(matrix(ncol=9,nrow=0))
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","covariate","P","mdl")
   
+  data_surv=data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status)) %>%
+    mutate(cov_cat_smoking_status= case_when(cov_cat_smoking_status=="Never smoker"~"Never smoker",
+                                             cov_cat_smoking_status=="Ever smoker"~"Ever smoker",
+                                             cov_cat_smoking_status=="Current smoker"~"Ever smoker"))
+  
+  smoking_status_mode <- get_mode(data_surv,"cov_cat_smoking_status")
+  data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status)) %>%
+    mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=smoking_status_mode))
+  
+  if(event == "dvt"){
+    data_surv=data_surv %>% mutate(cov_cat_deprivation= 
+                                     case_when(cov_cat_deprivation=="1-2 (most deprived)"~"1-4",
+                                               cov_cat_deprivation=="3-4"~"1-4",
+                                               cov_cat_deprivation=="5-6"~"5-6",
+                                               cov_cat_deprivation=="7-8"~"7-10",
+                                               cov_cat_deprivation=="9-10 (least deprived)"~"7-10"))
+    
+    data_surv$cov_cat_deprivation <- ordered(data_surv$cov_cat_deprivation, levels = c("1-4","5-6","7-10"))
+  }
 
   if(event == "ami"){
-    for(test_model in c("all_covars_no_smoking_no_consultation_no_ethnicity","all_covars_with_smoking_no_consultation_no_ethnicity","all_covars_no_smoking_with_consultation_no_ethnicity","all_covars_with_smoking_with_consultation_no_ethnicity","all_covars_with_smoking_with_consultation_with_ethnicity")){
+    for(test_model in c("all_covars_collapse_smoking_no_ethnicity","all_covars_collapse_smoking_with_ethnicity","all_covars_no_smoking_with_ethnicity")){
       
-      if(test_model == "all_covars_no_smoking_no_consultation_no_ethnicity"){
+      if(test_model == "all_covars_collapse_smoking_no_ethnicity"){
         model="mdl_agesex"
         
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_smoking_status","cov_num_consulation_rate")]
+        tmp_covars <- covariates_excl_region_sex_age
         
         surv_formula <- paste0(
           "Surv(tstart, tstop, event) ~ ",
           paste(tmp_covars, collapse="+"), 
           "+ cluster(patient_id) + region_name")
         
-      }else if(test_model == "all_covars_with_smoking_no_consultation_no_ethnicity"){
+      }else if(test_model == "all_covars_collapse_smoking_with_ethnicity"){
         model="mdl_agesex"
         
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_num_consulation_rate")]
+        tmp_covars <- covariates_excl_region_sex_age
         
         surv_formula <- paste0(
           "Surv(tstart, tstop, event) ~ ",
           paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
+          "+ cluster(patient_id) + region_name + ethnicity")
         
-      }else if(test_model == "all_covars_no_smoking_with_consultation_no_ethnicity"){
+      }else if(test_model == "all_covars_no_smoking_with_ethnicity"){
         model="mdl_agesex"
         
         tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_smoking_status")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_with_consultation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_with_consultation_with_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age
         
         surv_formula <- paste0(
           "Surv(tstart, tstop, event) ~ ",
@@ -257,39 +256,9 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl,event){
   }
   
   if(event == "dvt"){
-    for(test_model in c("all_covars_no_smoking_no_deprivation_no_ethnicity","all_covars_with_smoking_no_deprivation_no_ethnicity","all_covars_no_smoking_with_deprivation_no_ethnicity","all_covars_with_smoking_with_deprivation_no_ethnicity","all_covars_with_smoking_with_deprivation_with_ethnicity")){
+    for(test_model in c("all_covars_collapse_smoking_collapse_deprivation_no_ethnicity","all_covars_collapse_smoking_collapse_deprivation_with_ethnicity")){
       
-      if(test_model == "all_covars_no_smoking_no_deprivation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_smoking_status","cov_cat_deprivation")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_no_deprivation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_deprivation")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_no_smoking_with_deprivation_no_ethnicity"){
-        model="mdl_agesex"
-        
-        tmp_covars <- covariates_excl_region_sex_age[!covariates_excl_region_sex_age %in% c("cov_cat_smoking_status")]
-        
-        surv_formula <- paste0(
-          "Surv(tstart, tstop, event) ~ ",
-          paste(tmp_covars, collapse="+"), 
-          "+ cluster(patient_id) + region_name")
-        
-      }else if(test_model == "all_covars_with_smoking_with_deprivation_no_ethnicity"){
+      if(test_model == "all_covars_collapse_smoking_collapse_deprivation_no_ethnicity"){
         model="mdl_agesex"
         
         tmp_covars <- covariates_excl_region_sex_age
@@ -299,7 +268,7 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl,event){
           paste(tmp_covars, collapse="+"), 
           "+ cluster(patient_id) + region_name")
         
-      }else if(test_model == "all_covars_with_smoking_with_deprivation_with_ethnicity"){
+      }else if(test_model == "all_covars_collapse_smoking_collapse_deprivation_with_ethnicity"){
         model="mdl_agesex"
         
         tmp_covars <- covariates_excl_region_sex_age
