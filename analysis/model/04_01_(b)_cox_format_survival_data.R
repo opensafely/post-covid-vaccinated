@@ -270,6 +270,33 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     tbl_event_count$time_points <- time_point
     tbl_event_count$events_total <- as.numeric(tbl_event_count$events_total)
     
+    
+    #-------------Add person days of follow up for each time period-------------
+    
+    days_cat<- seq(1,length(unlist(interval_names)),1)
+    intervals_with_days_cat <- as.data.frame(matrix(c(unlist(interval_names),days_cat),ncol = 2, nrow = length(unlist(interval_names))))
+    intervals_with_days_cat[nrow(intervals_with_days_cat)+1,] <- c("pre expo",0)
+    colnames(intervals_with_days_cat) <- c("interval","days_cat")
+    intervals_with_days_cat <- intervals_with_days_cat[order(intervals_with_days_cat$days_cat),]
+    intervals_with_days_cat$person_days_follow_up <- NA
+    
+    for(i in 1:nrow(intervals_with_days_cat)){
+      days_category <- intervals_with_days_cat$days_cat[i]
+      interval_period <- intervals_with_days_cat$interval[i]
+      data_surv[,paste0("person_days_",interval_period)] <- ifelse(data_surv$days_cat == days_category,data_surv$tstop - data_surv$tstart,0)
+      intervals_with_days_cat$person_days_follow_up[which(intervals_with_days_cat$days_cat==days_category)] <- sum(data_surv[,paste0("person_days_",interval_period)])
+    }
+    
+    intervals_with_days_cat$days_cat <- NULL
+    intervals_with_days_cat[nrow(intervals_with_days_cat)+1,] <- c("all post expo", sum(intervals_with_days_cat$person_days_follow_up[which(intervals_with_days_cat$interval != "pre expo")]))
+    
+    
+    tbl_event_count <- tbl_event_count %>% left_join(intervals_with_days_cat, by=c("expo_week"="interval"))
+    tbl_event_count$person_days_follow_up <- as.numeric(tbl_event_count$person_days_follow_up)
+    tbl_event_count <- tbl_event_count %>% mutate("incidence rate (per 1000 person years)" = (events_total/(person_days_follow_up/365.2))*1000 )
+    
+    print(tbl_event_count)
+    
     #Any time periods with <=5 events? If yes, will reduce time periods
     ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
     
