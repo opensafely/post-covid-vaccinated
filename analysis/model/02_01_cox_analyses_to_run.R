@@ -20,6 +20,17 @@ covar_names <- append(covar_names, "patient_id")
 #covar_names<-append(covar_names,"patient_id")
 covar_names<-covar_names[!covar_names %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
 
+
+if(event_name=="ami" & cohort == "electively_unvaccinated"){
+  covar_names <- covar_names[!covar_names %in% c("cov_bin_angina","cov_bin_depression","cov_bin_hf","cov_bin_hypertension","cov_bin_lipid_medications","cov_bin_other_arterial_embolism")]
+}
+
+if(event_name=="dvt"  & cohort == "electively_unvaccinated"){
+  covar_names <- covar_names[!covar_names %in% c("cov_bin_antiplatelet_medications","cov_bin_cancer","cov_bin_diabetes","cov_bin_hypertension","cov_bin_obesity","cov_bin_vte")]
+}
+
+
+
 ##Set which models and cohorts are required
 
 if(active_analyses$model=="all"){
