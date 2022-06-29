@@ -154,14 +154,23 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   # 
   # print(paste0("Region_1 releveled with: ",relevel_with))
  
-  for(covariate_name in covariates){
+  for(ethnicity in c("don't inlcude","include")){
+    for(covariate_name in covariates){
     
-    model="mdl_agesex"
+    model="mdl_agsex"
     
-    surv_formula <- paste0(
-      "Surv(tstart, tstop, event) ~ ",
-      paste(c(interval_names,covariate_name), collapse="+"), 
-      "+ cluster(patient_id) + region_name")
+    if(ethnicity == "don't inlcude"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(c(interval_names,covariate_name), collapse="+"), 
+        "+ cluster(patient_id) + region_name")
+    }else if(ethnicity == "inlcude"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(c(interval_names,covariate_name), collapse="+"), 
+        "+ cluster(patient_id) + region_name + ethnicity")
+    }
+    
     
     
     # if(model=="mdl_agesex"){
@@ -233,13 +242,13 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
     #results=results%>%left_join(anova_fit_cox_model,by="covariate")
     
-    results$model <- paste0("age/sex/region/",covariate_name)
+    results$model <- paste0("age/sex/region/",covariate_name,"/",ethnicity," ethnicity")
     
     combined_results <- rbind(combined_results,results)
     
     print("Print results")
     print(results)
-    
+    }
   }
   
   print("Finised working on cox model")
