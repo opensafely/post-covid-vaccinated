@@ -25,8 +25,8 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  cohort_name <- "vaccinated"
-  #cohort_name = "electively_unvaccinated"
+#  cohort_name <- "vaccinated"
+  cohort_name = "electively_unvaccinated"
 }else{
   cohort_name <- args[[1]]
 }
@@ -80,7 +80,7 @@ table_2_subgroups_output <- function(cohort_name){
   for(i in outcomes){
     analyses_to_run <- active_analyses %>% filter(outcome_variable==i)
     
-    ##Set which cohorts are required
+    #Set which cohorts are required
     if(analyses_to_run$cohort=="all"){
       cohort_to_run=c("vaccinated", "electively_unvaccinated")
     }else{
@@ -92,7 +92,8 @@ table_2_subgroups_output <- function(cohort_name){
     analyses_to_run$subgroup <- row.names(analyses_to_run)
     colnames(analyses_to_run) <- c("run","subgroup")
     
-    analyses_to_run<- analyses_to_run %>% filter(run=="TRUE"  & subgroup != "active" & subgroup != "main") 
+    #analyses_to_run<- analyses_to_run %>% filter(run=="TRUE"  & subgroup != "active" & subgroup != "main") 
+    analyses_to_run<-analyses_to_run %>% filter(run=="TRUE")# & subgroup !="active")
     rownames(analyses_to_run) <- NULL
     analyses_to_run <- analyses_to_run %>% select(!run)
     analyses_to_run$event=i

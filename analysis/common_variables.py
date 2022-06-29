@@ -1,5 +1,15 @@
 # Based on script developed by Alex Walker and Robin Park (https://github.com/opensafely/long-covid-sick-notes/blob/master/analysis/common_variables.py)
 
+## function to add days to a string date
+from datetime import datetime, timedelta
+def days(datestring, days):
+  
+  dt = datetime.strptime(datestring, "%Y-%m-%d").date()
+  dt_add = dt + timedelta(days)
+  datestring_add = datetime.strftime(dt_add, "%Y-%m-%d")
+
+  return datestring_add
+
 # Import statements
 
 ## Cohort extractor
@@ -1690,6 +1700,11 @@ def generate_common_variables(index_date_variable):
         "tmp_cov_bin_stroke_isch_hes", "tmp_cov_bin_stroke_isch_snomed", "tmp_cov_bin_stroke_sah_hs_hes", "tmp_cov_bin_stroke_sah_hs_snomed",
     ),
 
+        ### Combined Stroke Ischeamic
+    cov_bin_stroke_isch=patients.maximum_of(
+        "tmp_cov_bin_stroke_isch_hes", "tmp_cov_bin_stroke_isch_snomed",
+    ),
+
     ## Other arterial embolism
     ### Primary care
     tmp_cov_bin_other_arterial_embolism_snomed=patients.with_these_clinical_events(
@@ -2090,15 +2105,15 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_recent_depression_snomed=patients.with_these_clinical_events(
         depression_snomed_clinical,
         returning='binary_flag',
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
+        return_expectations={"incidence": 0.1},
     ),
      ### HES
     tmp_cov_bin_recent_depression_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=depression_icd10,
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
+        return_expectations={"incidence": 0.1},
     ),
      ### Combined Recent Episode of depression
      cov_bin_recent_depression=patients.maximum_of(
@@ -2110,15 +2125,15 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_history_depression_snomed=patients.with_these_clinical_events(
         depression_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ),
      ### HES
     tmp_cov_bin_history_depression_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=depression_icd10,
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ),
      ### Combined History of depression
     cov_bin_history_depression=patients.maximum_of(
@@ -2130,15 +2145,15 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_recent_anxiety_general=patients.with_these_clinical_events(
         anxiety_combined_snomed_cov,
         returning='binary_flag',
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
+        return_expectations={"incidence": 0.1},
     ),
      ### HES
     tmp_cov_bin_recent_anxiety_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=anxiety_combined_hes_cov,
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
+        return_expectations={"incidence": 0.1},
     ),    
      ### Combined Recent Episode of of anxiety
     cov_bin_recent_anxiety=patients.maximum_of(
@@ -2150,15 +2165,15 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_history_anxiety_general=patients.with_these_clinical_events(
         anxiety_combined_snomed_cov,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ),
      ### HES
     tmp_cov_bin_history_anxiety_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=anxiety_combined_hes_cov,
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ),    
      ### Combined History of anxiety
     cov_bin_history_anxiety=patients.maximum_of(
@@ -2170,15 +2185,15 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_recent_eating_disorders=patients.with_these_clinical_events(
         eating_disorders_snomed_clinical,
         returning='binary_flag',
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
+        return_expectations={"incidence": 0.1},
     ),
         ### HES
     tmp_cov_bin_recent_eating_disorders_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=eating_disorder_icd10,
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)],
+        return_expectations={"incidence": 0.1},
     ), 
         ### Combined History of eating disorders
     cov_bin_recent_eating_disorders=patients.maximum_of(
@@ -2190,15 +2205,15 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_history_eating_disorders=patients.with_these_clinical_events(
         eating_disorders_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ),
         ### HES
     tmp_cov_bin_history_eating_disorders_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=eating_disorder_icd10,
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ), 
         ### Combined History of eating disorders
     cov_bin_history_eating_disorders=patients.maximum_of(
@@ -2210,15 +2225,15 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_recent_serious_mental_illness=patients.with_these_clinical_events(
         serious_mental_illness_snomed_clinical,
         returning='binary_flag',
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
+        return_expectations={"incidence": 0.1},
     ),
         ### HES
     tmp_cov_bin_recent_serious_mental_illness_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=serious_mental_illness_icd10,
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
+        return_expectations={"incidence": 0.1},
     ), 
         ### Combined Report of a Serious mental illness
     cov_bin_recent_serious_mental_illness=patients.maximum_of(
@@ -2230,15 +2245,15 @@ def generate_common_variables(index_date_variable):
     tmp_cov_bin_history_serious_mental_illness=patients.with_these_clinical_events(
         serious_mental_illness_snomed_clinical,
         returning='binary_flag',
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ),
         ### HES
     tmp_cov_bin_history_serious_mental_illness_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=serious_mental_illness_icd10,
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ), 
         ### Combined History of Serious mental illness
     cov_bin_history_serious_mental_illness=patients.maximum_of(
@@ -2253,15 +2268,15 @@ def generate_common_variables(index_date_variable):
             self_harm_15plus_snomed_clinical
         ),
         returning='binary_flag',
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
+        return_expectations={"incidence": 0.1},
     ),
      ### HES
     tmp_cov_bin_recent_self_harm_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=self_harm_15_10_combined_icd,
-        between=[f"{index_date_variable} - 6 months", f"{index_date_variable}"], 
-        return_expectations={"incidence": 0.03},
+        between=[days(f"{index_date_variable}", -182), days(f"{index_date_variable}", -1)], 
+        return_expectations={"incidence": 0.1},
     ),
      ### Combined Recent Report of Self harm
     cov_bin_recent_self_harm=patients.maximum_of(
@@ -2276,15 +2291,15 @@ def generate_common_variables(index_date_variable):
             self_harm_15plus_snomed_clinical
         ),
         returning='binary_flag',
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ),
      ### HES
     tmp_cov_bin_history_self_harm_icd10=patients.admitted_to_hospital(
         returning='binary_flag',
         with_these_diagnoses=self_harm_15_10_combined_icd,
-        on_or_before=f"{index_date_variable} - 6 months",
-        return_expectations={"incidence": 0.03},
+        on_or_before=[days(f"{index_date_variable}", -182)],
+        return_expectations={"incidence": 0.1},
     ),
      ### Combined History of Self harm
     cov_bin_history_self_harm=patients.maximum_of(
