@@ -102,7 +102,7 @@ stage1 <- function(cohort_name){
     input$cov_cat_deprivation <- ordered(input$cov_cat_deprivation, levels = c("1-2 (most deprived)","3-4","5-6","7-8","9-10 (least deprived)"))
       
     ## cov_cat_region
-    input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
+    input$cov_cat_region <- relevel(input$cov_cat_region, ref = "East")
     
     ## cov_cat_smoking_status
     levels(input$cov_cat_smoking_status) <- list("Ever smoker" = "E", "Missing" = "M", "Never smoker" = "N", "Current smoker" = "S")
