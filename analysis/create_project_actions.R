@@ -86,13 +86,36 @@ apply_model_function <- function(outcome, cohort){
     action(
       name = glue("Analysis_cox_{outcome}_{cohort}"),
       run = "r:latest analysis/model/01_cox_pipeline.R",
-      arguments = c(outcome,cohort),
+      arguments = c(outcome,cohort,"normal"),
       needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}"),"select_covariates_for_hosp_covid"),
       moderately_sensitive = list(
-        analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}.csv"),
-        compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
-        compiled_hrs_csv_to_release = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_to_release.csv"),
-        compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}.csv")
+        analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}_covariate_testing_normal.csv"),
+        compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_covariate_testing_normal.csv"),
+        compiled_hrs_csv_to_release = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_covariate_testing_normal_to_release.csv"),
+        compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}_covariate_testing_normal.csv"),
+        compiled_event_counts_csv_non_supressed = glue("output/review/model/compiled_event_counts_{outcome}_{cohort}_covariate_testing_normal.csv"),
+        describe_data_surv = glue("output/not-for-review/describe_data_surv_{outcome}_*_{cohort}_*_covariate_testing_normal.txt")
+      )
+    )
+  )
+}
+
+# Updated to a typical action running Cox models for one outcome
+apply_model_function_covariate_testing <- function(outcome, cohort){
+  splice(
+    comment(glue("Cox model {outcome} - {cohort}, covariate_testing")),
+    action(
+      name = glue("Analysis_cox_{outcome}_{cohort}_covariate_testing"),
+      run = "r:latest analysis/model/01_cox_pipeline.R",
+      arguments = c(outcome,cohort,"test_all"),
+      needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}"),"select_covariates_for_hosp_covid"),
+      moderately_sensitive = list(
+        analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}_covariate_testing_test_all.csv"),
+        compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_covariate_testing_test_all.csv"),
+        compiled_hrs_csv_to_release = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_covariate_testing_test_all_to_release.csv"),
+        compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}_covariate_testing_test_all.csv"),
+        compiled_event_counts_csv_non_supressed = glue("output/review/model/compiled_event_counts_{outcome}_{cohort}_covariate_testing_test_all.csv"),
+        describe_data_surv = glue("output/not-for-review/describe_data_surv_{outcome}_*_{cohort}_*_covariate_testing_test_all.txt")
       )
     )
   )
@@ -312,6 +335,11 @@ actions_list <- splice(
     # over outcomes
     unlist(lapply(outcomes_model, function(x) splice(unlist(lapply(cohort_to_run, function(y) apply_model_function(outcome = x, cohort = y)), recursive = FALSE))
       ),recursive = FALSE)),
+  
+  splice(
+    # over outcomes
+    unlist(lapply(outcomes_model, function(x) splice(unlist(lapply(cohort_to_run, function(y) apply_model_function_covariate_testing(outcome = x, cohort = y)), recursive = FALSE))
+    ),recursive = FALSE)),
 
   #comment("Split hospitalised COVID by region - vaccinated"),
   action(

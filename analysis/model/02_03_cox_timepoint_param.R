@@ -5,7 +5,7 @@
 ## =============================================================================
 # source(file.path(scripts_dir,"fit_model.R"))
 
-get_timepoint <- function(event,subgroup,stratify_by_subgroup,stratify_by,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names){
+get_timepoint <- function(event,subgroup,stratify_by_subgroup,stratify_by,input,cuts_days_since_expo,cuts_days_since_expo_reduced){
   print(paste0("Getting event counts and time cut-offs for subgroup: ", subgroup, " ", cohort))
   
   #Reduce dataset to those who do NOT have a prior history of COVID unless running the subgroup

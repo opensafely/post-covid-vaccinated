@@ -27,13 +27,16 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   print(paste0("Total number in survival data: ", nrow(survival_data)))
   print(paste0("Number of cases: ", nrow(cases)))
   
+  controls_per_case <- ifelse(nrow(cases)<100000,20,ifelse(nrow(cases)<500000,10,5))
+  print(paste0("Number of controls per case: ", controls_per_case))
+  
   if(startsWith(subgroup,"covid_pheno_")){
     non_cases_exposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (!is.na(expo_date)))
     non_cases_unexposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (is.na(expo_date)))
     
-    if(nrow(cases)*20 < nrow(non_cases_unexposed)){
-      non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*20,replace=FALSE), ]
-    }else if (nrow(cases)*20 >= nrow(non_cases_unexposed)){
+    if(nrow(cases)*controls_per_case < nrow(non_cases_unexposed)){
+      non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*controls_per_case,replace=FALSE), ]
+    }else if (nrow(cases)*controls_per_case >= nrow(non_cases_unexposed)){
       non_cases_unexposed=non_cases_unexposed
     }
     
@@ -48,9 +51,9 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   }else{
     non_cases <- survival_data %>% filter(!patient_id %in% cases$patient_id)
     
-    if(nrow(cases)*20 < nrow(non_cases)){
-      non_cases <- non_cases[sample(1:nrow(non_cases), nrow(cases)*20,replace=FALSE), ]
-    }else if (nrow(cases)*20 >= nrow(non_cases)){
+    if(nrow(cases)*controls_per_case < nrow(non_cases)){
+      non_cases <- non_cases[sample(1:nrow(non_cases), nrow(cases)*controls_per_case,replace=FALSE), ]
+    }else if (nrow(cases)*controls_per_case >= nrow(non_cases)){
       non_cases=non_cases
     }
     
@@ -311,8 +314,8 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     # Save events counts if less than 50 events as this script will not re-run with reduced time periods
     
     if(ind_any_zeroeventperiod==FALSE | less_than_50_events==TRUE){
-      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"), row.names = T)
-      print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
+      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods_covariate_testing_",covar_fit,".csv"), row.names = T)
+      print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods_covariate_testing_",covar_fit,".csv"))
     }
     
     
