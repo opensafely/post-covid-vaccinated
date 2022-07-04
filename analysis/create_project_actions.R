@@ -306,6 +306,25 @@ actions_list <- splice(
     moderately_sensitive = list(
       venn_diagram = glue("output/review/venn-diagrams/venn_diagram_*"))
   ),
+  
+  #comment("Temporary Stage 5a - Prepare data for models using reusable action"),
+  action(
+    name = "reusableaction_input",
+    run = "r:latest analysis/reusableaction_input.R ami vaccinated",
+    needs = list("stage1_data_cleaning_both","stage1_end_date_table_vaccinated"),
+    highly_sensitive = list(
+      cohort = glue("output/reusableaction_input_*"))
+  ),
+  
+  #comment("Temporary Stage 5b - Apply models using reusable action"),
+  action(
+    name = "reusableaction_model",
+    run = "cox-ipw:v0.0.4 --df_input=reusableaction_input_vaccinated_ami.csv --outcome=out_date_ami --covariate_other=cov_num_consulation_rate;cov_bin_healthcare_worker;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease --covariate_protect=cov_cat_sex;cov_num_age;cov_cat_region --cox_start=index_date --cox_stop=follow_up_end --controls_per_case=20 --df_output=results_vaccinated_hospitalised_ami.csv",
+    needs = list("stage1_data_cleaning_both","stage1_end_date_table_vaccinated","reusableaction_input"),
+    moderately_sensitive = list(
+      arguments = glue("output/args-results_vaccinated_hospitalised_ami.csv"),
+      estimates = glue("output/results_vaccinated_hospitalised_ami.csv"))
+  ),
 
   #comment("Stage 5 - Apply models"),
   splice(
