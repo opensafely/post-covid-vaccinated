@@ -36,7 +36,7 @@ rm_lowvar_covars <- function(data_surv){
   summary <- summary %>% filter(startsWith(Freq,"Mode")==F)
   summary$Freq=gsub(".*:", "",summary$Freq)#Remove everything before:
   summary$Freq <- as.numeric(summary$Freq)
-  covars_to_remove=as.character(summary$Var2[summary$Freq <=2])
+  covars_to_remove=as.character(summary$Var2[summary$Freq <=5])
   summary <- summary(summary$Var2)
   covars_to_remove <- append(covars_to_remove,names(summary)[summary==1])
   return(covars_to_remove)
@@ -54,7 +54,7 @@ collapse_categorical_covars <- function(data_surv){
   summary$Var2 <- gsub("\\s","",summary$Var2)
   summary$Freq <- as.numeric(summary$Freq)
   
-  cat_cov_to_remove=unique(as.character(summary$Var2[summary$Freq <=2]))
+  cat_cov_to_remove=unique(as.character(summary$Var2[summary$Freq <=5]))
   
   if("cov_cat_deprivation" %in% cat_cov_to_remove){
     data_surv=data_surv %>% mutate(cov_cat_deprivation= 
