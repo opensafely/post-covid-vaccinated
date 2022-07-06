@@ -1,6 +1,7 @@
 # Load packages ----------------------------------------------------------------
 
 library(magrittr)
+library(data.table)
 
 # Specify arguments ------------------------------------------------------------
 
@@ -32,6 +33,12 @@ end_dates <- dplyr::rename(end_dates,
         
 input <- input %>% dplyr::left_join(end_dates, by = "patient_id")
 rm(end_dates)
+
+# Adjust follow-up end date to take into account censor date
+# Not sure if there is a better way to do this - ifelse not great with dates but then creating
+# and uncreating a data table ?
+setDT(input)[follow_up_end == date_expo_censor, follow_up_end := follow_up_end-1]
+input <- as.data.frame(input)
 
 # Filter variables -------------------------------------------------------------
 
