@@ -43,7 +43,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     data_surv <- data_surv %>% left_join(covars)
   }
  
-  if(covar_fit == "test_all" & startsWith(subgroup,"ethnicity")==F){
+  if(subgroup=="covid_pheno_hospitalised" ){
     # Merge missing ethnicity into white ethnicity
     data_surv <- data_surv %>% mutate(ethnicity = as.character(ethnicity))%>%
       mutate(ethnicity = case_when(ethnicity=="White" ~ "White, including missing",
@@ -63,7 +63,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     print(unique(data_surv$ethnicity))
   }
   
-  if(covar_fit == "test_all"){
+  if(subgroup=="covid_pheno_hospitalised"){
     # Merge missing smoking into ever smoker
     data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status))%>%
       mutate(cov_cat_smoking_status = case_when(cov_cat_smoking_status=="Never smoker" ~ "Never smoker",
