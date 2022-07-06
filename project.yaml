@@ -328,7 +328,6 @@ actions:
         compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_pe_electively_unvaccinated_covariate_testing_normal.csv
         compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_pe_electively_unvaccinated_covariate_testing_normal.csv
         describe_data_surv: output/not-for-review/describe_data_surv_pe_*_electively_unvaccinated_*_covariate_testing_normal.txt
-        dataset: output/pe_electively_unvaccinated_input.csv
 
   ## Cox model for tia - vaccinated 
 
