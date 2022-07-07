@@ -398,8 +398,18 @@ actions_list <- splice(
     moderately_sensitive = list(
       covariates_for_hosp_covid_vacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_vaccinated.csv",
       covariates_for_hosp_covid_electively_unvacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv")
-
+  ),
+  
+  #comment("Temporary Action - Incidence plots"),
+  action(
+    name = "incidence_plots",
+    run = "r:latest analysis/descriptives/incidence_plots.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
+    needs = list("Analysis_cox_pe_electively_unvaccinated"),
+    moderately_sensitive = list(
+      exposure = glue("output/incidence_exposure-*"),
+      outcome = glue("output/incidence_outcome-*"))
   )
+  
 )
 
 
