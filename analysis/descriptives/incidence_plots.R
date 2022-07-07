@@ -1,14 +1,14 @@
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  file <- "input_pe_electively_unvaccinated.csv"
+  filename <- "input_pe_electively_unvaccinated.csv"
 } else {
-  file <- args[[1]]
+  filename <- args[[1]]
 }
 
 # Load data --------------------------------------------------------------------
 
-df <- readr::read_csv(paste0("output/",file))
+df <- readr::read_csv(file = paste0("output/",filename))
 
 # Plot exposure incidence plot -------------------------------------------------
 
@@ -27,6 +27,6 @@ df_outcome$group <- ifelse(df_outcome$expo==0,"Unexposed",df_outcome$group)
 df_outcome$group <- ifelse(df_outcome$expo==1,"Exposed",df_outcome$group)
 outcome <- incidence::incidence(df_outcome$event_date, interval = 1, group = df_outcome$group)
 
-jpeg(file=paste0("output/incidence_outcome-",gsub("\\..*","",file),".jpeg"))
+jpeg(file=paste0("output/incidence_outcome-",gsub("\\..*","",filename),".jpeg"))
 plot(outcome)
 dev.off()
