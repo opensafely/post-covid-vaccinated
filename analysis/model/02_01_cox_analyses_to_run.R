@@ -11,11 +11,11 @@ active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses <- active_analyses %>%dplyr::filter(outcome_variable==paste0("out_date_",event_name) & active == "TRUE")
 
 ## Select covariates of interest 
-covar_names_selected <- read_csv(paste0("output/not-for-review/covariates_to_adjust_for_hosp_covid_",cohort,".csv"))
-covar_names_selected <- covar_names_selected %>% filter(outcome_event == paste0("out_date_",event_name))
-covar_names_selected <- str_split(covar_names_selected$covariates, ";")[[1]]
-covar_names_selected <- append(covar_names_selected, "patient_id")
-covar_names_selected<-covar_names_selected[!covar_names_selected %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
+#covar_names_selected <- read_csv(paste0("output/not-for-review/covariates_to_adjust_for_hosp_covid_",cohort,".csv"))
+#covar_names_selected <- covar_names_selected %>% filter(outcome_event == paste0("out_date_",event_name))
+#covar_names_selected <- str_split(covar_names_selected$covariates, ";")[[1]]
+#covar_names_selected <- append(covar_names_selected, "patient_id")
+#covar_names_selected<-covar_names_selected[!covar_names_selected %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
 
 covar_names_all<-str_split(active_analyses$covariates, ";")[[1]]
 covar_names_all<-append(covar_names_all,"patient_id")
@@ -63,8 +63,8 @@ for(i in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
 }
 
 # Add in covariates
-
-analyses_to_run$covariates <- ifelse(analyses_to_run$subgroup=="covid_pheno_hospitalised", paste(covar_names_selected, collapse = ","),paste(covar_names_all, collapse = ","))
+analyses_to_run$covariates <- paste(covar_names_all, collapse = ",")
+#analyses_to_run$covariates <- ifelse(analyses_to_run$subgroup=="covid_pheno_hospitalised", paste(covar_names_selected, collapse = ","),paste(covar_names_all, collapse = ","))
 
 analyses_to_run$strata[analyses_to_run$strata=="South_Asian"]<- "South Asian"
 
