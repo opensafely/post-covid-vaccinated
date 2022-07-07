@@ -95,6 +95,9 @@ apply_model_function <- function(outcome, cohort){
         compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}_covariate_testing_normal.csv"),
         compiled_event_counts_csv_non_supressed = glue("output/review/model/compiled_event_counts_{outcome}_{cohort}_covariate_testing_normal.csv"),
         describe_data_surv = glue("output/not-for-review/describe_data_surv_{outcome}_*_{cohort}_*_covariate_testing_normal.txt")
+      ),
+      highly_sensitive = list(
+        dataset = glue("output/input_{outcome}_*_{cohort}_covariate_testing_normal.csv")
       )
     )
   )
@@ -116,6 +119,9 @@ apply_model_function_covariate_testing <- function(outcome, cohort){
         compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}_covariate_testing_test_all.csv"),
         compiled_event_counts_csv_non_supressed = glue("output/review/model/compiled_event_counts_{outcome}_{cohort}_covariate_testing_test_all.csv"),
         describe_data_surv = glue("output/not-for-review/describe_data_surv_{outcome}_*_{cohort}_*_covariate_testing_test_all.txt")
+      ),
+      highly_sensitive = list(
+        dataset = glue("output/input_{outcome}_*_{cohort}_covariate_testing_test_all.csv")
       )
     )
   )
