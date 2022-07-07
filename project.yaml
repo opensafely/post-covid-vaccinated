@@ -328,9 +328,6 @@ actions:
         compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_pe_electively_unvaccinated_covariate_testing_normal.csv
         compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_pe_electively_unvaccinated_covariate_testing_normal.csv
         describe_data_surv: output/not-for-review/describe_data_surv_pe_*_electively_unvaccinated_*_covariate_testing_normal.txt
-      highly_sensitive:
-        dataset: output/input_pe_electively_unvaccinated.csv
-      
 
   ## Cox model for tia - vaccinated 
 
@@ -1676,4 +1673,13 @@ actions:
       moderately_sensitive:
         covariates_for_hosp_covid_vacc: output/not-for-review/covariates_to_adjust_for_hosp_covid_vaccinated.csv
         covariates_for_hosp_covid_electively_unvacc: output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv
+
+  incidence_plots:
+    run: r:latest analysis/descriptives/incidence_plots.R input_pe_electively_unvaccinated.csv
+    needs:
+    - Analysis_cox_pe_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        exposure: output/incidence_exposure-*
+        outcome: output/incidence_outcome-*
 
