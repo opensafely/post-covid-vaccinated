@@ -90,30 +90,28 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   print(Hmisc::describe(data_surv))
   sink()
   
-  data.table::fwrite(data_surv, paste0("output/input_pe_electively_unvaccinated.csv"))
-  
-  # Fit model and prep output csv
-  # if(covar_fit != "test_all"){
-  #   fit_model <- coxfit(data_surv, interval_names, covar_names, mdl, subgroup)
-  #   fit_model$subgroup <- subgroup
-  #   fit_model$event <- event
-  #   fit_model$cohort <- cohort
-  #   fit_model$time_points <- time_point
-  #   fit_model$total_covid19_cases <- total_covid_cases
-  #   
-  #   write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point, "_time_periods_covariate_testing_",covar_fit,".csv"), row.names = T)
-  #   print(paste0("Hazard ratios saved: ", output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point,  "_time_periods_covariate_testing_",covar_fit,".csv"))
-  # }else{
-  #   fit_model <- coxfit_covariate_testing(data_surv, interval_names, covar_names, subgroup, mdl,event,time_point)
-  #   fit_model$subgroup <- subgroup
-  #   fit_model$event <- event
-  #   fit_model$cohort <- cohort
-  #   fit_model$time_points <- time_point
-  #   fit_model$total_covid19_cases <- total_covid_cases
-  #   
-  #   write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point, "_time_periods_covariate_testing_",covar_fit,".csv"), row.names = T)
-  #   print(paste0("Hazard ratios saved: ", output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point,  "_time_periods_covariate_testing_",covar_fit,".csv"))
-  # }
+  #Fit model and prep output csv
+  if(covar_fit != "test_all"){
+    fit_model <- coxfit(data_surv, interval_names, covar_names, mdl, subgroup)
+    fit_model$subgroup <- subgroup
+    fit_model$event <- event
+    fit_model$cohort <- cohort
+    fit_model$time_points <- time_point
+    fit_model$total_covid19_cases <- total_covid_cases
+
+    write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point, "_time_periods_covariate_testing_",covar_fit,".csv"), row.names = T)
+    print(paste0("Hazard ratios saved: ", output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point,  "_time_periods_covariate_testing_",covar_fit,".csv"))
+  }else{
+    fit_model <- coxfit_covariate_testing(data_surv, interval_names, covar_names, subgroup, mdl,event,time_point)
+    fit_model$subgroup <- subgroup
+    fit_model$event <- event
+    fit_model$cohort <- cohort
+    fit_model$time_points <- time_point
+    fit_model$total_covid19_cases <- total_covid_cases
+
+    write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point, "_time_periods_covariate_testing_",covar_fit,".csv"), row.names = T)
+    print(paste0("Hazard ratios saved: ", output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point,  "_time_periods_covariate_testing_",covar_fit,".csv"))
+  }
   
 }
 
