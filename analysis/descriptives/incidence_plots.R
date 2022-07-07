@@ -27,7 +27,7 @@ df_exposure <- unique(df[df$expo==1 & !is.na(df$expo_date),c("patient_id","expo_
 print("Describe exposure incidence data")
 
 sink(paste0("output/not-for-review/describe_incidence_exposure_",filename,".txt"))
-print(Hmisc::describe(df))
+print(Hmisc::describe(df_exposure))
 sink()
 
 # Plot exposure incidence plot -------------------------------------------------
@@ -51,7 +51,7 @@ df_outcome$group <- ifelse(df_outcome$expo==1,"Exposed",df_outcome$group)
 print("Describe outcome incidence data")
 
 sink(paste0("output/not-for-review/describe_incidence_outcome_",filename,".txt"))
-print(Hmisc::describe(df))
+print(Hmisc::describe(df_outcome))
 sink()
 
 # Plot outcome incidence plot --------------------------------------------------

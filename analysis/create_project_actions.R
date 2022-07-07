@@ -406,7 +406,9 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/incidence_plots.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
-      describe = glue("output/not-for-review/describe_incidence_*"),
+      describe_df = glue("output/not-for-review/describe_incidence_*"),
+      describe_exp = glue("output/not-for-review/describe_incidence_exposure_*"),
+      describe_out = glue("output/not-for-review/describe_incidence_outcome_*"),
       exposure = glue("output/incidence_exposure-*"),
       outcome = glue("output/incidence_outcome-*"))
   )

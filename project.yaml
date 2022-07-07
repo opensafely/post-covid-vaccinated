@@ -1840,7 +1840,9 @@ actions:
     - Analysis_cox_pe_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        describe: output/not-for-review/describe_incidence_*
+        describe_df: output/not-for-review/describe_incidence_*
+        describe_exp: output/not-for-review/describe_incidence_exposure_*
+        describe_out: output/not-for-review/describe_incidence_outcome_*
         exposure: output/incidence_exposure-*
         outcome: output/incidence_outcome-*
 
