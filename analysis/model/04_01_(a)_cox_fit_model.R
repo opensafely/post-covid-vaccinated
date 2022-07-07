@@ -90,7 +90,10 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   print(Hmisc::describe(data_surv))
   sink()
   
-  data.table::fwrite(data_surv, paste0("output/pe_electively_unvaccinated_input.csv"))
+  df <- as.data.frame(matrix(ncol=2,nrow=1))
+  data.table::fwrite(df, paste0("output/pe_electively_unvaccinated_input.csv"))
+  
+  data.table::fwrite(data_surv, paste0("output/input_pe_electively_unvaccinated.csv"))
   
   # Fit model and prep output csv
   # if(covar_fit != "test_all"){
