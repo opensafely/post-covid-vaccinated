@@ -7,10 +7,19 @@ if(length(args)==0){
 }
 
 # Load data --------------------------------------------------------------------
+print("Load data")
 
 df <- readr::read_csv(file = paste0("output/",filename))
 
+# Describe data ----------------------------------------------------------------
+print("Describe data")
+
+sink(paste0("output/not-for-review/describe_incidence_",filename,".txt"))
+print(Hmisc::describe(df))
+sink()
+
 # Plot exposure incidence plot -------------------------------------------------
+print("Plot exposure incidence plot")
 
 df_exposure <- unique(df[df$expo==1,c("patient_id","expo_date")])
 exposure <- incidence::incidence(df_exposure$expo_date, interval = 1)
@@ -20,6 +29,7 @@ plot(exposure)
 dev.off()
 
 # Plot outcome incidence plot --------------------------------------------------
+print("Plot outcome incidence plot")
 
 df_outcome <- df[df$event==1,c("patient_id","event_date","expo")]
 df_outcome$group <- ""
