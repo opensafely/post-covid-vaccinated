@@ -3,7 +3,7 @@ args <- commandArgs(trailingOnly=TRUE)
 if(length(args)==0){
   file <- "input_pe_electively_unvaccinated.csv"
 } else {
-  cohort_name <- args[[1]]
+  file <- args[[1]]
 }
 
 # Load data --------------------------------------------------------------------
