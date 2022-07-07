@@ -403,7 +403,7 @@ actions_list <- splice(
   #comment("Temporary Action - Incidence plots"),
   action(
     name = "incidence_plots",
-    run = "r:latest analysis/descriptives/incidence_plots.R input_pe_electively_unvaccinated.csv",
+    run = "r:latest analysis/descriptives/incidence_plots.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
       exposure = glue("output/incidence_exposure-*"),
