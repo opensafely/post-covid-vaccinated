@@ -90,9 +90,6 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   print(Hmisc::describe(data_surv))
   sink()
   
-  df <- as.data.frame(matrix(ncol=2,nrow=1))
-  data.table::fwrite(df, paste0("output/pe_electively_unvaccinated_input.csv"))
-  
   data.table::fwrite(data_surv, paste0("output/input_pe_electively_unvaccinated.csv"))
   
   # Fit model and prep output csv
@@ -162,96 +159,96 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup){
   combined_results <- as.data.frame(matrix(ncol=10,nrow=1))
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","results_fitted","model","covariates_removed","cat_covars_collapsed")
   
-  # for(model in mdl){
-  #   #Base formula
-  #   if(model %in% c("mdl_age_sex","mdl_age_sex_region")){
-  #     surv_formula <- paste0(
-  #       "Surv(tstart, tstop, event) ~ ",
-  #       paste(interval_names, collapse="+"),
-  #       "+ cluster(patient_id)")
-  #   }else if (model=="mdl_max_adj"){
-  #     surv_formula <- paste0(
-  #       "Surv(tstart, tstop, event) ~ ",
-  #       paste(covariates_excl_region_sex_age, collapse="+"), 
-  #       "+ cluster(patient_id)")
-  #   }
-  #   
-  #   # Add in region as either covriate or stratify by
-  #   if (model %in% c("mdl_age_sex_region","mdl_max_adj")){
-  #     if(subgroup=="covid_pheno_hospitalised"){
-  #       surv_formula <- paste(surv_formula, "region_name", sep="+")
-  #     }else{
-  #       surv_formula <- paste(surv_formula, "strat(region_name)", sep="+")
-  #     }
-  #   }
-  #   
-  #   #If subgroup is not sex then add sex into formula
-  #   if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
-  #     surv_formula <- paste(surv_formula, "sex", sep="+")
-  #   }
-  #   
-  #   #If subgroup is not ethnicity then add ethnicity into formula
-  #   if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj"){
-  #     surv_formula <- paste(surv_formula, "ethnicity", sep="+")
-  #   }
-  #   
-  #   #If subgroup is not age then add in age spline otherwise use age and age_sq
-  #   if ((startsWith(subgroup,"agegp_"))==F){
-  #     surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
-  #   }else if ((startsWith(subgroup,"agegp_"))==T){
-  #     surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
-  #   }
-  #   
-  #   print(surv_formula)
-  #   
-  #   # fit cox model
-  #   dd <<- datadist(data_surv)
-  #   #options(datadist="dd")
-  #   options(datadist="dd", contrasts=c("contr.treatment", "contr.treatment"))
-  #   print("Fitting cox model")
-  #   fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
-  #   # To get robust variance-covariance matrix so that robust standard errots can be used in CI's
-  #   robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
-  #   
-  #   print("Cox output")
-  #   print(fit_cox_model)
-  #   print("Finished fitting cox model")
-  #   
-  #   # Results ----
-  #   results=as.data.frame(names(fit_cox_model$coefficients))
-  #   colnames(results)="term"
-  #   results$estimate=exp(fit_cox_model$coefficients)
-  #   results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
-  #   results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
-  #   results$std.error=exp(sqrt(diag(vcov(fit_cox_model))))
-  #   results$robust.se=exp(sqrt(diag(vcov(robust_fit_cox_model))))
-  #   
-  #   if(model == "mdl_max_adj"){
-  #     results$covariates_removed=paste0(covars_to_remove, collapse = ",")
-  #     results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
-  #     print(paste0("Categorical covariates collapsed: ", covars_collapsed))
-  #   }else{
-  #     results$covariates_removed <- NA
-  #     results$cat_covars_collapsed <- NA
-  #   }
-  #   print("Print results")
-  #   print(results)
-  #   
-  #   #Add in P-values to results table
-  #   #Can only get for covariate as a whole and not for each level so left join onto main covariate name
-  #   #results$covariate=results$term
-  #   #results$covariate=sub('\\=.*', '', results$covariate)
-  #   #results$P="NA"
-  #   #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
-  #   #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
-  #   #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
-  #   #results=results%>%left_join(anova_fit_cox_model,by="covariate")
-  #   
-  #   results$results_fitted <- ifelse(all(results$estimate < 200 & results$std.error <10 & results$robust.se <10),"fitted_successfully","fitted_unsuccessfully")
-  #   
-  #   results$model <- model
-  #   combined_results <- rbind(combined_results,results)
-  # }
+  for(model in mdl){
+    #Base formula
+    if(model %in% c("mdl_age_sex","mdl_age_sex_region")){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(interval_names, collapse="+"),
+        "+ cluster(patient_id)")
+    }else if (model=="mdl_max_adj"){
+      surv_formula <- paste0(
+        "Surv(tstart, tstop, event) ~ ",
+        paste(covariates_excl_region_sex_age, collapse="+"),
+        "+ cluster(patient_id)")
+    }
+
+    # Add in region as either covriate or stratify by
+    if (model %in% c("mdl_age_sex_region","mdl_max_adj")){
+      if(subgroup=="covid_pheno_hospitalised"){
+        surv_formula <- paste(surv_formula, "region_name", sep="+")
+      }else{
+        surv_formula <- paste(surv_formula, "strat(region_name)", sep="+")
+      }
+    }
+
+    #If subgroup is not sex then add sex into formula
+    if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
+      surv_formula <- paste(surv_formula, "sex", sep="+")
+    }
+
+    #If subgroup is not ethnicity then add ethnicity into formula
+    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model == "mdl_max_adj"){
+      surv_formula <- paste(surv_formula, "ethnicity", sep="+")
+    }
+
+    #If subgroup is not age then add in age spline otherwise use age and age_sq
+    if ((startsWith(subgroup,"agegp_"))==F){
+      surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
+    }else if ((startsWith(subgroup,"agegp_"))==T){
+      surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
+    }
+
+    print(surv_formula)
+
+    # fit cox model
+    dd <<- datadist(data_surv)
+    #options(datadist="dd")
+    options(datadist="dd", contrasts=c("contr.treatment", "contr.treatment"))
+    print("Fitting cox model")
+    fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
+    # To get robust variance-covariance matrix so that robust standard errots can be used in CI's
+    robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
+
+    print("Cox output")
+    print(fit_cox_model)
+    print("Finished fitting cox model")
+
+    # Results ----
+    results=as.data.frame(names(fit_cox_model$coefficients))
+    colnames(results)="term"
+    results$estimate=exp(fit_cox_model$coefficients)
+    results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
+    results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
+    results$std.error=exp(sqrt(diag(vcov(fit_cox_model))))
+    results$robust.se=exp(sqrt(diag(vcov(robust_fit_cox_model))))
+
+    if(model == "mdl_max_adj"){
+      results$covariates_removed=paste0(covars_to_remove, collapse = ",")
+      results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
+      print(paste0("Categorical covariates collapsed: ", covars_collapsed))
+    }else{
+      results$covariates_removed <- NA
+      results$cat_covars_collapsed <- NA
+    }
+    print("Print results")
+    print(results)
+
+    #Add in P-values to results table
+    #Can only get for covariate as a whole and not for each level so left join onto main covariate name
+    #results$covariate=results$term
+    #results$covariate=sub('\\=.*', '', results$covariate)
+    #results$P="NA"
+    #anova_fit_cox_model=as.data.frame(anova(fit_cox_model))
+    #anova_fit_cox_model$covariate=row.names(anova_fit_cox_model)
+    #anova_fit_cox_model=anova_fit_cox_model%>%select("covariate","P")
+    #results=results%>%left_join(anova_fit_cox_model,by="covariate")
+
+    results$results_fitted <- ifelse(all(results$estimate < 200 & results$std.error <10 & results$robust.se <10),"fitted_successfully","fitted_unsuccessfully")
+
+    results$model <- model
+    combined_results <- rbind(combined_results,results)
+  }
   
     print("Finised working on cox model")
     return(combined_results)
