@@ -110,6 +110,9 @@ write.csv(analyses_not_run, paste0(output_dir,"/analyses_not_run_" , event_name 
 if(nrow(analyses_to_run)==0){
   sink(paste0("output/not-for-review/describe_data_surv_",event_name,"__",cohort,"__time_periods_covariate_testing_",covar_fit,".txt"))
   sink()
+  
+  df <- as.data.frame(matrix(ncol = 2))
+  data.table::fwrite(df, paste0("output/input_",event_name,"__",cohort,"_covariate_testing_",covar_fit,".csv"))
 }
   
 
