@@ -19,9 +19,9 @@ read_in_cols <- c("patient_id",
                   paste0("out_date_",event_name))
 
 if(active_analyses$prior_history_var != ""){
-  read_in_cols <- unique(append(read_in_cols, c(active_analyses$prior_history_var, covar_names)))
+  read_in_cols <- unique(append(read_in_cols, c(active_analyses$prior_history_var, covar_names_all)))
 }else{
-  read_in_cols <- unique(append(read_in_cols, c(covar_names)))
+  read_in_cols <- unique(append(read_in_cols, c(covar_names_all)))
 }
 
 input <- read_rds(paste0("output/input_",cohort,"_stage1.rds"))
@@ -56,7 +56,6 @@ cohort_end_date <- as.Date("2021-12-14")
 #Used to split time since COVID exposure; when there are time periods with no events then
 #a reduced number of time periods is used (need 197 instead of 196 as time periods are split using [ , ) 
 
-#cuts_days_since_expo <- c(28, 197) 
 cuts_days_since_expo <- c(7, 14, 28, 56, 84, 197) 
 cuts_days_since_expo_reduced <- c(28,197) 
 
