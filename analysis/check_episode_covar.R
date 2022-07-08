@@ -10,7 +10,8 @@ if(length(args)==0){
   output <- args[[3]]
 }
 
-# Seperate covariates ----------------------------------------------------------
+# Separate covariates ----------------------------------------------------------
+print("Separate covariates")
 
 covariates <- stringr::str_split(as.vector(covariates), ";")[[1]]
 
@@ -19,8 +20,8 @@ print("Load data")
 
 df <- read.csv(file=paste0("output/",filename))
 
-# Aggregate by ethncity and region ---------------------------------------------
-print("Load data")
+# Aggregate by provided covariates ---------------------------------------------
+print("Aggregate by provided covariates")
 
 df <- df[,c("patient_id","days_cat",covariates)]
 df$N <- 1
@@ -31,4 +32,4 @@ df <- aggregate(as.formula(f), data = df, FUN = sum)
 # Save output ------------------------------------------------------------------
 print("Save output")
 
-write.csv(df, paste0("output/",output,".csv"))
+write.csv(df[order(df$N),], paste0("output/",output,".csv"))
