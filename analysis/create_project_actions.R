@@ -410,7 +410,16 @@ actions_list <- splice(
       covariates_for_hosp_covid_electively_unvacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv")
   ),
   
-  #comment("Temporary Action - Incidence plots"),
+  #comment("Temporary action - check covariates by time period"),
+  action(
+    name = "check_episode_covar_pe",
+    run = "r:latest analysis/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv ethnicity;region_name pe-ethnicity_region",
+    needs = list("Analysis_cox_pe_electively_unvaccinated"),
+    moderately_sensitive = list(
+      check = glue("output/pe-ethnicity_region.csv"))
+  ),
+  
+  #comment("Temporary action - incidence plots for PE"),
   action(
     name = "incidence_plot_pe",
     run = "r:latest analysis/descriptives/incidence_plots.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
@@ -423,6 +432,7 @@ actions_list <- splice(
       outcome = glue("output/incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"))
   ),
   
+  #comment("Temporary action - incidence plots for VTE"),
   action(
     name = "incidence_plot_vte",
     run = "r:latest analysis/descriptives/incidence_plots.R input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.csv",
