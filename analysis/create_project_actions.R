@@ -421,7 +421,7 @@ actions_list <- splice(
   
   #comment("Temporary action - check available covariates by time period for PE"),
   action(
-    name = "check_episode_covar_pe-nonnum_covars",
+    name = "check_episode_covar_pe-available_covars",
     run = "r:latest analysis/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv cov_cat_smoking_status;cov_cat_deprivation;region_name;sex;ethnicity pe-available_covars",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
