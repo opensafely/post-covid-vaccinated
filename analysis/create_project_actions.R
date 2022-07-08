@@ -406,11 +406,11 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/incidence_plots.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
-      describe_df = glue("output/not-for-review/describe_incidence_*"),
-      describe_exp = glue("output/not-for-review/describe_incidence_exposure_*"),
-      describe_out = glue("output/not-for-review/describe_incidence_outcome_*"),
-      exposure = glue("output/incidence_exposure-*"),
-      outcome = glue("output/incidence_outcome-*"))
+      describe_df = glue("output/not-for-review/describe_incidence_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt"),
+      describe_exp = glue("output/not-for-review/describe_incidence_exposure_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt"),
+      describe_out = glue("output/not-for-review/describe_incidence_outcome_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt"),
+      exposure = glue("output/incidence_exposure-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
+      outcome = glue("output/incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"))
   ),
   
   action(
@@ -418,11 +418,11 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/incidence_plots.R input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.csv",
     needs = list("Analysis_cox_vte_electively_unvaccinated"),
     moderately_sensitive = list(
-      describe_df = glue("output/not-for-review/describe_incidence_*"),
-      describe_exp = glue("output/not-for-review/describe_incidence_exposure_*"),
-      describe_out = glue("output/not-for-review/describe_incidence_outcome_*"),
-      exposure = glue("output/incidence_exposure-*"),
-      outcome = glue("output/incidence_outcome-*"))
+      describe_df = glue("output/not-for-review/describe_incidence_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt"),
+      describe_exp = glue("output/not-for-review/describe_incidence_exposure_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt"),
+      describe_out = glue("output/not-for-review/describe_incidence_outcome_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt"),
+      exposure = glue("output/incidence_exposure-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg"),
+      outcome = glue("output/incidence_outcome-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg"))
   )
 
 )

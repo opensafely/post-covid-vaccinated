@@ -1840,11 +1840,11 @@ actions:
     - Analysis_cox_pe_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        describe_df: output/not-for-review/describe_incidence_*
-        describe_exp: output/not-for-review/describe_incidence_exposure_*
-        describe_out: output/not-for-review/describe_incidence_outcome_*
-        exposure: output/incidence_exposure-*
-        outcome: output/incidence_outcome-*
+        describe_df: output/not-for-review/describe_incidence_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt
+        describe_exp: output/not-for-review/describe_incidence_exposure_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt
+        describe_out: output/not-for-review/describe_incidence_outcome_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt
+        exposure: output/incidence_exposure-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
+        outcome: output/incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
 
   incidence_plot_vte:
     run: r:latest analysis/descriptives/incidence_plots.R input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.csv
@@ -1852,9 +1852,9 @@ actions:
     - Analysis_cox_vte_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        describe_df: output/not-for-review/describe_incidence_*
-        describe_exp: output/not-for-review/describe_incidence_exposure_*
-        describe_out: output/not-for-review/describe_incidence_outcome_*
-        exposure: output/incidence_exposure-*
-        outcome: output/incidence_outcome-*
+        describe_df: output/not-for-review/describe_incidence_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt
+        describe_exp: output/not-for-review/describe_incidence_exposure_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt
+        describe_out: output/not-for-review/describe_incidence_outcome_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt
+        exposure: output/incidence_exposure-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg
+        outcome: output/incidence_outcome-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg
 

@@ -14,7 +14,7 @@ df <- read.csv(file=paste0("output/",filename))
 # Describe data ----------------------------------------------------------------
 print("Describe data")
 
-sink(paste0("output/not-for-review/describe_incidence_",filename,".txt"))
+sink(paste0("output/not-for-review/describe_incidence_",gsub("\\..*","",filename),".txt"))
 print(Hmisc::describe(df))
 sink()
 
@@ -26,7 +26,7 @@ df_exposure <- unique(df[df$expo==1 & !is.na(df$expo_date),c("patient_id","expo_
 # Describe exposure incidence data ---------------------------------------------
 print("Describe exposure incidence data")
 
-sink(paste0("output/not-for-review/describe_incidence_exposure_",filename,".txt"))
+sink(paste0("output/not-for-review/describe_incidence_exposure_",gsub("\\..*","",filename),".txt"))
 print(Hmisc::describe(df_exposure))
 sink()
 
@@ -50,7 +50,7 @@ df_outcome$group <- ifelse(df_outcome$expo==1,"Exposed",df_outcome$group)
 # Describe outcome incidence data ---------------------------------------------
 print("Describe outcome incidence data")
 
-sink(paste0("output/not-for-review/describe_incidence_outcome_",filename,".txt"))
+sink(paste0("output/not-for-review/describe_incidence_outcome_",gsub("\\..*","",filename),".txt"))
 print(Hmisc::describe(df_outcome))
 sink()
 
