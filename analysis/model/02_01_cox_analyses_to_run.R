@@ -24,7 +24,7 @@ covar_names_all<-covar_names_all[!covar_names_all %in% c("cov_num_age","cov_cat_
 ##Set which models and cohorts are required
 
 if(active_analyses$model=="all"){
-  mdl=c("mdl_age_sex","mdl_age_sex_region","mdl_max_adj")
+  mdl=c("mdl_age_sex","mdl_age_sex_region","mdl_max_adj","mdl_max_adj_no_region","mdl_max_adj_no_ethnicity","mdl_max_adj_no_region_no_ethnicity")
 }else{
   mdl=active_analyses$model
 }
