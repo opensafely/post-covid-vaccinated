@@ -1846,3 +1846,15 @@ actions:
         exposure: output/incidence_exposure-*
         outcome: output/incidence_outcome-*
 
+  incidence_plots:
+    run: r:latest analysis/descriptives/incidence_plots.R input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.csv
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        describe_df: output/not-for-review/describe_incidence_*
+        describe_exp: output/not-for-review/describe_incidence_exposure_*
+        describe_out: output/not-for-review/describe_incidence_outcome_*
+        exposure: output/incidence_exposure-*
+        outcome: output/incidence_outcome-*
+

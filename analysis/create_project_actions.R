@@ -411,8 +411,20 @@ actions_list <- splice(
       describe_out = glue("output/not-for-review/describe_incidence_outcome_*"),
       exposure = glue("output/incidence_exposure-*"),
       outcome = glue("output/incidence_outcome-*"))
-  )
+  ),
   
+  action(
+    name = "incidence_plots",
+    run = "r:latest analysis/descriptives/incidence_plots.R input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.csv",
+    needs = list("Analysis_cox_vte_electively_unvaccinated"),
+    moderately_sensitive = list(
+      describe_df = glue("output/not-for-review/describe_incidence_*"),
+      describe_exp = glue("output/not-for-review/describe_incidence_exposure_*"),
+      describe_out = glue("output/not-for-review/describe_incidence_outcome_*"),
+      exposure = glue("output/incidence_exposure-*"),
+      outcome = glue("output/incidence_outcome-*"))
+  )
+
 )
 
 

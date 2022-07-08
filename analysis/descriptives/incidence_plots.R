@@ -9,7 +9,7 @@ if(length(args)==0){
 # Load data --------------------------------------------------------------------
 print("Load data")
 
-df <- readr::read_csv(file = paste0("output/",filename))
+df <- read.csv(file=paste0("output/",filename))
 
 # Describe data ----------------------------------------------------------------
 print("Describe data")
