@@ -419,13 +419,13 @@ actions_list <- splice(
       check = glue("output/pe-ethnicity_region.csv"))
   ),
   
-  #comment("Temporary action - check non-numeric covariates by time period for PE"),
+  #comment("Temporary action - check available covariates by time period for PE"),
   action(
     name = "check_episode_covar_pe-nonnum_covars",
-    run = "r:latest analysis/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv cov_bin_healthcare_worker;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_cat_sex pe-nonnum_covars",
+    run = "r:latest analysis/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv cov_cat_smoking_status;cov_cat_deprivation;region_name;sex;ethnicity pe-available_covars",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
-      check = glue("output/pe-nonnum_covars.csv"))
+      check = glue("output/pe-available_covars.csv"))
   ),
   
   #comment("Temporary action - incidence plots for PE"),
