@@ -118,7 +118,10 @@ stage1 <- function(cohort_name){
     ## vax_cat_product_*
     vax_cat_product_factors <- colnames(input)[grepl("vax_cat_product_",colnames(input))]
     input[,vax_cat_product_factors] <- lapply(input[,vax_cat_product_factors], function(x) ordered(x, levels = c("Pfizer","AstraZeneca","Moderna")))
-  
+    
+    ## Set reference level for binary covariates
+    bin_factors <- colnames(input)[grepl("cov_bin_",colnames(input))]
+    input[,bin_factors] <- lapply(input[,bin_factors], function(x) factor(x, levels = c("FALSE","TRUE")))
 
     #####################
     # 2. Apply QA rules #
