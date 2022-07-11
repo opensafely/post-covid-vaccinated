@@ -448,6 +448,26 @@ actions_list <- splice(
     moderately_sensitive = list(
       cumulative_outcome_plot = glue("output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
       cumulative_outcome_data = glue("output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"))
+  ),
+  
+  #comment("Temporary action - cumulative incidence plot by region for input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"),
+  action(
+    name = "region_cumulative_incidence-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
+    run = "r:latest analysis/descriptives/region_cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
+    needs = list("Analysis_cox_pe_electively_unvaccinated"),
+    moderately_sensitive = list(
+      region_cumulative_outcome_plot = glue("output/region_cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
+      region_cumulative_outcome_data = glue("output/region_cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"))
+  ),
+  
+  #comment("Temporary action - cumulative incidence plot by region for input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"),
+  action(
+    name = "region_cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
+    run = "r:latest analysis/descriptives/region_cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
+    needs = list("Analysis_cox_ate_electively_unvaccinated"),
+    moderately_sensitive = list(
+      region_cumulative_outcome_plot = glue("output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
+      region_cumulative_outcome_data = glue("output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"))
   )
   
 )
