@@ -62,3 +62,35 @@ outcome <- incidence::incidence(df_outcome$event_date, interval = 1, group = df_
 jpeg(file=paste0("output/incidence_outcome-",gsub("\\..*","",filename),".jpeg"))
 plot(outcome)
 dev.off()
+
+# Plot cumulative outcome incidence by days since exposure ---------------------
+print("Plot cumulative outcome incidence by days since exposure")
+
+df_cumulative <- df[df$expo==1 & df$event==1,
+                    c("patient_id","expo_date","event_date")]
+
+df_cumulative$days_since_exposure <- as.numeric(as.Date(df_cumulative$event_date) - as.Date(df_cumulative$expo_date))
+df_cumulative <- df_cumulative[df_cumulative$days_since_exposure>=0,]
+
+df_cumulative <- as.data.frame(table(df_cumulative$days_since_exposure))
+df_cumulative <- dplyr::rename(df_cumulative, "days_since_exposure" = "Var1")
+
+df_plot_cumulative <- data.frame(days_since_exposure = 0:196,
+                                 stringsAsFactors = FALSE)
+
+df_plot_cumulative <- merge(df_plot_cumulative, df_cumulative, by = "days_since_exposure", all.x = TRUE)
+
+df_plot_cumulative$Freq <- ifelse(is.na(df_plot_cumulative$Freq), 0, df_plot_cumulative$Freq)
+df_plot_cumulative$days_since_exposure <- as.numeric(df_plot_cumulative$days_since_exposure)
+df_plot_cumulative$cumulative_freq <- cumsum(df_plot_cumulative$Freq)
+
+ggplot2::ggplot(data = df_plot_cumulative, mapping = ggplot2::aes(x = days_since_exposure, y = cumulative_freq)) +
+  ggplot2::geom_path() +
+  ggplot2::scale_x_continuous(lim = c(0,196), breaks = seq(0,196,7), labels = seq(0,196,7)/7) +
+  ggplot2::labs(x = "Weeks since COVID-19 diagnosis", y = "Cumulative frequency of outcome events") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                 panel.grid.minor = ggplot2::element_blank())
+  
+ggplot2::ggsave(filename = paste0("output/cumulative_incidence_outcome-",gsub("\\..*","",filename),".jpeg"),
+                height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
