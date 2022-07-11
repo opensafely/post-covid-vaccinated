@@ -1929,7 +1929,7 @@ actions:
         covariates_for_hosp_covid_electively_unvacc: output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv
 
   check_episode_covar_pe-ethnicity_region:
-    run: r:latest analysis/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+    run: r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
       ethnicity;region_name pe-ethnicity_region
     needs:
     - Analysis_cox_pe_electively_unvaccinated
@@ -1938,7 +1938,7 @@ actions:
         check: output/pe-ethnicity_region.csv
 
   check_episode_covar_pe-available_covars:
-    run: r:latest analysis/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+    run: r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
       cov_cat_smoking_status;cov_cat_deprivation;region_name;sex;ethnicity pe-available_covars
     needs:
     - Analysis_cox_pe_electively_unvaccinated
@@ -1946,29 +1946,19 @@ actions:
       moderately_sensitive:
         check: output/pe-available_covars.csv
 
-  incidence_plot_pe:
-    run: r:latest analysis/descriptives/incidence_plots.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+  cumulative_incidence-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv:
+    run: r:latest analysis/descriptives/cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
     needs:
     - Analysis_cox_pe_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        describe_df: output/not-for-review/describe_incidence_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt
-        describe_exp: output/not-for-review/describe_incidence_exposure_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt
-        describe_out: output/not-for-review/describe_incidence_outcome_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt
-        exposure: output/incidence_exposure-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
-        outcome: output/incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
-        cumulative_outcome: output/cumulative_incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
+        cumulative_outcome: output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
 
-  incidence_plot_vte:
-    run: r:latest analysis/descriptives/incidence_plots.R input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.csv
+  cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv:
+    run: r:latest analysis/descriptives/cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
     needs:
-    - Analysis_cox_vte_electively_unvaccinated
+    - Analysis_cox_ate_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        describe_df: output/not-for-review/describe_incidence_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt
-        describe_exp: output/not-for-review/describe_incidence_exposure_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt
-        describe_out: output/not-for-review/describe_incidence_outcome_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt
-        exposure: output/incidence_exposure-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg
-        outcome: output/incidence_outcome-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg
-        cumulative_outcome: output/cumulative_incidence_outcome-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg
+        cumulative_outcome: output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
 

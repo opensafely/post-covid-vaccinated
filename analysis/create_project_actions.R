@@ -415,7 +415,7 @@ actions_list <- splice(
   #comment("Temporary action - check ethnicity and region by time period for PE"),
   action(
     name = "check_episode_covar_pe-ethnicity_region",
-    run = "r:latest analysis/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv ethnicity;region_name pe-ethnicity_region",
+    run = "r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv ethnicity;region_name pe-ethnicity_region",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
       check = glue("output/pe-ethnicity_region.csv"))
@@ -424,40 +424,30 @@ actions_list <- splice(
   #comment("Temporary action - check available covariates by time period for PE"),
   action(
     name = "check_episode_covar_pe-available_covars",
-    run = "r:latest analysis/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv cov_cat_smoking_status;cov_cat_deprivation;region_name;sex;ethnicity pe-available_covars",
+    run = "r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv cov_cat_smoking_status;cov_cat_deprivation;region_name;sex;ethnicity pe-available_covars",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
       check = glue("output/pe-available_covars.csv"))
   ),
   
-  #comment("Temporary action - incidence plots for PE"),
+  #comment("Temporary action - cumulative incidence plot for input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"),
   action(
-    name = "incidence_plot_pe",
-    run = "r:latest analysis/descriptives/incidence_plots.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
+    name = "cumulative_incidence-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
+    run = "r:latest analysis/descriptives/cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
-      describe_df = glue("output/not-for-review/describe_incidence_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt"),
-      describe_exp = glue("output/not-for-review/describe_incidence_exposure_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt"),
-      describe_out = glue("output/not-for-review/describe_incidence_outcome_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt"),
-      exposure = glue("output/incidence_exposure-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
-      outcome = glue("output/incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
-      cumulative_outcome = glue("output/cumulative_incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"))
+      cumulative_outcome = glue("output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"))
   ),
   
-  #comment("Temporary action - incidence plots for VTE"),
+  #comment("Temporary action - cumulative incidence plot for input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"),
   action(
-    name = "incidence_plot_vte",
-    run = "r:latest analysis/descriptives/incidence_plots.R input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.csv",
-    needs = list("Analysis_cox_vte_electively_unvaccinated"),
+    name = "cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
+    run = "r:latest analysis/descriptives/cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
+    needs = list("Analysis_cox_ate_electively_unvaccinated"),
     moderately_sensitive = list(
-      describe_df = glue("output/not-for-review/describe_incidence_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt"),
-      describe_exp = glue("output/not-for-review/describe_incidence_exposure_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt"),
-      describe_out = glue("output/not-for-review/describe_incidence_outcome_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt"),
-      exposure = glue("output/incidence_exposure-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg"),
-      outcome = glue("output/incidence_outcome-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg"),
-      cumulative_outcome = glue("output/cumulative_incidence_outcome-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg"))
+      cumulative_outcome = glue("output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"))
   )
-
+  
 )
 
 
