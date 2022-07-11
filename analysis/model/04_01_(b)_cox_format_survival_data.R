@@ -65,7 +65,9 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     print(paste0("Controls weight: ", non_case_inverse_weight))
     
   }
-
+  
+  survival_data_subgrouped <- as.data.frame(survival_data)
+  
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
   survival_data$days_to_end <- as.numeric(survival_data$follow_up_end-cohort_start_date)
   
@@ -319,7 +321,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     }
     
     
-    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_50_events))
+    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_50_events, survival_data_subgrouped))
     
   }else{
     analyses_not_run[nrow(analyses_not_run)+1,]<- c(event,subgroup,cohort,any_exposures,any_exposed_events,any_no_expo,"FALSE")

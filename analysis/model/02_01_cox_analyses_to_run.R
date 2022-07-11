@@ -21,6 +21,7 @@ covar_names_all<-str_split(active_analyses$covariates, ";")[[1]]
 covar_names_all<-append(covar_names_all,"patient_id")
 covar_names_all<-covar_names_all[!covar_names_all %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
 
+covar_names_sampled_data <- covar_names_all
 ##Set which models and cohorts are required
 
 if(active_analyses$model=="all"){

@@ -22,6 +22,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
   non_case_inverse_weight=list_data_surv_noncase_ids_interval_names[[5]]
   less_than_50_events=list_data_surv_noncase_ids_interval_names[[6]]
+  data_surv_subgrouped <- list_data_surv_noncase_ids_interval_names[[7]]
   if(less_than_50_events=="TRUE"){
     analyses_not_run[nrow(analyses_not_run)+1,]<<-c(event,subgroup,cohort,mdl,"TRUE","TRUE","TRUE","FALSE")
     return(fit_model_reducedcovariates)
@@ -34,6 +35,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
     ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
     non_case_inverse_weight=list_data_surv_noncase_ids_interval_names[[5]]
+    data_surv_subgrouped <- list_data_surv_noncase_ids_interval_names[[7]]
   }
   
   #Select covariates if using model mdl_max_adj
@@ -41,6 +43,9 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     covars=input%>%dplyr::select(all_of(covar_names))
     covar_names = names(covars)[ names(covars) != "patient_id"]
     data_surv <- data_surv %>% left_join(covars)
+    
+    covars=input%>%dplyr::select(all_of(covar_names_sampled_data))
+    data_surv_subgrouped <- data_surv_subgrouped %>% left_join(covars)
   }
  
   if(subgroup=="covid_pheno_hospitalised" ){
@@ -61,6 +66,22 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     
     print(paste0("Ethnicity releveled with: ",relevel_with))
     print(unique(data_surv$ethnicity))
+    
+    # Merge missing ethnicity into white ethnicity for subgrouped data to be saved
+    data_surv_subgrouped <- data_surv_subgrouped %>% mutate(ethnicity = as.character(ethnicity))%>%
+      mutate(ethnicity = case_when(ethnicity=="White" ~ "White, including missing",
+                                   ethnicity=="Mixed" ~ "Mixed",
+                                   ethnicity=="South Asian" ~ "South Asian",
+                                   ethnicity=="Black" ~ "Black",
+                                   ethnicity=="Other" ~ "Other",
+                                   ethnicity=="Missing" ~ "White, including missing"
+      ))
+    
+    relevel_with <- get_mode(data_surv_subgrouped,"ethnicity")
+    
+    data_surv_subgrouped <- data_surv_subgrouped %>% mutate(ethnicity = as.factor(ethnicity))%>%
+      mutate(ethnicity = relevel(ethnicity,ref=relevel_with))
+    
   }
   
   if(subgroup=="covid_pheno_hospitalised"){
@@ -80,15 +101,34 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     
     print(paste0("Smoking status releveled with: ",relevel_with))
     print(unique(data_surv$cov_cat_smoking_status))
+    
+    # Merge missing smoking into ever smoker for subgrouped data to be saved
+    data_surv_subgrouped <- data_surv_subgrouped %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status))%>%
+      mutate(cov_cat_smoking_status = case_when(cov_cat_smoking_status=="Never smoker" ~ "Never smoker",
+                                                cov_cat_smoking_status=="Ever smoker" ~ "Ever smoker",
+                                                cov_cat_smoking_status=="Current smoker" ~ "Current smoker",
+                                                cov_cat_smoking_status=="Missing" ~ "Ever smoker"
+      ))
+    
+    
+    relevel_with <- get_mode(data_surv_subgrouped,"cov_cat_smoking_status")
+    
+    data_surv_subgrouped <- data_surv_subgrouped %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status))%>%
+      mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=relevel_with))
   }
     
   #Add inverse probablity weights for non-cases
   data_surv$cox_weights <- ifelse(data_surv$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
+  data_surv_subgrouped$cox_weights <- ifelse(data_surv_subgrouped$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
   
   # Describe survival data
   sink(paste0("output/not-for-review/describe_data_surv_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods_covariate_testing_",covar_fit,".txt"))
   print(Hmisc::describe(data_surv))
   sink()
+  
+  # Save subgrouped dataset for Stata
+  write.csv(data_surv_subgrouped, file = paste0("output/input_sampled_data_",event,"_", subgroup,"_",cohort,"_covariate_testing_",covar_fit,".csv"))
+  
   
   if(event=="pe" & subgroup =="covid_pheno_hospitalised" & cohort == "electively_unvaccinated"){
     data.table::fwrite(data_surv, paste0("output/input_",event,"_",subgroup,"_",cohort,"_covariate_testing_",covar_fit,".csv"))
