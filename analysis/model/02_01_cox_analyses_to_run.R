@@ -21,6 +21,7 @@ covar_names_all<-str_split(active_analyses$covariates, ";")[[1]]
 covar_names_all<-append(covar_names_all,"patient_id")
 covar_names_all<-covar_names_all[!covar_names_all %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
 
+covar_names_sampled_data <- covar_names_all
 ##Set which models and cohorts are required
 
 if(active_analyses$model=="all"){
@@ -63,8 +64,7 @@ for(i in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
 }
 
 # Add in covariates
-analyses_to_run$covariates <- ifelse(analyses_to_run$subgroup=="covid_pheno_hospitalised", paste(covar_names_all, collapse = ","),paste(covar_names_all, collapse = ","))
-#analyses_to_run$covariates <- ifelse(analyses_to_run$subgroup=="covid_pheno_hospitalised", paste(covar_names_selected, collapse = ","),paste(covar_names_all, collapse = ","))
+analyses_to_run$covariates <- ifelse(analyses_to_run$subgroup=="covid_pheno_hospitalised", paste(covar_names_selected, collapse = ","),paste(covar_names_all, collapse = ","))
 
 analyses_to_run$strata[analyses_to_run$strata=="South_Asian"]<- "South Asian"
 

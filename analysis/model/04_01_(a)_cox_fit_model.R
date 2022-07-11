@@ -43,6 +43,8 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     covars=input%>%dplyr::select(all_of(covar_names))
     covar_names = names(covars)[ names(covars) != "patient_id"]
     data_surv <- data_surv %>% left_join(covars)
+    
+    covars=input%>%dplyr::select(all_of(covar_names_sampled_data))
     data_surv_subgrouped <- data_surv_subgrouped %>% left_join(covars)
   }
  
