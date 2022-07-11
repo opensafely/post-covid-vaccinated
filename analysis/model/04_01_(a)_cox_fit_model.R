@@ -126,7 +126,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   print(Hmisc::describe(data_surv))
   sink()
   
-  # Save subgrouped dataset for Strata
+  # Save subgrouped dataset for Stata
   write.csv(data_surv_subgrouped, file = paste0("output/input_sampled_data_",event,"_", subgroup,"_",cohort,"_covariate_testing_",covar_fit,".csv"))
   
   
