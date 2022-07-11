@@ -1952,7 +1952,8 @@ actions:
     - Analysis_cox_pe_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        cumulative_outcome: output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
+        cumulative_outcome_plot: output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
+        cumulative_outcome_data: output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
 
   cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv:
     run: r:latest analysis/descriptives/cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
@@ -1960,5 +1961,6 @@ actions:
     - Analysis_cox_ate_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        cumulative_outcome: output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
+        cumulative_outcome_plot: output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
+        cumulative_outcome_data: output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
 

@@ -436,8 +436,9 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
-      cumulative_outcome = glue("output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"))
-  ),
+      cumulative_outcome_plot = glue("output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
+      cumulative_outcome_data = glue("output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"))
+    ),
   
   #comment("Temporary action - cumulative incidence plot for input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"),
   action(
@@ -445,7 +446,8 @@ actions_list <- splice(
     run = "r:latest analysis/descriptives/cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv",
     needs = list("Analysis_cox_ate_electively_unvaccinated"),
     moderately_sensitive = list(
-      cumulative_outcome = glue("output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"))
+      cumulative_outcome_plot = glue("output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
+      cumulative_outcome_data = glue("output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"))
   )
   
 )

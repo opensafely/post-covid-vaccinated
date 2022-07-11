@@ -27,33 +27,38 @@ print("Restrict data to individuals with outcome after exposure")
 
 df <- df[df$days_since_exposure>=0,]
 
-# Calculate frequency for each day since epxosure ------------------------------
-print("Calculate frequency for each day since epxosure")
+# Calculate events on each day since exposure ----------------------------------
+print("Calculate events on each day since exposure")
 
 df <- as.data.frame(table(df$days_since_exposure))
-df <- dplyr::rename(df, "days_since_exposure" = "Var1")
+df <- dplyr::rename(df, "days_since_exposure" = "Var1", "events" = "Freq")
 
 # Make table with all possible days since epxosure -----------------------------
 print("Make table with all possible days since epxosure")
 
 df_plot <- data.frame(days_since_exposure = 0:196, stringsAsFactors = FALSE)
 df_plot <- merge(df_plot, df, by = "days_since_exposure", all.x = TRUE)
-df_plot$Freq <- ifelse(is.na(df_plot$Freq), 0, df_plot$Freq)
+df_plot$events <- ifelse(is.na(df_plot$events), 0, df_plot$events)
 
-# Calculate cumulative sum -----------------------------------------------------
-print("Calculate cumulative sum")
+# Calculate cumulative events --------------------------------------------------
+print("Calculate cumulative events")
 
 df_plot$days_since_exposure <- as.numeric(df_plot$days_since_exposure)
-df_plot$cumulative_freq <- cumsum(df_plot$Freq)
+df_plot$cumulative_events <- cumsum(df_plot$events)
+
+# Save data --------------------------------------------------------------------
+print("Save data")
+
+write.csv(df_plot, paste0("output/cumulative-",gsub("\\..*","",filename),".csv"))
 
 # Make plot --------------------------------------------------------------------
 print("Make plot")
 
-ggplot2::ggplot(data = df_plot, mapping = ggplot2::aes(x = days_since_exposure, y = cumulative_freq)) +
+ggplot2::ggplot(data = df_plot, mapping = ggplot2::aes(x = days_since_exposure, y = cumulative_events)) +
   ggplot2::geom_path() +
   ggplot2::scale_x_continuous(lim = c(0,196), breaks = seq(0,196,7), labels = seq(0,196,7)/7) +
-  ggplot2::scale_y_continuous(lim = c(0,max(df_plot$cumulative_freq))) + 
-  ggplot2::labs(x = "Weeks since COVID-19 diagnosis", y = "Cumulative frequency of outcome events") +
+  ggplot2::scale_y_continuous(lim = c(0,max(df_plot$cumulative_events))) + 
+  ggplot2::labs(x = "Weeks since COVID-19 diagnosis", y = "Cumulative eventsuency of outcome events") +
   ggplot2::theme_minimal() +
   ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                  panel.grid.minor = ggplot2::element_blank())
