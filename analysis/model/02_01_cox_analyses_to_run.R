@@ -63,7 +63,8 @@ for(i in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
 }
 
 # Add in covariates
-analyses_to_run$covariates <- ifelse(analyses_to_run$subgroup=="covid_pheno_hospitalised", paste(covar_names_selected, collapse = ","),paste(covar_names_all, collapse = ","))
+analyses_to_run$covariates <- ifelse(analyses_to_run$subgroup=="covid_pheno_hospitalised", paste(covar_names_all, collapse = ","),paste(covar_names_all, collapse = ","))
+#analyses_to_run$covariates <- ifelse(analyses_to_run$subgroup=="covid_pheno_hospitalised", paste(covar_names_selected, collapse = ","),paste(covar_names_all, collapse = ","))
 
 analyses_to_run$strata[analyses_to_run$strata=="South_Asian"]<- "South Asian"
 

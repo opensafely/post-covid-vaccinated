@@ -224,6 +224,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ami_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_ami_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_ami_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for ami - electively_unvaccinated 
 
@@ -243,6 +244,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ami_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_ami_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_ami_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for stroke_isch - vaccinated 
 
@@ -262,6 +264,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_stroke_isch_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for stroke_isch - electively_unvaccinated 
 
@@ -282,6 +285,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_stroke_isch_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for dvt - vaccinated 
 
@@ -301,6 +305,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_dvt_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_dvt_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_dvt_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for dvt - electively_unvaccinated 
 
@@ -320,6 +325,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_dvt_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_dvt_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_dvt_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for pe - vaccinated 
 
@@ -339,6 +345,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_pe_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_pe_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_pe_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for pe - electively_unvaccinated 
 
@@ -358,6 +365,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_pe_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_pe_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_pe_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for tia - vaccinated 
 
@@ -377,6 +385,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_tia_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_tia_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_tia_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for tia - electively_unvaccinated 
 
@@ -396,6 +405,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_tia_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_tia_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_tia_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for stroke_sah_hs - vaccinated 
 
@@ -415,6 +425,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_stroke_sah_hs_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for stroke_sah_hs - electively_unvaccinated 
 
@@ -435,6 +446,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_stroke_sah_hs_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for hf - vaccinated 
 
@@ -454,6 +466,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_hf_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_hf_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_hf_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for hf - electively_unvaccinated 
 
@@ -473,6 +486,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_hf_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_hf_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_hf_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for angina - vaccinated 
 
@@ -492,6 +506,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_angina_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_angina_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_angina_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for angina - electively_unvaccinated 
 
@@ -512,6 +527,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_angina_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_angina_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_angina_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for ate - vaccinated 
 
@@ -531,6 +547,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ate_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_ate_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_ate_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for ate - electively_unvaccinated 
 
@@ -550,6 +567,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ate_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_ate_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_ate_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for vte - vaccinated 
 
@@ -569,6 +587,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_vte_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_vte_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_vte_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for vte - electively_unvaccinated 
 
@@ -588,6 +607,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_vte_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_vte_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_vte_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for ami_primary_position - vaccinated 
 
@@ -608,6 +628,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ami_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_ami_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_ami_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for ami_primary_position - electively_unvaccinated 
 
@@ -628,6 +649,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ami_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_ami_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_ami_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for stroke_isch_primary_position - vaccinated 
 
@@ -648,6 +670,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_stroke_isch_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for stroke_isch_primary_position - electively_unvaccinated 
 
@@ -668,6 +691,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_stroke_isch_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for dvt_primary_position - vaccinated 
 
@@ -688,6 +712,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_dvt_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_dvt_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_dvt_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for dvt_primary_position - electively_unvaccinated 
 
@@ -708,6 +733,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_dvt_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_dvt_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_dvt_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for pe_primary_position - vaccinated 
 
@@ -728,6 +754,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_pe_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_pe_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_pe_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for pe_primary_position - electively_unvaccinated 
 
@@ -748,6 +775,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_pe_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_pe_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_pe_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for tia_primary_position - vaccinated 
 
@@ -768,6 +796,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_tia_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_tia_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_tia_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for tia_primary_position - electively_unvaccinated 
 
@@ -788,6 +817,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_tia_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_tia_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_tia_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for stroke_sah_hs_primary_position - vaccinated 
 
@@ -808,6 +838,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_stroke_sah_hs_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for stroke_sah_hs_primary_position - electively_unvaccinated 
 
@@ -828,6 +859,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_stroke_sah_hs_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for hf_primary_position - vaccinated 
 
@@ -848,6 +880,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_hf_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_hf_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_hf_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for hf_primary_position - electively_unvaccinated 
 
@@ -868,6 +901,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_hf_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_hf_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_hf_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for angina_primary_position - vaccinated 
 
@@ -888,6 +922,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_angina_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_angina_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_angina_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for angina_primary_position - electively_unvaccinated 
 
@@ -908,6 +943,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_angina_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_angina_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_angina_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for ate_primary_position - vaccinated 
 
@@ -928,6 +964,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ate_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_ate_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_ate_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for ate_primary_position - electively_unvaccinated 
 
@@ -948,6 +985,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ate_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_ate_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_ate_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model for vte_primary_position - vaccinated 
 
@@ -968,6 +1006,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_vte_primary_position_*_vaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_vte_primary_position_*_vaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_vte_primary_position_*_vaccinated_covariate_testing_normal.csv
 
   ## Cox model for vte_primary_position - electively_unvaccinated 
 
@@ -988,6 +1027,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_vte_primary_position_*_electively_unvaccinated_*_covariate_testing_normal.txt
       highly_sensitive:
         dataset: output/input_vte_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
+        sampled_dataset: output/input_sampled_data_vte_primary_position_*_electively_unvaccinated_covariate_testing_normal.csv
 
   ## Cox model ami - vaccinated, covariate_testing 
 
@@ -1007,6 +1047,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ami_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_ami_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_ami_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model ami - electively_unvaccinated, covariate_testing 
 
@@ -1026,6 +1067,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ami_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_ami_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_ami_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model stroke_isch - vaccinated, covariate_testing 
 
@@ -1045,6 +1087,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_stroke_isch_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model stroke_isch - electively_unvaccinated, covariate_testing 
 
@@ -1065,6 +1108,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_stroke_isch_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model dvt - vaccinated, covariate_testing 
 
@@ -1084,6 +1128,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_dvt_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_dvt_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_dvt_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model dvt - electively_unvaccinated, covariate_testing 
 
@@ -1103,6 +1148,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_dvt_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_dvt_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_dvt_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model pe - vaccinated, covariate_testing 
 
@@ -1122,6 +1168,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_pe_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_pe_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_pe_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model pe - electively_unvaccinated, covariate_testing 
 
@@ -1141,6 +1188,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_pe_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_pe_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_pe_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model tia - vaccinated, covariate_testing 
 
@@ -1160,6 +1208,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_tia_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_tia_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_tia_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model tia - electively_unvaccinated, covariate_testing 
 
@@ -1179,6 +1228,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_tia_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_tia_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_tia_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model stroke_sah_hs - vaccinated, covariate_testing 
 
@@ -1198,6 +1248,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_stroke_sah_hs_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model stroke_sah_hs - electively_unvaccinated, covariate_testing 
 
@@ -1218,6 +1269,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_stroke_sah_hs_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model hf - vaccinated, covariate_testing 
 
@@ -1237,6 +1289,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_hf_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_hf_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_hf_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model hf - electively_unvaccinated, covariate_testing 
 
@@ -1256,6 +1309,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_hf_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_hf_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_hf_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model angina - vaccinated, covariate_testing 
 
@@ -1275,6 +1329,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_angina_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_angina_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_angina_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model angina - electively_unvaccinated, covariate_testing 
 
@@ -1295,6 +1350,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_angina_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_angina_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_angina_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model ate - vaccinated, covariate_testing 
 
@@ -1314,6 +1370,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ate_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_ate_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_ate_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model ate - electively_unvaccinated, covariate_testing 
 
@@ -1333,6 +1390,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ate_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_ate_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_ate_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model vte - vaccinated, covariate_testing 
 
@@ -1352,6 +1410,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_vte_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_vte_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_vte_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model vte - electively_unvaccinated, covariate_testing 
 
@@ -1371,6 +1430,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_vte_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_vte_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_vte_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model ami_primary_position - vaccinated, covariate_testing 
 
@@ -1391,6 +1451,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ami_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_ami_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_ami_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model ami_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1413,6 +1474,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ami_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_ami_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_ami_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model stroke_isch_primary_position - vaccinated, covariate_testing 
 
@@ -1433,6 +1495,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_stroke_isch_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model stroke_isch_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1455,6 +1518,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_stroke_isch_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model dvt_primary_position - vaccinated, covariate_testing 
 
@@ -1475,6 +1539,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_dvt_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_dvt_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_dvt_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model dvt_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1497,6 +1562,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_dvt_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_dvt_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_dvt_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model pe_primary_position - vaccinated, covariate_testing 
 
@@ -1517,6 +1583,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_pe_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_pe_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_pe_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model pe_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1539,6 +1606,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_pe_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_pe_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_pe_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model tia_primary_position - vaccinated, covariate_testing 
 
@@ -1559,6 +1627,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_tia_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_tia_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_tia_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model tia_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1581,6 +1650,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_tia_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_tia_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_tia_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model stroke_sah_hs_primary_position - vaccinated, covariate_testing
 
@@ -1603,6 +1673,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_stroke_sah_hs_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model stroke_sah_hs_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1625,6 +1696,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_stroke_sah_hs_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model hf_primary_position - vaccinated, covariate_testing 
 
@@ -1645,6 +1717,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_hf_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_hf_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_hf_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model hf_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1667,6 +1740,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_hf_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_hf_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_hf_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model angina_primary_position - vaccinated, covariate_testing 
 
@@ -1687,6 +1761,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_angina_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_angina_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_angina_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model angina_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1709,6 +1784,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_angina_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_angina_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_angina_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model ate_primary_position - vaccinated, covariate_testing 
 
@@ -1729,6 +1805,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ate_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_ate_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_ate_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model ate_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1751,6 +1828,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_ate_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_ate_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_ate_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   ## Cox model vte_primary_position - vaccinated, covariate_testing 
 
@@ -1771,6 +1849,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_vte_primary_position_*_vaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_vte_primary_position_*_vaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_vte_primary_position_*_vaccinated_covariate_testing_test_all.csv
 
   ## Cox model vte_primary_position - electively_unvaccinated, covariate_testing
 
@@ -1793,6 +1872,7 @@ actions:
         describe_data_surv: output/not-for-review/describe_data_surv_vte_primary_position_*_electively_unvaccinated_*_covariate_testing_test_all.txt
       highly_sensitive:
         dataset: output/input_vte_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
+        sampled_dataset: output/input_sampled_data_vte_primary_position_*_electively_unvaccinated_covariate_testing_test_all.csv
 
   split_hosp_covid_by_region_vaccinated:
     run: r:latest analysis/descriptives/hospitalised_covid_events_by_region.R vaccinated

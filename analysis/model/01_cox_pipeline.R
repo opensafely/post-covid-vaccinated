@@ -112,7 +112,9 @@ if(nrow(analyses_to_run)==0){
   sink()
   
   df <- as.data.frame(matrix(ncol = 2))
-  data.table::fwrite(df, paste0("output/input_",event_name,"__",cohort,"_covariate_testing_",covar_fit,".csv"))
+  write.csv(df, paste0("output/input_",event_name,"__",cohort,"_covariate_testing_",covar_fit,".csv"))
+  
+  write.csv(df, file = paste0("output/input_sampled_data_",event_name,"__",cohort,"_covariate_testing_",covar_fit,".csv"))
 }
   
 
