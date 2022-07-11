@@ -441,7 +441,7 @@ actions_list <- splice(
       describe_out = glue("output/not-for-review/describe_incidence_outcome_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt"),
       exposure = glue("output/incidence_exposure-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
       outcome = glue("output/incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
-      cumulative_outcome = glue("output/cumulative_incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg"))
+      cumulative_outcome = glue("output/cumulative_incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"))
   ),
   
   #comment("Temporary action - incidence plots for VTE"),
