@@ -87,6 +87,7 @@ df_plot_cumulative$cumulative_freq <- cumsum(df_plot_cumulative$Freq)
 ggplot2::ggplot(data = df_plot_cumulative, mapping = ggplot2::aes(x = days_since_exposure, y = cumulative_freq)) +
   ggplot2::geom_path() +
   ggplot2::scale_x_continuous(lim = c(0,196), breaks = seq(0,196,7), labels = seq(0,196,7)/7) +
+  ggplot2::scale_y_continuous(lim = c(0,max(df_plot_cumulative$cumulative_freq))) + 
   ggplot2::labs(x = "Weeks since COVID-19 diagnosis", y = "Cumulative frequency of outcome events") +
   ggplot2::theme_minimal() +
   ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
