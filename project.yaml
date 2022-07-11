@@ -1957,6 +1957,7 @@ actions:
         describe_out: output/not-for-review/describe_incidence_outcome_input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.txt
         exposure: output/incidence_exposure-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
         outcome: output/incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
+        cumulative_outcome: output/cumulative_incidence_outcome-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg
 
   incidence_plot_vte:
     run: r:latest analysis/descriptives/incidence_plots.R input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.csv
@@ -1969,4 +1970,5 @@ actions:
         describe_out: output/not-for-review/describe_incidence_outcome_input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.txt
         exposure: output/incidence_exposure-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg
         outcome: output/incidence_outcome-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg
+        cumulative_outcome: output/cumulative_incidence_outcome-input_vte_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_test_all.jpeg
 
