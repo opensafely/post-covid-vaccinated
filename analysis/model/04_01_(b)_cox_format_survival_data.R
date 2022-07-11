@@ -34,10 +34,12 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     non_cases_exposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (!is.na(expo_date)))
     non_cases_unexposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (is.na(expo_date)))
     
-    if(nrow(cases)*controls_per_case < nrow(non_cases_unexposed)){
-      non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*controls_per_case,replace=FALSE), ]
-    }else if (nrow(cases)*controls_per_case >= nrow(non_cases_unexposed)){
-      non_cases_unexposed=non_cases_unexposed
+    if(cohort == "vaccinated"){
+      if(nrow(cases)*controls_per_case < nrow(non_cases_unexposed)){
+        non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*controls_per_case,replace=FALSE), ]
+      }else if (nrow(cases)*controls_per_case >= nrow(non_cases_unexposed)){
+        non_cases_unexposed=non_cases_unexposed
+      }
     }
     
     non_case_inverse_weight=(nrow(survival_data)-nrow(cases)-nrow(non_cases_exposed))/nrow(non_cases_unexposed)
