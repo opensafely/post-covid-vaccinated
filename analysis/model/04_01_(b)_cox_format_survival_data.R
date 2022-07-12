@@ -27,14 +27,19 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   print(paste0("Total number in survival data: ", nrow(survival_data)))
   print(paste0("Number of cases: ", nrow(cases)))
   
-  controls_per_case <- ifelse(nrow(cases)<100000,20,ifelse(nrow(cases)<500000,10,5))
+  if(subgroup != "covid_pheno_hospitalised"){
+    controls_per_case <- ifelse(nrow(cases)<100000,20,ifelse(nrow(cases)<500000,10,5))
+  }else{
+    controls_per_case <- ifelse(nrow(cases)<100000,60,30)
+  }
+  
   print(paste0("Number of controls per case: ", controls_per_case))
   
   if(startsWith(subgroup,"covid_pheno_")){
     non_cases_exposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (!is.na(expo_date)))
     non_cases_unexposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (is.na(expo_date)))
     
-    if(cohort == "vaccinated"){
+    if(cohort == "vaccinated" | (cohort == "electively_unvaccinated" & subgroup == "covid_pheno_non_hospitalised")){
       if(nrow(cases)*controls_per_case < nrow(non_cases_unexposed)){
         non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*controls_per_case,replace=FALSE), ]
       }else if (nrow(cases)*controls_per_case >= nrow(non_cases_unexposed)){
@@ -68,6 +73,10 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
   }
   
+  #Add inverse probablity weights for non-cases
+  survival_data$cox_weights <- ifelse(survival_data$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
+  
+  # Create datafram to be saved to run in Stata
   survival_data_subgrouped <- as.data.frame(survival_data)
   
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
@@ -82,7 +91,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   #===============================================================================
   #   CACHE some features
   #-------------------------------------------------------------------------------  
-  df_sex <- survival_data %>% dplyr::select(patient_id, sex)
+  df_sex_cox_weights <- survival_data %>% dplyr::select(patient_id, sex, cox_weights)
   df_age_region_ethnicity <- survival_data %>% dplyr::select(patient_id, AGE_AT_COHORT_START, region_name, ethnicity) %>% rename(age = AGE_AT_COHORT_START)
   df_age_region_ethnicity$age_sq <- df_age_region_ethnicity$age^2
   
@@ -231,7 +240,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     # FINALIZE age, region, data_surv
     #-------------------------------------------------------------------------------
     data_surv <- data_surv %>% left_join(df_age_region_ethnicity)
-    data_surv <- data_surv %>% left_join(df_sex)
+    data_surv <- data_surv %>% left_join(df_sex_cox_weights)
     print(paste0("Finished survival data"))
     
     # ============================= EVENTS COUNT =================================
@@ -290,7 +299,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     for(i in 1:nrow(intervals_with_days_cat)){
       days_category <- intervals_with_days_cat$days_cat[i]
       interval_period <- intervals_with_days_cat$interval[i]
-      data_surv[,paste0("person_days_",interval_period)] <- ifelse(data_surv$days_cat == days_category,data_surv$tstop - data_surv$tstart,0)
+      data_surv[,paste0("person_days_",interval_period)] <- ifelse(data_surv$days_cat == days_category,(data_surv$tstop - data_surv$tstart)*data_surv$cox_weights,0)
       intervals_with_days_cat$person_days_follow_up[which(intervals_with_days_cat$days_cat==days_category)] <- sum(data_surv[,paste0("person_days_",interval_period)])
     }
     
