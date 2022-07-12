@@ -260,13 +260,12 @@ stage1 <- function(cohort_name, group){
     print(meta_data_factors)
     sink()
     
-    #--------------------------------------------#
-    # Apply outcome specific exclusions criteria #
-    #--------------------------------------------#
-    
+    #-------------------------------------------------#
+    # 3.b. Apply outcome specific exclusions criteria #
+    #-------------------------------------------------#
     
     if (group == "diabetes"){
-      # Exclude individuals with a recorded diagnosis of diabetes prior to 1st January 2020 
+      # Exclude individuals with a recorded diagnosis of diabetes prior to index date
       input <- input %>% 
         filter(! out_date_t1dm < index_date | is.na(out_date_t1dm)) %>%
         filter(! out_date_t2dm < index_date | is.na(out_date_t2dm)) %>%

@@ -1,3 +1,5 @@
+library(tidyverse)
+
 # Create output directory ------------------------------------------------------
 
 fs::dir_create(here::here("lib"))
