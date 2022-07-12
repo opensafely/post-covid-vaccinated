@@ -76,9 +76,6 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   #Add inverse probablity weights for non-cases
   survival_data$cox_weights <- ifelse(survival_data$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
   
-  # Create datafram to be saved to run in Stata
-  survival_data_subgrouped <- as.data.frame(survival_data)
-  
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
   survival_data$days_to_end <- as.numeric(survival_data$follow_up_end-cohort_start_date)
   
@@ -316,6 +313,10 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     #Any time periods with <=5 events? If yes, will reduce time periods
     ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
     
+    if(time_point == "alternative"){
+      ind_any_zeroeventperiod = "FALSE"
+    }
+    
     #Are there <50 post expo events? If yes, won't run analysis
     #Can change <50 to be lower to test on dummy data
     less_than_50_events = any((as.numeric(tbl_event_count$events_total) <50) & (tbl_event_count$expo_week=="all post expo"))
@@ -327,12 +328,12 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     # Save events counts if less than 50 events as this script will not re-run with reduced time periods
     
     if(ind_any_zeroeventperiod==FALSE | less_than_50_events==TRUE){
-      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods_covariate_testing_",covar_fit,".csv"), row.names = T)
-      print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods_covariate_testing_",covar_fit,".csv"))
+      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"), row.names = T)
+      print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     }
     
     
-    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_50_events, survival_data_subgrouped))
+    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_50_events))
     
   }else{
     analyses_not_run[nrow(analyses_not_run)+1,]<- c(event,subgroup,cohort,any_exposures,any_exposed_events,any_no_expo,"FALSE")
