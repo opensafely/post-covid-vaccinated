@@ -62,12 +62,17 @@ df_plot <- df_plot %>%
 
 # Apply disclosure control -----------------------------------------------------
 print("Apply disclosure control")
+  
+df_plot <- df_plot[df_plot$events>5,] # Remove jumps that relate to less than 5 individuals
 
-df_plot <- df_plot[df_plot$events>5,]
-df_plot$events <- NULL
+df_plot <- df_plot %>%
+  dplyr::group_by(region) %>%
+  dplyr::mutate(events = c(cumulative_events[1],diff(cumulative_events))) # Update events variable to account for missing jumps
 
 # Save data --------------------------------------------------------------------
 print("Save data")
+
+df_plot <- df_plot[order(df_plot$region, df_plot$days_since_exposure),]
 
 write.csv(df_plot, paste0("output/region_cumulative-",gsub("\\..*","",filename),".csv"))
 
