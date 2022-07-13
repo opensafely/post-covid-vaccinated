@@ -31,8 +31,8 @@ library(Hmisc)
 args = commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  event_name="ate"
-  cohort="vaccinated"
+  event_name="pe"
+  cohort="electively_unvaccinated"
 }else{
   event_name  = args[[1]]
   cohort = args[[2]]
@@ -79,6 +79,10 @@ analyses_to_run$reduced_timepoint <- "reduced"
 analyses_to_run <- rbind(analyses_to_run, analyses_to_run_normal_timepoint)
 analyses_to_run <- analyses_to_run %>% filter(reduced_timepoint != "normal")
 rm(analyses_to_run_normal_timepoint)
+
+if(event_name == "pe" & cohort == "electively_unvaccinated"){
+  analyses_to_run$reduced_timepoint <- "alternative"
+}
 
 if(event_name %in% c("ate","vte")){
   analyses_to_run_hosp_alternative <- analyses_to_run %>% filter(subgroup == "covid_pheno_hospitalised")
