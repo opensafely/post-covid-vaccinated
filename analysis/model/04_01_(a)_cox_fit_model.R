@@ -89,10 +89,10 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   sink()
   
   
-  if(event=="pe" & subgroup =="covid_pheno_hospitalised" & cohort == "electively_unvaccinated"){
-    data.table::fwrite(data_surv, paste0("output/input_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
+  #if(event=="pe" & subgroup =="covid_pheno_hospitalised" & cohort == "electively_unvaccinated"){
+   # data.table::fwrite(data_surv, paste0("output/input_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     
-  }else{
+  #}else{
     data.table::fwrite(data_surv, paste0("output/input_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     
     #Fit model and prep output csv
@@ -107,7 +107,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     print(paste0("Hazard ratios saved: ", output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point,  "_time_periods.csv"))
     
     
-  }
+  #}
 }
 
 
