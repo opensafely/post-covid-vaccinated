@@ -60,30 +60,46 @@ df_plot <- df_plot %>%
   dplyr::group_by(region) %>%
   dplyr::mutate(cumulative_events = cumsum(events))
 
+# Apply disclosure control -----------------------------------------------------
+print("Apply disclosure control")
+
+df_plot <- df_plot[df_plot$events>5,]
+df_plot$events <- NULL
+
 # Save data --------------------------------------------------------------------
 print("Save data")
 
 write.csv(df_plot, paste0("output/region_cumulative-",gsub("\\..*","",filename),".csv"))
 
-# Make plot --------------------------------------------------------------------
-print("Make plot")
+# Plot data --------------------------------------------------------------------
 
-ggplot2::ggplot(data = df_plot,
-                mapping = ggplot2::aes(x = days_since_exposure, 
-                                       y = cumulative_events,
-                                       color = region)) +
-  ggplot2::geom_path() +
-  ggplot2::scale_x_continuous(lim = c(0,196), breaks = seq(0,196,7), labels = seq(0,196,7)/7) +
-  ggplot2::scale_y_continuous(lim = c(0,max(df_plot$cumulative_events))) + 
-  ggplot2::labs(x = "Weeks since COVID-19 diagnosis", 
-                y = "Cumulative outcome events") +
-  ggplot2::guides(color = ggplot2::guide_legend(title = "Region")) +
-  ggplot2::theme_minimal() +
-  ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-                 panel.grid.minor = ggplot2::element_blank())
-
-# Save plot --------------------------------------------------------------------
-print("Save plot")
-
-ggplot2::ggsave(filename = paste0("output/region_cumulative-",gsub("\\..*","",filename),".jpeg"),
-                height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+if (nrow(df_plot)>0) {
+ 
+  # Make plot ------------------------------------------------------------------
+  print("Make plot")
+  
+  ggplot2::ggplot(data = df_plot,
+                  mapping = ggplot2::aes(x = days_since_exposure, 
+                                         y = cumulative_events,
+                                         color = region)) +
+    ggplot2::geom_path() +
+    ggplot2::scale_x_continuous(lim = c(0,196), breaks = seq(0,196,7), labels = seq(0,196,7)/7) +
+    ggplot2::scale_y_continuous(lim = c(0,max(df_plot$cumulative_events))) + 
+    ggplot2::labs(x = "Weeks since COVID-19 diagnosis", 
+                  y = "Cumulative outcome events") +
+    ggplot2::guides(color = ggplot2::guide_legend(title = "Region")) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                   panel.grid.minor = ggplot2::element_blank())
+  
+  # Save plot ------------------------------------------------------------------
+  print("Save plot")
+  
+  ggplot2::ggsave(filename = paste0("output/region_cumulative-",gsub("\\..*","",filename),".jpeg"),
+                  height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+  
+} else {
+  
+  print("No plot data after disclosure control")
+  
+}
