@@ -30,7 +30,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   if(subgroup != "covid_pheno_hospitalised"){
     controls_per_case <- ifelse(nrow(cases)<100000,20,ifelse(nrow(cases)<500000,10,5))
   }else{
-    controls_per_case <- (4000000-nrow(cases))/nrow(cases)
+    controls_per_case <- ceiling((4000000-nrow(cases))/nrow(cases))
   }
   
   print(paste0("Number of controls per case: ", controls_per_case))
