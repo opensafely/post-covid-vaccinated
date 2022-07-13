@@ -30,7 +30,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   if(subgroup != "covid_pheno_hospitalised"){
     controls_per_case <- ifelse(nrow(cases)<100000,20,ifelse(nrow(cases)<500000,10,5))
   }else{
-    controls_per_case <- ifelse(nrow(cases)<100000,60,30)
+    controls_per_case <- (4000000-nrow(cases))/nrow(cases)
   }
   
   print(paste0("Number of controls per case: ", controls_per_case))
@@ -39,14 +39,14 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     non_cases_exposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (!is.na(expo_date)))
     non_cases_unexposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (is.na(expo_date)))
     
-    if(cohort == "vaccinated" | (cohort == "electively_unvaccinated" & subgroup == "covid_pheno_non_hospitalised")){
-      if(nrow(cases)*controls_per_case < nrow(non_cases_unexposed)){
-        non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*controls_per_case,replace=FALSE), ]
-      }else if (nrow(cases)*controls_per_case >= nrow(non_cases_unexposed)){
-        non_cases_unexposed=non_cases_unexposed
-      }
+    if(nrow(cases)*controls_per_case < nrow(non_cases_unexposed)){
+      non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*controls_per_case,replace=FALSE), ]
+      print("Non-cases sampled")
+    }else if (nrow(cases)*controls_per_case >= nrow(non_cases_unexposed)){
+      non_cases_unexposed=non_cases_unexposed
+      print("Non-cases not sampled - all non-cases used")
     }
-    
+
     non_case_inverse_weight=(nrow(survival_data)-nrow(cases)-nrow(non_cases_exposed))/nrow(non_cases_unexposed)
     survival_data <- bind_rows(cases,non_cases_exposed,non_cases_unexposed)
     
@@ -60,8 +60,10 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     if(nrow(cases)*controls_per_case < nrow(non_cases)){
       non_cases <- non_cases[sample(1:nrow(non_cases), nrow(cases)*controls_per_case,replace=FALSE), ]
+      print("Non-cases sampled")
     }else if (nrow(cases)*controls_per_case >= nrow(non_cases)){
       non_cases=non_cases
+      print("Non-cases not sampled - all non-cases used")
     }
     
     non_case_inverse_weight=(nrow(survival_data)-nrow(cases))/nrow(non_cases)
