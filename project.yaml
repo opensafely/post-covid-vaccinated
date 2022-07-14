@@ -1063,7 +1063,7 @@ actions:
         covariates_for_hosp_covid_electively_unvacc: output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv
 
   check_episode_covar_pe-ethnicity_region:
-    run: r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+    run: r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
       ethnicity;region_name pe-ethnicity_region
     needs:
     - Analysis_cox_pe_electively_unvaccinated
@@ -1072,7 +1072,7 @@ actions:
         check: output/pe-ethnicity_region.csv
 
   check_episode_covar_pe-available_covars:
-    run: r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+    run: r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
       cov_cat_smoking_status;cov_cat_deprivation;region_name;sex;ethnicity pe-available_covars
     needs:
     - Analysis_cox_pe_electively_unvaccinated
@@ -1080,39 +1080,39 @@ actions:
       moderately_sensitive:
         check: output/pe-available_covars.csv
 
-  cumulative_incidence-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv:
-    run: r:latest analysis/descriptives/cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+  cumulative_incidence-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv:
+    run: r:latest analysis/descriptives/cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
     needs:
     - Analysis_cox_pe_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        cumulative_outcome_plot: output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
-        cumulative_outcome_data: output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+        cumulative_outcome_plot: output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.jpeg
+        cumulative_outcome_data: output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
 
-  cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv:
-    run: r:latest analysis/descriptives/cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+  cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv:
+    run: r:latest analysis/descriptives/cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
     needs:
     - Analysis_cox_ate_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        cumulative_outcome_plot: output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
-        cumulative_outcome_data: output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+        cumulative_outcome_plot: output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.jpeg
+        cumulative_outcome_data: output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
 
-  region_cumulative_incidence-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv:
-    run: r:latest analysis/descriptives/region_cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+  region_cumulative_incidence-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv:
+    run: r:latest analysis/descriptives/region_cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
     needs:
     - Analysis_cox_pe_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        region_cumulative_outcome_plot: output/region_cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
-        region_cumulative_outcome_data: output/region_cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+        region_cumulative_outcome_plot: output/region_cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.jpeg
+        region_cumulative_outcome_data: output/region_cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
 
-  region_cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv:
-    run: r:latest analysis/descriptives/region_cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+  region_cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv:
+    run: r:latest analysis/descriptives/region_cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
     needs:
     - Analysis_cox_ate_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        region_cumulative_outcome_plot: output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
-        region_cumulative_outcome_data: output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
+        region_cumulative_outcome_plot: output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.jpeg
+        region_cumulative_outcome_data: output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv
 
