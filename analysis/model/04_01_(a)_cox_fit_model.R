@@ -44,7 +44,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     covars=input%>%dplyr::select(all_of(covar_names))
     covar_names = names(covars)[ names(covars) != "patient_id"]
     data_surv <- data_surv %>% left_join(covars)
-    sampled_data <- data_surv %>% left_join(covars)
+    sampled_data <- sampled_data %>% left_join(covars)
   }
  
   if(subgroup=="covid_pheno_hospitalised" ){
