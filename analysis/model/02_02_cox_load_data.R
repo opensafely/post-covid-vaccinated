@@ -40,7 +40,7 @@ input <- input %>% left_join(end_dates, by = "patient_id")
 rm(end_dates)
 
 #---------------------Set region reference level--------------------------------
-input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
+#input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
 
 #---------------------------SPECIFY MAIN PARAMETERS-----------------------------
 # specify study parameters
