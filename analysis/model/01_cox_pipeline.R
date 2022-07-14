@@ -78,11 +78,8 @@ analyses_to_run_normal_timepoint <- analyses_to_run %>% filter(reduced_timepoint
 analyses_to_run$reduced_timepoint <- "reduced"
 analyses_to_run <- rbind(analyses_to_run, analyses_to_run_normal_timepoint)
 analyses_to_run <- analyses_to_run %>% filter(reduced_timepoint != "normal")
-rm(analyses_to_run_normal_timepoint)
 
-if(event_name == "pe" & cohort == "electively_unvaccinated"){
-  analyses_to_run$reduced_timepoint <- "alternative"
-}
+rm(analyses_to_run_normal_timepoint)
 
 if(event_name %in% c("ate","vte")){
   analyses_to_run_hosp_alternative <- analyses_to_run %>% filter(subgroup == "covid_pheno_hospitalised")
@@ -113,11 +110,12 @@ if(nrow(analyses_to_run>0)){
 write.csv(analyses_not_run, paste0(output_dir,"/analyses_not_run_" , event_name ,"_",cohort,".csv"), row.names = T)
 
 if(nrow(analyses_to_run)==0){
-  sink(paste0("output/not-for-review/describe_data_surv_",event_name,"__",cohort,"_time_periods.txt"))
+  sink(paste0("output/not-for-review/describe_data_surv_",event_name,"__",cohort,"__time_periods.txt"))
   sink()
   
   df <- as.data.frame(matrix(ncol = 2))
-  write.csv(df, paste0("output/input_",event_name,"__",cohort,".csv"))
+  write.csv(df, paste0("output/input_",event_name,"__",cohort,"__time_periods.csv"))
+  write.csv(df, paste0("output/input_sampled_data_",event_name,"__",cohort,"__time_periods.csv"))
   
 }
   

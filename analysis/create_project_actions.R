@@ -97,7 +97,8 @@ apply_model_function <- function(outcome, cohort){
         describe_data_surv = glue("output/not-for-review/describe_data_surv_{outcome}_*_{cohort}_*_time_periods.txt")
       ),
       highly_sensitive = list(
-        dataset = glue("output/input_{outcome}_*_{cohort}_*_time_periods.csv")
+        dataset = glue("output/input_{outcome}_*_{cohort}_*_time_periods.csv"),
+        sampled_dataset = glue("output/input_sampled_data_{outcome}_*_{cohort}_*_time_periods.csv")
       )
     )
   )
