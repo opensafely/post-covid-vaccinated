@@ -81,12 +81,12 @@ analyses_to_run <- analyses_to_run %>% filter(reduced_timepoint != "normal")
 
 rm(analyses_to_run_normal_timepoint)
 
-if(event_name %in% c("ate","vte") & cohort == "vaccinated"){
-  analyses_to_run_hosp_alternative <- analyses_to_run %>% filter(subgroup == "covid_pheno_hospitalised")
-  analyses_to_run_hosp_alternative$reduced_timepoint <- "alternative"
-  analyses_to_run_hosp_alternative <- distinct(analyses_to_run_hosp_alternative)
-  analyses_to_run <- rbind(analyses_to_run, analyses_to_run_hosp_alternative)
-}
+#if(event_name %in% c("ate","vte") & cohort == "vaccinated"){
+#  analyses_to_run_hosp_alternative <- analyses_to_run %>% filter(subgroup == "covid_pheno_hospitalised")
+#  analyses_to_run_hosp_alternative$reduced_timepoint <- "alternative"
+#  analyses_to_run_hosp_alternative <- distinct(analyses_to_run_hosp_alternative)
+#  analyses_to_run <- rbind(analyses_to_run, analyses_to_run_hosp_alternative)
+#}
 
 
 # Source remainder of relevant files --------------------------------------------------------
