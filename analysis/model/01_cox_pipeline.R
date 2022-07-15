@@ -31,7 +31,7 @@ library(Hmisc)
 args = commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  event_name="pe"
+  event_name="ate"
   cohort="electively_unvaccinated"
 }else{
   event_name  = args[[1]]
@@ -57,9 +57,9 @@ source(file.path(scripts_dir,"06_cox_extra_functions.R"))
 source(file.path(scripts_dir,"02_03_cox_timepoint_param.R")) # Prepare dataset for model
 
 # add reduced time point column 
-
-analyses_to_run <- analyses_to_run %>% filter(subgroup=="covid_pheno_hospitalised")
-
+if(cohort =="vaccinated"){
+  analyses_to_run <- analyses_to_run %>% filter(subgroup=="covid_pheno_hospitalised")
+}
 
 analyses_to_run$reduced_timepoint <- lapply(split(analyses_to_run,seq(nrow(analyses_to_run))),
                                             function(analyses_to_run) 
@@ -74,12 +74,15 @@ analyses_to_run$reduced_timepoint <- lapply(split(analyses_to_run,seq(nrow(analy
 analyses_to_run$reduced_timepoint <-  as.character(analyses_to_run$reduced_timepoint)
 analyses_to_run <- analyses_to_run %>% filter(reduced_timepoint != "remove")
 analyses_to_run_normal_timepoint <- analyses_to_run %>% filter(reduced_timepoint == "normal")
-
 analyses_to_run$reduced_timepoint <- "reduced"
 analyses_to_run <- rbind(analyses_to_run, analyses_to_run_normal_timepoint)
-analyses_to_run <- analyses_to_run %>% filter(reduced_timepoint != "normal")
 
 rm(analyses_to_run_normal_timepoint)
+
+# Join in reduced covariates
+
+analyses_to_run <- analyses_to_run %>% left_join(non_zero_covar_names, by= c("event"="outcome_event","subgroup","reduced_timepoint"="time_period"))
+rm(non_zero_covar_names)
 
 #if(event_name %in% c("ate","vte") & cohort == "vaccinated"){
 #  analyses_to_run_hosp_alternative <- analyses_to_run %>% filter(subgroup == "covid_pheno_hospitalised")
@@ -103,7 +106,9 @@ if(nrow(analyses_to_run>0)){
              stratify_by_subgroup=analyses_to_run$stratify_by_subgroup,           
              stratify_by=analyses_to_run$strata,           
              time_point=analyses_to_run$reduced_timepoint,       
-             input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced,mdl))
+             input,covar_names,
+             reduced_covar_names=analyses_to_run$covariates,#
+             cuts_days_since_expo,cuts_days_since_expo_reduced,mdl))
 }
 
 #Save csv of anlayses not run

@@ -87,7 +87,7 @@ apply_model_function <- function(outcome, cohort){
       name = glue("Analysis_cox_{outcome}_{cohort}"),
       run = "r:latest analysis/model/01_cox_pipeline.R",
       arguments = c(outcome,cohort),
-      needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}"),"select_covariates_for_hosp_covid"),
+      needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}"),glue("stage_2_events_split_by_covariate_level_{cohort}")),
       moderately_sensitive = list(
         analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}.csv"),
         compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
@@ -104,7 +104,26 @@ apply_model_function <- function(outcome, cohort){
   )
 }
 
-
+# Updated to a typical action running Cox models for one outcome
+apply_model_function_covariate_testing <- function(outcome, cohort){
+  splice(
+    comment(glue("Cox model {outcome} - {cohort}, covariate_testing")),
+    action(
+      name = glue("Analysis_cox_{outcome}_{cohort}_covariate_testing"),
+      run = "r:latest analysis/model/01_cox_pipeline.R",
+      arguments = c(outcome,cohort,"test_all"),
+      needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}"),glue("stage_2_events_split_by_covariate_level_{cohort}")),
+      moderately_sensitive = list(
+        analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}_covariate_testing_test_all.csv"),
+        compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_covariate_testing_test_all.csv"),
+        compiled_hrs_csv_to_release = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_covariate_testing_test_all_to_release.csv"),
+        compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}_covariate_testing_test_all.csv"),
+        compiled_event_counts_csv_non_supressed = glue("output/review/model/compiled_event_counts_{outcome}_{cohort}_covariate_testing_test_all.csv"),
+        describe_data_surv = glue("output/not-for-review/describe_data_surv_{outcome}_*_{cohort}_*_covariate_testing_test_all.txt")
+      )
+    )
+  )
+}
 
 table2 <- function(cohort){
   splice(
@@ -121,16 +140,17 @@ table2 <- function(cohort){
   )
 }
 
-hosp_event_counts_by_covariate_level <- function(cohort){
+event_counts_by_covariate_level <- function(cohort){
   splice(
-    comment(glue("Hospitalised event counts by covariate - {cohort}")),
     action(
-      name = glue("hosp_event_counts_by_covariate_level_{cohort}"),
-      run = "r:latest analysis/descriptives/hospitalised_events_split_by_time_period_and_covariate_level.R",
+      name = glue("stage_2_events_split_by_covariate_level_{cohort}"),
+      run = "r:latest analysis/descriptives/events_split_by_covariate_level.R",
       arguments = c(cohort),
       needs = list("stage1_data_cleaning_both",glue("stage1_end_date_table_{cohort}")),
       moderately_sensitive = list(
-        hosp_counts_by_covariate = glue("output/not-for-review/hospitalised_event_counts_by_covariate_level_{cohort}.csv")
+        counts_by_covariate_level = glue("output/not-for-review/event_counts_by_covariate_level_{cohort}_*.csv"),
+        selected_covariates = glue("output/not-for-review/non_zero_selected_covariates_{cohort}_*.csv")
+        
       )
     )
   )
@@ -272,6 +292,13 @@ actions_list <- splice(
       Descriptive_Table = glue("output/review/descriptives/Table1_*.csv")
     )
   ),
+  
+  #comment("Stage 2 - Event counts by covariate level),
+  splice(
+    # over cohorts
+    unlist(lapply(cohort_to_run, function(x) event_counts_by_covariate_level(cohort = x)), recursive = FALSE)
+  ),
+  
 
   #comment("Stage 3 - No action there for CVD outcomes"),  
 
@@ -366,81 +393,7 @@ actions_list <- splice(
     needs = list("stage1_data_cleaning_both","stage1_end_date_table_electively_unvaccinated"),
     moderately_sensitive = list(
     hosp_events_by_region_non_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_non_suppressed.csv",
-    hosp_events_by_region_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_suppressed.csv")),
-  
-  #comment("Hospitalised event counts by covariate level"),
-  splice(
-    # over cohort
-    unlist(lapply(cohort_to_run, function(x) hosp_event_counts_by_covariate_level(cohort = x)), recursive = FALSE)
-  ),
-  
-  #comment("Select covariates for hosp COVID)
-  action(
-    name = "select_covariates_for_hosp_covid",
-    run = "r:latest analysis/descriptives/determine_covariates_for_hosp_covid.R both",
-    needs = list("hosp_event_counts_by_covariate_level_vaccinated","hosp_event_counts_by_covariate_level_electively_unvaccinated"),
-    moderately_sensitive = list(
-      covariates_for_hosp_covid_vacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_vaccinated.csv",
-      covariates_for_hosp_covid_electively_unvacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv")
-  ),
-  
-  #comment("Temporary action - check ethnicity and region by time period for PE"),
-  action(
-    name = "check_episode_covar_pe-ethnicity_region",
-    run = "r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv ethnicity;region_name pe-ethnicity_region",
-    needs = list("Analysis_cox_pe_electively_unvaccinated"),
-    moderately_sensitive = list(
-      check = glue("output/pe-ethnicity_region.csv"))
-  ),
-  
-  #comment("Temporary action - check available covariates by time period for PE"),
-  action(
-    name = "check_episode_covar_pe-available_covars",
-    run = "r:latest analysis/descriptives/check_episode_covar.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv cov_cat_smoking_status;cov_cat_deprivation;region_name;sex;ethnicity pe-available_covars",
-    needs = list("Analysis_cox_pe_electively_unvaccinated"),
-    moderately_sensitive = list(
-      check = glue("output/pe-available_covars.csv"))
-  ),
-  
-  #comment("Temporary action - cumulative incidence plot for input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv"),
-  action(
-    name = "cumulative_incidence-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv",
-    run = "r:latest analysis/descriptives/cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv",
-    needs = list("Analysis_cox_pe_electively_unvaccinated"),
-    moderately_sensitive = list(
-      cumulative_outcome_plot = glue("output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.jpeg"),
-      cumulative_outcome_data = glue("output/cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv"))
-    ),
-  
-  #comment("Temporary action - cumulative incidence plot for input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv"),
-  action(
-    name = "cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv",
-    run = "r:latest analysis/descriptives/cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv",
-    needs = list("Analysis_cox_ate_electively_unvaccinated"),
-    moderately_sensitive = list(
-      cumulative_outcome_plot = glue("output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.jpeg"),
-      cumulative_outcome_data = glue("output/cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv"))
-  ),
-  
-  #comment("Temporary action - cumulative incidence plot by region for input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv"),
-  action(
-    name = "region_cumulative_incidence-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv",
-    run = "r:latest analysis/descriptives/region_cumulative_incidence.R input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv",
-    needs = list("Analysis_cox_pe_electively_unvaccinated"),
-    moderately_sensitive = list(
-      region_cumulative_outcome_plot = glue("output/region_cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.jpeg"),
-      region_cumulative_outcome_data = glue("output/region_cumulative-input_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv"))
-  ),
-  
-  #comment("Temporary action - cumulative incidence plot by region for input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv"),
-  action(
-    name = "region_cumulative_incidence-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv",
-    run = "r:latest analysis/descriptives/region_cumulative_incidence.R input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv",
-    needs = list("Analysis_cox_ate_electively_unvaccinated"),
-    moderately_sensitive = list(
-      region_cumulative_outcome_plot = glue("output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.jpeg"),
-      region_cumulative_outcome_data = glue("output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv"))
-  )
+    hosp_events_by_region_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_suppressed.csv"))
   
 )
 
