@@ -89,12 +89,16 @@ apply_model_function <- function(outcome, cohort){
       arguments = c(outcome,cohort,"normal"),
       needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}"),glue("stage_2_events_split_by_covariate_level_{cohort}")),
       moderately_sensitive = list(
-        analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}_covariate_testing_normal.csv"),
-        compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_covariate_testing_normal.csv"),
-        compiled_hrs_csv_to_release = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_covariate_testing_normal_to_release.csv"),
-        compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}_covariate_testing_normal.csv"),
-        compiled_event_counts_csv_non_supressed = glue("output/review/model/compiled_event_counts_{outcome}_{cohort}_covariate_testing_normal.csv"),
-        describe_data_surv = glue("output/not-for-review/describe_data_surv_{outcome}_*_{cohort}_*_covariate_testing_normal.txt")
+        analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}.csv"),
+        compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
+        compiled_hrs_csv_to_release = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}_to_release.csv"),
+        compiled_event_counts_csv = glue("output/review/model/suppressed_compiled_event_counts_{outcome}_{cohort}.csv"),
+        compiled_event_counts_csv_non_supressed = glue("output/review/model/compiled_event_counts_{outcome}_{cohort}.csv"),
+        describe_data_surv = glue("output/not-for-review/describe_data_surv_{outcome}_*_{cohort}_*_time_periods.txt")
+      ),
+      highly_sensitive = list(
+        dataset = glue("output/input_{outcome}_*_{cohort}_*_time_periods.csv"),
+        sampled_dataset = glue("output/input_sampled_data_{outcome}_*_{cohort}_*_time_periods.csv")
       )
     )
   )
@@ -349,12 +353,22 @@ actions_list <- splice(
   
   #comment("Temporary Stage 5b - Apply models using reusable action"),
   action(
-    name = "reusableaction_model",
-    run = "cox-ipw:v0.0.4 --df_input=reusableaction_input_vaccinated_ami.csv --outcome=out_date_ami --covariate_other=cov_num_consulation_rate;cov_bin_healthcare_worker;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease --covariate_protect=cov_cat_sex;cov_num_age;cov_cat_region --cox_start=index_date --cox_stop=follow_up_end --controls_per_case=20 --df_output=results_vaccinated_hospitalised_ami.csv",
+    name = "reusableaction_model_main",
+    run = "cox-ipw:v0.0.4 --df_input=reusableaction_input_vaccinated_ami_main_analysis.csv --outcome=out_date_ami --covariate_other=cov_num_consulation_rate;cov_bin_healthcare_worker;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease --covariate_protect=cov_cat_sex;cov_num_age;cov_cat_region;cov_cat_ethnicity --cox_start=index_date --cox_stop=follow_up_end --controls_per_case=20 --df_output=results_vaccinated_ami_main.csv",
     needs = list("stage1_data_cleaning_both","stage1_end_date_table_vaccinated","reusableaction_input"),
     moderately_sensitive = list(
-      arguments = glue("output/args-results_vaccinated_hospitalised_ami.csv"),
-      estimates = glue("output/results_vaccinated_hospitalised_ami.csv"))
+      arguments = glue("output/args-results_vaccinated_ami_main.csv"),
+      estimates = glue("output/results_vaccinated_ami_main.csv"))
+  ),
+  
+  #comment("Temporary Stage 5b - Apply models using reusable action"),
+  action(
+    name = "reusableaction_model_hospitalised",
+    run = "cox-ipw:v0.0.4 --df_input=reusableaction_input_vaccinated_ami_hospitalised_analysis.csv --outcome=out_date_ami --covariate_other=cov_num_consulation_rate;cov_bin_healthcare_worker;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease --covariate_protect=cov_cat_sex;cov_num_age;cov_cat_region;cov_cat_ethnicity --cox_start=index_date --cox_stop=follow_up_end --controls_per_case=20 --df_output=results_vaccinated_ami_hospitalised.csv",
+    needs = list("stage1_data_cleaning_both","stage1_end_date_table_vaccinated","reusableaction_input"),
+    moderately_sensitive = list(
+      arguments = glue("output/args-results_vaccinated_ami_hospitalised.csv"),
+      estimates = glue("output/results_vaccinated_ami_hospitalised.csv"))
   ),
 
   #comment("Stage 5 - Apply models"),
@@ -362,11 +376,6 @@ actions_list <- splice(
     # over outcomes
     unlist(lapply(outcomes_model, function(x) splice(unlist(lapply(cohort_to_run, function(y) apply_model_function(outcome = x, cohort = y)), recursive = FALSE))
       ),recursive = FALSE)),
-  
-  splice(
-    # over outcomes
-    unlist(lapply(outcomes_model, function(x) splice(unlist(lapply(cohort_to_run, function(y) apply_model_function_covariate_testing(outcome = x, cohort = y)), recursive = FALSE))
-    ),recursive = FALSE)),
 
   #comment("Split hospitalised COVID by region - vaccinated"),
   action(

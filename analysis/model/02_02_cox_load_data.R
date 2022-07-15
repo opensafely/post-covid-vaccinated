@@ -19,9 +19,9 @@ read_in_cols <- c("patient_id",
                   paste0("out_date_",event_name))
 
 if(active_analyses$prior_history_var != ""){
-  read_in_cols <- unique(append(read_in_cols, c(active_analyses$prior_history_var, covar_names_all)))
+  read_in_cols <- unique(append(read_in_cols, c(active_analyses$prior_history_var, covar_names)))
 }else{
-  read_in_cols <- unique(append(read_in_cols, c(covar_names_all)))
+  read_in_cols <- unique(append(read_in_cols, c(covar_names)))
 }
 
 input <- read_rds(paste0("output/input_",cohort,"_stage1.rds"))
@@ -38,6 +38,9 @@ end_dates <- end_dates[,c("patient_id",
 
 input <- input %>% left_join(end_dates, by = "patient_id")
 rm(end_dates)
+
+#---------------------Set region reference level--------------------------------
+#input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
 
 #---------------------------SPECIFY MAIN PARAMETERS-----------------------------
 # specify study parameters
@@ -57,7 +60,8 @@ cohort_end_date <- as.Date("2021-12-14")
 #a reduced number of time periods is used (need 197 instead of 196 as time periods are split using [ , ) 
 
 cuts_days_since_expo <- c(7, 14, 28, 56, 84, 197) 
-cuts_days_since_expo_reduced <- c(28,197) 
+cuts_days_since_expo_reduced <- c(28,197)
+cuts_days_since_expo_alternative <- c(1,8,43,197)
 
 #Rename input variable names (by renaming here it means that these scripts can be used for other datasets without
 ## having to keep updating all the variable names throughout the following scripts)

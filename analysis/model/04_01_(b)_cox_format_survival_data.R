@@ -27,7 +27,12 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   print(paste0("Total number in survival data: ", nrow(survival_data)))
   print(paste0("Number of cases: ", nrow(cases)))
   
-  controls_per_case <- ifelse(nrow(cases)<100000,20,ifelse(nrow(cases)<500000,10,5))
+  if(subgroup != "covid_pheno_hospitalised"){
+    controls_per_case <- ifelse(nrow(cases)<100000,20,ifelse(nrow(cases)<500000,10,5))
+  }else{
+    controls_per_case <- ceiling((5000000-nrow(cases))/nrow(cases))
+  }
+  
   print(paste0("Number of controls per case: ", controls_per_case))
   
   if(startsWith(subgroup,"covid_pheno_")){
@@ -36,10 +41,12 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     if(nrow(cases)*controls_per_case < nrow(non_cases_unexposed)){
       non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*controls_per_case,replace=FALSE), ]
+      print("Non-cases sampled")
     }else if (nrow(cases)*controls_per_case >= nrow(non_cases_unexposed)){
       non_cases_unexposed=non_cases_unexposed
+      print("Non-cases not sampled - all non-cases used")
     }
-    
+
     non_case_inverse_weight=(nrow(survival_data)-nrow(cases)-nrow(non_cases_exposed))/nrow(non_cases_unexposed)
     survival_data <- bind_rows(cases,non_cases_exposed,non_cases_unexposed)
     
@@ -53,8 +60,10 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     if(nrow(cases)*controls_per_case < nrow(non_cases)){
       non_cases <- non_cases[sample(1:nrow(non_cases), nrow(cases)*controls_per_case,replace=FALSE), ]
+      print("Non-cases sampled")
     }else if (nrow(cases)*controls_per_case >= nrow(non_cases)){
       non_cases=non_cases
+      print("Non-cases not sampled - all non-cases used")
     }
     
     non_case_inverse_weight=(nrow(survival_data)-nrow(cases))/nrow(non_cases)
@@ -65,7 +74,12 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     print(paste0("Controls weight: ", non_case_inverse_weight))
     
   }
-
+  
+  #Add inverse probablity weights for non-cases
+  survival_data$cox_weights <- ifelse(survival_data$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
+  
+  sampled_data <- as.data.frame(survival_data)
+  
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
   survival_data$days_to_end <- as.numeric(survival_data$follow_up_end-cohort_start_date)
   
@@ -78,7 +92,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   #===============================================================================
   #   CACHE some features
   #-------------------------------------------------------------------------------  
-  df_sex <- survival_data %>% dplyr::select(patient_id, sex)
+  df_sex_cox_weights <- survival_data %>% dplyr::select(patient_id, sex, cox_weights)
   df_age_region_ethnicity <- survival_data %>% dplyr::select(patient_id, AGE_AT_COHORT_START, region_name, ethnicity) %>% rename(age = AGE_AT_COHORT_START)
   df_age_region_ethnicity$age_sq <- df_age_region_ethnicity$age^2
   
@@ -227,7 +241,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     # FINALIZE age, region, data_surv
     #-------------------------------------------------------------------------------
     data_surv <- data_surv %>% left_join(df_age_region_ethnicity)
-    data_surv <- data_surv %>% left_join(df_sex)
+    data_surv <- data_surv %>% left_join(df_sex_cox_weights)
     print(paste0("Finished survival data"))
     
     # ============================= EVENTS COUNT =================================
@@ -286,7 +300,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     for(i in 1:nrow(intervals_with_days_cat)){
       days_category <- intervals_with_days_cat$days_cat[i]
       interval_period <- intervals_with_days_cat$interval[i]
-      data_surv[,paste0("person_days_",interval_period)] <- ifelse(data_surv$days_cat == days_category,data_surv$tstop - data_surv$tstart,0)
+      data_surv[,paste0("person_days_",interval_period)] <- ifelse(data_surv$days_cat == days_category,(data_surv$tstop - data_surv$tstart)*data_surv$cox_weights,0)
       intervals_with_days_cat$person_days_follow_up[which(intervals_with_days_cat$days_cat==days_category)] <- sum(data_surv[,paste0("person_days_",interval_period)])
     }
     
@@ -303,6 +317,10 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     #Any time periods with <=5 events? If yes, will reduce time periods
     ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
     
+    if(time_point == "alternative"){
+      ind_any_zeroeventperiod = "FALSE"
+    }
+    
     #Are there <50 post expo events? If yes, won't run analysis
     #Can change <50 to be lower to test on dummy data
     less_than_50_events = any((as.numeric(tbl_event_count$events_total) <50) & (tbl_event_count$expo_week=="all post expo"))
@@ -314,12 +332,12 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     # Save events counts if less than 50 events as this script will not re-run with reduced time periods
     
     if(ind_any_zeroeventperiod==FALSE | less_than_50_events==TRUE){
-      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods_covariate_testing_",covar_fit,".csv"), row.names = T)
-      print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods_covariate_testing_",covar_fit,".csv"))
+      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"), row.names = T)
+      print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     }
     
     
-    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_50_events))
+    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_50_events, sampled_data))
     
   }else{
     analyses_not_run[nrow(analyses_not_run)+1,]<- c(event,subgroup,cohort,any_exposures,any_exposed_events,any_no_expo,"FALSE")

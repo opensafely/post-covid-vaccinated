@@ -118,7 +118,10 @@ stage1 <- function(cohort_name){
     ## vax_cat_product_*
     vax_cat_product_factors <- colnames(input)[grepl("vax_cat_product_",colnames(input))]
     input[,vax_cat_product_factors] <- lapply(input[,vax_cat_product_factors], function(x) ordered(x, levels = c("Pfizer","AstraZeneca","Moderna")))
-  
+    
+    ## Set reference level for binary covariates
+    bin_factors <- colnames(input)[grepl("cov_bin_",colnames(input))]
+    input[,bin_factors] <- lapply(input[,bin_factors], function(x) factor(x, levels = c("FALSE","TRUE")))
 
     #####################
     # 2. Apply QA rules #
@@ -237,7 +240,7 @@ stage1 <- function(cohort_name){
                       filter(cov_cat_region != "Missing")%>%
                       mutate(cov_cat_region = as.factor(cov_cat_region))
     
-    input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
+    input$cov_cat_region <- relevel(input$cov_cat_region, ref = "East")
     cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[7,1]) - nrow(input), "Criteria 6 (Inclusion): Known region")
     
     #Exclusion criteria 6: SARS-CoV-2 infection recorded prior to the start of follow-up
