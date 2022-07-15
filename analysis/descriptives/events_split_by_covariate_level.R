@@ -71,6 +71,7 @@ event_by_covariate_level <- function(cohort_name, time_periods,save_name){
   #                                        right = FALSE, 
   #                                        labels = agelabels)]
   
+  
   for(i in active_analyses$outcome_variable){
     analyses_to_run <- active_analyses %>% filter(outcome_variable==i)
     
@@ -86,7 +87,7 @@ event_by_covariate_level <- function(cohort_name, time_periods,save_name){
     analyses_to_run$subgroup <- row.names(analyses_to_run)
     colnames(analyses_to_run) <- c("run","subgroup")
     
-    analyses_to_run<- analyses_to_run %>% filter(run=="TRUE"  & subgroup != "active" & subgroup != "main") 
+    analyses_to_run<- analyses_to_run %>% filter(run=="TRUE"  & subgroup != "active") 
     rownames(analyses_to_run) <- NULL
     analyses_to_run <- analyses_to_run %>% select(!run)
     analyses_to_run$event=i
@@ -106,6 +107,7 @@ event_by_covariate_level <- function(cohort_name, time_periods,save_name){
     
     # Add in relevant subgroup levels to specify which stratum to run for
     analyses_to_run$strata <- NA
+    analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="main","main",analyses_to_run$strata)
     analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="covid_history","TRUE",analyses_to_run$strata)
     
     for(k in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
@@ -187,7 +189,7 @@ event_by_covariate_level <- function(cohort_name, time_periods,save_name){
   # write output for covariate count table
   write.csv(results, file=paste0(output_dir,"/event_counts_by_covariate_level_",cohort_name,"_",save_name,"_time_periods.csv"), row.names = F)
   
-  select_covariates_for_cox(results, save_name, time_periods_names, active_analyses)
+  select_covariates_for_cox(results, save_name, time_periods_names, active_analyses,cohort_name)
 }
 
 
@@ -321,7 +323,7 @@ event_by_covariate_level_counts <- function(survival_data,event,subgroup,stratif
 }
 
 
-select_covariates_for_cox <- function(results, save_name,time_periods_names, active_analyses){
+select_covariates_for_cox <- function(results, save_name,time_periods_names, active_analyses,cohort_name){
   print(paste0("Starting work on selecting covariates"))
   
   results <- results %>% mutate(across(c(unexposed_event_counts, all_of(time_periods_names)), as.numeric))
@@ -371,7 +373,8 @@ select_covariates_for_cox <- function(results, save_name,time_periods_names, act
     
   }
   
-  write.csv(results, file=paste0(output_dir,"/non_zero_selected_covariates_",cohort_name,"_",save_name,"_time_periods.csv"), row.names = F)
+  covariates_to_adjust_for$time_period <-  save_name
+  write.csv(covariates_to_adjust_for, file=paste0(output_dir,"/non_zero_selected_covariates_",cohort_name,"_",save_name,"_time_periods.csv"), row.names = F)
   
 }
 
