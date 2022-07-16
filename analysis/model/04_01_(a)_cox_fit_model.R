@@ -181,12 +181,8 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
   combined_results <- as.data.frame(matrix(ncol=11,nrow=0))
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","results_fitted","model","covariates_removed","cat_covars_collapsed","covariates_fitted")
   
-  if(subgroup == "covid_pheno_hospitalised"){
-    mdl = append(mdl,"mdl_max_adj_reduced_covars")
-  }
-  
   # For electively unvaccinated hospitalised ATE set the region reference as London
-  if(event_name == "ate" & cohort == "electively_unvaccinated" & subgroup == "covid_pheno_hospitalised"){
+  if(subgroup == "covid_pheno_hospitalised" & ((event_name == "ate" & cohort == "electively_unvaccinated") | (event_name == "vte" & cohort == "vaccinated") | (event_name == "angina" & cohort == "vaccinated"))){
     data_surv$region_name <- relevel(data_surv$region_name, ref = "London")
     print("Region releveled with London before fitting cox")
   }

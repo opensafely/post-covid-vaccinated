@@ -57,9 +57,6 @@ source(file.path(scripts_dir,"06_cox_extra_functions.R"))
 source(file.path(scripts_dir,"02_03_cox_timepoint_param.R")) # Prepare dataset for model
 
 # add reduced time point column 
-if(cohort =="vaccinated"){
-  analyses_to_run <- analyses_to_run %>% filter(subgroup=="covid_pheno_hospitalised")
-}
 
 analyses_to_run$reduced_timepoint <- lapply(split(analyses_to_run,seq(nrow(analyses_to_run))),
                                             function(analyses_to_run) 
