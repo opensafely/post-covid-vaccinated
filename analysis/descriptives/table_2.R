@@ -97,6 +97,9 @@ table_2_subgroups_output <- function(cohort_name){
     analyses_to_run <- analyses_to_run %>% select(!run)
     analyses_to_run$event=i
     
+    # Add an age/sex row
+    analyses_to_run[nrow(analyses_to_run) + 1,] = c("age_sex",i)
+    
     # Add in  all possible combinations of the subgroups, models and cohorts
     analyses_to_run <- crossing(analyses_to_run,cohort_to_run)
     
@@ -117,13 +120,17 @@ table_2_subgroups_output <- function(cohort_name){
     for(k in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
       analyses_to_run$strata <- ifelse(startsWith(analyses_to_run$subgroup,k),gsub(k,"",analyses_to_run$subgroup),analyses_to_run$strata)
     }
-    analyses_of_interest <- rbind(analyses_of_interest,analyses_to_run)
     
+    age_sex_cat <- ""
     for(l in c("Female","Male")){
       for(m in agelabels){
-        analyses_to_run[nrow(analyses_to_run)+1,] = c("age_sex",i,"age_sex",paste0(l,"_",m))
+        age_sex_cat <- paste0(age_sex_cat, l, "_", m, ";" , sep="")
       }
-    }
+    }  
+    analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="age_sex",age_sex_cat,analyses_to_run$strata)
+    analyses_to_run <- tidyr::separate_rows(analyses_to_run, strata, sep = ";")
+
+    analyses_of_interest <- rbind(analyses_of_interest,analyses_to_run)
     
   }
   
