@@ -33,6 +33,14 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     controls_per_case <- ceiling((5000000-nrow(cases))/nrow(cases))
   }
   
+  if(event_name == "pe" & cohort == "vaccinated" & subgroup == "covid_pheno_hospitalised"){
+    controls_per_case <- ceiling((4000000-nrow(cases))/nrow(cases))
+  }
+  
+  if(event_name == "vte" & cohort == "electively_unvaccinated" & subgroup != "main"){
+    controls_per_case <- ceiling((5000000-nrow(cases))/nrow(cases))
+  }
+  
   print(paste0("Number of controls per case: ", controls_per_case))
   
   if(startsWith(subgroup,"covid_pheno_")){
