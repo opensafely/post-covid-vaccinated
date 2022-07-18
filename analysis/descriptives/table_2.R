@@ -119,6 +119,12 @@ table_2_subgroups_output <- function(cohort_name){
     }
     analyses_of_interest <- rbind(analyses_of_interest,analyses_to_run)
     
+    for(l in c("Female","Male")){
+      for(m in agelabels){
+        analyses_to_run[nrow(analyses_to_run)+1,] = c("age_sex",i,"age_sex",paste0(l,"_",m))
+      }
+    }
+    
   }
   
   analyses_of_interest$strata[analyses_of_interest$strata=="South_Asian"]<- "South Asian"
@@ -133,10 +139,10 @@ table_2_subgroups_output <- function(cohort_name){
       startsWith(subgroup, "ethnicity") ~ "ethnicity",
       startsWith(subgroup, "prior_history") ~ "prior_history",
       startsWith(subgroup, "sex") ~ "sex",
+      startsWith(subgroup, "age_sex") ~ "age_sex",
       TRUE ~ as.character(subgroup)))
   
-  
-  analyses_of_interest[,c("unexposed_person_days", "unexposed_event_count","post_exposure_event_count", "total_person_days","day_0_event_counts")] <- NA
+    analyses_of_interest[,c("unexposed_person_days", "unexposed_event_count","post_exposure_event_count", "total_person_days","day_0_event_counts")] <- NA
   
   #-----------Populate analyses_of_interest with events counts/follow up--------
   for(i in 1:nrow(analyses_of_interest)){
@@ -241,6 +247,11 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
   
   if(startsWith(subgroup,"agegp_")){
     data_active=data_active %>% filter(agegroup== stratify_by)
+  }
+  
+  if(subgroup == "age_sex"){
+    data_active=data_active %>% filter(sex== sub("_.*","",stratify_by))
+    data_active=data_active %>% filter(agegroup== sub(".*e_","",stratify_by))
   }
   
   # calculate unexposed follow-up days for AER script
