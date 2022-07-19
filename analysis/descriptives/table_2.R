@@ -97,9 +97,6 @@ table_2_subgroups_output <- function(cohort_name){
     analyses_to_run <- analyses_to_run %>% select(!run)
     analyses_to_run$event=i
     
-    # Add an age/sex row
-    analyses_to_run[nrow(analyses_to_run) + 1,] = c("age_sex",i)
-    
     # Add in  all possible combinations of the subgroups, models and cohorts
     analyses_to_run <- crossing(analyses_to_run,cohort_to_run)
     
@@ -121,17 +118,7 @@ table_2_subgroups_output <- function(cohort_name){
       analyses_to_run$strata <- ifelse(startsWith(analyses_to_run$subgroup,k),gsub(k,"",analyses_to_run$subgroup),analyses_to_run$strata)
     }
     
-    age_sex_cat <- ""
-    for(l in c("Female","Male")){
-      for(m in agelabels){
-        age_sex_cat <- paste0(age_sex_cat, l, "_", m, ";" , sep="")
-      }
-    }  
-    analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="age_sex",age_sex_cat,analyses_to_run$strata)
-    analyses_to_run <- tidyr::separate_rows(analyses_to_run, strata, sep = ";")
-
     analyses_of_interest <- rbind(analyses_of_interest,analyses_to_run)
-    
   }
   
   analyses_of_interest$strata[analyses_of_interest$strata=="South_Asian"]<- "South Asian"
@@ -149,8 +136,17 @@ table_2_subgroups_output <- function(cohort_name){
       startsWith(subgroup, "age_sex") ~ "age_sex",
       TRUE ~ as.character(subgroup)))
   
-    analyses_of_interest[,c("unexposed_person_days", "unexposed_event_count","post_exposure_event_count", "total_person_days","day_0_event_counts")] <- NA
+  analyses_of_interest[,c("unexposed_person_days", "unexposed_event_count","post_exposure_event_count", "total_person_days","day_0_event_counts")] <- NA
   
+  #Add age/sex specific columns for unexposd_event_count, unexposed_person_days, total_covid_cases
+  for(l in c("Female","Male")){
+    for(m in agelabels){
+      for(n in c("unexposed_days","unexposed_count","covid_count")){
+        analyses_of_interest[,paste0(l,"_",m,"_",n)] <- NA
+      }
+    }
+  } 
+
   #-----------Populate analyses_of_interest with events counts/follow up--------
   for(i in 1:nrow(analyses_of_interest)){
     print(paste0("Working on ", analyses_of_interest$event[i]," ", analyses_of_interest$subgroup[i]))
@@ -186,6 +182,8 @@ table_2_subgroups_output <- function(cohort_name){
     analyses_of_interest$post_exposure_event_count[i] <- table2_output[[3]]
     analyses_of_interest$total_person_days[i] <- table2_output[[4]]
     analyses_of_interest$day_0_event_counts[i] <- table2_output[[5]]
+    
+    ##!!!need to come back here to add in age/sex subgroups
     
     setnames(survival_data,
              old = c("event_date",
@@ -256,11 +254,6 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
     data_active=data_active %>% filter(agegroup== stratify_by)
   }
   
-  if(subgroup == "age_sex"){
-    data_active=data_active %>% filter(sex== sub("_.*","",stratify_by))
-    data_active=data_active %>% filter(agegroup== sub(".*e_","",stratify_by))
-  }
-  
   # calculate unexposed follow-up days for AER script
   data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date))))
   index <- which(data_active$follow_up_end_unexposed < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
@@ -301,6 +294,17 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
 
   person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
   person_days_total = round(sum(data_active$person_days, na.rm = TRUE),1)
+  
+  #Add age/sex calculations
+  for(l in c("Female","Male")){
+    for(m in agelabels){
+      age_low <- gsub("_.*$","",m)
+      age_high <- gsub(".*_","",m)
+      age_low <- as.numeric(age_low)
+      age_high <- as.numeric(age_high)
+      assign(paste(l,"_",m,"_unexposed_days",sep=""), round(sum(data_active[which(data_active$sex==l & data_active$cov_num_age >= age_low & data_active$cov_num_age <= age_high), data_active$person_days_unexposed])))
+    }
+  }  
  
   if(!startsWith(subgroup,"covid_pheno_")){
     event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
