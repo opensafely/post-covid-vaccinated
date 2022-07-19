@@ -169,6 +169,7 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
   }
   
   covariates <- covar_names[covar_names %in% names(data_surv)] %>% sort()
+  reduced_covar_names <- str_split(reduced_covar_names, ";")[[1]]
   reduced_covariates <- intersect(covariates,reduced_covar_names)
   additional_covars_removed <- covariates[!covariates %in% reduced_covariates]
   print(paste0("Additional covariates removed for hospitalised analysis: ", additional_covars_removed))
