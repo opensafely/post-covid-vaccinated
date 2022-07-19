@@ -1076,3 +1076,10 @@ actions:
         region_cumulative_outcome_plot: output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg
         region_cumulative_outcome_data: output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv
 
+# cox models in stata
+run: stata:analysis/PE_AMI cox model code stata.do
+needs:
+- Analysis_cox_pe_electively_unvaccinated
+outputs: 
+  moderately sensitive:
+    log file: output/PE_AMI_cox_stata.log
