@@ -318,6 +318,20 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
     day_0_event_count <- length(which(data_active$event_date >= data_active$index_date &
                                         data_active$event_date == data_active$exp_date_covid19_confirmed & 
                                         data_active$event_date <= data_active$follow_up_end))
+    
+    #Add age/sex calculations
+    for(l in c("Female","Male")){
+      for(m in agelabels){
+        age_low <- gsub("_.*$","",m)
+        age_high <- gsub(".*_","",m)
+        age_low <- as.numeric(age_low)
+        age_high <- as.numeric(age_high)
+        assign(paste(l,"_",m,"_unexposed_events",sep=""), length(which((data_active$event_date >= data_active$index_date & 
+                                                                          data_active$event_date <= data_active$follow_up_end) &
+                                                                         (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed)) &
+                                                                          data_active$sex==l & data_active$cov_num_age >= age_low & data_active$cov_num_age <= age_high)))
+      }
+    }
   }
   
   if(subgroup=="covid_pheno_hospitalised"){
@@ -332,6 +346,20 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
     day_0_event_count <- length(which(data_active$event_date >= data_active$index_date &
                                         data_active$event_date == data_active$exp_date_covid19_confirmed & 
                                         data_active$event_date <= data_active$hospitalised_follow_up_end))
+    
+    #Add age/sex calculations
+    for(l in c("Female","Male")){
+      for(m in agelabels){
+        age_low <- gsub("_.*$","",m)
+        age_high <- gsub(".*_","",m)
+        age_low <- as.numeric(age_low)
+        age_high <- as.numeric(age_high)
+        assign(paste(l,"_",m,"_unexposed_events",sep=""), length(which((data_active$event_date >= data_active$index_date & 
+                                                                          data_active$event_date <= data_active$hospitalised_follow_up_end) &
+                                                                         (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed)) &
+                                                                          data_active$sex==l & data_active$cov_num_age >= age_low & data_active$cov_num_age <= age_high)))
+      }
+    }
   }
   
   if(subgroup=="covid_pheno_non_hospitalised"){
@@ -346,6 +374,20 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
     day_0_event_count <- length(which(data_active$event_date >= data_active$index_date &
                                         data_active$event_date == data_active$exp_date_covid19_confirmed &
                                         data_active$event_date <= data_active$non_hospitalised_follow_up_end))
+
+    #Add age/sex calculations
+    for(l in c("Female","Male")){
+      for(m in agelabels){
+        age_low <- gsub("_.*$","",m)
+        age_high <- gsub(".*_","",m)
+        age_low <- as.numeric(age_low)
+        age_high <- as.numeric(age_high)
+        assign(paste(l,"_",m,"_unexposed_events",sep=""), length(which((data_active$event_date >= data_active$index_date &
+                                                                          data_active$event_date <= data_active$non_hospitalised_follow_up_end) &
+                                                                         (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed)) &
+                                                                          data_active$sex==l & data_active$cov_num_age >= age_low & data_active$cov_num_age <= age_high)))
+      }
+    }
   }
   
   if(day_0_event_count <= 5 | (event_count_exposed - day_0_event_count) <=5){
@@ -360,7 +402,7 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
     event_count_exposed <- "[Redacted]"
   }
   
-  return(list(person_days_total_unexposed, event_count_unexposed, event_count_exposed,person_days_total, day_0_event_count))
+  return(list(person_days_total_unexposed, event_count_unexposed, event_count_exposed, person_days_total, day_0_event_count))
 }
 
 
