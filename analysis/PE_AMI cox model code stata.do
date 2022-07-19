@@ -1,10 +1,8 @@
 * Script to run PE and ATE outcomes in the electively unvaccinated population in STATA
 * Electively unvaccinated is a whole population sample
 
-clear
-cd "C:\Users\rd16568\OneDrive - University of Bristol\Documents\CONVALESCENCE\CVD stata analysis"
-import delim using "input_sampled_data_ate_covid_pheno_hospitalised_vaccinated_reduced_time_periods.csv"
-**log using "", replace
+import delim using "output/input_sampled_data_ate_covid_pheno_hospitalised_vaccinated_reduced_time_periods.csv" 
+log using "output/PE_AMI_cox_stata", replace
 
 *****************************
 * reformating the data
