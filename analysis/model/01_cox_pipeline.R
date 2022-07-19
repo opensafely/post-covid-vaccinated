@@ -104,7 +104,7 @@ if(nrow(analyses_to_run>0)){
              stratify_by=analyses_to_run$strata,           
              time_point=analyses_to_run$reduced_timepoint,       
              input,covar_names,
-             reduced_covar_names=analyses_to_run$covariates,#
+             reduced_covar_names=analyses_to_run$covariates,
              cuts_days_since_expo,cuts_days_since_expo_reduced,mdl))
 }
 
