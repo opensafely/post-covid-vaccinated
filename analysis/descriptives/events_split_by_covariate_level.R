@@ -354,7 +354,7 @@ select_covariates_for_cox <- function(results, save_name,time_periods_names, act
       tmp <- tmp %>%
         group_by(event, covariate, subgroup) %>%
         dplyr::mutate(keep_covariate = case_when(
-          any(unexposed_event_counts == 0 | days0_28_event_counts == 0 | days0_28_event_counts == 0) ~ "remove_covariate",
+          any(unexposed_event_counts == 0 | days0_28_event_counts == 0 | days28_197_event_counts == 0) ~ "remove_covariate",
           TRUE ~ "keep_covariate"))
     }else if(save_name == "alternative"){
       tmp <- tmp %>%
