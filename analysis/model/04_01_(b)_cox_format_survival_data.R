@@ -305,15 +305,31 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     intervals_with_days_cat <- intervals_with_days_cat[order(intervals_with_days_cat$days_cat),]
     intervals_with_days_cat$person_days_follow_up <- NA
     
+    intervals_with_days_cat$median_follow <- NA
+    
     for(i in 1:nrow(intervals_with_days_cat)){
       days_category <- intervals_with_days_cat$days_cat[i]
       interval_period <- intervals_with_days_cat$interval[i]
+      
+      #Multiply follow up by cox weights for person days of follow up
       data_surv[,paste0("person_days_",interval_period)] <- ifelse(data_surv$days_cat == days_category,(data_surv$tstop - data_surv$tstart)*data_surv$cox_weights,0)
       intervals_with_days_cat$person_days_follow_up[which(intervals_with_days_cat$days_cat==days_category)] <- sum(data_surv[,paste0("person_days_",interval_period)])
+      
+      
+      #Calculate person days excluding weighting to be used for median calculation
+      data_surv[,paste0("person_days_",interval_period)] <- ifelse(data_surv$days_cat == days_category,(data_surv$tstop - data_surv$tstart),0)
+      intervals_with_days_cat$median_follow[which(intervals_with_days_cat$days_cat==days_category)] <- weightedMedian(x = data_surv[data_surv$days_cat==days_category,paste0("person_days_",interval_period)][[1]], w = data_surv[data_surv$days_cat==days_category,"cox_weights"][[1]])
     }
     
+    data_surv$person_days_post_expo <- ifelse(data_surv$days_cat != 0,(data_surv$tstop - data_surv$tstart),0)
+    post_expo_median <- data_surv %>% filter(days_cat != 0) %>% 
+      group_by(patient_id) %>%
+      summarise(sum_follow_up = sum(person_days_post_expo)) %>%
+      left_join(data_surv %>% select(patient_id, cox_weights) %>% distinct(), by = "patient_id")
+    
+    
     intervals_with_days_cat$days_cat <- NULL
-    intervals_with_days_cat[nrow(intervals_with_days_cat)+1,] <- c("all post expo", sum(intervals_with_days_cat$person_days_follow_up[which(intervals_with_days_cat$interval != "pre expo")]))
+    intervals_with_days_cat[nrow(intervals_with_days_cat)+1,] <- c("all post expo", sum(intervals_with_days_cat$person_days_follow_up[which(intervals_with_days_cat$interval != "pre expo")]),weightedMedian(x = post_expo_median$sum_follow_up, w = post_expo_median$cox_weights))
     
     
     tbl_event_count <- tbl_event_count %>% left_join(intervals_with_days_cat, by=c("expo_week"="interval"))
