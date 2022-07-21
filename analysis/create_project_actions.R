@@ -439,6 +439,15 @@ actions_list <- splice(
     moderately_sensitive = list(
       region_cumulative_outcome_plot = glue("output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.jpeg"),
       region_cumulative_outcome_data = glue("output/region_cumulative-input_ate_covid_pheno_hospitalised_electively_unvaccinated_covariate_testing_normal.csv"))
+  ),
+  
+  #comment("Temporary action - run model using stata"),
+  action(
+    name = "stata_model",
+    run = "stata-mp:latest analysis/PE_AMI cox model code stata.do",
+    needs = list("Analysis_cox_pe_electively_unvaccinated"),
+    moderately_sensitive = list(
+      log_file = glue("output/PE_AMI_cox_stata.log"))
   )
   
 )
