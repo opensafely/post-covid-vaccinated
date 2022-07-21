@@ -396,21 +396,21 @@ actions_list <- splice(
     hosp_events_by_region_suppressed = "output/not-for-review/hospitalised_covid_event_counts_by_region_electively_unvaccinated_suppressed.csv")),
   
   #comment("Hospitalised event counts by covariate level"),
-  splice(
-    # over cohort
-    unlist(lapply(cohort_to_run, function(x) hosp_event_counts_by_covariate_level(cohort = x)), recursive = FALSE)
-  ),
+  # splice(
+  #   # over cohort
+  #   unlist(lapply(cohort_to_run, function(x) hosp_event_counts_by_covariate_level(cohort = x)), recursive = FALSE)
+  # ),
   
   #comment("Select covariates for hosp COVID)
-  action(
-    name = "select_covariates_for_hosp_covid",
-    run = "r:latest analysis/descriptives/determine_covariates_for_hosp_covid.R both",
-    needs = list("hosp_event_counts_by_covariate_level_vaccinated","hosp_event_counts_by_covariate_level_electively_unvaccinated"),
-    moderately_sensitive = list(
-      covariates_for_hosp_covid_vacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_vaccinated.csv",
-      covariates_for_hosp_covid_electively_unvacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv")
-  ),
-  
+  # action(
+  #   name = "select_covariates_for_hosp_covid",
+  #   run = "r:latest analysis/descriptives/determine_covariates_for_hosp_covid.R both",
+  #   needs = list("hosp_event_counts_by_covariate_level_vaccinated","hosp_event_counts_by_covariate_level_electively_unvaccinated"),
+  #   moderately_sensitive = list(
+  #     covariates_for_hosp_covid_vacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_vaccinated.csv",
+  #     covariates_for_hosp_covid_electively_unvacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv")
+  # ),
+  # 
   #comment("Temporary action - check ethnicity and region by time period for PE"),
   action(
     name = "check_episode_covar_pe-ethnicity_region",
@@ -472,10 +472,10 @@ actions_list <- splice(
   #comment("Temporary action - run model using stata"),
   action(
     name = "stata_model",
-    run = "stata-mp:latest analysis/PE_AMI cox model code stata.do",
+    run = "stata-mp:latest analysis/cox_model.do",
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
-      log_file = glue("output/PE_AMI_cox_stata.log"))
+      log_file = glue("output/stata_cox_model.log"))
   )
   
 )
