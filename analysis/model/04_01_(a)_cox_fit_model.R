@@ -83,12 +83,12 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   }
   
   if(subgroup=="covid_pheno_hospitalised"){
-    # Merge missing smoking into ever smoker
+    # Merge missing smoking into never smoker
     data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status))%>%
       mutate(cov_cat_smoking_status = case_when(cov_cat_smoking_status=="Never smoker" ~ "Never smoker",
                                                 cov_cat_smoking_status=="Ever smoker" ~ "Ever smoker",
                                                 cov_cat_smoking_status=="Current smoker" ~ "Current smoker",
-                                                cov_cat_smoking_status=="Missing" ~ "Ever smoker"
+                                                cov_cat_smoking_status=="Missing" ~ "Never smoker"
       ))
     
     
@@ -104,7 +104,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
       mutate(cov_cat_smoking_status = case_when(cov_cat_smoking_status=="Never smoker" ~ "Never smoker",
                                                 cov_cat_smoking_status=="Ever smoker" ~ "Ever smoker",
                                                 cov_cat_smoking_status=="Current smoker" ~ "Current smoker",
-                                                cov_cat_smoking_status=="Missing" ~ "Ever smoker"
+                                                cov_cat_smoking_status=="Missing" ~ "Never smoker"
       ))
     
     

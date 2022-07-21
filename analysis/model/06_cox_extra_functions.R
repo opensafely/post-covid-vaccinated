@@ -73,7 +73,7 @@ collapse_categorical_covars <- function(data_surv,subgroup){
         mutate(cov_cat_smoking_status= case_when(cov_cat_smoking_status=="Never smoker"~"Never smoker",
                                                  cov_cat_smoking_status=="Ever smoker"~"Ever smoker",
                                                  cov_cat_smoking_status=="Current smoker"~"Ever smoker",
-                                                 cov_cat_smoking_status=="Missing"~"Missing"))
+                                                 cov_cat_smoking_status=="Missing"~"Never smoker"))
       
       smoking_status_mode <- get_mode(data_surv,"cov_cat_smoking_status")
       data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status)) %>%
