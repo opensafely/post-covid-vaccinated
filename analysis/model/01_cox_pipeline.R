@@ -26,6 +26,7 @@ library(rms)
 #library(multcomp)
 library(readr)
 library(Hmisc)
+library(matrixStats)
 
 
 args = commandArgs(trailingOnly=TRUE)
