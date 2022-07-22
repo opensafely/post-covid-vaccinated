@@ -89,6 +89,17 @@ actions:
       highly_sensitive:
         cohort: output/input_*_stage1.rds
 
+  create_covid_incidence_data_both:
+    run: r:latest analysis/descriptives/create_incidence_data.R both
+    needs:
+    - preprocess_data_vaccinated
+    - preprocess_data_electively_unvaccinated
+    - stage1_data_cleaning_both
+    outputs:
+      moderately_sensitive:
+        weekly: output/review/figure-data/incidence/weekly_*.csv
+        cumulative: output/review/figure-data/incidence/cum_*.csv
+
   stage1_end_date_table_vaccinated:
     run: r:latest analysis/preprocess/create_follow_up_end_date.R vaccinated
     needs:
