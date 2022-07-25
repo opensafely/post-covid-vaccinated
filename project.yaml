@@ -1108,5 +1108,5 @@ actions:
     - Analysis_cox_pe_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        log_file: output/stata_cox_model.log
+        log: output/stata_cox_model.log
 
