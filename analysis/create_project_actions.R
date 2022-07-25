@@ -299,34 +299,6 @@ actions_list <- splice(
     unlist(lapply(cohort_to_run, function(x) event_counts_by_covariate_level(cohort = x)), recursive = FALSE)
   ),
   
-
-  #comment("Stage 3 - No action there for CVD outcomes"),  
-
-  #comment("Stage 3 - Diabetes flow - vaccinated"),  
-  
-  action(
-    name = "stage3_diabetes_flow_vaccinated",
-    run = "r:latest analysis/descriptives/diabetes_flowchart.R vaccinated",
-    needs = list("stage1_data_cleaning_both"),
-    moderately_sensitive = list(
-      flow_df = glue("output/review/figure-data/diabetes_flow_values_vaccinated.csv")
-      # flow_fig = glue("output/diabetes_flow.png"),
-    ),
-  ),
-
-  #comment("Stage 3 - Diabetes flow - electively_unvaccinated"),  
-  
-  action(
-    name = "stage3_diabetes_flow_electively_unvaccinated",
-    run = "r:latest analysis/descriptives/diabetes_flowchart.R electively_unvaccinated",
-    needs = list("stage1_data_cleaning_both"),
-    moderately_sensitive = list(
-      flow_df = glue("output/review/figure-data/diabetes_flow_values_electively_unvaccinated.csv")
-      # flow_fig = glue("output/diabetes_flow.png"),
-    ),
-  ),
-  
-  
   #comment("Stage 4 - Create input for table2"),
   splice(
     # over outcomes

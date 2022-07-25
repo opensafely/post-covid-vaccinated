@@ -27,7 +27,7 @@ import study_definition_helper_functions as helpers
 from common_variables import generate_common_variables
 (
     dynamic_variables
-) = generate_common_variables(index_date_variable="index_date")
+) = generate_common_variables(index_date_variable="index_date", index_date_variable_covariates = "index_date - 1 day")
 
 study = StudyDefinition(
 
