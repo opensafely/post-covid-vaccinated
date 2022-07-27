@@ -126,7 +126,7 @@ jcvi_variables = dict(
         severely_clinically_vulnerable=patients.with_these_clinical_events(
             shield_primis,
             returning="binary_flag",
-            on_or_before=ref_cev - 1 day,
+            on_or_before="ref_cev - 1 day",
             find_last_match_in_period=True,
         ),
 
