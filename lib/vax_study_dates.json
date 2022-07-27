@@ -1,0 +1,12 @@
+{
+  "ref_age_1": "2021-03-31",
+  "ref_age_2": "2021-07-01",
+  "ref_cev": "2021-01-18",
+  "ref_ar": "2021-02-15",
+  "pandemic_start": "2020-01-01",
+  "start_date": "2020-12-08",
+  "start_date_pfizer": "2020-12-08",
+  "start_date_az": "2021-01-04",
+  "start_date_moderna": "2021-03-04",
+  "end_date": "2022-06-07"
+}

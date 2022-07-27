@@ -16,7 +16,7 @@ import pandas as pd
 ### import groups and dates
 # jcvi_groups
 jcvi_groups = pd.read_csv(
-    filepath_or_buffer='./output/vax_jcvi_groups.csv',
+    filepath_or_buffer='./lib/vax_jcvi_groups.csv',
     dtype=str
 )
 dict_jcvi = {jcvi_groups['group'][i]: jcvi_groups['definition'][i] for i in jcvi_groups.index}
@@ -24,14 +24,14 @@ ratio_jcvi = {jcvi_groups['group'][i]: 1/len(jcvi_groups.index) for i in jcvi_gr
 
 # elig_dates
 elig_dates = pd.read_csv(
-    filepath_or_buffer='./output/vax_eligible_dates.csv',
+    filepath_or_buffer='./lib/vax_eligible_dates.csv',
     dtype=str
 )
 dict_elig = { elig_dates['date'][i] : elig_dates['description'][i] for i in elig_dates.index }
 ratio_elig = { elig_dates['date'][i] : 1/len(elig_dates.index) for i in elig_dates.index }
 
 #study_dates
-with open("./output/vax_study_dates.json") as f:
+with open("./lib/vax_study_dates.json") as f:
   study_dates = json.load(f)
 
 # define variables explicitly
@@ -40,7 +40,7 @@ ref_age_2=study_dates["ref_age_2"] # reference date for calculating age for phas
 ref_cev=study_dates["ref_cev"] # reference date for calculating clinically extremely vulnerable group
 ref_ar=study_dates["ref_ar"] #reference date for caluclating at risk group
 start_date=study_dates["start_date"] # start of phase 1
-end_date=study_dates["end_date"] # end of followup
+end_date=study_dates["end_date"] # latest date of data
 pandemic_start=study_dates["pandemic_start"]
 
 ## function to add days to a string date
@@ -149,47 +149,44 @@ jcvi_variables = dict(
     ),
 
     #### at-risk group variables
-    # Asthma Diagnosis code
-    astdx=patients.with_these_clinical_events(
-        ast_primis,
-        returning="binary_flag",
-        on_or_before=days(ref_ar, -1),
-        return_expectations={"incidence": 0.05},
-    ),
-            
     # asthma
     asthma_group=patients.satisfying(
-        """
-        astadm OR
-        (astdx AND astrxm1 AND astrxm2 AND astrxm3)
-        """,
-        # day before date at which at risk group became eligible
-        # Asthma Admission codes
-        astadm=patients.with_these_clinical_events(
-            astadm_primis,
-            returning="binary_flag",
-            on_or_before=days(ref_ar, -1),
-        ),
-        # Asthma systemic steroid prescription code in month 1
-        astrxm1=patients.with_these_medications(
-            astrx_primis,
-            returning="binary_flag",
-            between=[days(ref_ar, -31), days(ref_ar, -1)],
-        ),
-        # Asthma systemic steroid prescription code in month 2
-        astrxm2=patients.with_these_medications(
-            astrx_primis,
-            returning="binary_flag",
-            between=[days(ref_ar, -61), days(ref_ar, -32)],
-        ),
-        # Asthma systemic steroid prescription code in month 3
-        astrxm3=patients.with_these_medications(
-            astrx_primis,
-            returning="binary_flag",
-            between=[days(ref_ar, -91), days(ref_ar, -62)],
-        ),
-        return_expectations={"incidence": 0.01},
+    """
+      astadm OR
+      (ast AND astrxm1 AND astrxm2 AND astrxm3)
+      """,
+    # Asthma Admission codes in past 24 months
+    astadm=patients.with_these_clinical_events(
+      astadm_primis,
+      returning="binary_flag",
+      between=[days(ref_ar, -2*365), days(ref_ar, -1)],
     ),
+    # Asthma Diagnosis code
+    ast = patients.with_these_clinical_events(
+      ast_primis,
+      returning="binary_flag",
+      on_or_before=days(ref_ar, -1),
+    ),
+    # Asthma systemic steroid prescription code in month 1
+    astrxm1=patients.with_these_medications(
+      astrx_primis,
+      returning="binary_flag",
+      between=[days(ref_ar, -31), days(ref_ar, -1)],
+    ),
+    # Asthma systemic steroid prescription code in month 2
+    astrxm2=patients.with_these_medications(
+      astrx_primis,
+      returning="binary_flag",
+      between=[days(ref_ar, -61), days(ref_ar, -32)],
+    ),
+    # Asthma systemic steroid prescription code in month 3
+    astrxm3=patients.with_these_medications(
+      astrx_primis,
+      returning="binary_flag",
+      between=[days(ref_ar, -91), days(ref_ar, -62)],
+    ),
+
+  ),
 
     # Chronic Respiratory Disease other than asthma
     resp_group=patients.with_these_clinical_events(
@@ -386,6 +383,7 @@ jcvi_variables = dict(
              immuno_group OR
              ckd_group OR
              resp_group OR
+             asthma_group OR
              diab_group OR
              cld_group OR
              cns_group OR

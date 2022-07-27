@@ -173,21 +173,20 @@ actions_list <- splice(
   ),
   
   #comment("Generate vaccination eligibility information"),
-  action(
-    name = glue("vax_eligibility_inputs"),
-    run = "r:latest analysis/vax_eligibility_inputs.R",
-    highly_sensitive = list(
-      vax_study_dates_json = glue("output/vax_study_dates.json"),
-      vax_jcvi_groups= glue("output/vax_jcvi_groups.csv"),
-      vax_eligible_dates= ("output/vax_eligible_dates.csv")
-    )
-  ),
+  #action(
+  #  name = glue("vax_eligibility_inputs"),
+  #  run = "r:latest analysis/vax_eligibility_inputs.R",
+  #  highly_sensitive = list(
+  #    vax_study_dates_json = glue("output/vax_study_dates.json"),
+  #    vax_jcvi_groups= glue("output/vax_jcvi_groups.csv"),
+  #    vax_eligible_dates= ("output/vax_eligible_dates.csv")
+  #  )
+  #),
 
   #comment("Generate dummy data for study_definition - electively_unvaccinated"),
   action(
     name = "generate_study_population_electively_unvaccinated",
     run = "cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated --output-format feather",
-    needs = list("vax_eligibility_inputs"),
     highly_sensitive = list(
       cohort = glue("output/input_electively_unvaccinated.feather")
     )

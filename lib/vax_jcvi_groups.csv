@@ -1,0 +1,14 @@
+group,definition
+01,longres_group AND vax_jcvi_age_1 > 65
+02,vax_jcvi_age_1 >=80
+03,vax_jcvi_age_1 >=75
+04,vax_jcvi_age_1 >=70 OR (cev_group AND vax_jcvi_age_1 >=16 AND NOT preg_group)
+05,vax_jcvi_age_1 >=65
+06,atrisk_group AND vax_jcvi_age_1 >=16
+07,vax_jcvi_age_1 >=60
+08,vax_jcvi_age_1 >=55
+09,vax_jcvi_age_1 >=50
+10,vax_jcvi_age_2 >=40
+11,vax_jcvi_age_2 >=30
+12,vax_jcvi_age_2 >=18
+99,DEFAULT

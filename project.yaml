@@ -12,19 +12,9 @@ actions:
   ## Edit and run create_project_actions.R to update the project.yaml 
   ## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-  vax_eligibility_inputs:
-    run: r:latest analysis/vax_eligibility_inputs.R
-    outputs:
-      highly_sensitive:
-        vax_study_dates_json: output/vax_study_dates.json
-        vax_jcvi_groups: output/vax_jcvi_groups.csv
-        vax_eligible_dates: output/vax_eligible_dates.csv
-
   generate_study_population_electively_unvaccinated:
     run: cohortextractor:latest generate_cohort --study-definition study_definition_electively_unvaccinated
       --output-format feather
-    needs:
-    - vax_eligibility_inputs
     outputs:
       highly_sensitive:
         cohort: output/input_electively_unvaccinated.feather
@@ -1108,5 +1098,5 @@ actions:
     - Analysis_cox_pe_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        log: output/stata_cox_model.log
+        log_file: output/stata_cox_model.log
 
