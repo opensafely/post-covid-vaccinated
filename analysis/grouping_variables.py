@@ -105,7 +105,7 @@ jcvi_variables = dict(
             preg_primis,
             returning="date",
             find_last_match_in_period=True,
-            between=[ref_cev -252 days, ref_cev - 1 day],
+            between=["ref_cev -252 days", "ref_cev - 1 day"],
             date_format="YYYY-MM-DD",
         ),
         # date of last delivery code recorded in 36 weeks before elig_date
