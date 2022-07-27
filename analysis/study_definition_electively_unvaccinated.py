@@ -32,8 +32,11 @@ from common_variables import generate_common_variables
 ## Variables for deriving JCVI groups
 from grouping_variables import (
     jcvi_variables, 
+    ref_age_1,
+    ref_age_2,
+    ref_cev,
+    ref_ar,
     start_date,
-    end_date,
 )
 
 study = StudyDefinition(

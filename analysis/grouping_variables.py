@@ -31,27 +31,23 @@ dict_elig = { elig_dates['date'][i] : elig_dates['description'][i] for i in elig
 ratio_elig = { elig_dates['date'][i] : 1/len(elig_dates.index) for i in elig_dates.index }
 
 #study_dates
-with open("./lib/vax_study_dates.json") as f:
-  study_dates = json.load(f)
+#with open("./lib/vax_study_dates.json") as f:
+#  study_dates = json.load(f)
 
 # define variables explicitly
-ref_age_1=study_dates["ref_age_1"] # reference date for calculating age for phase 1 groups
-ref_age_2=study_dates["ref_age_2"] # reference date for calculating age for phase 2 groups
-ref_cev=study_dates["ref_cev"] # reference date for calculating clinically extremely vulnerable group
-ref_ar=study_dates["ref_ar"] #reference date for caluclating at risk group
-start_date=study_dates["start_date"] # start of phase 1
-end_date=study_dates["end_date"] # latest date of data
-pandemic_start=study_dates["pandemic_start"]
+ref_age_1 = "2021-03-31"
+ref_age_2 = "2021-07-01"
+ref_cev = "2021-01-18"
+ref_ar = "2021-02-15"
+start_date = "2020-12-08"
+#ref_age_1=study_dates["ref_age_1"] # reference date for calculating age for phase 1 groups
+#ref_age_2=study_dates["ref_age_2"] # reference date for calculating age for phase 2 groups
+#ref_cev=study_dates["ref_cev"] # reference date for calculating clinically extremely vulnerable group
+#ref_ar=study_dates["ref_ar"] #reference date for caluclating at risk group
+#start_date=study_dates["start_date"] # start of phase 1
+#end_date=study_dates["end_date"] # latest date of data
+#pandemic_start=study_dates["pandemic_start"]
 
-## function to add days to a string date
-from datetime import datetime, timedelta
-def days(datestring, days):
-  
-  dt = datetime.strptime(datestring, "%Y-%m-%d").date()
-  dt_add = dt + timedelta(days)
-  datestring_add = datetime.strftime(dt_add, "%Y-%m-%d")
-
-  return datestring_add
 
 # Notes:
 # for inequalities in the study definition, an extra expression is added to align with the comparison definitions in https://github.com/opensafely/covid19-vaccine-coverage-tpp-emis/blob/master/analysis/comparisons.py
@@ -109,7 +105,7 @@ jcvi_variables = dict(
             preg_primis,
             returning="date",
             find_last_match_in_period=True,
-            between=[days(ref_cev, -252), days(ref_cev, -1)],
+            between=[ref_cev -252 days, ref_cev - 1 day],
             date_format="YYYY-MM-DD",
         ),
         # date of last delivery code recorded in 36 weeks before elig_date
@@ -117,7 +113,7 @@ jcvi_variables = dict(
             pregdel_primis,
             returning="date",
             find_last_match_in_period=True,
-            between=[days(ref_cev, -252), days(ref_cev, -1)],
+            between=["ref_cev -252 days", "ref_cev - 1 day"],
             date_format="YYYY-MM-DD",
         ),
     ),
@@ -130,7 +126,7 @@ jcvi_variables = dict(
         severely_clinically_vulnerable=patients.with_these_clinical_events(
             shield_primis,
             returning="binary_flag",
-            on_or_before=days(ref_cev, -1),
+            on_or_before=ref_cev - 1 day,
             find_last_match_in_period=True,
         ),
 
@@ -143,7 +139,7 @@ jcvi_variables = dict(
         # NOT SHIELDED GROUP (medium and low risk) - only flag if later than 'shielded'
         less_vulnerable=patients.with_these_clinical_events(
             nonshield_primis,
-            between=["severely_clinically_vulnerable_date + 1 day", days(ref_cev, -1)],
+            between=["severely_clinically_vulnerable_date + 1 day", "ref_cev - 1 day"],
         ),
         return_expectations={"incidence": 0.01},
     ),
@@ -159,31 +155,31 @@ jcvi_variables = dict(
     astadm=patients.with_these_clinical_events(
       astadm_primis,
       returning="binary_flag",
-      between=[days(ref_ar, -2*365), days(ref_ar, -1)],
+      between=["ref_ar - 730 days", "ref_ar - 1day"],
     ),
     # Asthma Diagnosis code
     ast = patients.with_these_clinical_events(
       ast_primis,
       returning="binary_flag",
-      on_or_before=days(ref_ar, -1),
+      on_or_before="ref_ar - 1 day",
     ),
     # Asthma systemic steroid prescription code in month 1
     astrxm1=patients.with_these_medications(
       astrx_primis,
       returning="binary_flag",
-      between=[days(ref_ar, -31), days(ref_ar, -1)],
+      between=["ref_ar - 31 days", "ref_ar - 1 day"],
     ),
     # Asthma systemic steroid prescription code in month 2
     astrxm2=patients.with_these_medications(
       astrx_primis,
       returning="binary_flag",
-      between=[days(ref_ar, -61), days(ref_ar, -32)],
+      between=["ref_ar - 61 days", "ref_ar - 32 days"],
     ),
     # Asthma systemic steroid prescription code in month 3
     astrxm3=patients.with_these_medications(
       astrx_primis,
       returning="binary_flag",
-      between=[days(ref_ar, -91), days(ref_ar, -62)],
+      between=["ref_ar - 91 days", "ref_ar - 62 days"],
     ),
 
   ),
@@ -192,7 +188,7 @@ jcvi_variables = dict(
     resp_group=patients.with_these_clinical_events(
         resp_primis,
         returning="binary_flag",
-        on_or_before=days(ref_ar, -1),
+        on_or_before="ref_ar - 1 day",
         return_expectations={"incidence": 0.02},
     ),
 
@@ -200,7 +196,7 @@ jcvi_variables = dict(
     cns_group=patients.with_these_clinical_events(
         cns_primis,
         returning="binary_flag",
-        on_or_before=days(ref_ar, -1),
+        on_or_before="ref_ar - 1 day",
         return_expectations={"incidence": 0.01},
     ),
 
@@ -214,14 +210,14 @@ jcvi_variables = dict(
             diab_primis,
             returning="date",
             find_last_match_in_period=True,
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
             date_format="YYYY-MM-DD",
         ),
         dmres_date=patients.with_these_clinical_events(
             dmres_primis,
             returning="date",
             find_last_match_in_period=True,
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
             date_format="YYYY-MM-DD",
         ),
         return_expectations={"incidence": 0.01},
@@ -238,7 +234,7 @@ jcvi_variables = dict(
             sev_mental_primis,
             returning="date",
             find_last_match_in_period=True,
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
             date_format="YYYY-MM-DD",
         ),
         # Remission codes relating to Severe Mental Illness
@@ -246,7 +242,7 @@ jcvi_variables = dict(
             smhres_primis,
             returning="date",
             find_last_match_in_period=True,
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
             date_format="YYYY-MM-DD",
         ),
         return_expectations={"incidence": 0.01},
@@ -256,7 +252,7 @@ jcvi_variables = dict(
     chd_group=patients.with_these_clinical_events(
         chd_primis,
         returning="binary_flag",
-        on_or_before=days(ref_ar, -1),
+        on_or_before="ref_ar - 1 day",
         return_expectations={"incidence": 0.01},
     ),
 
@@ -272,7 +268,7 @@ jcvi_variables = dict(
             ckd15_primis,
             returning="date",
             find_last_match_in_period=True,
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
             date_format="YYYY-MM-DD",
         ),
         # Chronic kidney disease codes-stages 3 - 5
@@ -280,14 +276,14 @@ jcvi_variables = dict(
             ckd35_primis,
             returning="date",
             find_last_match_in_period=True,
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
             date_format="YYYY-MM-DD",
         ),
         # Chronic kidney disease diagnostic codes
         ckd=patients.with_these_clinical_events(
             ckd_primis,
             returning="binary_flag",
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
         ),
         return_expectations={"incidence": 0.01},
     ),
@@ -296,7 +292,7 @@ jcvi_variables = dict(
     cld_group=patients.with_these_clinical_events(
         cld_primis,
         returning="binary_flag",
-        on_or_before=days(ref_ar, -1),
+        on_or_before="ref_ar - 1 day",
         return_expectations={"incidence": 0.01},
     ),
 
@@ -307,13 +303,13 @@ jcvi_variables = dict(
         immdx=patients.with_these_clinical_events(
             immdx_primis,
             returning="binary_flag",
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
         ),
         # Immunosuppression medication codes
         immrx=patients.with_these_medications(
             immrx_primis,
             returning="binary_flag",
-            between=[days(ref_ar, -6*30), days(ref_ar, -1)],
+            between=["ref_ar - 180 days", "ref_ar - 1 day"],
         ),
         return_expectations={"incidence": 0.01},
     ),
@@ -322,7 +318,7 @@ jcvi_variables = dict(
     spln_group=patients.with_these_clinical_events(
         spln_primis,
         returning="binary_flag",
-        on_or_before=days(ref_ar, -1),
+        on_or_before="ref_ar - 1 day",
         return_expectations={"incidence": 0.01},
     ),
 
@@ -330,7 +326,7 @@ jcvi_variables = dict(
     learndis_group=patients.with_these_clinical_events(
         learndis_primis,
         returning="binary_flag",
-        on_or_before=days(ref_ar, -1),
+        on_or_before="ref_ar - 1 day",
         return_expectations={"incidence": 0.01},
     ),
 
@@ -345,7 +341,7 @@ jcvi_variables = dict(
             bmi_stage_primis,
             returning="date",
             find_last_match_in_period=True,
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
             date_format="YYYY-MM-DD",
         ),
         sev_obesity_date=patients.with_these_clinical_events(
@@ -353,7 +349,7 @@ jcvi_variables = dict(
             returning="date",
             find_last_match_in_period=True,
             ignore_missing_values=True,
-            between= ["bmi_stage_date", days(ref_ar, -1)],
+            between= ["bmi_stage_date", "ref_ar - 1 day"],
             date_format="YYYY-MM-DD",
         ),
         bmi_date=patients.with_these_clinical_events(
@@ -361,7 +357,7 @@ jcvi_variables = dict(
             returning="date",
             ignore_missing_values=True,
             find_last_match_in_period=True,
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
             date_format="YYYY-MM-DD",
         ),
         bmi_value_temp=patients.with_these_clinical_events(
@@ -369,7 +365,7 @@ jcvi_variables = dict(
             returning="numeric_value",
             ignore_missing_values=True,
             find_last_match_in_period=True,
-            on_or_before=days(ref_ar, -1),
+            on_or_before="ref_ar - 1 day",
             return_expectations={
                 "float": {"distribution": "normal", "mean": 25, "stddev": 5},
             },
@@ -402,7 +398,7 @@ jcvi_variables = dict(
     longres_group=patients.with_these_clinical_events(
         longres_primis,
         returning="binary_flag",
-        on_or_before=days(start_date, -1),
+        on_or_before="start_date - 1 day",
         return_expectations={"incidence": 0.01},
     ),
     ),
