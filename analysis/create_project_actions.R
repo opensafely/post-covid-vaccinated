@@ -476,6 +476,15 @@ actions_list <- splice(
     needs = list("Analysis_cox_pe_electively_unvaccinated"),
     moderately_sensitive = list(
       log_file = glue("output/stata_cox_model.log"))
+  ),
+  
+  #comment("Temporary action - check age differences between study definitions"),
+  action(
+    name = "tmp_check_age_diff_between_study_defs",
+    run = "r:latest analysis/tmp/check_age_differences.R",
+    needs = list("generate_study_population_index", "generate_study_population_electively_unvaccinated", "preprocess_data_electively_unvaccinated","preprocess_data_vaccinated"),
+    moderately_sensitive = list(
+      log_file = glue("output/not-for-review/tmp/describe_age_diff.txt"))
   )
   
 )

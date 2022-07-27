@@ -1108,5 +1108,16 @@ actions:
     - Analysis_cox_pe_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        log: output/stata_cox_model.log
+        log_file: output/stata_cox_model.log
+
+  tmp_check_age_diff_between_study_defs:
+    run: r:latest analysis/tmp/check_age_differences.R
+    needs:
+    - generate_study_population_index
+    - generate_study_population_electively_unvaccinated
+    - preprocess_data_electively_unvaccinated
+    - preprocess_data_vaccinated
+    outputs:
+      moderately_sensitive:
+        log_file: output/not-for-review/tmp/describe_age_diff.txt
 
