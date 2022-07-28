@@ -751,7 +751,7 @@ def generate_common_variables(index_date_variable, index_date_variable_covariate
 
     ## Age
     cov_num_age = patients.age_as_of(
-        f"{index_date_variable_covariates}",
+        f"{index_date_variable}",
         return_expectations = {
         "rate": "universal",
         "int": {"distribution": "population_ages"},
