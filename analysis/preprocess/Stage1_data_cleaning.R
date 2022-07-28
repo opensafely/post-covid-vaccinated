@@ -166,24 +166,32 @@ stage1 <- function(cohort_name){
     #saveRDS(QA_summary,file = "output/QA_input.rds")
     
     #QA summary
-    QA_summary <- data.frame(matrix(ncol = 2))
-    colnames(QA_summary) <- c('Rule', '# where rule true')
-    QA_summary[1,1]="Rule 1"
-    QA_summary[1,2]=nrow(input%>%filter(rule1==T))
-    QA_summary[2,1]="Rule 2"
-    QA_summary[2,2]=nrow(input%>%filter(rule2==T))
-    QA_summary[3,1]="Rule 3"
-    QA_summary[3,2]=nrow(input%>%filter(rule3==T))
-    QA_summary[4,1]="Rule 4"
-    QA_summary[4,2]=nrow(input%>%filter(rule4==T))
-    QA_summary[5,1]="Rule 5"
-    QA_summary[5,2]=nrow(input%>%filter(rule5==T))
-    QA_summary[6,1]="Rule 6"
-    QA_summary[6,2]=nrow(input%>%filter(rule6==T))
-    QA_summary[7,1]="Rule 7"
-    QA_summary[7,2]=nrow(input%>%filter(rule7==T))
-    QA_summary[8,1]="Total excluded from QA"
-    QA_summary[8,2]=nrow(input)-nrow(input_QA)
+    QA_summary <- data.frame(rule = character(),
+                             n_exclude = numeric())
+    
+    QA_summary[nrow(QA_summary)+1,] <- c("Rule 1: Year of birth is after year of death or patient only has year of death",
+                                         nrow(input%>%filter(rule1==T)))
+    
+    QA_summary[nrow(QA_summary)+1,] <- c("Rule 2: Year of birth predates NHS established year or year of birth exceeds current date",
+                                         nrow(input%>%filter(rule2==T)))
+    
+    QA_summary[nrow(QA_summary)+1,] <- c("Rule 3: Date of death is NULL or invalid (on or before 1/1/1900 or after current date)",
+                                         nrow(input%>%filter(rule3==T)))
+    
+    QA_summary[nrow(QA_summary)+1,] <- c("Rule 4: Check index_date within expected range (between 2021-06-01 and 2021-12-14)",
+                                         nrow(input%>%filter(rule4==T)))
+    
+    QA_summary[nrow(QA_summary)+1,] <- c("Rule 5: Pregnancy/birth codes for men",
+                                         nrow(input%>%filter(rule5==T)))
+    
+    QA_summary[nrow(QA_summary)+1,] <- c("Rule 6: HRT or COCP meds for men",
+                                         nrow(input%>%filter(rule6==T)))
+    
+    QA_summary[nrow(QA_summary)+1,] <- c("Rule 7: Prostate cancer codes for women",
+                                         nrow(input%>%filter(rule7==T)))
+    
+    QA_summary[nrow(QA_summary)+1,] <- c("Total excluded from QA",
+                                         nrow(input)-nrow(input_QA))
     
     
     #Save Qa summary as .csv
