@@ -186,9 +186,9 @@ if(cohort_name=="electively_unvaccinated"){
   df$pat_start_date <- as.Date(df$vax_date_eligible)+84
 }
 
-df$index_source <- ifelse(df$study_start_date>df$pat_start_date ,"study_start_date","pat_start_date")
+df$index_source <- ifelse(df$study_start_date>df$pat_start_date | is.na(df$pat_start_date),"study_start_date","pat_start_date")
 
-df$index_date <- as.Date(ifelse(df$study_start_date>df$pat_start_date ,df$study_start_date,df$pat_start_date), origin = "1970-01-01")# Convert dates to date format -------------------------------------------------
+df$index_date <- as.Date(ifelse(df$study_start_date>df$pat_start_date | is.na(df$pat_start_date),df$study_start_date,df$pat_start_date), origin = "1970-01-01")# Convert dates to date format -------------------------------------------------
 
 print("Index date and source determined successfully")
 
