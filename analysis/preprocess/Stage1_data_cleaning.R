@@ -122,6 +122,18 @@ stage1 <- function(cohort_name){
     ## Set reference level for binary covariates
     bin_factors <- colnames(input)[grepl("cov_bin_",colnames(input))]
     input[,bin_factors] <- lapply(input[,bin_factors], function(x) factor(x, levels = c("FALSE","TRUE")))
+    
+    # QC for consultation variable
+    # max to 365 (average of one per day)
+    
+    print("Consultation variable before QC")
+    summary(input$cov_num_consulation_rate)
+    
+    input <- input %>%
+      mutate(cov_num_consulation_rate = replace(cov_num_consulation_rate, cov_num_consulation_rate > 365, 365))
+    
+    print("Consultation variable after QC")
+    summary(input$cov_num_consulation_rate)
 
     #####################
     # 2. Apply QA rules #
