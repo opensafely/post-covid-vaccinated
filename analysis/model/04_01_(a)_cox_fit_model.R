@@ -82,7 +82,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     
   }
   
-  if(subgroup=="covid_pheno_hospitalised" | (event_name == "hf" & cohort == "electively_unvaccinated" & subgroup == "main")){
+  if(subgroup=="covid_pheno_hospitalised"){
     # Merge missing smoking into never smoker
     data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status))%>%
       mutate(cov_cat_smoking_status = case_when(cov_cat_smoking_status=="Never smoker" ~ "Never smoker",
@@ -183,10 +183,10 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","results_fitted","model","covariates_removed","cat_covars_collapsed","covariates_fitted")
   
   # For electively unvaccinated hospitalised ATE set the region reference as London
-  if(subgroup == "covid_pheno_hospitalised" & ((event_name == "ate" & cohort == "electively_unvaccinated") | (event_name == "vte" & cohort == "vaccinated") | (event_name == "angina" & cohort == "vaccinated"))){
-    data_surv$region_name <- relevel(data_surv$region_name, ref = "London")
-    print("Region releveled with London before fitting cox")
-  }
+  # if(subgroup == "covid_pheno_hospitalised" & ((event_name == "ate" & cohort == "electively_unvaccinated") | (event_name == "vte" & cohort == "vaccinated") | (event_name == "angina" & cohort == "vaccinated"))){
+  #   data_surv$region_name <- relevel(data_surv$region_name, ref = "London")
+  #   print("Region releveled with London before fitting cox")
+  # }
   
   for(model in mdl){
     #Base formula
