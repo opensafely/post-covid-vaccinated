@@ -224,7 +224,7 @@ stage1 <- function(cohort_name){
     #----------------------------------------------------------------#
     
     #Inclusion criteria 1: Alive on the first day of follow up
-    input <- input %>% filter(index_date < death_date)
+    input <- input %>% filter(index_date < death_date | is.na(death_date))
     cohort_flow[nrow(cohort_flow)+1,] <- c(nrow(input),as.numeric(cohort_flow[2,1]) - nrow(input), "Criteria 1 (Inclusion): Alive on the first day of follow up") # Feed into the cohort flow
     
     #Inclusion criteria 2: Known age between 18 and 110 on 01/06/2021 
