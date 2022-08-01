@@ -89,10 +89,6 @@ rm(non_zero_covar_names)
 
 
 # Source remainder of relevant files --------------------------------------------------------
-if(cohort == "electively_unvaccinated" & (event_name == "ate" | event_name == "hf")){
-  input$region_name <- relevel(input$region_name, ref = "London")
-  print("Region releveled with London before fitting cox")
-}
 
 source(file.path(scripts_dir,paste0("03_01_cox_subgrouping.R"))) # Model specification
 
