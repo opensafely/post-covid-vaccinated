@@ -1089,10 +1089,10 @@ actions:
   stata_model:
     run: stata-mp:latest analysis/cox_model.do
     needs:
-    - Analysis_cox_pe_electively_unvaccinated
+    - Analysis_cox_ami_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        log_file: output/stata_cox_model.log
+        log_file: output/stata_cox_model_ami.log
 
   tmp_check_age_diff_between_study_defs:
     run: r:latest analysis/tmp/check_age_differences.R
