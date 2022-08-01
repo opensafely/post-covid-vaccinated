@@ -1,7 +1,7 @@
 * Script to run PE and ATE outcomes in the electively unvaccinated population in STATA
 * Electively unvaccinated is a whole population sample
 
-import delim using "./output/input_sampled_data_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv" 
+import delim using "./output/input_sampled_data_ami_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv" 
 
 *****************************
 * reformating the data
@@ -82,7 +82,7 @@ tab days28_197
 *model
 
 cap log close
-log using ./output/stata_cox_model, replace t
+log using ./output/stata_cox_model_ami, replace t
 
 stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex, vce(robust) strata(st_region_name) 
 stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex st_ethnicity st_cov_bin* i.st_cov_cat*, vce(robust) strata(st_region_name)  
