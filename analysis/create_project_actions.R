@@ -445,9 +445,9 @@ actions_list <- splice(
   action(
     name = "stata_model",
     run = "stata-mp:latest analysis/cox_model.do",
-    needs = list("Analysis_cox_pe_electively_unvaccinated"),
+    needs = list("Analysis_cox_ami_electively_unvaccinated"),
     moderately_sensitive = list(
-      log_file = glue("output/stata_cox_model.log"))
+      log_file = glue("output/stata_cox_model_ami.log"))
   ),
   
   #comment("Temporary action - check age differences between study definitions"),
