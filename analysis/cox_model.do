@@ -1,7 +1,7 @@
 * Script to run PE and ATE outcomes in the electively unvaccinated population in STATA
 * Electively unvaccinated is a whole population sample
 
-import delim using "./output/input_sampled_data_ami_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods.csv" 
+import delim using "./output/input_sampled_data_ami_main_electively_unvaccinated_reduced_time_periods.csv" 
 
 *****************************
 * reformating the data
