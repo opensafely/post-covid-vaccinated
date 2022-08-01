@@ -87,4 +87,7 @@ log using ./output/stata_cox_model_ami, replace t
 stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex, vce(robust) strata(st_region_name) 
 stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex st_ethnicity st_cov_bin* i.st_cov_cat*, vce(robust) strata(st_region_name)  
 
+stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex i.st_region_name, vce(robust) 
+stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex i.st_ethnicity i.st_region_name st_cov_bin* i.st_cov_cat*, vce(robust) 
+
 log close
