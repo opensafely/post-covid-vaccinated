@@ -55,7 +55,7 @@ keep patient_id date_of_death_sd expo_date_sd follow_up_start_sd event_date_sd f
 * stset : assigning follow up
 recode event_date_sd (missing = 0) (nonmissing = 1), gen(event)
 tab event
-replace follow_up_start_sd = follow_up_start_sd-1 // currently date of entry included in analysis, but stset excludes, want to include the day they entered and count that in follow up
+replace follow_up_start_sd = follow_up_start_sd-0.5 // currently date of entry included in analysis, but stset excludes, want to include the day they entered and count that in follow up
 
 stset follow_up_end_sd, failure(event) id(patient_id) enter(follow_up_start_sd) origin(time mdy(06,01,2021))
 stsplit time_expo, after(expo_date_sd) at(0 28 197)
