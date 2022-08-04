@@ -54,6 +54,7 @@ keep patient_id date_of_death_sd expo_date_sd follow_up_start_sd event_date_sd f
 *********************************************************
 * stset : assigning follow up
 recode event_date_sd (missing = 0) (nonmissing = 1), gen(event)
+replace event = 0.5 if event_date_sd == follow_up_end_sd // events on day 0 weighted 0.5
 tab event
 replace follow_up_start_sd = follow_up_start_sd-0.5 // currently date of entry included in analysis, but stset excludes, want to include the day they entered and count that in follow up
 
