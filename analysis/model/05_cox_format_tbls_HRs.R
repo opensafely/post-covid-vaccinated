@@ -79,7 +79,7 @@ event_counts_completed <- pmap(list(event_count_done),
 if(length(event_count_done)>0){
   df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
   df_event_counts <- df_event_counts %>% select(event, cohort, subgroup, time_points, expo_week, events_total, person_days_follow_up, `incidence rate (per 1000 person years)`, median_follow)
-  df_event_counts$subgroup <- factor(df_event_counts$subgroup, levels = c("main","hospitalised","non_hospitalised","covid_history"))
+  df_event_counts$subgroup <- factor(df_event_counts$subgroup, levels = c("main","covid_pheno_hospitalised","covid_pheno_non_hospitalised","covid_history"))
   df_event_counts$time_points <- factor(df_event_counts$time_points, levels = c("normal","reduced","alternative"))
   df_event_counts <- df_event_counts[order(df_event_counts$subgroup,df_event_counts$time_points),]
   write.csv(df_event_counts, paste0(output_dir,"/compiled_event_counts_", event_name, "_", cohort,".csv") , row.names=F)
