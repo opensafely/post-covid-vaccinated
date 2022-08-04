@@ -80,11 +80,13 @@ rm(analyses_to_run_normal_timepoint)
 analyses_to_run <- analyses_to_run %>% left_join(non_zero_covar_names, by= c("event"="outcome_event","subgroup","reduced_timepoint"="time_period"))
 rm(non_zero_covar_names)
 
-if(event_name %in% c("pe") & cohort == "electively_unvaccinated"){
-  analyses_to_run_hosp_alternative <- analyses_to_run %>% filter(subgroup == "covid_pheno_hospitalised")
-  analyses_to_run_hosp_alternative$reduced_timepoint <- "alternative"
-  analyses_to_run_hosp_alternative <- distinct(analyses_to_run_hosp_alternative)
-  analyses_to_run <- rbind(analyses_to_run, analyses_to_run_hosp_alternative)
+if(event_name %in% c("pe","ami")){
+  analyses_to_run_alternative <- analyses_to_run %>% select(-covariates)
+  analyses_to_run_alternative$reduced_timepoint <- "alternative"
+  analyses_to_run_alternative <- distinct(analyses_to_run_alternative)
+  analyses_to_run_alternative$covariates <- analyses_to_run$covariates[1]
+  analyses_to_run <- rbind(analyses_to_run, analyses_to_run_alternative)
+  rm(analyses_to_run_alternative)
 }
 
 
