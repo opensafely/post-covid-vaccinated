@@ -4,7 +4,7 @@ subgroup_data <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_p
   print(paste0("Using ",time_point," time point"))
   
   #Reduce dataset to those who do NOT have a prior history of COVID 
-  survival_data=input%>%filter(sub_bin_covid19_confirmed_history == TRUE)
+  survival_data=input%>%filter(sub_bin_covid19_confirmed_history == FALSE)
   
   for(i in c("hospitalised","non_hospitalised")){
     if(stratify_by == i){
