@@ -189,13 +189,13 @@ event_counts_by_time_period <- function(cohort){
     group_by(subgroup_cat,event,time_points) %>%
     dplyr::mutate(person_time = case_when(
       any(events_total <=5 ) ~ "[Redacted]",
-      TRUE ~ as.character(events_total)))#
+      TRUE ~ as.character(person_time)))
   
   event_counts <- event_counts %>%
     group_by(subgroup_cat,event,time_points) %>%
     dplyr::mutate(`incidence rate (per 1000 person years)` = case_when(
       any(events_total <=5 ) ~ "[Redacted]",
-      TRUE ~ as.character(events_total)))
+      TRUE ~ as.character(`incidence rate (per 1000 person years)`)))
   
   event_counts <- event_counts %>%
     group_by(subgroup_cat,event,time_points) %>%
