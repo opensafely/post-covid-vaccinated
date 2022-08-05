@@ -450,14 +450,21 @@ actions_list <- splice(
       log_file = glue("output/stata_cox_model_ami.log"))
   ),
   
-  #comment("Temporary action - check age differences between study definitions"),
   action(
-    name = "tmp_check_age_diff_between_study_defs",
-    run = "r:latest analysis/tmp/check_age_differences.R",
-    needs = list("generate_study_population_index", "generate_study_population_electively_unvaccinated", "preprocess_data_electively_unvaccinated","preprocess_data_vaccinated"),
+    name = "event_counts_by_time_period_vaccinated",
+    run = "r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated",
+    needs = list("stage1_data_cleaning_both", "stage1_end_date_table_vaccinated"),
     moderately_sensitive = list(
-      log_file = glue("output/not-for-review/tmp/describe_age_diff.txt"))
-  )
+      event_counts = "output/review/descriptives/event_counts_by_time_period_vaccinated.csv")
+  ),
+  
+  action(
+    name = "event_counts_by_time_period_electively_unvaccinated",
+    run = "r:latest analysis/descriptives/event_counts_by_time_period.R electively_unvaccinated",
+    needs = list("stage1_data_cleaning_both", "stage1_end_date_table_electively_unvaccinated"),
+    moderately_sensitive = list(
+      event_counts = "output/review/descriptives/event_counts_by_time_period_electively_unvaccinated.csv")
+    )
   
 )
 

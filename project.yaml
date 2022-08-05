@@ -1094,14 +1094,21 @@ actions:
       moderately_sensitive:
         log_file: output/stata_cox_model_ami.log
 
-  tmp_check_age_diff_between_study_defs:
-    run: r:latest analysis/tmp/check_age_differences.R
+  event_counts_by_time_period_vaccinated:
+    run: r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated
     needs:
-    - generate_study_population_index
-    - generate_study_population_electively_unvaccinated
-    - preprocess_data_electively_unvaccinated
-    - preprocess_data_vaccinated
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
     outputs:
       moderately_sensitive:
-        log_file: output/not-for-review/tmp/describe_age_diff.txt
+        event_counts: output/review/descriptives/event_counts_by_time_period_vaccinated.csv
+
+  event_counts_by_time_period_electively_unvaccinated:
+    run: r:latest analysis/descriptives/event_counts_by_time_period.R electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        event_counts: output/review/descriptives/event_counts_by_time_period_electively_unvaccinated.csv
 
