@@ -34,7 +34,7 @@ foreach var of varlist sex ethnicity region_name agegroup {
 *Age spline at 3 knots at the 10th, 50th and 90th percentiles
 mkspline age_cubic = age_at_cohort_start, cubic knots(10 50 90)
 
-data checking
+*data checking
 gen event_pre_enter = 1 if (event_date_sd<follow_up_start_sd) | ///
 							(event_date_sd==follow_up_start_sd)
 tab event_pre_enter
