@@ -27,7 +27,37 @@ foreach var of varlist cov_cat* {
 	encode `var', gen(st_`var')
 }
 
-foreach var of varlist sex ethnicity region_name agegroup {
+replace st_cov_cat_smoking_status = .
+replace st_cov_cat_smoking_status = 3 if cov_cat_smoking_status=="Current smoker"
+replace st_cov_cat_smoking_status = 2 if cov_cat_smoking_status=="Ever smoker"
+replace st_cov_cat_smoking_status = 1 if cov_cat_smoking_status=="Never smoker"
+lab def smoking 3 "Current smoker" 2 "Ever smoker" 1 "Never smoker"
+lab var st_cov_cat_smoking_status smoking
+
+gen st_ethnicity = 1 if ethnicity=="White, including missing"
+replace st_ethnicity = 2 if ethnicity=="Black"
+replace st_ethnicity = 3 if ethnicity=="South Asian"
+replace st_ethnicity = 4 if ethnicity=="Mixed"
+replace st_ethnicity = 5 if ethnicity=="Other"
+lab def ethnic_grps 1 "White, including missing" 2 "Black" ///
+3 "South Asian" 4 "Mixed" 5 "Other"
+lab var st_ethnicity ethnic_grps
+
+gen st_region = 1 if region=="East"
+replace st_region = 2 if region=="East Midlands"
+replace st_region = 3 if region=="London"
+replace st_region = 4 if region=="North East"
+replace st_region = 5 if region=="North West"
+replace st_region = 6 if region=="South East"
+replace st_region = 7 if region=="South West"
+replace st_region = 8 if region=="West Midlands"
+replace st_region = 9 if region=="Yorkshire and The Humber"
+lab def region 1 "East" 2 "East Midlands" 3 "London" ///
+4 "North East" 5 "North West" 6 "South East" 7 "South West" ///
+8 "West Midlands" 9 "Yorkshire and The Humber"
+lab var st_region region
+
+foreach var of varlist sex agegroup {
 	encode `var', gen(st_`var')	
 }
 
@@ -86,8 +116,9 @@ cap log close
 log using ./output/stata_cox_model_ami, replace t
 
 stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex, vce(robust) strata(st_region_name) 
-stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex st_ethnicity st_cov_bin* i.st_cov_cat*, vce(robust) strata(st_region_name)  
+stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex bst_ethnicity st_cov_bin* i.st_cov_cat*, vce(robust) strata(st_region_name)  
 
+stcox days0_28 days28_197, vce(robust) 
 stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex i.st_region_name, vce(robust) 
 stcox days0_28 days28_197 age_cubic1 age_cubic2 st_sex i.st_ethnicity i.st_region_name st_cov_bin* i.st_cov_cat*, vce(robust) 
 
