@@ -186,9 +186,9 @@ if(cohort_name=="electively_unvaccinated"){
   df$pat_start_date <- as.Date(df$vax_date_eligible)+84
 }
 
-df$index_source <- ifelse(df$study_start_date>df$pat_start_date ,"study_start_date","pat_start_date")
+df$index_source <- ifelse(df$study_start_date>df$pat_start_date | is.na(df$pat_start_date),"study_start_date","pat_start_date")
 
-df$index_date <- as.Date(ifelse(df$study_start_date>df$pat_start_date ,df$study_start_date,df$pat_start_date), origin = "1970-01-01")# Convert dates to date format -------------------------------------------------
+df$index_date <- as.Date(ifelse(df$study_start_date>df$pat_start_date | is.na(df$pat_start_date),df$study_start_date,df$pat_start_date), origin = "1970-01-01")# Convert dates to date format -------------------------------------------------
 
 print("Index date and source determined successfully")
 
@@ -236,10 +236,6 @@ df$cov_bin_obesity <-ifelse(df$cov_bin_obesity==TRUE |df$cov_cat_bmi_groups=="Ob
 df[,c("cov_num_bmi")] <- NULL
 
 # Convert dates to date format -------------------------------------------------
-
-df <- df %>%
-  dplyr::rename(tmp_out_max_hba1c_mmol_mol_date = tmp_out_num_max_hba1c_date,
-                tmp_out_bmi_date_measured = cov_num_bmi_date_measured)
 
 for (i in colnames(df)[grepl("_date",colnames(df))]) {
   df[,i] <- as.Date(df[,i])

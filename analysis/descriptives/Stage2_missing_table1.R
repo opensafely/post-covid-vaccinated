@@ -49,6 +49,10 @@ active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses <- active_analyses %>% filter(active == TRUE)
 outcome_groups <- unique(active_analyses$outcome_group)
 
+#delta period
+cohort_start = as.Date("2021-06-01", format="%Y-%m-%d")
+cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
+
 # Define stage2 function -------------------------------------------------------
 
 stage2 <- function(cohort_name, covid_history, group) {
@@ -157,7 +161,10 @@ stage2 <- function(cohort_name, covid_history, group) {
   input$cov_cat_consulation_rate_group <- ifelse(input$cov_num_consulation_rate==0, "0", input$cov_cat_consulation_rate_group)
   input$cov_cat_consulation_rate_group <- ifelse(input$cov_num_consulation_rate>=1 & input$cov_num_consulation_rate<=5, "1-6", input$cov_cat_consulation_rate_group)
   input$cov_cat_consulation_rate_group <- ifelse(input$cov_num_consulation_rate>=6, "6+", input$cov_cat_consulation_rate_group)
-
+  
+  # Censor COVID exposure dates
+  input <- input %>% mutate(exp_date_covid19_confirmed = replace(exp_date_covid19_confirmed, which(exp_date_covid19_confirmed>cohort_end | exp_date_covid19_confirmed<cohort_start), NA))
+  
   # Populate table 1 
   covar_names <- active_analyses %>% filter(outcome_group==group)
   covar_names<-str_split(active_analyses$covariates, ";")[[1]]
