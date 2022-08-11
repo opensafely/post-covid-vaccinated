@@ -135,7 +135,6 @@ table_2_subgroups_output <- function(cohort_name){
       startsWith(subgroup, "ethnicity") ~ "ethnicity",
       startsWith(subgroup, "prior_history") ~ "prior_history",
       startsWith(subgroup, "sex") ~ "sex",
-      startsWith(subgroup, "age_sex") ~ "age_sex",
       TRUE ~ as.character(subgroup)))
   
   analyses_of_interest[,c("unexposed_person_days", "unexposed_event_count","post_exposure_event_count", "total_person_days","day_0_event_counts")] <- NA
