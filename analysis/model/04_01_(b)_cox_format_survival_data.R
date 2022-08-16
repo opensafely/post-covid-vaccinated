@@ -8,9 +8,6 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   #------------------ RANDOM SAMPLE NON-CASES for IP WEIGHING ------------------
   set.seed(137)
   
-  #Replace event dates that lie outside of follow up time with NA
-  survival_data$event_date[survival_data$event_date<survival_data$follow_up_start | survival_data$event_date > survival_data$follow_up_end]=NA
-  
   if(startsWith(subgroup,"covid_pheno_")){
   cases <- survival_data %>% filter((!is.na(event_date)) & 
                                      (
@@ -228,26 +225,24 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     with_expo <- with_expo %>% dplyr::select(all_of(common_cols))
     data_surv <-rbind(without_expo, with_expo)
     
+    # Define episode labels --------------------------------------------------------
+    episode_labels <- data.frame(days_cat = 0:length(cuts_days_since_expo),
+                                 expo_week = c("days_pre",paste0("days", c("0", cuts_days_since_expo[1:(length(cuts_days_since_expo)-1)]),"_", cuts_days_since_expo)),
+                                 stringsAsFactors = FALSE)
     
+    interval_names <- episode_labels$expo_week[episode_labels$expo_week != "days_pre"]
     
-    #===============================================================================
-    #   PIVOT WIDE for WEEKS_SINCE_COVID
-    #-------------------------------------------------------------------------------
-    #data_surv$days_to_expo <- as.numeric(data_surv$expo_date - as.Date(cohort_start_date))
-    
-    interval_names <- mapply(function(x, y) ifelse(x == y, paste0("days", x), paste0("days", x, "_", y)), 
-                             lag(cuts_days_since_expo, default = 0), 
-                             cuts_days_since_expo, 
-                             SIMPLIFY = FALSE)
-    
-    
-    intervals <- mapply(c, lag(cuts_days_since_expo, default = 0), cuts_days_since_expo, SIMPLIFY = F)
-    
-    i<-0
-    for (ls in mapply(list, interval_names, intervals, SIMPLIFY = F)){
-      i <- i+1
-      data_surv[[ls[[1]]]] <- if_else(data_surv$days_cat==i, 1, 0)
+    # Add indicators for episode -------------------------------------------------
+    for (i in 1:max(episode_labels$days_cat)) {
+      
+      preserve_cols <- colnames(data_surv) 
+      
+      data_surv$tmp <- as.numeric(data_surv$days_cat==i)
+      
+      colnames(data_surv) <- c(preserve_cols,episode_labels[episode_labels$days_cat==i,]$expo_week)
+      
     }
+    
     
     #===============================================================================
     # FINALIZE age, region, data_surv
@@ -256,94 +251,72 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     data_surv <- data_surv %>% left_join(df_sex_cox_weights)
     print(paste0("Finished survival data"))
     
-    # ============================= EVENTS COUNT =================================
-    which_days_since_covid <- function(row_data_surv, interval_names){
-      days_cols <- row_data_surv %>% dplyr::select(all_of(interval_names))
-      expo_day_period <- names(days_cols)[which(days_cols == 1)]
-      row_data_surv$expo_days <- ifelse(length(expo_day_period)==0, NA,expo_day_period )
-      #row_data_surv$expo_days <- names(days_cols)[which(days_cols == 1)]
-      row_data_surv$expo_days <- ifelse(is.na(row_data_surv$expo_days),"pre expo", row_data_surv$expo_days)
-      return(row_data_surv)
-    }
-  
-    get_tbl_event_count <- function(data_surv, interval_names){
-      df_events <- data_surv %>% filter(event==1)
-      ls_data_surv <- split(df_events, 1:nrow(df_events))
-      ls_data_surv <- lapply(ls_data_surv, which_days_since_covid, unlist(interval_names))
-      ls_data_surv <- do.call("rbind", ls_data_surv)
-      tbl_event_count <- aggregate(event ~ expo_days, ls_data_surv, sum)
-      tbl_event_count[nrow(tbl_event_count) + 1,] = c("all post expo", sum(head(tbl_event_count$event, (nrow(tbl_event_count)-1)))  )
-      return(tbl_event_count)
-    }
-    tbl_event_count_all <- get_tbl_event_count(data_surv, interval_names)
+    # Calculate number of events per episode -------------------------------------
     
-    tbl_event_count <- list(tbl_event_count_all) %>% reduce(left_join, by = "expo_days")
+    events <- data_surv[data_surv$event=="1", c("patient_id","days_cat")]
     
-    event_count_levels <- c("pre expo", unlist(interval_names), "all post expo")
-    tbl_event_count_levels <- data.frame(event_count_levels)
-    names(tbl_event_count_levels) <- c("expo_days")
+    events <- aggregate(days_cat ~ patient_id, data = events, FUN = max)
     
+    events <- data.frame(table(events$days_cat), 
+                         stringsAsFactors = FALSE)
     
-    tbl_event_count <- merge(tbl_event_count_levels, tbl_event_count, all.x = TRUE)
-    tbl_event_count[is.na(tbl_event_count)] <- 0
+    events <- dplyr::rename(events, "days_cat" = "Var1", "events_total" = "Freq")
     
-    tbl_event_count <- tbl_event_count %>%
-      arrange(factor(expo_days, 
-                     levels = event_count_levels), 
-              expo_days)
+    # Add number of events to episode info table ---------------------------------
     
-    names(tbl_event_count) <- c("expo_week", "events_total")
-    tbl_event_count$event <- event
-    tbl_event_count$subgroup <- subgroup
-    tbl_event_count$cohort <- cohort
-    tbl_event_count$time_points <- time_point
-    tbl_event_count$events_total <- as.numeric(tbl_event_count$events_total)
+    episode_info <- merge(episode_labels, events, by = "days_cat", all.x = TRUE)
+    episode_info$events_total <- ifelse(is.na(episode_info$events_total),0,episode_info$events_total)
+    episode_info[nrow(episode_info) + 1,] = c(max(episode_info$days_cat)+1,"all post expo",  sum(episode_info[which(episode_info$days_cat != 0),"events_total"]))
     
+    # Calculate person-time in each episode --------------------------------------
     
-    #-------------Add person days of follow up for each time period-------------
+    tmp <- data_surv[,c("days_cat","tstart","tstop","cox_weights")]
+    tmp$person_days_follow_up <- (tmp$tstop - tmp$tstart)*tmp$cox_weights
+    tmp <- rbind(tmp,tmp %>% filter(days_cat !=0) %>% mutate(days_cat = max(episode_info$days_cat)))
+    tmp[,c("tstart","tstop","cox_weights")] <- NULL
+    tmp <- aggregate(person_days_follow_up ~ days_cat, data = tmp, FUN = sum)
     
-    days_cat<- seq(1,length(unlist(interval_names)),1)
-    intervals_with_days_cat <- as.data.frame(matrix(c(unlist(interval_names),days_cat),ncol = 2, nrow = length(unlist(interval_names))))
-    intervals_with_days_cat[nrow(intervals_with_days_cat)+1,] <- c("pre expo",0)
-    colnames(intervals_with_days_cat) <- c("interval","days_cat")
-    intervals_with_days_cat <- intervals_with_days_cat[order(intervals_with_days_cat$days_cat),]
-    intervals_with_days_cat$person_days_follow_up <- NA
+    episode_info <- merge(episode_info, tmp, by = "days_cat", all.x = TRUE)
     
-    intervals_with_days_cat$median_follow <- NA
+    # Calculate incidence ------------------------------------------------------
+    episode_info <- episode_info %>% mutate(across(c(person_days_follow_up,events_total),as.numeric))
+    episode_info <- episode_info %>% mutate("incidence rate (per 1000 person years)" = (events_total/(person_days_follow_up/365.2))*1000 )
     
-    for(i in 1:nrow(intervals_with_days_cat)){
-      days_category <- intervals_with_days_cat$days_cat[i]
-      interval_period <- intervals_with_days_cat$interval[i]
-      
-      #Multiply follow up by cox weights for person days of follow up
-      data_surv[,paste0("person_days_",interval_period)] <- ifelse(data_surv$days_cat == days_category,(data_surv$tstop - data_surv$tstart)*data_surv$cox_weights,0)
-      intervals_with_days_cat$person_days_follow_up[which(intervals_with_days_cat$days_cat==days_category)] <- sum(data_surv[,paste0("person_days_",interval_period)])
-      
-      
-      #Calculate person days excluding weighting to be used for median calculation
-      data_surv[,paste0("person_days_",interval_period)] <- ifelse(data_surv$days_cat == days_category,(data_surv$tstop - data_surv$tstart),0)
-      intervals_with_days_cat$median_follow[which(intervals_with_days_cat$days_cat==days_category)] <- weightedMedian(x = data_surv[data_surv$days_cat==days_category,paste0("person_days_",interval_period)][[1]], w = data_surv[data_surv$days_cat==days_category,"cox_weights"][[1]])
-    }
+    # Calculate median person-time -----------------------------------------------
     
-    data_surv$person_days_post_expo <- ifelse(data_surv$days_cat != 0,(data_surv$tstop - data_surv$tstart),0)
-    post_expo_median <- data_surv %>% filter(days_cat != 0) %>% 
+    tmp <- data_surv[,c("patient_id","days_cat","tstart","tstop","cox_weights")]
+    tmp$person_time <- tmp$tstop - tmp$tstart
+    
+    tmp_post_expo <- tmp %>% filter(days_cat != 0) %>% 
       group_by(patient_id) %>%
-      summarise(sum_follow_up = sum(person_days_post_expo)) %>%
-      left_join(data_surv %>% select(patient_id, cox_weights) %>% distinct(), by = "patient_id")
+      summarise(person_time = sum(person_time)) %>%
+      left_join(tmp %>% select(patient_id, cox_weights) %>% distinct(), by = "patient_id") %>%
+      mutate(days_cat = max(episode_info$days_cat)) %>%
+      select(- patient_id)
     
+    tmp[,c("patient_id","tstart","tstop")] <- NULL
+    tmp <- rbind(tmp,tmp_post_expo)
     
-    intervals_with_days_cat$days_cat <- NULL
-    intervals_with_days_cat[nrow(intervals_with_days_cat)+1,] <- c("all post expo", sum(intervals_with_days_cat$person_days_follow_up[which(intervals_with_days_cat$interval != "pre expo")]),weightedMedian(x = post_expo_median$sum_follow_up, w = post_expo_median$cox_weights))
+    tmp <- tmp %>%
+      dplyr::group_by(days_cat) %>%
+      dplyr::mutate(median_follow_up = matrixStats::weightedMedian(x = person_time, w = cox_weights)) %>%
+      dplyr::ungroup(days_cat)
     
+    tmp <- unique(tmp[,c("days_cat","median_follow_up")])
     
-    tbl_event_count <- tbl_event_count %>% left_join(intervals_with_days_cat, by=c("expo_week"="interval"))
-    tbl_event_count$person_days_follow_up <- as.numeric(tbl_event_count$person_days_follow_up)
-    tbl_event_count <- tbl_event_count %>% mutate("incidence rate (per 1000 person years)" = (events_total/(person_days_follow_up/365.2))*1000 )
+    episode_info <- merge(episode_info, tmp, by = "days_cat", all.x = TRUE)
+    episode_info $days_cat <- NULL
     
-    print(tbl_event_count)
+    episode_info$event <- event
+    episode_info$subgroup <- subgroup
+    episode_info$cohort <- cohort
+    episode_info$time_points <- time_point
+    episode_info$events_total <- as.numeric(episode_info$events_total)
+    
+    print(episode_info)
     
     #Any time periods with <=5 events? If yes, will reduce time periods
-    ind_any_zeroeventperiod <- any((tbl_event_count$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
+    ind_any_zeroeventperiod <- any((episode_info$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
     
     if(time_point == "alternative"){
       ind_any_zeroeventperiod = "FALSE"
@@ -351,7 +324,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     #Are there <50 post expo events? If yes, won't run analysis
     #Can change <50 to be lower to test on dummy data
-    less_than_50_events = any((as.numeric(tbl_event_count$events_total) <50) & (tbl_event_count$expo_week=="all post expo"))
+    less_than_50_events = any((as.numeric(episode_info$events_total) <50) & (episode_info$expo_week=="all post expo"))
     
     
     # If ind_any_zeroeventperiod==TRUE then this script will re-run again with reduced time periods and
@@ -360,7 +333,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     # Save events counts if less than 50 events as this script will not re-run with reduced time periods
     
     if(ind_any_zeroeventperiod==FALSE | less_than_50_events==TRUE){
-      write.csv(tbl_event_count, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"), row.names = T)
+      write.csv(episode_info, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"), row.names = T)
       print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     }
     
