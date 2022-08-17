@@ -246,13 +246,21 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
     print("Cox output")
     print(fit_cox_model)
     print("Finished fitting cox model")
-
+  
     # Results ----
     results=as.data.frame(names(fit_cox_model$coefficients))
     colnames(results)="term"
     results$estimate=exp(fit_cox_model$coefficients)
-    results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
-    results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
+    
+    if(all(data_surv$cox_weights ==1)){
+      print("Using regular SE's for CI's")
+      results$conf.low=exp(confint(fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
+      results$conf.high=exp(confint(fit_cox_model,level=0.95)[,2])
+    }else if(all(data_surv$cox_weights !=1)){
+      print("Using robust SE's for CI's")
+      results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
+      results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
+    }
     results$std.error=exp(sqrt(diag(vcov(fit_cox_model))))
     results$robust.se=exp(sqrt(diag(vcov(robust_fit_cox_model))))
 
