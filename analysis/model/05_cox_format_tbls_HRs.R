@@ -78,10 +78,7 @@ event_counts_completed <- pmap(list(event_count_done),
 
 if(length(event_count_done)>0){
   df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
-  df_event_counts <- df_event_counts %>% select(event, cohort, subgroup, time_points, expo_week, events_total, person_days_follow_up, `incidence rate (per 1000 person years)`, median_follow)
-  df_event_counts$subgroup <- factor(df_event_counts$subgroup, levels = c("main","covid_pheno_hospitalised","covid_pheno_non_hospitalised","covid_history"))
-  df_event_counts$time_points <- factor(df_event_counts$time_points, levels = c("normal","reduced","alternative"))
-  df_event_counts <- df_event_counts[order(df_event_counts$subgroup,df_event_counts$time_points),]
+  df_event_counts <- df_event_counts %>% select(event, cohort, subgroup, time_points, expo_week, events_total, person_days_follow_up, `incidence rate (per 1000 person years)`, median_follow_up)
   write.csv(df_event_counts, paste0(output_dir,"/compiled_event_counts_", event_name, "_", cohort,".csv") , row.names=F)
   print(paste0("Compiled event counts saved: ", output_dir,"/compiled_event_counts_", event_name,"_", cohort,".csv"))
   
@@ -103,7 +100,8 @@ if(length(event_count_done)>0){
     tmp <- tmp %>% 
       mutate(events_total = replace(events_total, expo_week=="all post expo", sum(tmp[which(tmp$events_total >5 & !(tmp$expo_week %in% c("pre expo", "all post expo"))),events_total])))   
     tmp <- tmp %>% 
-      mutate(events_total = replace(events_total, events_total <=5, "[Redacted]"))
+      mutate(median_follow_up = replace(median_follow_up,events_total <=5, "[Redacted]"),
+             events_total = replace(events_total, events_total <=5, "[Redacted]"))
     
     tmp$events_total <- as.character(tmp$events_total)
     tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]", na.rm = T), "Redacted results", "No redacted results")
@@ -145,7 +143,7 @@ if(length(results_done)>0){
       df_hr_subgroup=df_hr_subgroup[1:nrow(df_counts_subgroup),]
       df_hr_subgroup$expo_week=df_counts_subgroup$expo_week
       df_hr_subgroup$events_total=df_counts_subgroup$events_total
-      df_hr_subgroup$median_follow_up <- df_counts_subgroup$median_follow
+      df_hr_subgroup$median_follow_up <- df_counts_subgroup$median_follow_up
       df_hr_subgroup=df_hr_subgroup%>%select(term,subgroup,event,expo_week,events_total,median_follow_up,cohort,time_points,model)
       event_counts_to_left_join=rbind(event_counts_to_left_join,df_hr_subgroup)
     }
