@@ -100,7 +100,8 @@ if(length(event_count_done)>0){
     tmp <- tmp %>% 
       mutate(events_total = replace(events_total, expo_week=="all post expo", sum(tmp[which(tmp$events_total >5 & !(tmp$expo_week %in% c("pre expo", "all post expo"))),events_total])))   
     tmp <- tmp %>% 
-      mutate(events_total = replace(events_total, events_total <=5, "[Redacted]"))
+      mutate(median_follow_up = replace(median_follow_up,events_total <=5, "[Redacted]"),
+             events_total = replace(events_total, events_total <=5, "[Redacted]"))
     
     tmp$events_total <- as.character(tmp$events_total)
     tmp$redacted_results <- ifelse(any(tmp$events_total == "[Redacted]", na.rm = T), "Redacted results", "No redacted results")
