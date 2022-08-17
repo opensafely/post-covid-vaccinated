@@ -12,3 +12,4 @@ venv/
 .Rhistory
 .Rproj.user*
 .Rproj.user
+analysis/stata_vs_R/*
