@@ -63,7 +63,6 @@ mkspline age_spline = age, cubic knots(`r(c_1)' `r(c_2)' `r(c_3)')
 
 stset follow_up_end, failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(06,01,2021))
 stsplit days, after(exposure_date) at(0 28 197)
-tab days outcome_status
 
 * Calculate study follow up
 
@@ -86,7 +85,10 @@ tab days28_197
 cap log close
 log using ./output/stata_cox_model_ami, replace t
 
+tab days outcome_status
+
 di "Total follow-up in days: " follow_up_total
+bysort days: summarize(follow_up), detail
 
 stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron
 stcox days0_28 days28_197 i.sex age_spline1 age_spline2 i.region, efron
