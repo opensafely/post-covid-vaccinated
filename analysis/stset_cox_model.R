@@ -1,5 +1,6 @@
 library(survival)
 library(magrittr)
+library(rms)
 
 # Parameters
 
@@ -28,7 +29,8 @@ results <- data.frame(term = character(),
                       pval = numeric(),
                       n = numeric(),
                       n_event = numeric(),
-                      call = character())
+                      call = character(),
+                      cox_package = character())
 
 
 # Perform Cox regression using Stata data
@@ -55,9 +57,29 @@ for (i in c("", "+ region", "+ strata(region)")) {
                        "pval" = "Pr...z..")
   
   tmp <- tmp[,c("term","hr","se","pval","n","n_event","call")]
-  
+  tmp$cox_package <- "survival::coxph"
   results <- rbind(results, tmp)
   
+  if(i=="+ strata(region)"){
+    i="+ strat(region)"
+  }
+  
+  dd <<- datadist(data_surv_stata)
+  fit_stata <- rms::cph(as.formula(paste0("Surv(t0, t, outcome_status) ~ days0_28 + days28_197 + sex + age_spline1 + age_spline2 + cluster(patient_id)",i)), 
+                               data = data_surv_stata)
+  
+  tmp <- as.data.frame(names(fit_stata$coefficients))
+  colnames(tmp) <- "term"
+  tmp$hr <- exp(fit_stata$coefficients)
+  tmp$se <- exp(sqrt(diag(vcov(fit_stata))))
+  tmp$pval <- as.numeric(NA)
+  tmp$n <- nrow(data_surv_stata)
+  tmp$n_event <- fit_stata$n[[2]]
+  tmp$call <- paste0("age + sex ",i)
+  tmp$cox_package <- "rms::coxph"
+  
+  results <- rbind(results, tmp)
+ 
 }
 
 readr::write_csv(results, "output/stset_cox_model.csv")
