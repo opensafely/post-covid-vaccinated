@@ -1105,7 +1105,7 @@ actions:
         stset_cox_model: output/stset_cox_model.csv
 
   stata_r_cox_input_difference:
-    run: r:latest analysis/stata_r_input_difference.R
+    run: r:latest analysis/stata_r_input_data_difference.R
     needs:
     - stata_model
     - Analysis_cox_ami_electively_unvaccinated

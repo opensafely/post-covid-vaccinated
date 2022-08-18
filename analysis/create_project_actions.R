@@ -464,7 +464,7 @@ actions_list <- splice(
   
   action(
     name = "stata_r_cox_input_difference",
-    run = "r:latest analysis/stata_r_input_difference.R",
+    run = "r:latest analysis/stata_r_input_data_difference.R",
     needs = list("stata_model","Analysis_cox_ami_electively_unvaccinated"),
     moderately_sensitive = list(
       input_difference = "output/stata_r_input_difference.csv")
