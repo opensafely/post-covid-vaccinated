@@ -33,8 +33,8 @@
     "primis-covid19-vacc-uptake-eth2001.csv": {
       "id": "primis-covid19-vacc-uptake/eth2001/v1",
       "url": "https://codelists.opensafely.org/codelist/primis-covid19-vacc-uptake/eth2001/v1/",
-      "downloaded_at": "2022-04-21 14:09:09.456662Z",
-      "sha": "36e4eacba898e6ec72da8ff66e8c673bfd9aa8e4"
+      "downloaded_at": "2022-08-18 09:29:01.048846Z",
+      "sha": "2ff9aea91a05f41fe911a885eee50d2494247d58"
     },
     "opensafely-smoking-unclear.csv": {
       "id": "opensafely/smoking-unclear/2020-04-29",
@@ -959,24 +959,6 @@
       "url": "https://codelists.opensafely.org/codelist/bristol/hdl-cholesterol/64775990/",
       "downloaded_at": "2022-04-21 14:09:17.684042Z",
       "sha": "ce9f10f91453a33d5de195b7d02656bf11782760"
-    },
-    "bristol-pe_i26.csv": {
-      "id": "bristol/pe_i26/00398cbc",
-      "url": "https://codelists.opensafely.org/codelist/bristol/pe_i26/00398cbc/",
-      "downloaded_at": "2022-04-21 14:09:17.797805Z",
-      "sha": "066b79182d212664aff52aa293ba048295499eb9"
-    },
-    "bristol-pe_i260.csv": {
-      "id": "bristol/pe_i260/672a1986",
-      "url": "https://codelists.opensafely.org/codelist/bristol/pe_i260/672a1986/",
-      "downloaded_at": "2022-04-21 14:09:17.924279Z",
-      "sha": "badb40c49b3608c9391e0eff1b0a7731cfd6c254"
-    },
-    "bristol-pe_i269.csv": {
-      "id": "bristol/pe_i269/4e1aa651",
-      "url": "https://codelists.opensafely.org/codelist/bristol/pe_i269/4e1aa651/",
-      "downloaded_at": "2022-04-21 14:09:18.041261Z",
-      "sha": "7ec5e75887483b1918e3c2ad3ed512c4d64f452e"
     },
     "user-RochelleKnight-confirmed-hospitalised-covid-19.csv": {
       "id": "user/RochelleKnight/confirmed-hospitalised-covid-19/1f0d2526",

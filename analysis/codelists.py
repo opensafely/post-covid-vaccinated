@@ -1152,21 +1152,3 @@ prediabetes_snomed = codelist_from_csv(
     system="snomed",
     column="code",
 )
-
-pe_i26_icd10 = codelist_from_csv(
-    "codelists/bristol-pe_i26.csv",
-    system="icd10",
-    column="code",
-)
-
-pe_i260_icd10 = codelist_from_csv(
-    "codelists/bristol-pe_i260.csv",
-    system="icd10",
-    column="code",
-)
-
-pe_i269_icd10 = codelist_from_csv(
-    "codelists/bristol-pe_i269.csv",
-    system="icd10",
-    column="code",
-)
