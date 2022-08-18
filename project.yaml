@@ -1093,6 +1093,16 @@ actions:
     outputs:
       moderately_sensitive:
         log_file: output/stata_cox_model_ami.log
+      highly_sensitive:
+        stset: output/stset.csv
+
+  stset_cox_model:
+    run: r:latest analysis/stset_cox_model.R
+    needs:
+    - stata_model
+    outputs:
+      moderately_sensitive:
+        stset_cox_model: output/stset_cox_model.csv
 
   event_counts_by_time_period_vaccinated:
     run: r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated

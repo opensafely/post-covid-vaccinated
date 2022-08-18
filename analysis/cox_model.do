@@ -95,3 +95,8 @@ stcox days0_28 days28_197 i.sex age_spline1 age_spline2 i.region, efron
 stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron strata(region)
 
 log close
+
+* Save stset data
+
+export delimited using "./output/stset.csv", replace
+

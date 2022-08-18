@@ -446,8 +446,20 @@ actions_list <- splice(
     name = "stata_model",
     run = "stata-mp:latest analysis/cox_model.do",
     needs = list("Analysis_cox_ami_electively_unvaccinated"),
+    highly_sensitive = list(
+      stset = glue("output/stset.csv")
+    ),
     moderately_sensitive = list(
-      log_file = glue("output/stata_cox_model_ami.log"))
+      log_file = glue("output/stata_cox_model_ami.log")
+      )
+  ),
+  
+  action(
+    name = "stset_cox_model",
+    run = "r:latest analysis/stset_cox_model.R",
+    needs = list("stata_model"),
+    moderately_sensitive = list(
+      stset_cox_model = "output/stset_cox_model.csv")
   ),
   
   action(
