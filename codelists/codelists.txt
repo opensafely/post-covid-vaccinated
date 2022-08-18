@@ -95,7 +95,6 @@ primis-covid19-vacc-uptake/carehome/v1
 primis-covid19-vacc-uptake/nursehome/v1
 primis-covid19-vacc-uptake/domcare/v1
 primis-covid19-vacc-uptake/longres/v1
-primis-covid19-vacc-uptake/eth2001/v1
 primis-covid19-vacc-uptake/pregdel/v1.2.1
 primis-covid19-vacc-uptake/preg/v1
 user/hjforbes/type-1-diabetes/674fbd7a
@@ -159,7 +158,4 @@ user/hjforbes/nondiagnostic-diabetes-codes/50f30a3b
 opensafely/cholesterol-tests-numerical-value/7e3a22f3
 opensafely/prediabetes-snomed/6bdbb7dd
 bristol/hdl-cholesterol/64775990
-bristol/pe_i26/00398cbc
-bristol/pe_i260/672a1986
-bristol/pe_i269/4e1aa651
 user/RochelleKnight/confirmed-hospitalised-covid-19/1f0d2526
