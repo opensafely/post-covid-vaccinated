@@ -65,6 +65,12 @@ stset follow_up_end, failure(outcome_status) id(patient_id) enter(follow_up_star
 stsplit days, after(exposure_date) at(0 28 197)
 tab days outcome_status
 
+* Calculate study follow up
+
+replace days = 197 if days==-1
+gen follow_up = _t - _t0
+egen follow_up_total = total(follow_up)  
+
 * Make days variables
 
 gen days0_28 = 0
@@ -79,6 +85,8 @@ tab days28_197
 
 cap log close
 log using ./output/stata_cox_model_ami, replace t
+
+di "Total follow-up in days: " follow_up_total
 
 stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron
 stcox days0_28 days28_197 i.sex age_spline1 age_spline2 i.region, efron
