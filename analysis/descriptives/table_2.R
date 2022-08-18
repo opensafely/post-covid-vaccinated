@@ -271,9 +271,6 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
   index <- which(data_active$follow_up_end_unexposed < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
   data_active$person_days_unexposed[index] = data_active$person_days_unexposed[index] + 1
   
-  # calculate exposed follow-up days for AER script
-  data_active = data_active %>% mutate(person_days_exposed = as.numeric((as.Date(follow_up_end) - as.Date(exp_date_covid19_confirmed))) +1)
-  
   if(subgroup == "covid_pheno_hospitalised"){
     data_active$exp_date_covid19_confirmed <- as.Date(ifelse((!is.na(data_active$hospitalised_date_expo_censor)) & (data_active$exp_date_covid19_confirmed >= data_active$hospitalised_date_expo_censor), NA, data_active$exp_date_covid19_confirmed), origin='1970-01-01')
     data_active$event_date <- as.Date(ifelse((!is.na(data_active$hospitalised_date_expo_censor)) & (data_active$event_date >= data_active$hospitalised_date_expo_censor), NA, data_active$event_date), origin='1970-01-01')
