@@ -463,6 +463,14 @@ actions_list <- splice(
   ),
   
   action(
+    name = "stata_r_cox_input_difference",
+    run = "r:latest analysis/stata_r_input_difference.R",
+    needs = list("stata_model","Analysis_cox_ami_electively_unvaccinated"),
+    moderately_sensitive = list(
+      input_difference = "output/stata_r_input_difference.csv")
+  ),
+  
+  action(
     name = "event_counts_by_time_period_vaccinated",
     run = "r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated",
     needs = list("stage1_data_cleaning_both", "stage1_end_date_table_vaccinated"),

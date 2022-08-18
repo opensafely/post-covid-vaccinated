@@ -1104,6 +1104,15 @@ actions:
       moderately_sensitive:
         stset_cox_model: output/stset_cox_model.csv
 
+  stata_r_cox_input_difference:
+    run: r:latest analysis/stata_r_input_difference.R
+    needs:
+    - stata_model
+    - Analysis_cox_ami_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        input_difference: output/stata_r_input_difference.csv
+
   event_counts_by_time_period_vaccinated:
     run: r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated
     needs:
