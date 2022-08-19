@@ -21,6 +21,9 @@ data_surv_stata <- dplyr::rename(data_surv_stata,
 data_surv_stata$outcome_status <- ifelse(is.na(data_surv_stata$outcome_status), 
                                          0, data_surv_stata$outcome_status)
 
+# Select relevant columns to use with rms:: as datadist does not like how stata formats some columns
+data_surv_stata <- data_surv_stata %>% dplyr::select (patient_id,t0,t,outcome_status,days0_28,days28_197,sex,age_spline1,age_spline2,region)
+
 # Make empty results data frame
 
 results <- data.frame(term = character(),
@@ -65,8 +68,9 @@ for (i in c("", "+ region", "+ strata(region)")) {
   }
   
   dd <<- datadist(data_surv_stata)
-  fit_stata <- rms::cph(as.formula(paste0("Surv(t0, t, outcome_status) ~ days0_28 + days28_197 + sex + age_spline1 + age_spline2 + cluster(patient_id)",i)), 
-                               data = data_surv_stata)
+  fit_stata <- rms::cph(as.formula(paste0("Surv(t0, t, outcome_status) ~ days0_28 + days28_197 + sex + age_spline1 + age_spline2",i)), 
+                               data = data_surv_stata,
+                                id=patient_id)
   
   tmp <- as.data.frame(names(fit_stata$coefficients))
   colnames(tmp) <- "term"
@@ -76,8 +80,23 @@ for (i in c("", "+ region", "+ strata(region)")) {
   tmp$n <- nrow(data_surv_stata)
   tmp$n_event <- fit_stata$n[[2]]
   tmp$call <- paste0("age + sex ",i)
-  tmp$cox_package <- "rms::coxph"
+  tmp$cox_package <- "rms::cph - no cluster(patient_id)"
   
+  results <- rbind(results, tmp)
+  
+  fit_stata <- rms::cph(as.formula(paste0("Surv(t0, t, outcome_status) ~ days0_28 + days28_197 + sex + age_spline1 + age_spline2 + cluster(patient_id)",i)), 
+                        data = data_surv_stata)
+  
+  tmp <- as.data.frame(names(fit_stata$coefficients))
+  colnames(tmp) <- "term"
+  tmp$hr <- exp(fit_stata$coefficients)
+  tmp$se <- exp(sqrt(diag(vcov(fit_stata))))
+  tmp$pval <- as.numeric(NA)
+  tmp$n <- nrow(data_surv_stata)
+  tmp$n_event <- fit_stata$n[[2]]
+  tmp$call <- paste0("age + sex ",i)
+  tmp$cox_package <- "rms::cph - with cluster(patient_id)"
+ 
   results <- rbind(results, tmp)
  
 }
