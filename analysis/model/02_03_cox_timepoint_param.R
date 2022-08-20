@@ -77,8 +77,8 @@ get_timepoint <- function(event,subgroup,stratify_by_subgroup,stratify_by,input,
   
   # Update COVID phenotypes after setting COVID exposure dates to NA that lie
   # outside follow up
-  survival_data$expo_pheno=as.character(survival_data$expo_pheno)
-  survival_data=survival_data%>%rowwise()%>%mutate(expo_pheno =ifelse(is.na(expo_date), "no_infection",expo_pheno))
+  #survival_data$expo_pheno=as.character(survival_data$expo_pheno)
+  #survival_data=survival_data%>%rowwise()%>%mutate(expo_pheno =ifelse(is.na(expo_date), "no_infection",expo_pheno))
 
   
   

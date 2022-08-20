@@ -130,7 +130,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     data.table::fwrite(data_surv, paste0("output/input_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     
     #Fit model and prep output csv
-    fit_model <- coxfit(data_surv, interval_names, covar_names,reduced_covar_names, mdl, subgroup)
+    fit_model <- coxfit(data_surv, interval_names, covar_names,reduced_covar_names, mdl, subgroup,non_case_inverse_weight)
     fit_model$subgroup <- subgroup
     fit_model$event <- event
     fit_model$cohort <- cohort
@@ -145,7 +145,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
 
 
 #------------------------ GET SURV FORMULA & COXPH() ---------------------------
-coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, mdl, subgroup){
+coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, mdl, subgroup,non_case_inverse_weight){
   print("Working on cox model")
   
   if("mdl_max_adj" %in% mdl){
@@ -252,11 +252,11 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
     colnames(results)="term"
     results$estimate=exp(fit_cox_model$coefficients)
     
-    if(all(data_surv$cox_weights ==1)){
+    if(non_case_inverse_weight ==1){
       print("Using regular SE's for CI's")
       results$conf.low=exp(confint(fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
       results$conf.high=exp(confint(fit_cox_model,level=0.95)[,2])
-    }else if(all(data_surv$cox_weights !=1)){
+    }else if(non_case_inverse_weight !=1){
       print("Using robust SE's for CI's")
       results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
       results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
