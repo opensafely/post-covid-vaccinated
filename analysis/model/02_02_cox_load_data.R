@@ -39,9 +39,6 @@ end_dates <- end_dates[,c("patient_id",
 input <- input %>% left_join(end_dates, by = "patient_id")
 rm(end_dates)
 
-#---------------------Set region reference level--------------------------------
-#input$cov_cat_region <- relevel(input$cov_cat_region, ref = "London")
-
 #---------------------------SPECIFY MAIN PARAMETERS-----------------------------
 # specify study parameters
 #For all analysis aside from age stratifed, analysis is performed across all ages 
@@ -61,7 +58,6 @@ cohort_end_date <- as.Date("2021-12-14")
 
 cuts_days_since_expo <- c(7, 14, 28, 56, 84, 197) 
 cuts_days_since_expo_reduced <- c(28,197)
-cuts_days_since_expo_alternative <- c(1,28,197)
 
 #Rename input variable names (by renaming here it means that these scripts can be used for other datasets without
 ## having to keep updating all the variable names throughout the following scripts)

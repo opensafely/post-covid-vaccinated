@@ -11,16 +11,6 @@ active_analyses <- read_rds("lib/active_analyses.rds")
 active_analyses <- active_analyses %>%dplyr::filter(outcome_variable==paste0("out_date_",event_name) & active == "TRUE")
 
 ## Select covariates of interest
-for(i in c("normal","reduced","alternative")){
-   assign(paste0("non_zero_covar_names_",i),read_csv(paste0("output/not-for-review/non_zero_selected_covariates_",cohort,"_",i,"_time_periods.csv")) )
-}
-
-non_zero_covar_names <- rbind(non_zero_covar_names_normal, non_zero_covar_names_reduced, non_zero_covar_names_alternative)
-rm(non_zero_covar_names_normal, non_zero_covar_names_reduced, non_zero_covar_names_alternative)
-
-non_zero_covar_names <- non_zero_covar_names %>% filter(outcome_event == paste0("out_date_",event_name))
-non_zero_covar_names$outcome_event <- gsub("out_date_", "",non_zero_covar_names$outcome_event)
-
 covar_names <-str_split(active_analyses$covariates, ";")[[1]]
 covar_names <-append(covar_names,"patient_id")
 covar_names <-covar_names[!covar_names %in% c("cov_num_age","cov_cat_ethnicity","cov_cat_region","cov_cat_sex")]
@@ -28,7 +18,7 @@ covar_names <-covar_names[!covar_names %in% c("cov_num_age","cov_cat_ethnicity",
 ##Set which models and cohorts are required
 
 if(active_analyses$model=="all"){
-  mdl=c("mdl_age_sex","mdl_age_sex_region","mdl_max_adj","mdl_max_adj_reduced_covars")
+  mdl=c("mdl_age_sex","mdl_age_sex_region","mdl_max_adj")
 }else{
   mdl=active_analyses$model
 }
@@ -80,12 +70,3 @@ analyses_to_run <- analyses_to_run %>%
     startsWith(subgroup, "prior_history") ~ "prior_history",
     startsWith(subgroup, "sex") ~ "sex",
     TRUE ~ as.character(subgroup)))
-
-
-## Separate into to dataframes as this will allow all the vaccinated/electively unvaccinated
-## analyses to be run in one go to save having to read in the data for each individual analysis
-## i.e can read it in once and run all the vaccinated analyses in one go
-
-#for(i in cohort_to_run){
-#  assign(paste0("analyses_to_run_",i),analyses_to_run %>% filter(cohort_to_run == i) )
-#}

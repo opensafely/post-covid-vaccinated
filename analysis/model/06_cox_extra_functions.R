@@ -68,27 +68,16 @@ collapse_categorical_covars <- function(data_surv,subgroup){
   }
   
   if("cov_cat_smoking_status" %in% cat_cov_to_remove){
-    if(subgroup != "covid_pheno_hospitalised"){
-      data_surv=data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status)) %>%
-        mutate(cov_cat_smoking_status= case_when(cov_cat_smoking_status=="Never smoker"~"Never smoker",
-                                                 cov_cat_smoking_status=="Ever smoker"~"Ever smoker",
-                                                 cov_cat_smoking_status=="Current smoker"~"Ever smoker",
-                                                 cov_cat_smoking_status=="Missing"~"Never smoker"))
-      
-      smoking_status_mode <- get_mode(data_surv,"cov_cat_smoking_status")
-      data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status)) %>%
-        mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=smoking_status_mode))
-    }else if (subgroup == "covid_pheno_hospitalised"){
-      data_surv=data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status)) %>%
-        mutate(cov_cat_smoking_status= case_when(cov_cat_smoking_status=="Never smoker"~"Never smoker",
-                                                 cov_cat_smoking_status=="Ever smoker"~"Ever smoker",
-                                                 cov_cat_smoking_status=="Current smoker"~"Ever smoker"))
-      
-      smoking_status_mode <- get_mode(data_surv,"cov_cat_smoking_status")
-      data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status)) %>%
-        mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=smoking_status_mode))
-    }
+    data_surv=data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status)) %>%
+      mutate(cov_cat_smoking_status= case_when(cov_cat_smoking_status=="Never smoker"~"Never smoker",
+                                               cov_cat_smoking_status=="Ever smoker"~"Ever smoker",
+                                               cov_cat_smoking_status=="Current smoker"~"Ever smoker",
+                                               cov_cat_smoking_status=="Missing"~"Never smoker"))
     
+    smoking_status_mode <- get_mode(data_surv,"cov_cat_smoking_status")
+    data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status)) %>%
+      mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=smoking_status_mode))
+
   }
   return(list(data_surv,cat_cov_to_remove))
 }
