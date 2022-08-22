@@ -126,59 +126,6 @@ for (i in 1:length(outcomes)) {
 df$prior_history_var <- ifelse(df$outcome=="Arterial thrombosis event - Primary position events","sub_bin_ate",df$prior_history_var)
 df$prior_history_var <- ifelse(df$outcome=="Venous thrombosis event - Primary position events","cov_bin_vte",df$prior_history_var)
 
-# Add diabetes outcomes --------------------------------------------------------
-
-outcomes <- c("Type 1 diabetes",
-              "Type 2 diabetes",
-              "Other or non-specific diabetes",
-              "Gestational diabetes")
-
-outcomes_short <- c("diabetes_type1","diabetes_type2","diabetes_other","diabetes_gestational")
-
-for (i in 1:length(outcomes)) {
-  df[nrow(df)+1,] <- c(FALSE,
-                       outcomes[i],
-                       paste0("out_date_",outcomes_short[i]),
-                       rep("",22),
-                       "Diabetes")
-}
-
-# Add Mental Health outcomes --------------------------------------------------------
-
-outcomes <- c("Depression",
-              "Anxiety - general",
-              "Anxiety - obsessive compulsive disorder", 
-              "Anxiety - post traumatic stress disorder", 
-              "Eating disorders", 
-              "Serious mental illness",
-              "Self harm, aged >=10",
-              "Self harm, aged >=15",
-              "Suicide",
-              "Addiction")
-
-outcomes_short <- c("depression",
-                    "anxiety_general",
-                    "anxiety_ocd", 
-                    "anxiety_ptsd", 
-                    "eating_disorders", 
-                    "serious_mental_illness",
-                    "self_harm_10plus",
-                    "self_harm_15plus",
-                    "suicide",
-                    "addiction")
-
-for (i in 1:length(outcomes)) {
-  df[nrow(df)+1,] <- c(FALSE,
-                       outcomes[i],
-                       paste0("out_date_",outcomes_short[i]),
-                       "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_cat_sex;cov_bin_lipid_medications;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_chronic_obstructive_pulmonary_disease;cov_bin_depression;cov_bin_anxiety;cov_bin_eating_disorders;cov_bin_serious_mental_illness;cov_bin_self_harm",
-                       rep("all",2),
-                       rep(TRUE,4),
-                       rep(FALSE,14),
-                       "",
-                       "Mental_health")
-}
-
 # Save active analyses list ----------------------------------------------------
 
 saveRDS(df, file = "lib/active_analyses.rds")
