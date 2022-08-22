@@ -6,7 +6,7 @@ output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenS
 dir.create(file.path(output_dir), recursive =TRUE, showWarnings = FALSE)
 
 cohort <- c("vaccinated","electively_unvaccinated","pre_vaccination")
-i="electively_unvaccinated"
+
 for(i in cohort){
   print(paste0("Working on table 2 ", i))
   table2_raw <- read.csv(paste0(results_dir,"table2_", i, ".csv"))
