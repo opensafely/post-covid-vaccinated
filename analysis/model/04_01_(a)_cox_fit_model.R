@@ -9,7 +9,7 @@ source(file.path(scripts_dir,"04_01_(b)_cox_format_survival_data.R"))
 
 #------------------FORMAT SURVIVAL DATASET AND RUN COX MODEL--------------------
 
-fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,reduced_covar_names,total_covid_cases,time_point){
+fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases,time_point){
   list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event,subgroup, stratify_by_subgroup, stratify_by,survival_data,cuts_days_since_expo,time_point)
   if(length(list_data_surv_noncase_ids_interval_names)==1){
     analyses_not_run <<- list_data_surv_noncase_ids_interval_names[[1]]
@@ -46,91 +46,63 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     data_surv <- data_surv %>% left_join(covars)
     sampled_data <- sampled_data %>% left_join(covars)
   }
- 
-  if(subgroup=="covid_pheno_hospitalised" ){
-    # Merge missing ethnicity into white ethnicity
-    data_surv <- data_surv %>% mutate(ethnicity = as.character(ethnicity))%>%
-      mutate(ethnicity = case_when(ethnicity=="White" ~ "White, including missing",
-                                   ethnicity=="Mixed" ~ "Mixed",
-                                   ethnicity=="South Asian" ~ "South Asian",
-                                   ethnicity=="Black" ~ "Black",
-                                   ethnicity=="Other" ~ "Other",
-                                   ethnicity=="Missing" ~ "White, including missing"
-      ))
-    
-    relevel_with <- get_mode(data_surv,"ethnicity")
-    
-    data_surv <- data_surv %>% mutate(ethnicity = as.factor(ethnicity))%>%
-      mutate(ethnicity = relevel(ethnicity,ref=relevel_with))
-    
-    print(paste0("Ethnicity releveled with: ",relevel_with))
-    print(unique(data_surv$ethnicity))
-    
-    sampled_data <- sampled_data %>% mutate(ethnicity = as.character(ethnicity))%>%
-      mutate(ethnicity = case_when(ethnicity=="White" ~ "White, including missing",
-                                   ethnicity=="Mixed" ~ "Mixed",
-                                   ethnicity=="South Asian" ~ "South Asian",
-                                   ethnicity=="Black" ~ "Black",
-                                   ethnicity=="Other" ~ "Other",
-                                   ethnicity=="Missing" ~ "White, including missing"
-      ))
-    
-    relevel_with <- get_mode(sampled_data,"ethnicity")
-    
-    sampled_data <- sampled_data %>% mutate(ethnicity = as.factor(ethnicity))%>%
-      mutate(ethnicity = relevel(ethnicity,ref=relevel_with))
-    
-  }
-  
-  if(subgroup=="covid_pheno_hospitalised"){
-    # Merge missing smoking into never smoker
-    data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status))%>%
-      mutate(cov_cat_smoking_status = case_when(cov_cat_smoking_status=="Never smoker" ~ "Never smoker",
-                                                cov_cat_smoking_status=="Ever smoker" ~ "Ever smoker",
-                                                cov_cat_smoking_status=="Current smoker" ~ "Current smoker",
-                                                cov_cat_smoking_status=="Missing" ~ "Never smoker"
-      ))
-    
-    
-    relevel_with <- get_mode(data_surv,"cov_cat_smoking_status")
-    
-    data_surv <- data_surv %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status))%>%
-      mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=relevel_with))
-    
-    print(paste0("Smoking status releveled with: ",relevel_with))
-    print(unique(data_surv$cov_cat_smoking_status))
-    
-    sampled_data <- sampled_data %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status))%>%
-      mutate(cov_cat_smoking_status = case_when(cov_cat_smoking_status=="Never smoker" ~ "Never smoker",
-                                                cov_cat_smoking_status=="Ever smoker" ~ "Ever smoker",
-                                                cov_cat_smoking_status=="Current smoker" ~ "Current smoker",
-                                                cov_cat_smoking_status=="Missing" ~ "Never smoker"
-      ))
-    
-    
-    relevel_with <- get_mode(sampled_data,"cov_cat_smoking_status")
-    
-    sampled_data <- sampled_data %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status))%>%
-      mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=relevel_with))
-  }
     
   # Describe survival data
   sink(paste0("output/not-for-review/describe_data_surv_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.txt"))
   print(Hmisc::describe(data_surv))
   sink()
   
+  #Check for covariates to remove or collapse for stata data
+  if("mdl_max_adj" %in% mdl){
+    covars_to_remove <- rm_lowvar_covars(data_surv)[!is.na((rm_lowvar_covars(data_surv)))]
+    sampled_data <- sampled_data %>% dplyr::select(!all_of(covars_to_remove))
+    sampled_data_covariates <- covar_names[covar_names %in% names(sampled_data)] %>% sort()
+    sampled_data$covariates_to_fit=paste0(sampled_data_covariates, collapse = ",")
+    print(paste0("Covariates to fit in sampled data: ", sampled_data_covariates))
+    
+    collapse_covars_list=collapse_categorical_covars(data_surv,subgroup)
+    covars_collapsed=collapse_covars_list[[2]]
+    covars_collapsed=unique(covars_collapsed[covars_collapsed %in% c("cov_cat_deprivation","cov_cat_smoking_status")])
+    print(paste0("Categorical covariates collapsed in sampled data: ", covars_collapsed))
+    
+    if("cov_cat_deprivation" %in% covars_collapsed){
+      sampled_data=sampled_data %>% mutate(cov_cat_deprivation= 
+                                             case_when(cov_cat_deprivation=="1-2 (most deprived)"~"1-4",
+                                                       cov_cat_deprivation=="3-4"~"1-4",
+                                                       cov_cat_deprivation=="5-6"~"5-6",
+                                                       cov_cat_deprivation=="7-8"~"7-10",
+                                                       cov_cat_deprivation=="9-10 (least deprived)"~"7-10"))
+      
+      sampled_data$cov_cat_deprivation <- ordered(sampled_data$cov_cat_deprivation, levels = c("1-4","5-6","7-10"))
+    }
+    
+    if("cov_cat_smoking_status" %in% covars_collapsed){
+      sampled_data=sampled_data %>% mutate(cov_cat_smoking_status = as.character(cov_cat_smoking_status)) %>%
+        mutate(cov_cat_smoking_status= case_when(cov_cat_smoking_status=="Never smoker"~"Never smoker",
+                                                 cov_cat_smoking_status=="Ever smoker"~"Ever smoker",
+                                                 cov_cat_smoking_status=="Current smoker"~"Ever smoker",
+                                                 cov_cat_smoking_status=="Missing"~"Never smoker"))
+      
+      smoking_status_mode <- get_mode(sampled_data,"cov_cat_smoking_status")
+      sampled_data <- sampled_data %>% mutate(cov_cat_smoking_status = as.factor(cov_cat_smoking_status)) %>%
+        mutate(cov_cat_smoking_status = relevel(cov_cat_smoking_status,ref=smoking_status_mode))
+      
+    }
+    sampled_data$covariates_collapsed=paste0(covars_collapsed, collapse = ",")
+  }
+  
   # Save sampled data for Stata
   write.csv(sampled_data, paste0("output/input_sampled_data_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv") )
   
   
-  if((event=="pe" & subgroup =="covid_pheno_hospitalised" & cohort == "electively_unvaccinated") | time_point == "alternative") {
+  if((event=="pe" & subgroup =="covid_pheno_hospitalised" & cohort == "electively_unvaccinated")) {
     data.table::fwrite(data_surv, paste0("output/input_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     
   }else{
     data.table::fwrite(data_surv, paste0("output/input_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     
     #Fit model and prep output csv
-    fit_model <- coxfit(data_surv, interval_names, covar_names,reduced_covar_names, mdl, subgroup,non_case_inverse_weight)
+    fit_model <- coxfit(data_surv, interval_names, covar_names, mdl, subgroup,non_case_inverse_weight)
     fit_model$subgroup <- subgroup
     fit_model$event <- event
     fit_model$cohort <- cohort
@@ -145,7 +117,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
 
 
 #------------------------ GET SURV FORMULA & COXPH() ---------------------------
-coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, mdl, subgroup,non_case_inverse_weight){
+coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_case_inverse_weight){
   print("Working on cox model")
   
   if("mdl_max_adj" %in% mdl){
@@ -168,10 +140,6 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
   }
   
   covariates <- covar_names[covar_names %in% names(data_surv)] %>% sort()
-  reduced_covar_names <- str_split(reduced_covar_names, ";")[[1]]
-  reduced_covariates <- intersect(covariates,reduced_covar_names)
-  additional_covars_removed <- covariates[!covariates %in% reduced_covariates]
-  print(paste0("Additional covariates removed for hospitalised analysis: ", additional_covars_removed))
   
   # get Survival formula ----
   
@@ -181,38 +149,21 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
   combined_results <- as.data.frame(matrix(ncol=11,nrow=0))
   colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","results_fitted","model","covariates_removed","cat_covars_collapsed","covariates_fitted")
   
-  # For electively unvaccinated hospitalised ATE set the region reference as London
-  # if(subgroup == "covid_pheno_hospitalised" & ((event_name == "ate" & cohort == "electively_unvaccinated") | (event_name == "vte" & cohort == "vaccinated") | (event_name == "angina" & cohort == "vaccinated"))){
-  #   data_surv$region_name <- relevel(data_surv$region_name, ref = "London")
-  #   print("Region releveled with London before fitting cox")
-  # }
-  
   for(model in mdl){
     #Base formula
     if(model %in% c("mdl_age_sex","mdl_age_sex_region")){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
-        paste(interval_names, collapse="+"),
-        "+ cluster(patient_id)")
+        paste(interval_names, collapse="+"))
     }else if (model =="mdl_max_adj"){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
-        paste(covariates_excl_region_sex_age, collapse="+"),
-        "+ cluster(patient_id)")
-    }else if(model == "mdl_max_adj_reduced_covars"){
-      surv_formula <- paste0(
-        "Surv(tstart, tstop, event) ~ ",
-        paste(c(interval_names,reduced_covariates), collapse="+"),
-        "+ cluster(patient_id)")
+        paste(covariates_excl_region_sex_age, collapse="+"))
     }
     
     # Add in region as either covariate or stratify by
-    if (model %in% c("mdl_age_sex_region","mdl_max_adj","mdl_max_adj_reduced_covars")){
-      if(subgroup=="covid_pheno_hospitalised"){
-        surv_formula <- paste(surv_formula, "region_name", sep="+")
-      }else{
-        surv_formula <- paste(surv_formula, "strat(region_name)", sep="+")
-      }
+    if (model %in% c("mdl_age_sex_region","mdl_max_adj")){
+      surv_formula <- paste(surv_formula, "strat(region_name)", sep="+")
     }
 
     #If subgroup is not sex then add sex into formula
@@ -221,7 +172,7 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
     }
 
     #If subgroup is not ethnicity then add ethnicity into formula
-    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model %in% c("mdl_max_adj","mdl_max_adj_reduced_covars")){
+    if ((startsWith(subgroup,"ethnicity"))==F & (!"ethnicity" %in% covariates_excl_region_sex_age) & model %in% c("mdl_max_adj")){
       surv_formula <- paste(surv_formula, "ethnicity", sep="+")
     }
 
@@ -239,8 +190,8 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
     #options(datadist="dd")
     options(datadist="dd", contrasts=c("contr.treatment", "contr.treatment"))
     print("Fitting cox model")
-    fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,surv = TRUE,x=TRUE,y=TRUE)
-    # To get robust variance-covariance matrix so that robust standard errots can be used in CI's
+    fit_cox_model <-rms::cph(formula=as.formula(surv_formula),data=data_surv, weight=data_surv$cox_weights,id=data_surv$patient_id, surv = TRUE,x=TRUE,y=TRUE)
+    # To get robust variance-covariance matrix so that robust standard errors can be used in CI's
     robust_fit_cox_model=rms::robcov(fit_cox_model, cluster = data_surv$patient_id)
 
     print("Cox output")
@@ -268,10 +219,6 @@ coxfit <- function(data_surv, interval_names, covar_names, reduced_covar_names, 
       results$covariates_removed=paste0(covars_to_remove, collapse = ",")
       results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
       results$covariates_fitted <- "normal"
-    }else if(model =="mdl_max_adj_reduced_covars"){
-      results$covariates_removed=paste0(c(covars_to_remove, additional_covars_removed), collapse = ",")
-      results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
-      results$covariates_fitted <- "reduced"
     }else{
       results$covariates_removed <- NA
       results$cat_covars_collapsed <- NA
