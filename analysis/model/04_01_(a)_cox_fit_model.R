@@ -205,11 +205,11 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
     
     if(non_case_inverse_weight ==1){
       print("Using regular SE's for CI's")
-      results$conf.low=exp(confint(fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
+      results$conf.low=exp(confint(fit_cox_model,level=0.95)[,1]) #use regular standard errors to calculate CI for non-sampled data
       results$conf.high=exp(confint(fit_cox_model,level=0.95)[,2])
     }else if(non_case_inverse_weight !=1){
       print("Using robust SE's for CI's")
-      results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
+      results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI for sampled data
       results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
     }
     results$std_error_ln_hr=sqrt(diag(vcov(fit_cox_model)))
