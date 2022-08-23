@@ -25,7 +25,7 @@ outcome_name_table <- active_analyses_table %>%
   mutate(outcome_name=active_analyses_table$outcome_variable %>% str_replace("out_date_", ""))
 
 # Focus on first 8 CVD outcomes (remove ate and vte)
-outcome_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name %in% c("ate","vte")]
+outcome_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name %in% c("ate")]
 
 
 #---------------------------------------------#
@@ -39,11 +39,11 @@ hr_file_paths <- pmap(list(hr_files),
                         df <- fread(fpath)
                         return(df)
                       })
-estimates <- rbindlist(hr_file_paths, fill=TRUE)
+main_estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
 #Get median follow-up time
-median_follow_up <- estimates %>% select(expo_week, median_follow_up, event, subgroup, model, cohort, time_points) %>%
-                                  filter(event %in% c("ate","vte") & median_follow_up != "[Redacted]" & !expo_week %in% c("days_pre","all post expo") )
+median_follow_up <- main_estimates %>% select(expo_week, median_follow_up, event, subgroup, model, cohort, time_points) %>%
+  filter(event %in% c("ate","vte") & median_follow_up != "[Redacted]" & !expo_week %in% c("days_pre","all post expo") )
 median_follow_up <- median_follow_up %>% rename(term=expo_week)
 median_follow_up$add_days <- sub("days","",median_follow_up$term)
 median_follow_up$add_days <- sub('\\_.*', '', median_follow_up$add_days)
@@ -51,35 +51,29 @@ median_follow_up$add_days <- as.numeric(median_follow_up$add_days)
 median_follow_up$median_follow_up <- as.numeric(median_follow_up$median_follow_up) +median_follow_up$add_days
 
 # Get estimates for main analyses and list of outcomes from active analyses
-main_estimates <- subset(estimates, subgroup == "main" & event %in% outcome_to_plot & term %in% term[grepl("^days",term)])
+main_estimates <- main_estimates %>% filter((subgroup %in% c("sex_Male","sex_Female","prior_history_TRUE","prior_history_FALSE")) 
+                                            & event %in% outcome_to_plot
+                                            & results_fitted == "fitted_successfully"
+                                            & term %in% c("days0_28","days28_197","days197_535") )
+  
+rm(hr_file_paths)
 
 #--------------------------Format the results-----------------------------------
 main_estimates <- main_estimates %>% mutate(across(c("estimate","conf.low","conf.high"), as.numeric))
+main_estimates <- main_estimates %>% filter(model == "mdl_max_adj")
+
+term_to_time <- data.frame(term = c("days0_28","days28_197","days197_535"),
+                           time = c(2,16,52))
+main_estimates <- merge(main_estimates, term_to_time, by = c("term"), all.x = TRUE)
+
+
+
+
+
+
+
 main_estimates$model <- ifelse(main_estimates$model == "mdl_agesex", "mdl_age_sex",main_estimates$model)
-
-main_estimates_ate <- main_estimates %>% filter(model %in% c("mdl_age_sex","mdl_max_adj")
-                                                & event == "ate"
-                                               & results_fitted != "fitted_unsuccessfully"
-                                               & (event != "ate" | time_points != "normal"))
-
-main_estimates_vte_vacc <- main_estimates %>% filter(model %in% c("mdl_age_sex","mdl_max_adj")
-                                                & event == "vte"
-                                                & (results_fitted == "fitted_successfully" | is.na(results_fitted))
-                                                & cohort == "vaccinated")
-
-main_estimates_vte_pre_vacc <- main_estimates %>% filter(model %in% c("mdl_age_sex","mdl_max_adj")
-                                                     & event == "vte"
-                                                     & (results_fitted == "fitted_successfully" | is.na(results_fitted))
-                                                     & cohort == "pre_vaccination")
-
-main_estimates_vte_unvax <- main_estimates %>% filter(model %in% c("mdl_age_sex","mdl_max_adj")
-                                                         & event == "vte"
-                                                         & (results_fitted == "fitted_successfully" | is.na(results_fitted))
-                                                         & cohort == "electively_unvaccinated"
-                                                      & term %in% c("days0_28","days28_197"))
-
-
-main_estimates <- rbind(main_estimates_ate,main_estimates_vte_vacc,main_estimates_vte_pre_vacc,main_estimates_vte_unvax)                                        
+main_estimates <- main_estimates %>% filter(model %in% c("mdl_age_sex","mdl_max_adj") & ((event == "ate" & term %in% c("days0_28","days28_197")) |(event == "vte" & term %in% c("days0_7","days7_14", "days14_28", "days28_56", "days56_84", "days84_197") & cohort == "vaccinated") |(event == "vte" & term %in% c("days0_28","days28_197") & (cohort == "electively_unvaccinated" | cohort == "pre_vaccination"))))
 main_estimates$expo_week <- NULL
 main_estimates$median_follow_up <- NULL
 
@@ -87,17 +81,15 @@ main_estimates$median_follow_up <- NULL
 # 4. Specify time in weeks (mid-point) #
 #--------------------------------------#
 term_to_time <- data.frame(term = c("days0_7","days7_14", "days14_28", "days28_56", "days56_84", "days84_197", 
-                                    "days0_28","days28_197","days197_535"),
+                                    "days0_28","days28_197"),
                            time = c(0.5,1.5,3,6,10,20,
-                                    2,16,52))
-
-
+                                    2,16))
 main_estimates <- merge(main_estimates, term_to_time, by = c("term"), all.x = TRUE)
 
 main_estimates <- main_estimates %>% left_join(median_follow_up)
 main_estimates$median_follow_up <- as.numeric(main_estimates$median_follow_up) /7
-main_estimates$time_to_plot <- ifelse(main_estimates$term == "days28_197" | main_estimates$term == "days84_197" & main_estimates$cohort !="pre_vaccination" ,main_estimates$median_follow_up,main_estimates$time)
-main_estimates$time_to_plot <- ifelse(main_estimates$term == "days197_535" ,main_estimates$median_follow_up,main_estimates$time_to_plot)
+main_estimates$time_to_plot <- ifelse(main_estimates$term == "days28_197" | main_estimates$term == "days84_197" ,main_estimates$median_follow_up,main_estimates$time)
+main_estimates$time_to_plot <- ifelse(is.na(main_estimates$time_to_plot),main_estimates$time,main_estimates$time_to_plot)
 
 #------------------------------------------#
 # 4. Specify groups and their line colours #
@@ -140,7 +132,7 @@ for(event_name in outcome_to_plot){
     ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) +    
     #    ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
     ggplot2::scale_y_continuous(lim = c(0.5,64), breaks = c(0.5,1,2,4,8,16,32,64), trans = "log") +
-    ggplot2::scale_x_continuous(lim = c(0,36), breaks = seq(0,36,4)) +
+    ggplot2::scale_x_continuous(lim = c(0,28), breaks = seq(0,28,4)) +
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$model))+ 
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$model)) +
     ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$model)) +
