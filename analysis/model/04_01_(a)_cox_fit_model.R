@@ -212,8 +212,8 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
       results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI
       results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
     }
-    results$std.error=exp(sqrt(diag(vcov(fit_cox_model))))
-    results$robust.se=exp(sqrt(diag(vcov(robust_fit_cox_model))))
+    results$std_error_ln_hr=sqrt(diag(vcov(fit_cox_model)))
+    results$robust_se_ln_hr=sqrt(diag(vcov(robust_fit_cox_model)))
 
     if(model == "mdl_max_adj"){
       results$covariates_removed=paste0(covars_to_remove, collapse = ",")
@@ -239,7 +239,12 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
     #results=results%>%left_join(anova_fit_cox_model,by="covariate")
 
     results$results_fitted <- ifelse(all(results$estimate < 200 & results$std.error <10 & results$robust.se <10),"fitted_successfully","fitted_unsuccessfully")
-
+    
+    df <- as.data.frame(matrix(ncol = ncol(results),nrow = 2))
+    colnames(df) <- colnames(results)
+    df$term <- c("days_pre", "all post expo")
+    results <- rbind(df, results)
+    
     results$model <- model
     combined_results <- rbind(combined_results,results)
   }
