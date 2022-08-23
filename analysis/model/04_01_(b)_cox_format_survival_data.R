@@ -23,13 +23,6 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     controls_per_case <- ceiling((5000000-nrow(cases))/nrow(cases))
   }
   
-  #Test - do not sample electively unvaccinated; sampling possible to change to just adding in as quick line
-  # then will update all later
-  
-  if(cohort == "electively_unvaccinated"){
-    controls_per_case <- ceiling((nrow(survival_data)-nrow(cases))/nrow(cases))
-  }
-  
   print(paste0("Number of controls per case: ", controls_per_case))
   
   if(startsWith(subgroup,"covid_pheno_")){
