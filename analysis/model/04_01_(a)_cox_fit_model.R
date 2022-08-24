@@ -11,33 +11,16 @@ source(file.path(scripts_dir,"04_01_(b)_cox_format_survival_data.R"))
 
 fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases,time_point){
   list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event,subgroup, stratify_by_subgroup, stratify_by,survival_data,cuts_days_since_expo,time_point)
+  
   if(length(list_data_surv_noncase_ids_interval_names)==1){
     analyses_not_run <<- list_data_surv_noncase_ids_interval_names[[1]]
     return(fit_model_reducedcovariates)
   }
   
   data_surv <- list_data_surv_noncase_ids_interval_names[[1]]
-  noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
-  interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
-  ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
-  non_case_inverse_weight=list_data_surv_noncase_ids_interval_names[[5]]
-  less_than_50_events=list_data_surv_noncase_ids_interval_names[[6]]
-  sampled_data <- list_data_surv_noncase_ids_interval_names[[7]]
-  
-  if(less_than_50_events=="TRUE"){
-    analyses_not_run[nrow(analyses_not_run)+1,]<<-c(event,subgroup,cohort,mdl,"TRUE","TRUE","TRUE","FALSE")
-    return(fit_model_reducedcovariates)
-  }
-
-  if(ind_any_zeroeventperiod==TRUE){
-    list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event,subgroup, stratify_by_subgroup, stratify_by,survival_data, cuts_days_since_expo=cuts_days_since_expo_reduced,time_point)
-    data_surv <- list_data_surv_noncase_ids_interval_names[[1]]
-    noncase_ids <- list_data_surv_noncase_ids_interval_names[[2]]
-    interval_names <-list_data_surv_noncase_ids_interval_names[[3]]
-    ind_any_zeroeventperiod <- list_data_surv_noncase_ids_interval_names[[4]]
-    non_case_inverse_weight=list_data_surv_noncase_ids_interval_names[[5]]
-    sampled_data <- list_data_surv_noncase_ids_interval_names[[7]]
-  }
+  interval_names <-list_data_surv_noncase_ids_interval_names[[2]]
+  non_case_inverse_weight=list_data_surv_noncase_ids_interval_names[[3]]
+  sampled_data <- list_data_surv_noncase_ids_interval_names[[4]]
   
   #Select covariates if using model mdl_max_adj
   if("mdl_max_adj" %in% mdl){
@@ -147,8 +130,8 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
   covariates_excl_region_sex_age <- unique(c(interval_names, covariates))
   knot_placement=as.numeric(quantile(data_surv$age, probs=c(0.1,0.5,0.9)))
   
-  combined_results <- as.data.frame(matrix(ncol=11,nrow=0))
-  colnames(combined_results) <- c("term","estimate","conf.low","conf.high","std.error","robust.se","results_fitted","model","covariates_removed","cat_covars_collapsed","covariates_fitted")
+  combined_results <- as.data.frame(matrix(ncol=10,nrow=0))
+  colnames(combined_results) <- c("term","estimate","conf_low","conf_high","se_ln_hr","robust_se_ln_hr","results_fitted","model","covariates_removed","cat_covars_collapsed")
   
   for(model in mdl){
     #Base formula
@@ -206,12 +189,12 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
     
     if(non_case_inverse_weight ==1){
       print("Using regular SE's for CI's")
-      results$conf.low=exp(confint(fit_cox_model,level=0.95)[,1]) #use regular standard errors to calculate CI for non-sampled data
-      results$conf.high=exp(confint(fit_cox_model,level=0.95)[,2])
+      results$conf_low=exp(confint(fit_cox_model,level=0.95)[,1]) #use regular standard errors to calculate CI for non-sampled data
+      results$conf_high=exp(confint(fit_cox_model,level=0.95)[,2])
     }else if(non_case_inverse_weight !=1){
       print("Using robust SE's for CI's")
-      results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI for sampled data
-      results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
+      results$conf_low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI for sampled data
+      results$conf_high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
     }
     results$se_ln_hr=sqrt(diag(vcov(fit_cox_model)))
     results$robust_se_ln_hr=sqrt(diag(vcov(robust_fit_cox_model)))
@@ -219,11 +202,9 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
     if(model == "mdl_max_adj"){
       results$covariates_removed=paste0(covars_to_remove, collapse = ",")
       results$cat_covars_collapsed=paste0(covars_collapsed, collapse = ",")
-      results$covariates_fitted <- "normal"
     }else{
       results$covariates_removed <- NA
       results$cat_covars_collapsed <- NA
-      results$covariates_fitted <- NA
     }
     
     print("Print results")

@@ -32,7 +32,7 @@ library(matrixStats)
 args = commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  event_name="ate"
+  event_name="ami"
   cohort="vaccinated"
 }else{
   event_name  = args[[1]]
@@ -74,6 +74,11 @@ analyses_to_run$reduced_timepoint <- "reduced"
 analyses_to_run <- rbind(analyses_to_run, analyses_to_run_normal_timepoint)
 
 rm(analyses_to_run_normal_timepoint)
+
+#Remove hospitalised analysis with normal timepoints as this will be run in stata and we don't need the saved data sets
+#from this.
+
+analyses_to_run <- analyses_to_run %>% filter(subgroup != "covid_pheno_hospitalised" | reduced_timepoint != "normal")
 
 # Source remainder of relevant files --------------------------------------------------------
 
