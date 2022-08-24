@@ -10,8 +10,10 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   
   print(paste0("Total number in survival data: ", nrow(survival_data)))
   
-  if(nrow(survival_data) >= 4000000){
+  if(nrow(survival_data) > 4000000){
     print("Sample size above 4 million - sampling starting")
+    
+    # Select all event cases as controls per case is determined by the number of events
     
     cases <- survival_data %>% filter((!is.na(event_date)) & 
                                         (
@@ -24,8 +26,13 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     print(paste0("Number of controls per case: ", controls_per_case))
     
+    # All cases and all exposed to COVID-19 are included in the data set. Non-cases-non-exposed are randomly sampled.
+    
     non_cases_exposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (!is.na(expo_date)))
     non_cases_unexposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (is.na(expo_date)))
+    
+    # If number of cases * controls per cases > non-cases-non-exposed then use all of non-cases-non-exposed
+    # otherwise randomly sample non-cases-non-exposed
     
     if(nrow(cases)*controls_per_case < nrow(non_cases_unexposed)){
       non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*controls_per_case,replace=FALSE), ]
@@ -35,6 +42,7 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
       print("Non-cases not sampled - all non-cases used")
     }
     
+    # Weight of those who are sampled, used in cox model to weight the non_cases_unexposed so that 'whole' population is analysed
     non_case_inverse_weight=(nrow(survival_data)-nrow(cases)-nrow(non_cases_exposed))/nrow(non_cases_unexposed)
     survival_data <- bind_rows(cases,non_cases_exposed,non_cases_unexposed)
     
@@ -44,19 +52,24 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     print(paste0("Number of controls (non exposed): ", nrow(non_cases_unexposed)))
     print(paste0("Controls (non exposed) weight: ", non_case_inverse_weight))
     
-    #Add inverse probablity weights for non-cases
+    #Add inverse probability weights for non-cases
     survival_data$cox_weights <- ifelse(survival_data$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
   }else{
     print("Sample size below 4 million - no sampling")
+    # No sampling therefore cox weight of 1
     non_case_inverse_weight <- 1
     survival_data$cox_weights <- 1
     
   }
   
+  # The sampled df is used in stata to run hospitalised analyses
   sampled_data <- as.data.frame(survival_data)
   
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
   survival_data$days_to_end <- as.numeric(survival_data$follow_up_end-cohort_start_date)
+  
+  # Add one to follow up as this allows people the day to have an event and ensures that days of follow up are correct
+  # eg as.Date("2020-01-01) - as.Date("2020-01-01) gives zero days but we want this as one day of follow-up 
   
   survival_data$days_to_end <- (survival_data$days_to_end +1)
   
@@ -216,6 +229,8 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     episode_info <- episode_info %>% mutate("incidence rate (per 1000 person years)" = (events_total/(person_days_follow_up/365.2))*1000 )
     
     # Calculate median person-time -----------------------------------------------
+    
+    #Median person time of those with an event within each time period used for plotting figures.
     
     tmp <- data_surv[data_surv$event ==1,c("patient_id","days_cat","tstart","tstop")]
     tmp$person_time <- tmp$tstop - tmp$tstart
