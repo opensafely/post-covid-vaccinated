@@ -78,7 +78,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   write.csv(sampled_data, paste0("output/input_sampled_data_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv") )
   
   
-  if((event=="pe" & subgroup =="covid_pheno_hospitalised" & cohort == "electively_unvaccinated")) {
+  if((subgroup =="covid_pheno_hospitalised")) {
     data.table::fwrite(data_surv, paste0("output/input_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     
   }else{
