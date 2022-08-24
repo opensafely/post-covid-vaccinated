@@ -233,18 +233,15 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     # Calculate median person-time -----------------------------------------------
     
-    tmp <- data_surv[data_surv$event ==1,c("patient_id","days_cat","tstart","tstop","cox_weights")]
+    tmp <- data_surv[data_surv$event ==1,c("patient_id","days_cat","tstart","tstop")]
     tmp$person_time <- tmp$tstop - tmp$tstart
     
     tmp[,c("patient_id","tstart","tstop")] <- NULL
 
     tmp <- tmp %>%
       dplyr::group_by(days_cat) %>%
-      dplyr::mutate(median_follow_up = matrixStats::weightedMedian(x = person_time, w = cox_weights)) %>%
-      dplyr::ungroup(days_cat)
-    
-    tmp <- unique(tmp[,c("days_cat","median_follow_up")])
-    
+      summarise(median_follow_up = median(person_time, na.rm = TRUE))
+      
     episode_info <- merge(episode_info, tmp, by = "days_cat", all.x = TRUE)
     episode_info $days_cat <- NULL
     
