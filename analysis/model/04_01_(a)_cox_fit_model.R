@@ -108,6 +108,7 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     fit_model$cohort <- cohort
     fit_model$time_points <- time_point
     fit_model$total_covid19_cases <- total_covid_cases
+    fit_model$data_sampled <- ifelse(non_case_inverse_weight == 1, "FALSE", "TRUE")
     
     write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point, "_time_periods.csv"), row.names = T)
     print(paste0("Hazard ratios saved: ", output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point,  "_time_periods.csv"))
@@ -212,7 +213,7 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
       results$conf.low=exp(confint(robust_fit_cox_model,level=0.95)[,1]) #use robust standard errors to calculate CI for sampled data
       results$conf.high=exp(confint(robust_fit_cox_model,level=0.95)[,2])
     }
-    results$std_error_ln_hr=sqrt(diag(vcov(fit_cox_model)))
+    results$se_ln_hr=sqrt(diag(vcov(fit_cox_model)))
     results$robust_se_ln_hr=sqrt(diag(vcov(robust_fit_cox_model)))
 
     if(model == "mdl_max_adj"){
