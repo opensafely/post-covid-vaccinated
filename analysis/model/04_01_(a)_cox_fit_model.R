@@ -131,7 +131,7 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
   knot_placement=as.numeric(quantile(data_surv$age, probs=c(0.1,0.5,0.9)))
   
   combined_results <- as.data.frame(matrix(ncol=10,nrow=0))
-  colnames(combined_results) <- c("term","estimate","conf_low","conf_high","std_error_ln_hr","robust_se_ln_hr","results_fitted","model","covariates_removed","cat_covars_collapsed")
+  colnames(combined_results) <- c("term","estimate","conf_low","conf_high","se_ln_hr","robust_se_ln_hr","results_fitted","model","covariates_removed","cat_covars_collapsed")
   
   for(model in mdl){
     #Base formula
