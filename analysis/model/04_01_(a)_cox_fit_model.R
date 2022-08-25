@@ -75,8 +75,8 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
   }
   
   # Save sampled data for Stata
-  write.csv(sampled_data, paste0("output/input_sampled_data_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv") )
-  
+  write.csv(sampled_data, paste0("output/input_sampled_data_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"),row.names = F )
+  rm(sampled_data)
   
   if((subgroup =="covid_pheno_hospitalised")) {
     data.table::fwrite(data_surv, paste0("output/input_",event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
@@ -92,8 +92,9 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     fit_model$time_points <- time_point
     fit_model$total_covid19_cases <- total_covid_cases
     fit_model$data_sampled <- ifelse(non_case_inverse_weight == 1, "FALSE", "TRUE")
+    fit_model$N_sample_size <- length(unique(data_surv$patient_id))
     
-    write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point, "_time_periods.csv"), row.names = T)
+    write.csv(fit_model, paste0(output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point, "_time_periods.csv"), row.names = F)
     print(paste0("Hazard ratios saved: ", output_dir,"/tbl_hr_" , event, "_",subgroup,"_", cohort,"_",time_point,  "_time_periods.csv"))
     
   }
