@@ -36,7 +36,7 @@ result_file_paths <- pmap(list(results_done),
 
 if(length(results_done)>0){
   df_hr <- rbindlist(result_file_paths, fill=TRUE)
-  df_hr <- df_hr %>% mutate_if(is.numeric, round, digits=5)%>%select(-V1)
+  df_hr <- df_hr %>% mutate_if(is.numeric, round, digits=5)
   write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_", event_name,"_", cohort,".csv") , row.names=F)
   print(paste0("Compiled HR's saved: ", output_dir,"/compiled_HR_results_", event_name,"_", cohort,".csv"))
 }else{
@@ -78,7 +78,7 @@ event_counts_completed <- pmap(list(event_count_done),
                                  })
 
 if(length(event_count_done)>0){
-  df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)  %>% dplyr::select(!"V1")
+  df_event_counts <- rbindlist(event_counts_completed, fill=TRUE)
   df_event_counts <- df_event_counts %>% select(event, cohort, subgroup, time_points, expo_week, events_total, person_days_follow_up, `incidence rate (per 1000 person years)`, median_follow_up)
   write.csv(df_event_counts, paste0(output_dir,"/compiled_event_counts_", event_name, "_", cohort,".csv") , row.names=F)
   print(paste0("Compiled event counts saved: ", output_dir,"/compiled_event_counts_", event_name,"_", cohort,".csv"))
@@ -162,8 +162,8 @@ if(length(results_done)>0){
   supressed_df_hr <- supressed_df_hr[order(supressed_df_hr$redacted_results),]
   
   supressed_df_hr=supressed_df_hr%>%select(event,cohort,subgroup,model,time_points,term,estimate,conf_low,conf_high,se_ln_hr,robust_se_ln_hr,
-                                           events_total, median_follow_up,results_fitted,covariates_removed,cat_covars_collapsed,redacted_results,data_sampled,total_covid19_cases)
-
+                                           events_total, median_follow_up,N_sample_size,results_fitted,covariates_removed,cat_covars_collapsed,redacted_results,data_sampled,total_covid19_cases)
+  
   write.csv(supressed_df_hr,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv") , row.names=F)
   print(paste0("Supressed HR with event counts saved: ", output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv"))
   
