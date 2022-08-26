@@ -45,7 +45,8 @@ estimates <- estimates %>% filter(subgroup == "main"
                                        & event %in% outcomes_to_plot 
                                        & term %in% term[grepl("^days",term)]
                                        & results_fitted == "fitted_successfully"
-                                       & model == "mdl_max_adj")
+                                       & model == "mdl_max_adj") %>%
+  select(term,estimate,conf.low,conf.high,event,subgroup,cohort,time_points)
 
 main_estimates <- estimates[0,]
 
@@ -68,6 +69,14 @@ for(i in unique(estimates$event)){
 
 main_estimates <- main_estimates[!duplicated(main_estimates), ]
 main_estimates <- main_estimates %>% mutate(across(c(estimate,conf.low,conf.high),as.numeric))
+
+# We want to plot thhe figures using the same time-points across all cohorts so that they can be compared
+# If any cohort uses reduced time points then all cohorts will be plotted with reduced time points
+main_estimates <- main_estimates %>%
+  group_by(event,subgroup) %>%
+  dplyr::mutate(time_period_to_plot = case_when(
+    any(time_points == "reduced") ~ "reduced",
+    TRUE ~ "normal"))
 
 #--------------------------------------#
 # 4. Specify time in weeks (mid-point) #
@@ -108,10 +117,10 @@ main_estimates <- main_estimates %>% left_join(outcome_name_table %>% select(out
 for(i in c("any_position","primary_position")){
   if(i == "any_position"){
     df <- main_estimates %>% filter(!event %in% event[grepl("primary_position",event)]
-                                    & time_points == "reduced")
+                                    & time_points == time_period_to_plot)
   }else{
     df <- main_estimates %>% filter(event %in% event[grepl("primary_position",event)]
-                                    & time_points == "reduced")
+                                    & time_points == time_period_to_plot)
   }
   
   ggplot2::ggplot(data=df,
