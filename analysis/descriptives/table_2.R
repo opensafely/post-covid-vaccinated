@@ -283,7 +283,8 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
       mutate(event_date = replace(event_date, which(!is.na(date_expo_censor) & (event_date >= date_expo_censor)), NA)) %>%
       filter((index_date != date_expo_censor)|is.na(date_expo_censor))
     
-    setDT(data_active)[follow_up_end == date_expo_censor, follow_up_end := follow_up_end-1]
+    data_active[follow_up_end == date_expo_censor, follow_up_end := follow_up_end-1]
+   # setDT(data_active)[follow_up_end == date_expo_censor, follow_up_end := follow_up_end-1]
   }
   
   data_active <- data_active %>% mutate(event_date = replace(event_date, which(event_date>follow_up_end | event_date<index_date), NA),
