@@ -40,7 +40,7 @@ agebreaks <- c(0, 40, 60, 80, 111)
 agelabels <- c("18_39", "40_59", "60_79", "80_110")
 
 #aer variables
-aer_outcomes <- c("out_date_ate","out_date_vte")
+aer_outcomes <- c("out_date_ate","out_date_vte","out_date_ate_primary_position","out_date_vte_primary_position")
 sex <- c("Female","Male")
 
 table_2_subgroups_output <- function(cohort_name){
