@@ -8,45 +8,31 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   #------------------ RANDOM SAMPLE NON-CASES for IP WEIGHING ------------------
   set.seed(137)
   
-  if(startsWith(subgroup,"covid_pheno_")){
-  cases <- survival_data %>% filter((!is.na(event_date)) & 
-                                     (
-                                       (event_date == follow_up_end) & (event_date < date_expo_censor | is.na(date_expo_censor))
-                                     ))
-  }else{
-  cases <- survival_data %>% filter((!is.na(event_date)) & 
-                                      (
-                                        event_date == follow_up_end
-                                      ))
-  }
-  
-
   print(paste0("Total number in survival data: ", nrow(survival_data)))
-  print(paste0("Number of cases: ", nrow(cases)))
   
-  if(subgroup != "covid_pheno_hospitalised"){
+  if(nrow(survival_data) > 4000000){
+    print("Sample size above 4 million - sampling starting")
+    
+    # Select all event cases as controls per case is determined by the number of events
+    
+    cases <- survival_data %>% filter((!is.na(event_date)) & 
+                                        (
+                                          event_date == follow_up_end
+                                        ))
+
+    print(paste0("Number of cases: ", nrow(cases)))
+    
     controls_per_case <- ifelse(nrow(cases)<100000,20,ifelse(nrow(cases)<500000,10,5))
-  }else{
-    controls_per_case <- ceiling((5000000-nrow(cases))/nrow(cases))
-  }
-  
-  # if(cohort == "vaccinated" & subgroup == "covid_pheno_hospitalised" & (event_name == "pe" | event_name == "hf" )){
-  #   controls_per_case <- ceiling((4000000-nrow(cases))/nrow(cases))
-  # }
-  # 
-  # if(event_name == "vte" & cohort == "electively_unvaccinated" & subgroup != "main"){
-  #   controls_per_case <- ceiling((5000000-nrow(cases))/nrow(cases))
-  # }
-  
-  #if(event_name == "hf" & cohort == "electively_unvaccinated"){
-  #  controls_per_case <- ceiling((5000000-nrow(cases))/nrow(cases))
-  #}
-  
-  print(paste0("Number of controls per case: ", controls_per_case))
-  
-  if(startsWith(subgroup,"covid_pheno_")){
+    
+    print(paste0("Number of controls per case: ", controls_per_case))
+    
+    # All cases and all exposed to COVID-19 are included in the data set. Non-cases-non-exposed are randomly sampled.
+    
     non_cases_exposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (!is.na(expo_date)))
     non_cases_unexposed <- survival_data %>% filter((!patient_id %in% cases$patient_id) & (is.na(expo_date)))
+    
+    # If number of cases * controls per cases > non-cases-non-exposed then use all of non-cases-non-exposed
+    # otherwise randomly sample non-cases-non-exposed
     
     if(nrow(cases)*controls_per_case < nrow(non_cases_unexposed)){
       non_cases_unexposed <- non_cases_unexposed[sample(1:nrow(non_cases_unexposed), nrow(cases)*controls_per_case,replace=FALSE), ]
@@ -55,7 +41,8 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
       non_cases_unexposed=non_cases_unexposed
       print("Non-cases not sampled - all non-cases used")
     }
-
+    
+    # Weight of those who are sampled, used in cox model to weight the non_cases_unexposed so that 'whole' population is analysed
     non_case_inverse_weight=(nrow(survival_data)-nrow(cases)-nrow(non_cases_exposed))/nrow(non_cases_unexposed)
     survival_data <- bind_rows(cases,non_cases_exposed,non_cases_unexposed)
     
@@ -64,39 +51,27 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     print(paste0("Number of controls (exposed): ", nrow(non_cases_exposed)))
     print(paste0("Number of controls (non exposed): ", nrow(non_cases_unexposed)))
     print(paste0("Controls (non exposed) weight: ", non_case_inverse_weight))
+    
+    #Add inverse probability weights for non-cases
+    survival_data$cox_weights <- ifelse(survival_data$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
   }else{
-    non_cases <- survival_data %>% filter(!patient_id %in% cases$patient_id)
-    
-    if(nrow(cases)*controls_per_case < nrow(non_cases)){
-      non_cases <- non_cases[sample(1:nrow(non_cases), nrow(cases)*controls_per_case,replace=FALSE), ]
-      print("Non-cases sampled")
-    }else if (nrow(cases)*controls_per_case >= nrow(non_cases)){
-      non_cases=non_cases
-      print("Non-cases not sampled - all non-cases used")
-    }
-    
-    non_case_inverse_weight=(nrow(survival_data)-nrow(cases))/nrow(non_cases)
-    survival_data <- bind_rows(cases,non_cases)
-    noncase_ids <- unique(non_cases$patient_id)
-    
-    print(paste0("Number of controls: ", nrow(non_cases)))
-    print(paste0("Controls weight: ", non_case_inverse_weight))
+    print("Sample size below 4 million - no sampling")
+    # No sampling therefore cox weight of 1
+    non_case_inverse_weight <- 1
+    survival_data$cox_weights <- 1
     
   }
   
-  #Add inverse probablity weights for non-cases
-  survival_data$cox_weights <- ifelse(survival_data$patient_id %in% noncase_ids, non_case_inverse_weight, 1)
-  
+  # The sampled df is used in stata to run hospitalised analyses
   sampled_data <- as.data.frame(survival_data)
   
   survival_data$days_to_start <- as.numeric(survival_data$follow_up_start-cohort_start_date)
   survival_data$days_to_end <- as.numeric(survival_data$follow_up_end-cohort_start_date)
   
-  if(startsWith(subgroup,"covid_pheno_")){
-    survival_data$days_to_end <- ifelse((!is.na(survival_data$date_expo_censor)) & (survival_data$follow_up_end == survival_data$date_expo_censor), survival_data$days_to_end, (survival_data$days_to_end +1 ))
-  }else{
-    survival_data$days_to_end <- (survival_data$days_to_end +1) 
-  }
+  # Add one to follow up as this allows people the day to have an event and ensures that days of follow up are correct
+  # eg as.Date("2020-01-01) - as.Date("2020-01-01) gives zero days but we want this as one day of follow-up 
+  
+  survival_data$days_to_end <- (survival_data$days_to_end +1)
   
   #===============================================================================
   #   CACHE some features
@@ -117,23 +92,10 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   any_exposed_events <- nrow(with_expo %>% filter(!is.na(event_date)))>0
   
   if(any_exposures==T & any_exposed_events ==T ){
-    if(startsWith(subgroup,"covid_pheno_")==T){
-      with_expo <- with_expo %>% 
-        dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH, date_expo_censor) %>%  
-        mutate(event_status = if_else( (!is.na(event_date)) & 
-                                         (
-                                           ((event_date <= follow_up_end) & ((follow_up_end != date_expo_censor) | is.na(date_expo_censor ))) | 
-                                             ((event_date < follow_up_end) & (follow_up_end == date_expo_censor)) 
-                                         ), 
-                                       1, 0))
-    }else{
-      with_expo <- with_expo %>% 
-        dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH) %>%  
-        mutate(event_status = if_else( (!is.na(event_date)) 
-                                       , 1, 0)) 
-      
-    }
-    
+    with_expo <- with_expo %>% 
+      dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH) %>%  
+      mutate(event_status = if_else( (!is.na(event_date)) 
+                                     , 1, 0)) 
     
     # ......................................
     # CHUNK UP FOLLOW-UP PERIOD by CHANGE OF STATE OF EXPOSURE
@@ -149,14 +111,10 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     # with_expo <- with_expo %>% dplyr::select(!id)
     with_expo$id <- NULL
 
-    if(startsWith(subgroup,"covid_pheno_")){
-      rm(list=c("d1", "d2", "non_cases_exposed","non_cases_unexposed", "cases"))
-    }else{
-      rm(list=c("d1", "d2", "non_cases", "cases"))
-    }
-
-
     
+    rm(list=c("d1", "d2"))
+   
+
     # ----------------------- SPLIT POST-COVID TIME------------------------------
     with_expo_postexpo <- with_expo %>% filter(expo==1)
     
@@ -180,8 +138,8 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     rm(list=c("ls_with_expo", "with_expo_preexpo", "with_expo_postexpo"))
     
     with_expo  <- with_expo %>%
-      group_by(patient_id) %>% arrange(days_cat) %>% mutate(last_step = ifelse(row_number()==n(),1,0))
-    with_expo$event  <- with_expo$event * with_expo$last_step
+      group_by(patient_id) %>% arrange(days_cat) 
+
   }
   
   
@@ -192,22 +150,10 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
   any_no_expo <- nrow(with_expo)>0
   
   if(any_no_expo == T & any_exposures== T & any_exposed_events == T ){
-    if(startsWith(subgroup,"covid_pheno_")==T){
-      without_expo <- without_expo %>% 
-        dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH, date_expo_censor) %>%  
-        mutate(event = if_else( (!is.na(event_date)) & 
-                                  (
-                                    ((event_date <= follow_up_end) & ((follow_up_end != date_expo_censor) | is.na(date_expo_censor ))) | 
-                                      ((event_date < follow_up_end) & (follow_up_end == date_expo_censor)) 
-                                  ), 
-                                1, 0))
-    }else{
-      without_expo <- without_expo %>%
-        dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH) %>% 
-        mutate(event = if_else( (!is.na(event_date)), 
-                                1, 0))
-    }
-    
+    without_expo <- without_expo %>%
+      dplyr::select(patient_id, expo_date, follow_up_end, event_date, days_to_start, days_to_end, DATE_OF_DEATH) %>% 
+      mutate(event = if_else( (!is.na(event_date)), 
+                              1, 0))
     
     # ......................................
     
@@ -284,25 +230,15 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     # Calculate median person-time -----------------------------------------------
     
-    tmp <- data_surv[,c("patient_id","days_cat","tstart","tstop","cox_weights")]
+    #Median person time of those with an event within each time period used for plotting figures.
+    
+    tmp <- data_surv[data_surv$event ==1,c("patient_id","days_cat","tstart","tstop")]
     tmp$person_time <- tmp$tstop - tmp$tstart
     
-    tmp_post_expo <- tmp %>% filter(days_cat != 0) %>% 
-      group_by(patient_id) %>%
-      summarise(person_time = sum(person_time)) %>%
-      left_join(tmp %>% select(patient_id, cox_weights) %>% distinct(), by = "patient_id") %>%
-      mutate(days_cat = max(episode_info$days_cat)) %>%
-      select(- patient_id)
-    
     tmp[,c("patient_id","tstart","tstop")] <- NULL
-    tmp <- rbind(tmp,tmp_post_expo)
     
-    tmp <- tmp %>%
-      dplyr::group_by(days_cat) %>%
-      dplyr::mutate(median_follow_up = matrixStats::weightedMedian(x = person_time, w = cox_weights)) %>%
-      dplyr::ungroup(days_cat)
-    
-    tmp <- unique(tmp[,c("days_cat","median_follow_up")])
+    tmp <- tmp %>% group_by(days_cat) %>% 
+      summarise(median_follow_up = median(person_time, na.rm = TRUE))
     
     episode_info <- merge(episode_info, tmp, by = "days_cat", all.x = TRUE)
     episode_info $days_cat <- NULL
@@ -315,30 +251,11 @@ fit_get_data_surv <- function(event,subgroup, stratify_by_subgroup, stratify_by,
     
     print(episode_info)
     
-    #Any time periods with <=5 events? If yes, will reduce time periods
-    ind_any_zeroeventperiod <- any((episode_info$events_total <= 5) & (!identical(cuts_days_since_expo, c(28, 197))))
-    
-    if(time_point == "alternative"){
-      ind_any_zeroeventperiod = "FALSE"
-    }
-    
-    #Are there <50 post expo events? If yes, won't run analysis
-    #Can change <50 to be lower to test on dummy data
-    less_than_50_events = any((as.numeric(episode_info$events_total) <50) & (episode_info$expo_week=="all post expo"))
+    write.csv(episode_info, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"), row.names = F)
+    print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
     
     
-    # If ind_any_zeroeventperiod==TRUE then this script will re-run again with reduced time periods and
-    # we only want to save the final event count file. For reduced time periods, ind_any_zeroeventperiod will
-    # always be FALSE
-    # Save events counts if less than 50 events as this script will not re-run with reduced time periods
-    
-    if(ind_any_zeroeventperiod==FALSE | less_than_50_events==TRUE){
-      write.csv(episode_info, paste0(output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"), row.names = T)
-      print(paste0("Event counts saved: ", output_dir,"/tbl_event_count_" ,event,"_", subgroup,"_",cohort,"_",time_point,"_time_periods.csv"))
-    }
-    
-    
-    return(list(data_surv, noncase_ids, interval_names, ind_any_zeroeventperiod, non_case_inverse_weight, less_than_50_events, sampled_data))
+    return(list(data_surv,interval_names, non_case_inverse_weight, sampled_data))
     
   }else{
     analyses_not_run[nrow(analyses_not_run)+1,]<- c(event,subgroup,cohort,any_exposures,any_exposed_events,any_no_expo,"FALSE")

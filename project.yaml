@@ -119,26 +119,6 @@ actions:
         DateChecks: output/not-for-review/Check_dates_range_*.csv
         Descriptive_Table: output/review/descriptives/Table1_*.csv
 
-  stage_2_events_split_by_covariate_level_vaccinated:
-    run: r:latest analysis/descriptives/events_split_by_covariate_level.R vaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_vaccinated
-    outputs:
-      moderately_sensitive:
-        counts_by_covariate_level: output/not-for-review/event_counts_by_covariate_level_vaccinated_*.csv
-        selected_covariates: output/not-for-review/non_zero_selected_covariates_vaccinated_*.csv
-
-  stage_2_events_split_by_covariate_level_electively_unvaccinated:
-    run: r:latest analysis/descriptives/events_split_by_covariate_level.R electively_unvaccinated
-    needs:
-    - stage1_data_cleaning_both
-    - stage1_end_date_table_electively_unvaccinated
-    outputs:
-      moderately_sensitive:
-        counts_by_covariate_level: output/not-for-review/event_counts_by_covariate_level_electively_unvaccinated_*.csv
-        selected_covariates: output/not-for-review/non_zero_selected_covariates_electively_unvaccinated_*.csv
-
   ## Stage 4 - Table 2 - vaccinated cohort 
 
   stage4_table_2_vaccinated:
@@ -217,7 +197,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_ami_vaccinated.csv
@@ -237,7 +216,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_ami_electively_unvaccinated.csv
@@ -257,7 +235,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_stroke_isch_vaccinated.csv
@@ -277,7 +254,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_stroke_isch_electively_unvaccinated.csv
@@ -297,7 +273,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_dvt_vaccinated.csv
@@ -317,7 +292,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_dvt_electively_unvaccinated.csv
@@ -337,7 +311,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_pe_vaccinated.csv
@@ -357,7 +330,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_pe_electively_unvaccinated.csv
@@ -377,7 +349,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_tia_vaccinated.csv
@@ -397,7 +368,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_tia_electively_unvaccinated.csv
@@ -417,7 +387,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_vaccinated.csv
@@ -437,7 +406,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_electively_unvaccinated.csv
@@ -457,7 +425,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_hf_vaccinated.csv
@@ -477,7 +444,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_hf_electively_unvaccinated.csv
@@ -497,7 +463,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_angina_vaccinated.csv
@@ -517,7 +482,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_angina_electively_unvaccinated.csv
@@ -537,7 +501,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_ate_vaccinated.csv
@@ -557,7 +520,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_ate_electively_unvaccinated.csv
@@ -577,7 +539,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_vte_vaccinated.csv
@@ -597,7 +558,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_vte_electively_unvaccinated.csv
@@ -617,7 +577,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_ami_primary_position_vaccinated.csv
@@ -637,7 +596,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_ami_primary_position_electively_unvaccinated.csv
@@ -657,7 +615,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_stroke_isch_primary_position_vaccinated.csv
@@ -677,7 +634,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_stroke_isch_primary_position_electively_unvaccinated.csv
@@ -697,7 +653,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_dvt_primary_position_vaccinated.csv
@@ -717,7 +672,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_dvt_primary_position_electively_unvaccinated.csv
@@ -737,7 +691,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_pe_primary_position_vaccinated.csv
@@ -757,7 +710,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_pe_primary_position_electively_unvaccinated.csv
@@ -777,7 +729,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_tia_primary_position_vaccinated.csv
@@ -797,7 +748,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_tia_primary_position_electively_unvaccinated.csv
@@ -818,7 +768,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_primary_position_vaccinated.csv
@@ -839,7 +788,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_primary_position_electively_unvaccinated.csv
@@ -859,7 +807,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_hf_primary_position_vaccinated.csv
@@ -879,7 +826,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_hf_primary_position_electively_unvaccinated.csv
@@ -899,7 +845,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_angina_primary_position_vaccinated.csv
@@ -919,7 +864,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_angina_primary_position_electively_unvaccinated.csv
@@ -939,7 +883,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_ate_primary_position_vaccinated.csv
@@ -959,7 +902,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_ate_primary_position_electively_unvaccinated.csv
@@ -979,7 +921,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
-    - stage_2_events_split_by_covariate_level_vaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_vte_primary_position_vaccinated.csv
@@ -999,7 +940,6 @@ actions:
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
-    - stage_2_events_split_by_covariate_level_electively_unvaccinated
     outputs:
       moderately_sensitive:
         analyses_not_run: output/review/model/analyses_not_run_vte_primary_position_electively_unvaccinated.csv
@@ -1093,6 +1033,25 @@ actions:
     outputs:
       moderately_sensitive:
         log_file: output/stata_cox_model_ami.log
+      highly_sensitive:
+        stset: output/stset.csv
+
+  stset_cox_model:
+    run: r:latest analysis/stset_cox_model.R
+    needs:
+    - stata_model
+    outputs:
+      moderately_sensitive:
+        stset_cox_model: output/stset_cox_model.csv
+
+  stata_r_cox_input_difference:
+    run: r:latest analysis/stata_r_input_data_difference.R
+    needs:
+    - stata_model
+    - Analysis_cox_ami_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        input_difference: output/stata_r_input_difference.csv
 
   event_counts_by_time_period_vaccinated:
     run: r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated

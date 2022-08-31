@@ -87,7 +87,7 @@ apply_model_function <- function(outcome, cohort){
       name = glue("Analysis_cox_{outcome}_{cohort}"),
       run = "r:latest analysis/model/01_cox_pipeline.R",
       arguments = c(outcome,cohort),
-      needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}"),glue("stage_2_events_split_by_covariate_level_{cohort}")),
+      needs = list("stage1_data_cleaning_both", glue("stage1_end_date_table_{cohort}")),
       moderately_sensitive = list(
         analyses_not_run = glue("output/review/model/analyses_not_run_{outcome}_{cohort}.csv"),
         compiled_hrs_csv = glue("output/review/model/suppressed_compiled_HR_results_{outcome}_{cohort}.csv"),
@@ -139,25 +139,6 @@ table2 <- function(cohort){
     )
   )
 }
-
-event_counts_by_covariate_level <- function(cohort){
-  splice(
-    action(
-      name = glue("stage_2_events_split_by_covariate_level_{cohort}"),
-      run = "r:latest analysis/descriptives/events_split_by_covariate_level.R",
-      arguments = c(cohort),
-      needs = list("stage1_data_cleaning_both",glue("stage1_end_date_table_{cohort}")),
-      moderately_sensitive = list(
-        counts_by_covariate_level = glue("output/not-for-review/event_counts_by_covariate_level_{cohort}_*.csv"),
-        selected_covariates = glue("output/not-for-review/non_zero_selected_covariates_{cohort}_*.csv")
-        
-      )
-    )
-  )
-}
-
-
-
 
 
 ##########################################################
@@ -291,12 +272,6 @@ actions_list <- splice(
       DateChecks = glue("output/not-for-review/Check_dates_range_*.csv"),
       Descriptive_Table = glue("output/review/descriptives/Table1_*.csv")
     )
-  ),
-  
-  #comment("Stage 2 - Event counts by covariate level),
-  splice(
-    # over cohorts
-    unlist(lapply(cohort_to_run, function(x) event_counts_by_covariate_level(cohort = x)), recursive = FALSE)
   ),
   
   #comment("Stage 4 - Create input for table2"),
@@ -446,8 +421,28 @@ actions_list <- splice(
     name = "stata_model",
     run = "stata-mp:latest analysis/cox_model.do",
     needs = list("Analysis_cox_ami_electively_unvaccinated"),
+    highly_sensitive = list(
+      stset = glue("output/stset.csv")
+    ),
     moderately_sensitive = list(
-      log_file = glue("output/stata_cox_model_ami.log"))
+      log_file = glue("output/stata_cox_model_ami.log")
+      )
+  ),
+  
+  action(
+    name = "stset_cox_model",
+    run = "r:latest analysis/stset_cox_model.R",
+    needs = list("stata_model"),
+    moderately_sensitive = list(
+      stset_cox_model = "output/stset_cox_model.csv")
+  ),
+  
+  action(
+    name = "stata_r_cox_input_difference",
+    run = "r:latest analysis/stata_r_input_data_difference.R",
+    needs = list("stata_model","Analysis_cox_ami_electively_unvaccinated"),
+    moderately_sensitive = list(
+      input_difference = "output/stata_r_input_difference.csv")
   ),
   
   action(

@@ -32,7 +32,7 @@ library(matrixStats)
 args = commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  event_name="ate"
+  event_name="ami"
   cohort="vaccinated"
 }else{
   event_name  = args[[1]]
@@ -75,10 +75,10 @@ analyses_to_run <- rbind(analyses_to_run, analyses_to_run_normal_timepoint)
 
 rm(analyses_to_run_normal_timepoint)
 
-# Join in reduced covariates
+#Remove hospitalised analysis with normal timepoints as this will be run in stata and we don't need the saved data sets
+#from this.
 
-analyses_to_run <- analyses_to_run %>% left_join(non_zero_covar_names, by= c("event"="outcome_event","subgroup","reduced_timepoint"="time_period"))
-rm(non_zero_covar_names)
+analyses_to_run <- analyses_to_run %>% filter(subgroup != "covid_pheno_hospitalised" | reduced_timepoint != "normal")
 
 # Source remainder of relevant files --------------------------------------------------------
 
@@ -95,7 +95,6 @@ if(nrow(analyses_to_run>0)){
              stratify_by=analyses_to_run$strata,           
              time_point=analyses_to_run$reduced_timepoint,       
              input,covar_names,
-             reduced_covar_names=analyses_to_run$covariates,
              cuts_days_since_expo,cuts_days_since_expo_reduced,mdl))
 }
 
