@@ -150,7 +150,7 @@ table_2_subgroups_output <- function(cohort_name){
       startsWith(subgroup, "aer") ~ "aer_subgroup",
       TRUE ~ as.character(subgroup)))
   
-  analyses_of_interest[,c("unexposed_person_days", "unexposed_event_count","post_exposure_event_count", "total_person_days","day_0_event_counts")] <- NA
+  analyses_of_interest[,c("unexposed_person_days", "unexposed_event_count","post_exposure_event_count", "total_person_days","day_0_event_counts","total_covid19_cases")] <- NA
   
   #-----------Populate analyses_of_interest with events counts/follow up--------
   for(i in 1:nrow(analyses_of_interest)){
@@ -187,6 +187,7 @@ table_2_subgroups_output <- function(cohort_name){
     analyses_of_interest$post_exposure_event_count[i] <- table2_output[[3]]
     analyses_of_interest$total_person_days[i] <- table2_output[[4]]
     analyses_of_interest$day_0_event_counts[i] <- table2_output[[5]]
+    analyses_of_interest$total_covid19_cases[i] <- table2_output[[6]]
 
     setnames(survival_data,
              old = c("event_date",
@@ -234,10 +235,21 @@ table_2_subgroups_output <- function(cohort_name){
 
 table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_by, stratify_by_subgroup){
   data_active <- survival_data
-
-  data_active <- data_active %>% mutate(event_date = replace(event_date, which(event_date>follow_up_end | event_date<index_date), NA))
-  data_active <- data_active %>% mutate(exp_date_covid19_confirmed = replace(exp_date_covid19_confirmed, which(exp_date_covid19_confirmed>follow_up_end | exp_date_covid19_confirmed<index_date), NA))
+  data_active$date_expo_censor <- NA
   
+  for(i in c("hospitalised","non_hospitalised")){
+    if(stratify_by == i){
+      data_active$follow_up_end <- NULL
+      data_active$date_expo_censor <- NULL
+      setnames(data_active, 
+               old = c(c(paste0(i,"_follow_up_end")),
+                       c(paste0(i,"_date_expo_censor"))),
+               
+               new = c("follow_up_end",
+                       "date_expo_censor"))
+    }
+  }
+
   # filter the population according to whether the subgroup is covid_history
   if(subgroup == "covid_history"){
     data_active <- data_active %>% filter(sub_bin_covid19_confirmed_history ==T)
@@ -266,39 +278,28 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
     data_active=data_active %>% filter(sex == aer_sex & agegroup== aer_age)
   }
   
+  if(startsWith(subgroup,"covid_pheno_")){
+    data_active <- data_active %>% mutate(exp_date_covid19_confirmed = replace(exp_date_covid19_confirmed, which(!is.na(date_expo_censor) & (exp_date_covid19_confirmed >= date_expo_censor)), NA) )%>%
+      mutate(event_date = replace(event_date, which(!is.na(date_expo_censor) & (event_date >= date_expo_censor)), NA)) %>%
+      filter((index_date != date_expo_censor)|is.na(date_expo_censor))
+    
+    setDT(data_active)[follow_up_end == date_expo_censor, follow_up_end := follow_up_end-1]
+  }
+  
+  data_active <- data_active %>% mutate(event_date = replace(event_date, which(event_date>follow_up_end | event_date<index_date), NA),
+                                        exp_date_covid19_confirmed = replace(exp_date_covid19_confirmed, which(exp_date_covid19_confirmed>follow_up_end | exp_date_covid19_confirmed<index_date), NA))
+  
+  data_active=data_active%>%filter(follow_up_end>=index_date)
+
   # calculate unexposed follow-up days for AER script
   data_active = data_active %>% mutate(person_days_unexposed = as.numeric((as.Date(follow_up_end_unexposed) - as.Date(index_date))))
-  index <- which(data_active$follow_up_end_unexposed < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))
+  
+  index <- which((data_active$follow_up_end_unexposed < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed)) &
+                   (data_active$follow_up_end_unexposed < data_active$date_expo_censor | is.na(data_active$date_expo_censor)))
   data_active$person_days_unexposed[index] = data_active$person_days_unexposed[index] + 1
   
-  if(subgroup == "covid_pheno_hospitalised"){
-    data_active$exp_date_covid19_confirmed <- as.Date(ifelse((!is.na(data_active$hospitalised_date_expo_censor)) & (data_active$exp_date_covid19_confirmed >= data_active$hospitalised_date_expo_censor), NA, data_active$exp_date_covid19_confirmed), origin='1970-01-01')
-    data_active$event_date <- as.Date(ifelse((!is.na(data_active$hospitalised_date_expo_censor)) & (data_active$event_date >= data_active$hospitalised_date_expo_censor), NA, data_active$event_date), origin='1970-01-01')
-    data_active <- data_active %>% filter((index_date != hospitalised_date_expo_censor)|is.na(hospitalised_date_expo_censor))
-  }
-  
-  if(subgroup == "covid_pheno_non_hospitalised"){
-    data_active$exp_date_covid19_confirmed <- as.Date(ifelse((!is.na(data_active$non_hospitalised_date_expo_censor)) & (data_active$exp_date_covid19_confirmed >= data_active$non_hospitalised_date_expo_censor), NA, data_active$exp_date_covid19_confirmed), origin='1970-01-01')
-    data_active$event_date <- as.Date(ifelse((!is.na(data_active$non_hospitalised_date_expo_censor)) & (data_active$event_date >= data_active$non_hospitalised_date_expo_censor), NA, data_active$event_date), origin='1970-01-01')
-    data_active <- data_active %>% filter((index_date != non_hospitalised_date_expo_censor)|is.na(non_hospitalised_date_expo_censor))
-  }
-  
-  
-  if(!startsWith(subgroup,"covid_pheno_")){
-    data_active = data_active %>% mutate(person_days = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1)
-  }
-  
-  if(subgroup=="covid_pheno_hospitalised"){
-    data_active = data_active %>% mutate(person_days = as.numeric((as.Date(hospitalised_follow_up_end) - as.Date(index_date))))
-    index <- which(data_active$hospitalised_follow_up_end > data_active$hospitalised_date_expo_censor | is.na(data_active$hospitalised_date_expo_censor))
-    data_active$person_days[index] = data_active$person_days[index] + 1
-  }
-  
-  if(subgroup=="covid_pheno_non_hospitalised"){
-    data_active = data_active %>% mutate(person_days = as.numeric((as.Date(non_hospitalised_follow_up_end) - as.Date(index_date))))
-    index <- which(data_active$non_hospitalised_follow_up_end > data_active$non_hospitalised_date_expo_censor | is.na(data_active$non_hospitalised_date_expo_censor))
-    data_active$person_days[index] = data_active$person_days[index] + 1
-  }
+  # calculate total person days of follow-up
+  data_active = data_active %>% mutate(person_days = as.numeric((as.Date(follow_up_end) - as.Date(index_date)))+1)
   
   data_active = data_active %>% filter((person_days_unexposed >=0 & person_days_unexposed <= 197)
                                        & (person_days >=0 & person_days <= 197)) # filter out follow up period
@@ -306,48 +307,22 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
 
   person_days_total_unexposed  = round(sum(data_active$person_days_unexposed, na.rm = TRUE),1)
   person_days_total = round(sum(data_active$person_days, na.rm = TRUE),1)
-
-  if(!startsWith(subgroup,"covid_pheno_")){
-    event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
-                                          data_active$event_date >= data_active$exp_date_covid19_confirmed & 
-                                          data_active$event_date <= data_active$follow_up_end))
-    
-    event_count_unexposed<- length(which((data_active$event_date >= data_active$index_date & 
-                                            data_active$event_date <= data_active$follow_up_end) &
-                                           (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))))
-    
-    day_0_event_count <- length(which(data_active$event_date >= data_active$index_date &
-                                        data_active$event_date == data_active$exp_date_covid19_confirmed & 
+  
+  # calculate total covid cases for aer
+  total_covid_cases <- nrow(data_active %>% filter(!is.na(exp_date_covid19_confirmed)))
+  
+  # calculate pre and post exposure event counts
+  event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
+                                        data_active$event_date >= data_active$exp_date_covid19_confirmed & 
                                         data_active$event_date <= data_active$follow_up_end))
-  }
   
-  if(subgroup=="covid_pheno_hospitalised"){
-    event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
-                                          data_active$event_date >= data_active$exp_date_covid19_confirmed & 
-                                          data_active$event_date <= data_active$hospitalised_follow_up_end))
-    
-    event_count_unexposed<- length(which((data_active$event_date >= data_active$index_date & 
-                                            data_active$event_date <= data_active$hospitalised_follow_up_end) &
-                                           (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))))
-    
-    day_0_event_count <- length(which(data_active$event_date >= data_active$index_date &
-                                        data_active$event_date == data_active$exp_date_covid19_confirmed & 
-                                        data_active$event_date <= data_active$hospitalised_follow_up_end))
-  }
+  event_count_unexposed<- length(which((data_active$event_date >= data_active$index_date & 
+                                          data_active$event_date <= data_active$follow_up_end) &
+                                         (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))))
   
-  if(subgroup=="covid_pheno_non_hospitalised"){
-    event_count_exposed <- length(which(data_active$event_date >= data_active$index_date &
-                                          data_active$event_date >= data_active$exp_date_covid19_confirmed & 
-                                          data_active$event_date <= data_active$non_hospitalised_follow_up_end))
-    
-    event_count_unexposed<- length(which((data_active$event_date >= data_active$index_date &
-                                            data_active$event_date <= data_active$non_hospitalised_follow_up_end) &
-                                           (data_active$event_date < data_active$exp_date_covid19_confirmed | is.na(data_active$exp_date_covid19_confirmed))))
-  
-    day_0_event_count <- length(which(data_active$event_date >= data_active$index_date &
-                                        data_active$event_date == data_active$exp_date_covid19_confirmed &
-                                        data_active$event_date <= data_active$non_hospitalised_follow_up_end))
-  }
+  day_0_event_count <- length(which(data_active$event_date >= data_active$index_date &
+                                      data_active$event_date == data_active$exp_date_covid19_confirmed & 
+                                      data_active$event_date <= data_active$follow_up_end))
   
   
   if(day_0_event_count <= 5 | (event_count_exposed - day_0_event_count) <=5){
@@ -361,12 +336,8 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
   if(event_count_exposed <= 5){
     event_count_exposed <- "[Redacted]"
   }
-
-  list(person_days_total_unexposed, event_count_unexposed, event_count_exposed, person_days_total, day_0_event_count)
   
- 
-
-  return(list(person_days_total_unexposed, event_count_unexposed, event_count_exposed, person_days_total, day_0_event_count))
+  return(list(person_days_total_unexposed, event_count_unexposed, event_count_exposed, person_days_total, day_0_event_count, total_covid_cases))
 }
 
 # Run function using specified commandArgs
