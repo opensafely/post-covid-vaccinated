@@ -40,9 +40,9 @@ if(length(results_done)>0){
   write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_", event_name,"_", cohort,".csv") , row.names=F)
   print(paste0("Compiled HR's saved: ", output_dir,"/compiled_HR_results_", event_name,"_", cohort,".csv"))
 }else{
-  df_hr <- as.data.frame(matrix(ncol = 16))
+  df_hr <- as.data.frame(matrix(ncol = 15))
   colnames(df_hr) <- c("term", "estimate", "conf_low", "conf_high", "std_error_ln_hr", "robust_se_ln_hr", "covariates_removed",
-                       "cat_covars_collapsed","results_fitted", "model","subgroup", "event", "cohort", "time_period", "total_covid19_cases","data_sampled")
+                       "cat_covars_collapsed","results_fitted", "model","subgroup", "event", "cohort", "time_period","data_sampled")
 
   write.csv(df_hr, paste0(output_dir,"/compiled_HR_results_", event_name,"_", cohort,".csv") , row.names=F)
   print(paste0("Compiled HR's saved: ", output_dir,"/compiled_HR_results_", event_name,"_", cohort,".csv"))
@@ -162,7 +162,7 @@ if(length(results_done)>0){
   supressed_df_hr <- supressed_df_hr[order(supressed_df_hr$redacted_results),]
   
   supressed_df_hr=supressed_df_hr%>%select(event,cohort,subgroup,model,time_points,term,estimate,conf_low,conf_high,se_ln_hr,robust_se_ln_hr,
-                                           events_total, median_follow_up,N_sample_size,results_fitted,covariates_removed,cat_covars_collapsed,redacted_results,data_sampled,total_covid19_cases)
+                                           events_total, median_follow_up,N_sample_size,results_fitted,covariates_removed,cat_covars_collapsed,redacted_results,data_sampled)
   
   write.csv(supressed_df_hr,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv") , row.names=F)
   print(paste0("Supressed HR with event counts saved: ", output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv"))
@@ -172,9 +172,9 @@ if(length(results_done)>0){
   write.csv(supressed_df_hr,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,"_to_release.csv") , row.names=F)
   
 }else{
-  supressed_combined_hr_event_counts <- as.data.frame(matrix(ncol = 19))
+  supressed_combined_hr_event_counts <- as.data.frame(matrix(ncol = 18))
   colnames(supressed_combined_hr_event_counts) <- c("event","cohort","subgroup","model","time_points","term","estimate","conf_low","conf_high","se_ln_hr","robust_se_ln_hr",
-                                                    "events_total", "median_follow_up","results_fitted","covariates_removed","cat_covars_collapsed","redacted_results","cox_weight","total_covid19_cases")
+                                                    "events_total", "median_follow_up","results_fitted","covariates_removed","cat_covars_collapsed","redacted_results","cox_weight")
   
   write.csv(supressed_combined_hr_event_counts,paste0(output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv") , row.names=F)
   print(paste0("Supressed HR with event counts saved: ", output_dir,"/suppressed_compiled_HR_results_",event_name,"_", cohort,".csv"))

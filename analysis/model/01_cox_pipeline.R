@@ -32,7 +32,7 @@ library(matrixStats)
 args = commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  event_name="ami"
+  event_name="ate"
   cohort="vaccinated"
 }else{
   event_name  = args[[1]]
