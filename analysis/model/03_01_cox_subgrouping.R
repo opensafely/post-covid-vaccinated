@@ -69,6 +69,17 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_po
     survival_data=survival_data %>% filter(agegroup== stratify_by)
   }
   
+  # Age/sex subgroups for AER
+  
+  if(startsWith(subgroup,"aer_")){
+    aer_subgroup <- sub("aer_","",subgroup)
+    aer_subgroup <- sub("_","",aer_subgroup)
+    aer_sex <- sub("(\\D+).*", "\\1", aer_subgroup)
+    aer_age <-  sub(".*?(\\d+.*)", "\\1", aer_subgroup)
+    
+    survival_data=survival_data %>% filter(sex == aer_sex & agegroup== aer_age)
+  }
+  
   # Detect if a column is of date type, if so impose study start/end dates
   # only really interested in event_date and expo_date being within follow-up at this point as all other date variable 
   #have been checked in inclusion/exclusion & QA
@@ -93,16 +104,13 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_po
     setDT(survival_data)[follow_up_end == date_expo_censor, follow_up_end := follow_up_end-1]
   }
   
-  
   survival_data=survival_data%>%filter(follow_up_end>=follow_up_start)
-  
-  total_covid_cases=nrow(survival_data %>% filter(!is.na(expo_date)))
   
   # add statement for reduced time cutoffs
   if(time_point == "reduced"){
-    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_reduced,cuts_days_since_expo_reduced,covar_names,total_covid_cases,time_point)
+    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_reduced,cuts_days_since_expo_reduced,covar_names,time_point)
   }else if(time_point == "normal"){
-    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo, cuts_days_since_expo_reduced,covar_names,total_covid_cases,time_point)
+    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo, cuts_days_since_expo_reduced,covar_names,time_point)
   }
 
   print(paste0("Finished working on subgroup: ", subgroup, ", ",mdl,", ", cohort))

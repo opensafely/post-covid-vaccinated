@@ -9,7 +9,7 @@ source(file.path(scripts_dir,"04_01_(b)_cox_format_survival_data.R"))
 
 #------------------FORMAT SURVIVAL DATASET AND RUN COX MODEL--------------------
 
-fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,total_covid_cases,time_point){
+fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo,cuts_days_since_expo_reduced,covar_names,time_point){
   list_data_surv_noncase_ids_interval_names <- fit_get_data_surv(event,subgroup, stratify_by_subgroup, stratify_by,survival_data,cuts_days_since_expo,time_point)
   
   if(length(list_data_surv_noncase_ids_interval_names)==1){
@@ -90,7 +90,6 @@ fit_model_reducedcovariates <- function(event,subgroup,stratify_by_subgroup,stra
     fit_model$event <- event
     fit_model$cohort <- cohort
     fit_model$time_points <- time_point
-    fit_model$total_covid19_cases <- total_covid_cases
     fit_model$data_sampled <- ifelse(non_case_inverse_weight == 1, "FALSE", "TRUE")
     fit_model$N_sample_size <- length(unique(data_surv$patient_id))
     

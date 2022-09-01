@@ -113,11 +113,13 @@ table_2_subgroups_output <- function(cohort_name){
     
     index = which(active_analyses$outcome_variable == i)
     analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,"prior_history"),active_analyses$prior_history_var[index],analyses_to_run$stratify_by_subgroup)
+    analyses_to_run$stratify_by_subgroup <- ifelse(startsWith(analyses_to_run$subgroup,"aer_"),sub("aer_","",analyses_to_run$subgroup),analyses_to_run$stratify_by_subgroup)
     analyses_to_run$stratify_by_subgroup <- ifelse(is.na(analyses_to_run$stratify_by_subgroup),analyses_to_run$subgroup,analyses_to_run$stratify_by_subgroup)
     
     # Add in relevant subgroup levels to specify which stratum to run for
     analyses_to_run$strata <- NA
     analyses_to_run$strata <- ifelse(analyses_to_run$subgroup=="covid_history","TRUE",analyses_to_run$strata)
+    analyses_to_run$strata <- ifelse(startsWith(analyses_to_run$subgroup,"aer_"),sub("aer_","",analyses_to_run$subgroup),analyses_to_run$strata)
     
     for(k in c("covid_pheno_","agegp_","sex_","ethnicity_","prior_history_")){
       analyses_to_run$strata <- ifelse(startsWith(analyses_to_run$subgroup,k),gsub(k,"",analyses_to_run$subgroup),analyses_to_run$strata)
@@ -128,15 +130,6 @@ table_2_subgroups_output <- function(cohort_name){
   
   analyses_of_interest$strata[analyses_of_interest$strata=="South_Asian"]<- "South Asian"
   analyses_of_interest <- analyses_of_interest %>% filter(cohort_to_run == cohort_name)
-  
-  # add age/sex subgroups for AER calculations
-  for(i in aer_outcomes){
-    for(j in sex){
-      for(k in agelabels){
-        analyses_of_interest[nrow(analyses_of_interest)+1,] <- list(paste0("aer_",j,"_",k),i,cohort_name,paste0("aer_",j,"_",k),paste0("aer_",j,"_",k))
-      }
-    }
-  }
   
   #-----------------Add subgroup category for low count redaction---------------
   analyses_of_interest <- analyses_of_interest %>% 
