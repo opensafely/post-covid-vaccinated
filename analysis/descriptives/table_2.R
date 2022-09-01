@@ -39,10 +39,6 @@ cohort_end = as.Date("2021-12-14", format="%Y-%m-%d")
 agebreaks <- c(0, 40, 60, 80, 111)
 agelabels <- c("18_39", "40_59", "60_79", "80_110")
 
-#aer variables
-aer_outcomes <- c("out_date_ate","out_date_vte","out_date_ate_primary_position","out_date_vte_primary_position")
-sex <- c("Female","Male")
-
 table_2_subgroups_output <- function(cohort_name){
   
   #----------------------Define analyses of interests---------------------------
@@ -68,7 +64,7 @@ table_2_subgroups_output <- function(cohort_name){
                                   colnames(survival_data)[grepl("out_",colnames(survival_data))],
                                   colnames(survival_data)[grepl("follow_up",colnames(survival_data))],
                                   colnames(survival_data)[grepl("_expo_",colnames(survival_data))],
-                                  active_analyses$prior_history_var[active_analyses$prior_history_var !=""])]
+                                  unique(active_analyses$prior_history_var[active_analyses$prior_history_var !=""]))]
   
   setnames(survival_data, 
            old = c("cov_cat_sex", 

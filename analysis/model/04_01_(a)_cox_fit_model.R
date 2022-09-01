@@ -151,7 +151,7 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
     }
 
     #If subgroup is not sex then add sex into formula
-    if ((startsWith(subgroup,"sex"))==F & (!"sex" %in% covariates_excl_region_sex_age)){
+    if (!startsWith(subgroup,"sex") & !startsWith(subgroup,"aer") & (!"sex" %in% covariates_excl_region_sex_age)){
       surv_formula <- paste(surv_formula, "sex", sep="+")
     }
 
@@ -161,9 +161,9 @@ coxfit <- function(data_surv, interval_names, covar_names, mdl, subgroup,non_cas
     }
 
     #If subgroup is not age then add in age spline otherwise use age and age_sq
-    if ((startsWith(subgroup,"agegp_"))==F){
+    if (!startsWith(subgroup,"agegp_") & !startsWith(subgroup,"aer")){
       surv_formula <- paste(surv_formula, "rms::rcs(age,parms=knot_placement)", sep="+")
-    }else if ((startsWith(subgroup,"agegp_"))==T){
+    }else if (startsWith(subgroup,"agegp_") | startsWith(subgroup,"aer")){
       surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
     }
 

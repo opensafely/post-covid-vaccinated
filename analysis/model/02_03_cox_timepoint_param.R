@@ -48,7 +48,7 @@ get_timepoint <- function(event,subgroup,stratify_by_subgroup,stratify_by,input,
   # Filter for age group of interest -------------------------------------------
   
   # If a age group subgroup analysis then use the age subgroup otherwise analyse for all ages
-  if(startsWith(subgroup,"agegp")){
+  if(startsWith(subgroup,"agegp") | startsWith(subgroup,"aer")){
     agebreaks=agebreaks_strata
     agelabels=agelabels_strata
   }else{
