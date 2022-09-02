@@ -15,15 +15,6 @@ library(ggplot2)
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
 output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
 
-#------------------#
-# 1. Load argument #
-#------------------#
-# NOTE: No action written in project.yaml for running figures so no need for arguments
-#args = commandArgs(trailingOnly=TRUE)
-
-# Define cohort(s)
-cohort=c("vaccinated","electively_unvaccinated")
-
 #-------------------------#
 # 2. Get outcomes to plot #
 #-------------------------#

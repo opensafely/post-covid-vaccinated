@@ -48,6 +48,7 @@ estimates <- estimates %>% filter(subgroup == "main"
                                        & model == "mdl_max_adj") %>%
   select(term,estimate,conf.low,conf.high,event,subgroup,cohort,time_points)
 
+#Can be removed once final results are out
 main_estimates <- estimates[0,]
 
 for(i in unique(estimates$event)){
@@ -70,7 +71,7 @@ for(i in unique(estimates$event)){
 main_estimates <- main_estimates[!duplicated(main_estimates), ]
 main_estimates <- main_estimates %>% mutate(across(c(estimate,conf.low,conf.high),as.numeric))
 
-# We want to plot thhe figures using the same time-points across all cohorts so that they can be compared
+# We want to plot the figures using the same time-points across all cohorts so that they can be compared
 # If any cohort uses reduced time points then all cohorts will be plotted with reduced time points
 main_estimates <- main_estimates %>%
   group_by(event,subgroup) %>%
