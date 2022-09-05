@@ -41,7 +41,7 @@ hr_file_paths <- pmap(list(hr_files),
 estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
 # Get estimates for main analyses and list of outcomes from active analyses
-main_estimates <- estimates %>% filter(subgroup == "main" 
+main_estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospitalised","covid_pheno_hospitalised") 
                                        & event %in% outcomes_to_plot 
                                        & term %in% term[grepl("^days",term)]
                                        & results_fitted == "fitted_successfully"
@@ -49,7 +49,7 @@ main_estimates <- estimates %>% filter(subgroup == "main"
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,median_follow_up)
 
 
-main_estimates <- main_estimates %>% mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
+main_estimates <- main_estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
 
 # We want to plot the figures using the same time-points across all cohorts so that they can be compared
 # If any cohort uses reduced time points then all cohorts will be plotted with reduced time points
@@ -71,7 +71,7 @@ main_estimates$add_to_median <- sub("days","",main_estimates$term)
 main_estimates$add_to_median <- as.numeric(sub("\\_.*","",main_estimates$add_to_median))
 
 main_estimates$median_follow_up <- ((main_estimates$median_follow_up + main_estimates$add_to_median)-1)/7
-#main_estimates$median_follow_up <- ifelse(main_estimates$median_follow_up == 0, 0.001,main_estimates$median_follow_up )
+main_estimates$median_follow_up <- ifelse(main_estimates$median_follow_up == 0, 0.001,main_estimates$median_follow_up )
 
 
 #term_to_time <- data.frame(term = c("days0_7","days7_14", "days14_28", "days28_56", "days56_84", "days84_197","days197_535", 
@@ -90,9 +90,16 @@ main_estimates$colour <- ifelse(main_estimates$cohort=="pre_vaccination","#d2ac4
 main_estimates$colour <- ifelse(main_estimates$cohort=="vaccinated","#58764c",main_estimates$colour) # Grey
 main_estimates$colour <- ifelse(main_estimates$cohort=="electively_unvaccinated","#94273c",main_estimates$colour) # Black
 
+#Specify lines
+main_estimates$linetype <- ""
+main_estimates$linetype <- ifelse(main_estimates$subgroup=="covid_pheno_hospitalised","solid",main_estimates$linetype)
+main_estimates$linetype <- ifelse(main_estimates$subgroup=="covid_pheno_non_hospitalised","dashed",main_estimates$linetype)
+
 # Factor variables for ordering
 main_estimates$cohort <- factor(main_estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
 main_estimates$colour <- factor(main_estimates$colour, levels=c("#d2ac47","#58764c","#94273c"))
+main_estimates$linetype <- factor(main_estimates$linetype,levels = c("solid","dashed"))
+main_estimates$subgroup <- factor(main_estimates$subgroup,levels = c("covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
 
 # Rename adjustment groups
 levels(main_estimates$cohort) <- list("Pre-vaccinated (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Electively unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
@@ -102,36 +109,36 @@ levels(main_estimates$cohort) <- list("Pre-vaccinated (2020-01-01 - 2021-06-18)"
 main_estimates <- main_estimates %>% left_join(outcome_name_table %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
 
 main_estimates$outcome <- factor(main_estimates$outcome, levels=c("Arterial thrombosis event",
-                                                                            "Venous thrombosis event",
-                                                                            "Acute myocardial infarction",
-                                                                            "Ischaemic stroke",
-                                                                            "Pulmonary embolism",
-                                                                            "Deep vein thrombosis",
-                                                                            "Transient ischaemic attack",
-                                                                            "Subarachnoid haemorrhage and haemorrhagic stroke",
-                                                                            "Heart failure",
-                                                                            "Angina",
-                                                                            "Arterial thrombosis event - Primary position events",
-                                                                            "Venous thrombosis event - Primary position events",
-                                                                            "Acute myocardial infarction - Primary position events",
-                                                                            "Ischaemic stroke - Primary position events",
-                                                                            "Pulmonary embolism - Primary position events",
-                                                                            "Deep vein thrombosis - Primary position events",
-                                                                            "Transient ischaemic attack - Primary position events",
-                                                                            "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events",
-                                                                            "Heart failure - Primary position events",
-                                                                            "Angina - Primary position events"))
+                                                                  "Venous thrombosis event",
+                                                                  "Acute myocardial infarction",
+                                                                  "Ischaemic stroke",
+                                                                  "Pulmonary embolism",
+                                                                  "Deep vein thrombosis",
+                                                                  "Transient ischaemic attack",
+                                                                  "Subarachnoid haemorrhage and haemorrhagic stroke",
+                                                                  "Heart failure",
+                                                                  "Angina",
+                                                                  "Arterial thrombosis event - Primary position events",
+                                                                  "Venous thrombosis event - Primary position events",
+                                                                  "Acute myocardial infarction - Primary position events",
+                                                                  "Ischaemic stroke - Primary position events",
+                                                                  "Pulmonary embolism - Primary position events",
+                                                                  "Deep vein thrombosis - Primary position events",
+                                                                  "Transient ischaemic attack - Primary position events",
+                                                                  "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events",
+                                                                  "Heart failure - Primary position events",
+                                                                  "Angina - Primary position events"))
 
 
 
-
+i="any_position"
 for(i in c("any_position","primary_position")){
   if(i == "any_position"){
     df <- main_estimates %>% filter(!event %in% event[grepl("primary_position",event)]
-                                    & time_points == time_period_to_plot)
+                                    & time_points == "reduced")
   }else{
     df <- main_estimates %>% filter(event %in% event[grepl("primary_position",event)]
-                                    & time_points == time_period_to_plot)
+                                    & time_points == "reduced")
   }
   
   ggplot2::ggplot(data=df,
@@ -151,6 +158,7 @@ for(i in c("any_position","primary_position")){
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
     ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
+    #ggplot2::scale_linetype_manual(values = levels(df$linetype), labels = levels(df$subgroup)) +
     ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
     ggplot2::guides(fill=ggplot2::guide_legend(ncol = 3, byrow = TRUE)) +
     ggplot2::theme_minimal() +
@@ -164,7 +172,7 @@ for(i in c("any_position","primary_position")){
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
     ggplot2::facet_wrap(outcome~., ncol = 2)
   
-  ggplot2::ggsave(paste0(output_dir,"Figure1_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+  ggplot2::ggsave(paste0(output_dir,"Figure2_covid_pheno_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
   
   
 }
