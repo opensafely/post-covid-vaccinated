@@ -24,7 +24,3 @@
 ## create_follow_up_end_dates.R 
 
 * Creates a dataset for each outcome group that includes the index date and follow-up end date for each patient_id. 
-
-## diabetes_algorithm.R 
-
-* A function called by preprocess_data.R to assign diabetes cases.
