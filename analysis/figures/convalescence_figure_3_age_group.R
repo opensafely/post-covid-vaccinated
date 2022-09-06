@@ -34,7 +34,7 @@ hr_file_paths <- pmap(list(hr_files),
 estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
 #-------------------------Filter to active outcomes-----------------------------
-main_estimates <- estimates %>% filter(subgroup %in% subgroup[grepl("prior",subgroup)]
+main_estimates <- estimates %>% filter(subgroup %in% subgroup[grepl("^age",subgroup)]
                                        & event %in% outcomes_to_plot 
                                        & term %in% term[grepl("^days",term)]
                                        & results_fitted == "fitted_successfully"
@@ -51,19 +51,22 @@ main_estimates$add_to_median <- as.numeric(sub("\\_.*","",main_estimates$add_to_
 main_estimates$median_follow_up <- ((main_estimates$median_follow_up + main_estimates$add_to_median)-1)/7
 
 # Rename subgroup to 'nice' format------------------------------------------------
-
-main_estimates$subgroup <- ifelse(main_estimates$subgroup=="prior_history_FALSE","No prior history of event",main_estimates$subgroup)
-main_estimates$subgroup <- ifelse(main_estimates$subgroup=="prior_history_TRUE","Prior history of event",main_estimates$subgroup)
+main_estimates$subgroup <- ifelse(main_estimates$subgroup=="agegp_18_39","Age group: 18-39",main_estimates$subgroup)
+main_estimates$subgroup <- ifelse(main_estimates$subgroup=="agegp_40_59","Age group: 40-59",main_estimates$subgroup)
+main_estimates$subgroup <- ifelse(main_estimates$subgroup=="agegp_60_79","Age group: 60-79",main_estimates$subgroup)
+main_estimates$subgroup <- ifelse(main_estimates$subgroup=="agegp_80_110","Age group: 80-110",main_estimates$subgroup)
 
 
 # Specify line colours ---------------------------------------------------------
 main_estimates$colour <- ""
-main_estimates$colour <- ifelse(main_estimates$subgroup=="No prior history of event","#332288",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Prior history of event","#88CCEE",main_estimates$colour) 
- 
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 18-39","#000000",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 40-59","#56B4E9",main_estimates$colour) 
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 60-79","#009E73",main_estimates$colour) 
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 80-110","#D55E00",main_estimates$colour) 
+
 # Factor variables for ordering
-main_estimates$colour <- factor(main_estimates$colour, levels=c("#332288","#88CCEE"))
-main_estimates$subgroup <- factor(main_estimates$subgroup, levels = c("No prior history of event","Prior history of event"))
+main_estimates$colour <- factor(main_estimates$colour, levels=c("#000000","#56B4E9","#009E73","#D55E00"))
+main_estimates$subgroup <- factor(main_estimates$subgroup, levels = c("Age group: 18-39","Age group: 40-59","Age group: 60-79","Age group: 80-110"))
 main_estimates$cohort <- factor(main_estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
 
 # Rename adjustment groups
@@ -101,7 +104,7 @@ ggplot2::ggplot(data=df,
                                                 ymax = ifelse(conf_high>64,64,conf_high),  
                                                 width = 0), 
                          #position = ggplot2::position_dodge(width = 1)
-                         )+   
+  )+   
   #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
   ggplot2::geom_line() +
   #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
@@ -111,7 +114,7 @@ ggplot2::ggplot(data=df,
   ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
   ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$subgroup)) +
   ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-  ggplot2::guides(fill=ggplot2::guide_legend(ncol = 3, byrow = TRUE)) +
+  ggplot2::guides(fill=ggplot2::guide_legend(ncol = 4, byrow = TRUE)) +
   ggplot2::theme_minimal() +
   ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
                  panel.grid.minor = ggplot2::element_blank(),
@@ -125,20 +128,7 @@ ggplot2::ggplot(data=df,
         plot.title = element_text(hjust = 0.5))+
   ggplot2::facet_wrap(cohort~., ncol = 3)
 
-ggplot2::ggsave(paste0(output_dir,"convalescence_figure3_prior_history_ate.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
-  
-  
-
-
-
-
-
-
-
-
-
-
-
+ggplot2::ggsave(paste0(output_dir,"convalescence_figure3_age_group_ate.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
 
 
 
