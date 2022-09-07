@@ -101,7 +101,8 @@ ggplot2::ggplot(data=df,
   ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf_low<0.25,0.25,conf_low), 
                                                 ymax = ifelse(conf_high>64,64,conf_high),  
                                                 width = 0), 
-                         position = ggplot2::position_dodge(width = 1))+   
+                         #position = ggplot2::position_dodge(width = 1)
+                         )+   
   #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
   ggplot2::geom_line() +
   #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
