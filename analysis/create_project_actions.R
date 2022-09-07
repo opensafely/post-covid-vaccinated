@@ -21,6 +21,8 @@ active_analyses_table <- subset(active_analyses, active_analyses$active =="TRUE"
 outcomes_model <- active_analyses_table$outcome_variable %>% str_replace("out_date_", "")
 cohort_to_run <- c("vaccinated", "electively_unvaccinated")
 analyses <- c("main", "subgroups")
+analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata_formatted.csv")
+analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run)
 
 # create action functions ----
 
@@ -135,6 +137,21 @@ table2 <- function(cohort){
       needs = list("stage1_data_cleaning_both",glue("stage1_end_date_table_{cohort}")),
       moderately_sensitive = list(
         input_table_2 = glue("output/review/descriptives/table2_{cohort}.csv")
+      )
+    )
+  )
+}
+
+stata_actions <- function(outcome, cohort, subgroup,time_periods, file_name){
+  splice(
+    comment(glue("Stata cox {outcome} {subgroup} {cohort} {time_periods}")),
+    action(
+      name = glue("stata_cox_model_{outcome}_{subgroup}_{cohort}_{time_periods}"),
+      run = "stata-mp:latest analysis/model/stata.do",
+      arguments = c(file_name,time_periods),
+      needs = list(glue("Analysis_cox_{outcome}_{cohort}")),
+      moderately_sensitive = list(
+        stata_output = glue("output/review/model/stata_output_{file_name}")
       )
     )
   )
@@ -323,7 +340,17 @@ actions_list <- splice(
     # over outcomes
     unlist(lapply(outcomes_model, function(x) splice(unlist(lapply(cohort_to_run, function(y) apply_model_function(outcome = x, cohort = y)), recursive = FALSE))
       ),recursive = FALSE)),
-
+  
+  lapply(split(analyses_to_run_stata,seq(nrow(analyses_to_run_stata))),
+         function(analyses_to_run_stata)
+           stata_actions(           
+             outcome=analyses_to_run_stata$outcome,           
+             cohort=analyses_to_run_stata$cohort,           
+             subgroup=analyses_to_run_stata$subgroup,           
+             time_periods=analyses_to_run_stata$time_periods,           
+             file_name=analyses_to_run_stata$file_name)) ,
+  
+  
   #comment("Split hospitalised COVID by region - vaccinated"),
   action(
     name = "split_hosp_covid_by_region_vaccinated",
@@ -473,10 +500,11 @@ project_list <- splice(
 #####################################################################################
 ## convert list to yaml, reformat comments and white space, and output a .yaml file #
 #####################################################################################
-as.yaml(project_list, indent=2) %>%
+x=as.yaml(project_list, indent=2) %>%
   # convert comment actions to comments
   convert_comment_actions() %>%
   # add one blank line before level 1 and level 2 keys
   str_replace_all("\\\n(\\w)", "\n\n\\1") %>%
   str_replace_all("\\\n\\s\\s(\\w)", "\n\n  \\1") %>%
   writeLines("project.yaml")
+
