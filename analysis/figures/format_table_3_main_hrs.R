@@ -71,7 +71,6 @@ main_estimates$est <- ifelse(is.na(main_estimates$estimate),NA,paste0(ifelse(mai
                   "-",ifelse(main_estimates$conf_high>=10,sprintf("%.1f",main_estimates$conf_high),sprintf("%.2f",main_estimates$conf_high)),")"))
 
 
-
 # Specify estimate order -----------------------------------------------------
 
 main_estimates$outcome <- factor(main_estimates$outcome, levels=c("Acute myocardial infarction",
@@ -103,7 +102,7 @@ main_estimates$subgroup <- factor(main_estimates$subgroup, levels = c("All",
                                                                       "Non-hospitalised COVID-19"))
 
 main_estimates$cohort <- factor(main_estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
-levels(main_estimates$cohort) <- list("Pre-vaccinated (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Electively unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
+levels(main_estimates$cohort) <- list("Pre-vaccinated"="pre_vaccination", "Vaccinated"="vaccinated","Electively unvaccinated"="electively_unvaccinated")
 
 
 # Remove unnecessary variables -----------------------------------------------

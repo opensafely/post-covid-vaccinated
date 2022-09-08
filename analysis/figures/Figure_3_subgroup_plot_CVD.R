@@ -1,14 +1,11 @@
+#libraries
 library(readr)
-library(dplyr)
-library(tidyverse)
-library(ggplot2)
 library(data.table)
-library(plyr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
 
-cohort=c("pre_vaccination", "vaccinated","electively_unvaccinated")
-events_to_plot <- c("ate","vte")
-
-results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release/"
+results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
 output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
 
 active_analyses <- read_rds("lib/active_analyses.rds") %>% filter(active == "TRUE")
@@ -22,19 +19,18 @@ outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_n
 
 
 #--------Load fully adjusted main and COVID phenotype results-------------------
-hr_files=list.files(path =results_dir , pattern = "suppressed_compiled_HR_results_*")
+hr_files=list.files(path = results_dir, pattern = "suppressed_compiled_HR_results_*")
 hr_files=hr_files[endsWith(hr_files,".csv")]
-hr_files=paste0(results_dir,hr_files)
-
-hr_file_paths <- pmap(list(hr_files), 
-                      function(fpath){ 
-                        df <- fread(fpath) 
+hr_files=paste0(results_dir,"/", hr_files)
+hr_file_paths <- pmap(list(hr_files),
+                      function(fpath){
+                        df <- fread(fpath)
                         return(df)
                       })
 estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
 #-------------------------Filter to active outcomes-----------------------------
-main_estimates <- estimates %>% filter(subgroup !="covid_history"
+main_estimates <- estimates %>% filter(!subgroup %in% c("covid_history","main","covid_pheno_hospitalised","covid_pheno_non_hospitalised")
                                        & event %in% outcomes_to_plot 
                                        & term %in% term[grepl("^days",term)]
                                        & results_fitted == "fitted_successfully"
@@ -44,7 +40,6 @@ main_estimates <- estimates %>% filter(subgroup !="covid_history"
 
 main_estimates <- main_estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
 
-#main_estimates <- main_estimates %>% filter(model == "mdl_max_adj"| (model == "mdl_agesex" & subgroup == "main"))
 
 #---------------------------Specify time to plot--------------------------------
 main_estimates$add_to_median <- sub("days","",main_estimates$term)
@@ -73,8 +68,6 @@ main_estimates$subgroup <- ifelse(main_estimates$subgroup=="ethnicity_South_Asia
 main_estimates$subgroup <- ifelse(main_estimates$subgroup=="ethnicity_Black","Ethnicity: Black",main_estimates$subgroup)
 main_estimates$subgroup <- ifelse(main_estimates$subgroup=="ethnicity_Other","Ethnicity: Other Ethnic Groups",main_estimates$subgroup)
 main_estimates$subgroup <- ifelse(main_estimates$subgroup=="ethnicity_Missing","Ethnicity: Missing",main_estimates$subgroup)
-
-
 
 # Give ethnicity estimates extra space -----------------------------------------
 
@@ -127,6 +120,26 @@ main_estimates$grouping=ifelse(startsWith(main_estimates$subgroup,"Age group")==
 main_estimates$grouping=ifelse(startsWith(main_estimates$subgroup,"Sex")==T,"Sex",main_estimates$grouping)
 main_estimates$grouping=ifelse(startsWith(main_estimates$subgroup,"Ethnicity")==T,"Ethnicity",main_estimates$grouping)
 
+main_estimates$grouping_name=""
+main_estimates$grouping_name <- ifelse(main_estimates$cohort == "pre_vaccination", paste0(main_estimates$grouping," - Pre-vaccinated"),main_estimates$grouping_name)
+main_estimates$grouping_name <- ifelse(main_estimates$cohort == "vaccinated", paste0(main_estimates$grouping," - Vaccinated"),main_estimates$grouping_name)
+main_estimates$grouping_name <- ifelse(main_estimates$cohort == "electively_unvaccinated", paste0(main_estimates$grouping," - Electively unvaccinated"),main_estimates$grouping_name)
+
+#Set factor levels
+main_estimates$grouping_name <- factor(main_estimates$grouping_name, levels = c("Age group - Pre-vaccinated",
+                                                                      "Age group - Vaccinated",
+                                                                      "Age group - Electively unvaccinated",
+                                                                      "Ethnicity - Pre-vaccinated",
+                                                                      "Ethnicity - Vaccinated"  ,
+                                                                      "Ethnicity - Electively unvaccinated",
+                                                                      "Prior history of event - Pre-vaccinated",
+                                                                      "Prior history of event - Vaccinated" ,
+                                                                      "Prior history of event - Electively unvaccinated",
+                                                                      "Sex - Pre-vaccinated",
+                                                                      "Sex - Vaccinated",
+                                                                      "Sex - Electively unvaccinated"
+                                                                      ))
+
 # We want to plot the figures using the same time-points across all cohorts so that they can be compared
 # If any cohort uses reduced time points then all cohorts will be plotted with reduced time points
 main_estimates <- main_estimates %>%
@@ -136,127 +149,97 @@ main_estimates <- main_estimates %>%
     TRUE ~ "reduced"))
 
 main_estimates <- main_estimates %>%
-  group_by(event,grouping,cohort) %>%
+  group_by(event,grouping) %>%
   dplyr::mutate(time_period_to_plot = case_when(
     any(time_period_to_plot == "reduced") ~ "reduced",
     TRUE ~ "normal"))
 
-
-#c="pre_vaccination"
-#outcome_name="ate"
-for(c in cohort){
-  for(outcome_name in events_to_plot){
-    df=main_estimates %>% filter(cohort == c & event==outcome_name & time_points == time_period_to_plot)
-    if(nrow(df)>0){
-      group_levels <-c()
-      for(i in c("Overall","Hospitalised/Non-hospitalised COVID-19", "Prior history of event","Age group","Sex","Ethnicity" )){
-        levels_available <- unique(df$grouping)
-        if(i %in% levels_available){
-          group_levels <- append(group_levels,i)
-        }
-      }
-      
-      df$grouping <- factor(df$grouping, levels=group_levels)
-      
-      
-      sub_group_levels <-c()
-      for(i in c("Maximal adjustment","Age/sex adjustment","Hospitalised COVID-19","Non-hospitalised COVID-19","Prior history of event", "No prior history of event","Age group: 18-39",
-                 "Age group: 40-59","Age group: 60-79","Age group: 80-110","Sex: Female","Sex: Male","Ethnicity: White",
-                 "Ethnicity: Black","Ethnicity: South Asian","Ethnicity: Other Ethnic Groups", "Ethnicity: Mixed","Ethnicity: Missing")){
-        levels_available <- unique(df$subgroup)
-        if(i %in% levels_available){
-          sub_group_levels <- append(sub_group_levels,i)
-        }
-      }
-      
-      df$subgroup <- factor(df$subgroup, levels=sub_group_levels)
-      
-      colour_levels <-c()
-      for(i in c("#000000",
-                 "#bababa",
-                 "#e31a1c",
-                 "#fb9a99",
-                 "#ff7f00",
-                 "#fdbf6f",
-                 "#006d2c",
-                 "#31a354",
-                 "#74c476",
-                 "#bae4b3",
-                 "#6a3d9a",
-                 "#cab2d6",
-                 "#08519c",
-                 "#2171b5",
-                 "#4292c6",
-                 "#6baed6",
-                 "#9ecae1",
-                 "#c5dfed")){
-        levels_available <- unique(df$colour)
-        if(i %in% levels_available){
-          colour_levels <- append(colour_levels,i)
-        }
-      } 
-      
-      df$colour <- factor(df$colour, levels=colour_levels)
-      
-      # Plot figures------------------------------------------------------------------
-      min_plot <- 0.25
-    
-      if(max(df$estimate, na.rm = T)<64){
-        max_plot <- 64
-        y_lim <- c(0.25,64)
-        y_lim_breaks <- c(0.5,1,2,4,8,16,32,64)
-      }else{
-        max_plot <- 128
-        y_lim <- c(0.25,128)
-        y_lim_breaks <- c(0.5,1,2,4,8,16,32,64,128)
-      }
-      
-      ggplot2::ggplot(data = df, 
-                      mapping = ggplot2::aes(x = median_follow_up, y = estimate, color = subgroup, shape = subgroup, fill = subgroup)) +
-        ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-        #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1.5))+
-        ggplot2::geom_point()+
-        ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf_low<min_plot,min_plot,conf_low), 
-                                                      ymax = ifelse(conf_high>max_plot,max_plot,conf_high),  
-                                                      width = 0), 
-                               #position = ggplot2::position_dodge(width = 1)
-                               )+
-        #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1.5)) +
-        ggplot2::geom_line() +
-        ggplot2::scale_y_continuous(lim = y_lim, breaks = y_lim_breaks, trans = "log") +
-        ggplot2::scale_x_continuous(lim = c(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling)), breaks = seq(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling),4)) +
-        ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$subgroup))+ 
-        ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
-        ggplot2::scale_shape_manual(values = c(rep(21,18))) +
-        ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-        ggplot2::guides(fill=ggplot2::guide_legend(ncol = 6, byrow = TRUE)) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
-                       panel.grid.minor = ggplot2::element_blank(),
-                       panel.spacing.x = ggplot2::unit(0.5, "lines"),
-                       panel.spacing.y = ggplot2::unit(0, "lines"),
-                       legend.key = ggplot2::element_rect(colour = NA, fill = NA),
-                       legend.title = ggplot2::element_blank(),
-                       legend.position="bottom",
-                       plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
-        ggplot2::facet_wrap(grouping~.,ncol=2)
-      
-      ggplot2::ggsave(paste0(output_dir,"figure_3_",outcome_name,"_",c, ".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+outcome_name="ate"
+for(outcome_name in outcomes_to_plot){
+  df=main_estimates %>% filter(event==outcome_name & time_points == time_period_to_plot)
+  
+  sub_group_levels <-c()
+  for(i in c("Maximal adjustment","Age/sex adjustment","Hospitalised COVID-19","Non-hospitalised COVID-19","Prior history of event", "No prior history of event","Age group: 18-39",
+             "Age group: 40-59","Age group: 60-79","Age group: 80-110","Sex: Female","Sex: Male","Ethnicity: White",
+             "Ethnicity: Black","Ethnicity: South Asian","Ethnicity: Other Ethnic Groups", "Ethnicity: Mixed","Ethnicity: Missing")){
+    levels_available <- unique(df$subgroup)
+    if(i %in% levels_available){
+      sub_group_levels <- append(sub_group_levels,i)
     }
   }
-}
-      
-      
-    
-        
-      
-      
-      
-     
-        
-       
-        
-        
-        
-        
   
+  df$subgroup <- factor(df$subgroup, levels=sub_group_levels)
+  
+  colour_levels <-c()
+  for(i in c("#000000",
+             "#bababa",
+             "#e31a1c",
+             "#fb9a99",
+             "#ff7f00",
+             "#fdbf6f",
+             "#006d2c",
+             "#31a354",
+             "#74c476",
+             "#bae4b3",
+             "#6a3d9a",
+             "#cab2d6",
+             "#08519c",
+             "#2171b5",
+             "#4292c6",
+             "#6baed6",
+             "#9ecae1",
+             "#c5dfed")){
+    levels_available <- unique(df$colour)
+    if(i %in% levels_available){
+      colour_levels <- append(colour_levels,i)
+    }
+  } 
+  
+  df$colour <- factor(df$colour, levels=colour_levels)
+  
+  # Plot figures------------------------------------------------------------------
+  min_plot <- 0.25
+  
+  if(max(df$estimate, na.rm = T)<64){
+    max_plot <- 64
+    y_lim <- c(0.25,64)
+    y_lim_breaks <- c(0.5,1,2,4,8,16,32,64)
+  }else{
+    max_plot <- 128
+    y_lim <- c(0.25,128)
+    y_lim_breaks <- c(0.5,1,2,4,8,16,32,64,128)
+  }
+  
+  ggplot2::ggplot(data = df, 
+                        mapping = ggplot2::aes(x = median_follow_up, y = estimate, color = subgroup, shape = subgroup, fill = subgroup)) +
+    ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
+    #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1.5))+
+    ggplot2::geom_point()+
+    ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf_low<min_plot,min_plot,conf_low), 
+                                                  ymax = ifelse(conf_high>max_plot,max_plot,conf_high),  
+                                                  width = 0), 
+                           #position = ggplot2::position_dodge(width = 1)
+    )+
+    #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1.5)) +
+    ggplot2::geom_line() +
+    ggplot2::scale_y_continuous(lim = y_lim, breaks = y_lim_breaks, trans = "log") +
+    ggplot2::scale_x_continuous(lim = c(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling)), breaks = seq(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling),4)) +
+    ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$subgroup))+ 
+    ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
+    ggplot2::scale_shape_manual(values = c(rep(21,18))) +
+    ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
+    ggplot2::guides(fill=ggplot2::guide_legend(ncol = 6, byrow = TRUE)) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   panel.spacing.x = ggplot2::unit(0.5, "lines"),
+                   panel.spacing.y = ggplot2::unit(0, "lines"),
+                   legend.key = ggplot2::element_rect(colour = NA, fill = NA),
+                   legend.title = ggplot2::element_blank(),
+                   legend.position="bottom",
+                   plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
+    ggplot2::facet_wrap(grouping_name~.,ncol=3)
+  
+  ggplot2::ggsave(paste0(output_dir,"Figure3_subgroups_",outcome_name,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+}
+
