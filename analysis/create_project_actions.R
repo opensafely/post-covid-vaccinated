@@ -21,7 +21,7 @@ active_analyses_table <- subset(active_analyses, active_analyses$active =="TRUE"
 outcomes_model <- active_analyses_table$outcome_variable %>% str_replace("out_date_", "")
 cohort_to_run <- c("vaccinated", "electively_unvaccinated")
 analyses <- c("main", "subgroups")
-analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata_formatted.csv")
+analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv")
 analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run)
 
 # create action functions ----
@@ -142,16 +142,16 @@ table2 <- function(cohort){
   )
 }
 
-stata_actions <- function(outcome, cohort, subgroup,time_periods, file_name){
+stata_actions <- function(outcome, cohort, subgroup,time_periods){
   splice(
     comment(glue("Stata cox {outcome} {subgroup} {cohort} {time_periods}")),
     action(
       name = glue("stata_cox_model_{outcome}_{subgroup}_{cohort}_{time_periods}"),
       run = "stata-mp:latest analysis/model/stata.do",
-      arguments = c(file_name,time_periods),
+      arguments = c(glue("output/input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods.csv"),time_periods),
       needs = list(glue("Analysis_cox_{outcome}_{cohort}")),
       moderately_sensitive = list(
-        stata_output = glue("output/review/model/stata_output_{file_name}")
+        stata_output = glue("output/review/model/stata_output_input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods.csv")
       )
     )
   )
@@ -363,8 +363,7 @@ actions_list <- splice(
              outcome=analyses_to_run_stata$outcome,           
              cohort=analyses_to_run_stata$cohort,           
              subgroup=analyses_to_run_stata$subgroup,           
-             time_periods=analyses_to_run_stata$time_periods,           
-             file_name=analyses_to_run_stata$file_name))
+             time_periods=analyses_to_run_stata$time_periods))
   
   
   

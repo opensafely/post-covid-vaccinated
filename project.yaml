@@ -932,7 +932,7 @@ actions:
       highly_sensitive:
         dataset: output/input_vte_primary_position_*_electively_unvaccinated_*_time_periods.csv
         sampled_dataset: output/input_sampled_data_vte_primary_position_*_electively_unvaccinated_*_time_periods.csv
-  
+  '1':
 
     ## Stata cox ami hospitalised vaccinated reduced 
     stata_cox_model_ami_hospitalised_vaccinated_reduced:
@@ -942,8 +942,8 @@ actions:
       - Analysis_cox_ami_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_ami_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_ami_hospitalised_vaccinated_reduced_time_periods.csv
+  '2':
 
     ## Stata cox stroke_isch hospitalised vaccinated reduced 
     stata_cox_model_stroke_isch_hospitalised_vaccinated_reduced:
@@ -953,8 +953,8 @@ actions:
       - Analysis_cox_stroke_isch_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_stroke_isch_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_stroke_isch_hospitalised_vaccinated_reduced_time_periods.csv
+  '3':
 
     ## Stata cox dvt hospitalised vaccinated reduced 
     stata_cox_model_dvt_hospitalised_vaccinated_reduced:
@@ -964,8 +964,8 @@ actions:
       - Analysis_cox_dvt_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_dvt_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_dvt_hospitalised_vaccinated_reduced_time_periods.csv
+  '4':
 
     ## Stata cox pe hospitalised vaccinated reduced 
     stata_cox_model_pe_hospitalised_vaccinated_reduced:
@@ -975,8 +975,8 @@ actions:
       - Analysis_cox_pe_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_pe_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_pe_hospitalised_vaccinated_reduced_time_periods.csv
+  '5':
 
     ## Stata cox hf hospitalised vaccinated reduced 
     stata_cox_model_hf_hospitalised_vaccinated_reduced:
@@ -986,8 +986,8 @@ actions:
       - Analysis_cox_hf_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_hf_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_hf_hospitalised_vaccinated_reduced_time_periods.csv
+  '6':
 
     ## Stata cox angina hospitalised vaccinated reduced 
     stata_cox_model_angina_hospitalised_vaccinated_reduced:
@@ -997,8 +997,8 @@ actions:
       - Analysis_cox_angina_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_angina_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_angina_hospitalised_vaccinated_reduced_time_periods.csv
+  '7':
 
     ## Stata cox ate hospitalised vaccinated reduced 
     stata_cox_model_ate_hospitalised_vaccinated_reduced:
@@ -1008,8 +1008,8 @@ actions:
       - Analysis_cox_ate_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_ate_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_ate_hospitalised_vaccinated_reduced_time_periods.csv
+  '8':
 
     ## Stata cox vte hospitalised vaccinated reduced 
     stata_cox_model_vte_hospitalised_vaccinated_reduced:
@@ -1019,8 +1019,8 @@ actions:
       - Analysis_cox_vte_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_hospitalised_vaccinated_reduced_time_periods.csv
+  '9':
 
     ## Stata cox ami_primary_position hospitalised vaccinated reduced 
     stata_cox_model_ami_primary_position_hospitalised_vaccinated_reduced:
@@ -1030,8 +1030,8 @@ actions:
       - Analysis_cox_ami_primary_position_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_ami_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_ami_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
+  '10':
 
     ## Stata cox stroke_isch_primary_position hospitalised vaccinated reduced
 
@@ -1043,8 +1043,8 @@ actions:
       - Analysis_cox_stroke_isch_primary_position_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_stroke_isch_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_stroke_isch_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
+  '11':
 
     ## Stata cox dvt_primary_position hospitalised vaccinated reduced 
     stata_cox_model_dvt_primary_position_hospitalised_vaccinated_reduced:
@@ -1054,8 +1054,8 @@ actions:
       - Analysis_cox_dvt_primary_position_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_dvt_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_dvt_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
+  '12':
 
     ## Stata cox pe_primary_position hospitalised vaccinated reduced 
     stata_cox_model_pe_primary_position_hospitalised_vaccinated_reduced:
@@ -1065,8 +1065,8 @@ actions:
       - Analysis_cox_pe_primary_position_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_pe_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_pe_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
+  '13':
 
     ## Stata cox hf_primary_position hospitalised vaccinated reduced 
     stata_cox_model_hf_primary_position_hospitalised_vaccinated_reduced:
@@ -1076,8 +1076,8 @@ actions:
       - Analysis_cox_hf_primary_position_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_hf_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_hf_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
+  '14':
 
     ## Stata cox angina_primary_position hospitalised vaccinated reduced 
     stata_cox_model_angina_primary_position_hospitalised_vaccinated_reduced:
@@ -1087,8 +1087,8 @@ actions:
       - Analysis_cox_angina_primary_position_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_angina_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_angina_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
+  '15':
 
     ## Stata cox ate_primary_position hospitalised vaccinated reduced 
     stata_cox_model_ate_primary_position_hospitalised_vaccinated_reduced:
@@ -1098,8 +1098,8 @@ actions:
       - Analysis_cox_ate_primary_position_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_ate_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_ate_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
+  '16':
 
     ## Stata cox vte_primary_position hospitalised vaccinated reduced 
     stata_cox_model_vte_primary_position_hospitalised_vaccinated_reduced:
@@ -1109,8 +1109,8 @@ actions:
       - Analysis_cox_vte_primary_position_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_primary_position_hospitalised_vaccinated_reduced_time_periods.csv
+  '17':
 
     ## Stata cox pe hospitalised vaccinated normal 
     stata_cox_model_pe_hospitalised_vaccinated_normal:
@@ -1120,8 +1120,8 @@ actions:
       - Analysis_cox_pe_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_pe_hospitalised_vaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_pe_hospitalised_vaccinated_normal_time_periods.csv
+  '18':
 
     ## Stata cox hf hospitalised vaccinated normal 
     stata_cox_model_hf_hospitalised_vaccinated_normal:
@@ -1131,8 +1131,8 @@ actions:
       - Analysis_cox_hf_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_hf_hospitalised_vaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_hf_hospitalised_vaccinated_normal_time_periods.csv
+  '19':
 
     ## Stata cox angina hospitalised vaccinated normal 
     stata_cox_model_angina_hospitalised_vaccinated_normal:
@@ -1142,8 +1142,8 @@ actions:
       - Analysis_cox_angina_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_angina_hospitalised_vaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_angina_hospitalised_vaccinated_normal_time_periods.csv
+  '20':
 
     ## Stata cox ate hospitalised vaccinated normal 
     stata_cox_model_ate_hospitalised_vaccinated_normal:
@@ -1153,8 +1153,8 @@ actions:
       - Analysis_cox_ate_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_ate_hospitalised_vaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_ate_hospitalised_vaccinated_normal_time_periods.csv
+  '21':
 
     ## Stata cox vte hospitalised vaccinated normal 
     stata_cox_model_vte_hospitalised_vaccinated_normal:
@@ -1164,8 +1164,8 @@ actions:
       - Analysis_cox_vte_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_hospitalised_vaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_hospitalised_vaccinated_normal_time_periods.csv
+  '22':
 
     ## Stata cox ami hospitalised electively_unvaccinated reduced 
     stata_cox_model_ami_hospitalised_electively_unvaccinated_reduced:
@@ -1175,8 +1175,8 @@ actions:
       - Analysis_cox_ami_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_ami_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_ami_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '23':
 
     ## Stata cox stroke_isch hospitalised electively_unvaccinated reduced 
     stata_cox_model_stroke_isch_hospitalised_electively_unvaccinated_reduced:
@@ -1186,8 +1186,8 @@ actions:
       - Analysis_cox_stroke_isch_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_stroke_isch_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_stroke_isch_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '24':
 
     ## Stata cox dvt hospitalised electively_unvaccinated reduced 
     stata_cox_model_dvt_hospitalised_electively_unvaccinated_reduced:
@@ -1197,8 +1197,8 @@ actions:
       - Analysis_cox_dvt_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_dvt_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_dvt_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '25':
 
     ## Stata cox pe hospitalised electively_unvaccinated reduced 
     stata_cox_model_pe_hospitalised_electively_unvaccinated_reduced:
@@ -1208,8 +1208,8 @@ actions:
       - Analysis_cox_pe_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_pe_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_pe_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '26':
 
     ## Stata cox hf hospitalised electively_unvaccinated reduced 
     stata_cox_model_hf_hospitalised_electively_unvaccinated_reduced:
@@ -1219,8 +1219,8 @@ actions:
       - Analysis_cox_hf_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_hf_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_hf_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '27':
 
     ## Stata cox angina hospitalised electively_unvaccinated reduced 
     stata_cox_model_angina_hospitalised_electively_unvaccinated_reduced:
@@ -1230,8 +1230,8 @@ actions:
       - Analysis_cox_angina_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_angina_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_angina_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '28':
 
     ## Stata cox ate hospitalised electively_unvaccinated reduced 
     stata_cox_model_ate_hospitalised_electively_unvaccinated_reduced:
@@ -1241,8 +1241,8 @@ actions:
       - Analysis_cox_ate_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_ate_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_ate_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '29':
 
     ## Stata cox vte hospitalised electively_unvaccinated reduced 
     stata_cox_model_vte_hospitalised_electively_unvaccinated_reduced:
@@ -1252,8 +1252,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '30':
 
     ## Stata cox ate_primary_position hospitalised electively_unvaccinated reduced
 
@@ -1265,8 +1265,8 @@ actions:
       - Analysis_cox_ate_primary_position_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_ate_primary_position_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_ate_primary_position_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '31':
 
     ## Stata cox vte_primary_position hospitalised electively_unvaccinated reduced
 
@@ -1278,8 +1278,8 @@ actions:
       - Analysis_cox_vte_primary_position_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_primary_position_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_primary_position_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '32':
 
     ## Stata cox pe hospitalised electively_unvaccinated normal 
     stata_cox_model_pe_hospitalised_electively_unvaccinated_normal:
@@ -1289,8 +1289,8 @@ actions:
       - Analysis_cox_pe_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_pe_hospitalised_electively_unvaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_pe_hospitalised_electively_unvaccinated_normal_time_periods.csv
+  '33':
 
     ## Stata cox vte hospitalised electively_unvaccinated normal 
     stata_cox_model_vte_hospitalised_electively_unvaccinated_normal:
@@ -1300,8 +1300,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_hospitalised_electively_unvaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_hospitalised_electively_unvaccinated_normal_time_periods.csv
+  '34':
 
     ## Stata cox angina covid_history vaccinated reduced 
     stata_cox_model_angina_covid_history_vaccinated_reduced:
@@ -1311,8 +1311,8 @@ actions:
       - Analysis_cox_angina_vaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_angina_covid_history_vaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_angina_covid_history_vaccinated_reduced_time_periods.csv
+  '35':
 
     ## Stata cox pe main electively_unvaccinated reduced 
     stata_cox_model_pe_main_electively_unvaccinated_reduced:
@@ -1322,8 +1322,8 @@ actions:
       - Analysis_cox_pe_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_pe_main_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_pe_main_electively_unvaccinated_reduced_time_periods.csv
+  '36':
 
     ## Stata cox pe main electively_unvaccinated normal 
     stata_cox_model_pe_main_electively_unvaccinated_normal:
@@ -1333,8 +1333,8 @@ actions:
       - Analysis_cox_pe_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_pe_main_electively_unvaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_pe_main_electively_unvaccinated_normal_time_periods.csv
+  '37':
 
     ## Stata cox hf main electively_unvaccinated normal 
     stata_cox_model_hf_main_electively_unvaccinated_normal:
@@ -1344,8 +1344,8 @@ actions:
       - Analysis_cox_hf_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_hf_main_electively_unvaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_hf_main_electively_unvaccinated_normal_time_periods.csv
+  '38':
 
     ## Stata cox hf main electively_unvaccinated reduced 
     stata_cox_model_hf_main_electively_unvaccinated_reduced:
@@ -1355,8 +1355,8 @@ actions:
       - Analysis_cox_hf_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_hf_main_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_hf_main_electively_unvaccinated_reduced_time_periods.csv
+  '39':
 
     ## Stata cox hf non_hospitalised electively_unvaccinated reduced 
     stata_cox_model_hf_non_hospitalised_electively_unvaccinated_reduced:
@@ -1366,8 +1366,8 @@ actions:
       - Analysis_cox_hf_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_hf_non_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_hf_non_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '40':
 
     ## Stata cox vte sex_Male electively_unvaccinated normal 
     stata_cox_model_vte_sex_Male_electively_unvaccinated_normal:
@@ -1377,8 +1377,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_sex_Male_electively_unvaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_sex_Male_electively_unvaccinated_normal_time_periods.csv
+  '41':
 
     ## Stata cox vte sex_Male electively_unvaccinated reduced 
     stata_cox_model_vte_sex_Male_electively_unvaccinated_reduced:
@@ -1388,8 +1388,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_sex_Male_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_sex_Male_electively_unvaccinated_reduced_time_periods.csv
+  '42':
 
     ## Stata cox vte age_40_59 electively_unvaccinated normal 
     stata_cox_model_vte_age_40_59_electively_unvaccinated_normal:
@@ -1399,8 +1399,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_age_40_59_electively_unvaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_age_40_59_electively_unvaccinated_normal_time_periods.csv
+  '43':
 
     ## Stata cox vte age_60_79 electively_unvaccinated reduced 
     stata_cox_model_vte_age_60_79_electively_unvaccinated_reduced:
@@ -1410,8 +1410,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_age_60_79_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_age_60_79_electively_unvaccinated_reduced_time_periods.csv
+  '44':
 
     ## Stata cox vte ethnicity_White electively_unvaccinated normal 
     stata_cox_model_vte_ethnicity_White_electively_unvaccinated_normal:
@@ -1421,8 +1421,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_ethnicity_White_electively_unvaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_ethnicity_White_electively_unvaccinated_normal_time_periods.csv
+  '45':
 
     ## Stata cox vte ethnicity_Black electively_unvaccinated reduced 
     stata_cox_model_vte_ethnicity_Black_electively_unvaccinated_reduced:
@@ -1432,8 +1432,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_ethnicity_Black_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_ethnicity_Black_electively_unvaccinated_reduced_time_periods.csv
+  '46':
 
     ## Stata cox vte prior_history_FALSE electively_unvaccinated normal 
     stata_cox_model_vte_prior_history_FALSE_electively_unvaccinated_normal:
@@ -1443,8 +1443,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_prior_history_FALSE_electively_unvaccinated_normal_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_prior_history_FALSE_electively_unvaccinated_normal_time_periods.csv
+  '47':
 
     ## Stata cox hf_primary_position non_hospitalised electively_unvaccinated
       reduced 
@@ -1455,8 +1455,8 @@ actions:
       - Analysis_cox_hf_primary_position_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_hf_primary_position_non_hospitalised_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_hf_primary_position_non_hospitalised_electively_unvaccinated_reduced_time_periods.csv
+  '48':
 
     ## Stata cox vte aer_Female_60_79 electively_unvaccinated reduced 
     stata_cox_model_vte_aer_Female_60_79_electively_unvaccinated_reduced:
@@ -1466,8 +1466,8 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_aer_Female_60_79_electively_unvaccinated_reduced_time_periods.csv
-  
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_aer_Female_60_79_electively_unvaccinated_reduced_time_periods.csv
+  '49':
 
     ## Stata cox vte aer_Male_60_79 electively_unvaccinated reduced 
     stata_cox_model_vte_aer_Male_60_79_electively_unvaccinated_reduced:
@@ -1477,5 +1477,5 @@ actions:
       - Analysis_cox_vte_electively_unvaccinated
       outputs:
         moderately_sensitive:
-          stata_output: output/review/model/stata_output_output/input_sampled_data_vte_aer_Male_60_79_electively_unvaccinated_reduced_time_periods.csv
+          stata_output: output/review/model/stata_output_input_sampled_data_vte_aer_Male_60_79_electively_unvaccinated_reduced_time_periods.csv
 
