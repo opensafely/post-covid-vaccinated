@@ -1,13 +1,13 @@
 #Project:Vaccinated delta wave population study
 #Branch:Absolute excess risk calculations
-#Scripts: Renin Toms, Xiyun Jiang, Venexia Walker
+#Scripts: Renin Toms, Xiyun Jiang, Venexia Walker, Lucy Teece
 #Reviewer: Genevieve Cezard
 
 #TO RUN OUTSIDE OPENSAFELY
 # 1. load the right input data and make sure of the file names and variable structure
 # 2. Cntrl+A run the whole script and find the results in working directory
 
-fs::dir_create(here::here("output", "review", "model"))
+fs::dir_create(here::here("output", "review", "AER_results"))
 fs::dir_create(here::here("output", "not-for-review", "AER_results"))
 scripts_dir <- "analysis/model"
 hr_dir <- "output/review/model"
@@ -19,14 +19,16 @@ aer_results_dir <- "output/review/AER_results"
 source(file.path(scripts_dir,"Absolute_excess_risk_function.R"))
 
 #USE - TO CHECK SINGLE AER
-#event_of_interest="ami"
-#cohort_of_interest="vaccinated"
-#subgroup_of_interest="covid_pheno_non_hospitalised"
-#model_of_interest="mdl_max_adj"
+# event_of_interest="ate"
+# cohort_of_interest="vaccinated"
+# subgroup_of_interest="covid_pheno_non_hospitalised"
+# model_of_interest="mdl_max_adj"
 
 library(purrr)
 library(data.table)
 library(tidyverse)
+
+agelabels <- c("18_39", "40_59", "60_79", "80_110")
 
 #-------------------------------
 #Step 1. AER for active analyses
@@ -47,9 +49,12 @@ active <- tidyr::separate_rows(active, model, sep = ";")                        
 active$cohort <- ifelse(active$cohort=="all","vaccinated;electively_unvaccinated",active$cohort) # includes 2 cohorts
 active <- tidyr::separate_rows(active, cohort, sep = ";")                                        # separate rows for each cohort
 
+#Focus only on aer analyses
+active <- subset(active, startsWith(active$strata,"aer_"))                      # keep only aer subgroups
+active <- subset(active, active$model=="mdl_max_adj")                           # only require aer for full model
+
 colnames(active) <- c("event","model","cohort","subgroup")
 active <- active %>% select(-model, everything())                                                  #Order the columns 
-
 
 
 #----------------------
@@ -72,6 +77,10 @@ input <- input %>%
   select(-conf.low, -conf.high, -std.error,-robust.se, -P, -redacted_results) %>%
   filter(str_detect(term, "^days"))
 
+#Focus for aer analyses
+input <- subset(input, input$subgroup=="main")                                  # only aer in main analyses
+input <- subset(input, input$model=="mdl_max_adj")                              # only require aer for full model
+input <- input %>% select(-c("subgroup","total_covid19_cases"))                 # duplicate variables also available in Table 2 (more relevent)
 
 #---------------------------------Input Table 2---------------------------------
 table_2_vaccinated <- read_csv(paste0(table_2_dir,"/table2_vaccinated.csv"))
@@ -79,45 +88,48 @@ table_2_electively_unvaccinated <- read_csv(paste0(table_2_dir,"/table2_elective
 table_2 <- rbind(table_2_vaccinated,table_2_electively_unvaccinated)
 
 #-------------------Select required columns and term----------------------------
-table_2 <- table_2 %>% select(subgroup, event, cohort_to_run, unexposed_person_days,unexposed_event_count)
+table_2 <- table_2 %>% select(subgroup, event, cohort_to_run,unexposed_person_days,unexposed_event_count,total_covid19_cases)
 table_2$event <- gsub("out_date_","",table_2$event)
-colnames(table_2)<- c("subgroup","event","cohort","unexposed_person_days","unexposed_event_count")
+colnames(table_2)<- c("subgroup","event","cohort","unexposed_person_days","unexposed_event_count","total_covid19_cases")
 rm(table_2_vaccinated,table_2_electively_unvaccinated)
 
-# Non-hospitalised/hospitalised unexposed person days are the same as in the
-# main analysis so copy these values and add onto table
+#Focus for aer analyses
+table_2 <- subset(table_2, startsWith(table_2$subgroup,"aer_"))                                       # keep only aer values
 
-for(i in unique(table_2$event)){
-  tmp <- table_2 %>% filter(event==i & cohort=="vaccinated" & subgroup=="covid_pheno_non_hospitalised")
-  if(nrow(tmp)>0){
-    table_2[nrow(table_2)+1,] <- c("main", tmp[1,2:5])
-  }
-  
-  tmp <- table_2 %>% filter(event==i & cohort=="electively_unvaccinated" & subgroup=="covid_pheno_non_hospitalised")
-  if(nrow(tmp)>0){
-    table_2[nrow(table_2)+1,] <- c("main", tmp[1,2:5])
-  }
-}
+# # Non-hospitalised/hospitalised unexposed person days are the same as in the
+# # main analysis so copy these values and add onto table
+# 
+# for(i in unique(table_2$event)){
+#   tmp <- table_2 %>% filter(event==i & cohort=="vaccinated" & subgroup=="covid_pheno_non_hospitalised")
+#   if(nrow(tmp)>0){
+#     table_2[nrow(table_2)+1,] <- c("main", tmp[1,2:5])
+#   }
+#   
+#   tmp <- table_2 %>% filter(event==i & cohort=="electively_unvaccinated" & subgroup=="covid_pheno_non_hospitalised")
+#   if(nrow(tmp)>0){
+#     table_2[nrow(table_2)+1,] <- c("main", tmp[1,2:5])
+#   }
+# }
 
-input <- input %>% left_join(table_2, by=c("event","subgroup","cohort"))
+input <- input %>% left_join(table_2, by=c("event","cohort"))
 input <- input %>% filter(!is.na(unexposed_person_days) & unexposed_event_count != "[Redacted]")
 
 #Determine which analyses have a complete set of results so that AER can be calculated
 df <- input %>% select(event, subgroup, model, cohort) %>% distinct
 active_available <- merge(active,df)
 results_unavailable <- active %>% anti_join(active_available)
-rm(active,table_2,df,tmp)
+rm(active,table_2,df)
+# rm(tmp)
 
-#-----------------------
-#Step 3. Run AER funtion
-#-----------------------
+#-------------------------
+#Step 3. Run AER function
+#-------------------------
 
 lapply(split(active_available,seq(nrow(active_available))),
        function(active_available)
          excess_risk(   
            event_of_interest = active_available$event,
            cohort_of_interest = active_available$cohort,
-           subgroup_of_interest = active_available$subgroup,
            model_of_interest = active_available$model,
            input))
 
