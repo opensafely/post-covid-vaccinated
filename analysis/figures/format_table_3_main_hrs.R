@@ -20,7 +20,8 @@ outcome_name_table <- active_analyses %>%
 
 
 #---------------Focus on first 8 CVD outcomes (remove ate and vte)--------------
-outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name != c("ate","vte","ate_primary_position","vte_primary_position")]
+#outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name != c("ate","vte","ate_primary_position","vte_primary_position")]
+outcomes_to_plot <- outcome_name_table$outcome_name
 
 #------------------------------Load all estimates-------------------------------
 
@@ -58,7 +59,7 @@ main_estimates <- df %>% left_join(main_estimates)
 
 main_estimates <- main_estimates %>% filter((subgroup == "main" & model %in% c("mdl_max_adj","mdl_age_sex_region"))
                                             | (subgroup %in% c("covid_pheno_hospitalised","covid_pheno_non_hospitalised") & model=="mdl_max_adj")) %>% 
-  mutate(across(c(estimate,conf_low,conf_high),as.numeric))
+  dplyr::mutate(across(c(estimate,conf_low,conf_high),as.numeric))
 
 rm(df1,df2,df)
 #------------------------------Tidy event names---------------------------------
@@ -72,17 +73,20 @@ main_estimates$est <- ifelse(is.na(main_estimates$estimate),NA,paste0(ifelse(mai
 
 
 # Specify estimate order -----------------------------------------------------
-
-main_estimates$outcome <- factor(main_estimates$outcome, levels=c("Acute myocardial infarction",
+main_estimates$outcome <- factor(main_estimates$outcome, levels=c("Arterial thrombosis event",
+                                                                  "Acute myocardial infarction",
                                                                   "Ischaemic stroke",
+                                                                  "Venous thrombosis event",
                                                                   "Pulmonary embolism",
                                                                   "Deep vein thrombosis",
                                                                   "Heart failure",
                                                                   "Angina",
                                                                   "Transient ischaemic attack",
                                                                   "Subarachnoid haemorrhage and haemorrhagic stroke",
+                                                                  "Arterial thrombosis event - Primary position events",
                                                                   "Acute myocardial infarction - Primary position events",
                                                                   "Ischaemic stroke - Primary position events",
+                                                                  "Venous thrombosis event - Primary position events",
                                                                   "Pulmonary embolism - Primary position events",
                                                                   "Deep vein thrombosis - Primary position events",
                                                                   "Heart failure - Primary position events",
@@ -110,6 +114,72 @@ levels(main_estimates$cohort) <- list("Pre-vaccinated"="pre_vaccination", "Vacci
 main_estimates[,c("event","estimate","conf_low","conf_high","model")] <- NULL
 
 # Convert long to wide -------------------------------------------------------
+
+format_hr_table <- function(df, time_periods,outcome_position){
+  df$time_points <- NULL
+  df <- tidyr::pivot_wider(df, names_from = term, values_from = est)
+  df <- df[order(df$outcome,df$subgroup,df$cohort),]
+  if(grepl("reduced", time_periods)){
+    df <- df %>% select("outcome","subgroup","cohort","days0_28","days28_197","days197_535")
+  }else{
+    df <- df %>% select("outcome","subgroup","cohort","days0_7","days7_14","days14_28","days28_56","days56_84","days84_197","days197_535")
+  }
+  
+  tmp <- as.data.frame(matrix(ncol=ncol(df),nrow=0))
+  colnames(tmp) <- colnames(df)
+  
+  for (i in unique(df$outcome)) {
+    df1 <- df %>% filter(outcome == i)
+    tmp[nrow(tmp)+1,] <- i
+    tmp <- rbind(tmp,df1)
+  }
+  
+  if(outcome_position == "any_position"){
+    tmp[nrow(tmp)+1,] <- "Arterial thrombosis events"
+    tmp[nrow(tmp)+1,] <- "Venous thromboembolism events"
+    tmp[nrow(tmp)+1,] <- "Other vascular events"
+    
+    tmp$outcome <- factor(tmp$outcome, levels=c("Arterial thrombosis events",
+                                                "Arterial thrombosis event",
+                                                "Acute myocardial infarction",
+                                                "Ischaemic stroke",
+                                                "Venous thromboembolism events",
+                                                "Venous thrombosis event",
+                                                "Pulmonary embolism",
+                                                "Deep vein thrombosis",
+                                                "Other vascular events",
+                                                "Heart failure",
+                                                "Angina",
+                                                "Transient ischaemic attack",
+                                                "Subarachnoid haemorrhage and haemorrhagic stroke"))
+  }else{
+    tmp[nrow(tmp)+1,] <- "Arterial thrombosis events - Primary position events"
+    tmp[nrow(tmp)+1,] <- "Venous thromboembolism events - Primary position events"
+    tmp[nrow(tmp)+1,] <- "Other vascular events - Primary position events"
+    
+    tmp$outcome <- factor(tmp$outcome, levels=c("Arterial thrombosis events - Primary position events",
+                                                "Arterial thrombosis event - Primary position events",
+                                                "Acute myocardial infarction - Primary position events",
+                                                "Ischaemic stroke - Primary position events",
+                                                "Venous thromboembolism events - Primary position events",
+                                                "Venous thrombosis event - Primary position events",
+                                                "Pulmonary embolism - Primary position events",
+                                                "Deep vein thrombosis - Primary position events",
+                                                "Other vascular events - Primary position events",
+                                                "Heart failure - Primary position events",
+                                                "Angina - Primary position events",
+                                                "Transient ischaemic attack - Primary position events",
+                                                "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events"))
+  }
+  
+  
+  tmp <- tmp[order(tmp$outcome),]
+  tmp$outcome <- NULL
+  tmp <- tmp %>% dplyr::rename("Event" = "subgroup")
+  
+  write.csv(tmp, file = paste0(output_dir,"table3_main_formatted_hr_",outcome_position,"_",time_periods,"_time_periods.csv"),row.names = F)
+}
+
 main_estimates_reduced <- main_estimates %>% filter(time_points == "reduced" 
                                                     & !outcome %in% outcome[grepl("Primary position",outcome)])
 
@@ -122,53 +192,8 @@ main_estimates_normal <- main_estimates %>% filter(time_points == "normal"
 main_estimates_normal_primary_position <- main_estimates %>% filter(time_points == "normal" 
                                                                      & outcome %in% outcome[grepl("Primary position",outcome)])
 
-format_hr_table <- function(df, time_periods){
-  df$time_points <- NULL
-  df <- tidyr::pivot_wider(df, names_from = term, values_from = est)
-  df <- df[order(df$outcome,df$subgroup,df$cohort),]
-  if(time_periods == "reduced"){
-    df <- df %>% select("outcome","subgroup","cohort","days0_28","days28_197","days197_535")
-  }else{
-    df <- df %>% select("outcome","subgroup","cohort","days0_7","days7_14","days14_28","days28_56","days56_84","days84_197","days197_535")
-  }
-  return(df)
-}
 
-main_estimates_reduced <- format_hr_table(main_estimates_reduced,"reduced")
-main_estimates_reduced_primary_position <- format_hr_table(main_estimates_reduced_primary_position,"reduced")
-main_estimates_normal <- format_hr_table(main_estimates_normal,"normal")
-main_estimates_normal_primary_position <- format_hr_table(main_estimates_normal_primary_position,"normal")
-
-
-write.csv(main_estimates_reduced, file = paste0(output_dir,"table3_main_hr_formatted_reduced_time_periods.csv"),row.names = F)
-write.csv(main_estimates_reduced_primary_position, file = paste0(output_dir,"table3_main_hr_formatted_reduced_time_periods_primary_position.csv"),row.names = F)
-write.csv(main_estimates_normal, file = paste0(output_dir,"table3_main_hr_formatted_normal_time_periods.csv"),row.names = F)
-write.csv(main_estimates_normal_primary_position, file = paste0(output_dir,"table3_main_hr_formatted_normal_time_periods_primary_position.csv"),row.names = F)
-
-
-# main_estimates$stratum <- factor(main_estimates$stratum, levels=c("Extensive adjustment",
-#                                             "Age/sex/region adjustment",
-#                                             "Hospitalised COVID-19",
-#                                             "Non-hospitalised COVID-19",
-#                                             "Prior history of event",
-#                                             "No prior history of event",
-#                                             "Age group: <40",
-#                                             "Age group: 40-59",
-#                                             "Age group: 60-79",
-#                                             "Age group: >=80",
-#                                             "Sex: Female",
-#                                             "Sex: Male",
-#                                             "Ethnicity: White",
-#                                             "Ethnicity: Black or Black British",
-#                                             "Ethnicity: Asian or Asian British",
-#                                             "Ethnicity: Other Ethnic Groups",
-#                                             "Ethnicity: Mixed")) 
-
-
-
-# Save -----------------------------------------------------------------------  
-
-#data.table::fwrite(main_estimates, paste0("output/ccu002_01_suppl_table_4_",event,".csv"))
-#data.table::fwrite(main_estimates, paste0("output/ccu002_01_suppl_table_4.csv"))
-
-#}
+format_hr_table(main_estimates_reduced,"reduced","any_position")
+format_hr_table(main_estimates_reduced_primary_position,"reduced","primary_position")
+format_hr_table(main_estimates_normal,"normal","any_position")
+format_hr_table(main_estimates_normal_primary_position,"normal","primary_position")

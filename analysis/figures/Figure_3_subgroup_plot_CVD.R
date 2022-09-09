@@ -4,6 +4,7 @@ library(data.table)
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
+library(plyr)
 
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
 output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
@@ -30,7 +31,7 @@ hr_file_paths <- pmap(list(hr_files),
 estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
 #-------------------------Filter to active outcomes-----------------------------
-main_estimates <- estimates %>% filter(!subgroup %in% c("covid_history","main","covid_pheno_hospitalised","covid_pheno_non_hospitalised")
+main_estimates <- estimates %>% filter(!subgroup %in% c("covid_history","main","covid_pheno_hospitalised","covid_pheno_non_hospitalised","ethnicity_Missing")
                                        & event %in% outcomes_to_plot 
                                        & term %in% term[grepl("^days",term)]
                                        & results_fitted == "fitted_successfully"
@@ -87,18 +88,18 @@ main_estimates$subgroup <- ifelse(main_estimates$subgroup=="ethnicity_Missing","
 main_estimates$colour <- ""
 main_estimates$colour <- ifelse(main_estimates$subgroup=="Maximal adjustment","#000000",main_estimates$colour)
 main_estimates$colour <- ifelse(main_estimates$subgroup=="Age/sex adjustment","#bababa",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 18-39","#006d2c",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 40-59","#31a354",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 60-79","#74c476",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 80-110","#bae4b3",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 18-39","#0808c9",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 40-59","#0085ff",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 60-79","#00c9df",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Age group: 80-110","#73ffa6",main_estimates$colour)
 main_estimates$colour <- ifelse(main_estimates$subgroup=="Sex: Male","#cab2d6",main_estimates$colour)
 main_estimates$colour <- ifelse(main_estimates$subgroup=="Sex: Female","#6a3d9a",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: White","#08519c",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: Black","#2171b5",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: South Asian","#4292c6",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: Other Ethnic Groups","#6baed6",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: Mixed","#9ecae1",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: Missing","#c5dfed",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: White","#444e86",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: Black","#ff126b",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: South Asian","#ff4fae",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: Other Ethnic Groups","#e97de1",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: Mixed","#c3a1ff",main_estimates$colour)
+#main_estimates$colour <- ifelse(main_estimates$subgroup=="Ethnicity: Missing","#c5dfed",main_estimates$colour)
 main_estimates$colour <- ifelse(main_estimates$subgroup=="Prior history of event","#ff7f00",main_estimates$colour)
 main_estimates$colour <- ifelse(main_estimates$subgroup=="No prior history of event","#fdbf6f",main_estimates$colour)
 main_estimates$colour <- ifelse(main_estimates$subgroup=="Non-hospitalised COVID-19","#fb9a99",main_estimates$colour)
@@ -177,17 +178,17 @@ for(outcome_name in outcomes_to_plot){
              "#fb9a99",
              "#ff7f00",
              "#fdbf6f",
-             "#006d2c",
-             "#31a354",
-             "#74c476",
-             "#bae4b3",
+             "#0808c9",
+             "#0085ff",
+             "#00c9df",
+             "#73ffa6",
              "#6a3d9a",
              "#cab2d6",
-             "#08519c",
-             "#2171b5",
-             "#4292c6",
-             "#6baed6",
-             "#9ecae1",
+             "#444e86",
+             "#ff126b",
+             "#ff4fae",
+             "#e97de1",
+             "#c3a1ff",
              "#c5dfed")){
     levels_available <- unique(df$colour)
     if(i %in% levels_available){
