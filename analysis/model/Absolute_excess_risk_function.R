@@ -10,11 +10,14 @@
 ## 
 ## TO RUN OUTSIDE OPENSAFELY PLATFORM
 ## Content: 
-## 1. Extract required variables
-## 2. Average daily incidence of each outcome in unexposed age/sex subgroups
-## 3. Create life table to calculate cumulative risk over time
-## 4. Daily event incidence after multiplying by adjusted hazard ratio
-## 5. Absolute excess risk calculation (difference between risk with/without covid)
+## 0. Clean input data and subset to relevant event / cohort
+## 1. Average daily incidence of each outcome in unexposed age/sex subgroups
+## 2. Life table approach to calculate cumulative risk over time
+## 3. Carry over time-varying hazard ratios
+## 4. Daily event incidence in exposed age/sex subgroups
+## 5. Daily excess risk between exposed and unexposed age/sex subgroups
+## 6. Absolute excess risk weighted by total number of COVID cases
+## 7. total absolute excess risk as culmination of age/sex subgroups
 ## =============================================================================
 
 # # CODE FOR SINGLE AER
