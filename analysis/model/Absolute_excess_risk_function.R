@@ -55,6 +55,8 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   
   colnames(lifetable) <- c("days")
   lifetable$event <- event_of_interest
+  lifetable$cohort <- cohort_of_interest
+  lifetable$model <- model_of_interest
 
   for(l in c("Female","Male")){
     for(m in agelabels){
