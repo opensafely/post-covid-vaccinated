@@ -65,7 +65,7 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   #Step1. Calculate average daily incidence of outcome in unexposed age/sex subgroups
   #As number of events (in the unexposed) divided by time (days)
   lifetable$incidence_unexp <- input$unexposed_event_count[1] / input$unexposed_person_days[1]
-  
+ 
   #Step2. Use life table approach to calculate cumulative risk over time in unexposed age/sex subgroups
   lifetable$cumulative_survival_unexp <- cumprod(1 - lifetable$incidence_unexp) 
   
@@ -97,8 +97,8 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   
   #Step5. Calculate daily excess risk
   #As difference in cumulative survival unexposed and expected cumulative survival in unexposed
-  lifetable$excess_risk_main <- lifetable$cumulative_survival_exp_main -lifetable$cumulative_survival_unexp
-  lifetable$excess_risk_subgroup <- lifetable$cumulative_survival_exp_subgroup -lifetable$cumulative_survival_unexp
+  lifetable$excess_risk_main <- lifetable$cumulative_survival_unexp - lifetable$cumulative_survival_exp_main
+  lifetable$excess_risk_subgroup <- lifetable$cumulative_survival_unexp - lifetable$cumulative_survival_exp_subgroup
   
   #Step6. Carry over total number of COVID cases in age/sex subgroup, calculate subgroup-specific absolute excess risk
   lifetable$total_covid19_cases <- input$total_covid19_cases[1]
