@@ -21,10 +21,10 @@
 ## =============================================================================
 
 # # CODE FOR SINGLE AER
-#event_of_interest="ate"
-#cohort_of_interest="vaccinated"
-#model_of_interest="mdl_max_adj"     #Should always be maximum adjusted model
-#subgroup_of_interest="aer_Female_40_59"
+# event_of_interest="ate"
+# cohort_of_interest="pre_vaccination"
+# model_of_interest="mdl_max_adj"     #Should always be maximum adjusted model
+# subgroup_of_interest="aer_Female_40_59"
 
 excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest,subgroup_of_interest, input) {
   

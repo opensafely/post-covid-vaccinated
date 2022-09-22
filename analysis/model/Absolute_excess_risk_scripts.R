@@ -1,12 +1,7 @@
-#Project:Vaccinated delta wave population study
-#Branch:Absolute excess risk calculations
-#Scripts: Renin Toms, Xiyun Jiang, Venexia Walker, Lucy Teece
-#Reviewer: Genevieve Cezard
 
-#TO RUN OUTSIDE OPENSAFELY
-# 1. load the right input data and make sure of the file names and variable structure
-# 2. Cntrl+A run the whole script and find the results in working directory
+# Calculates AER within age/sex subgroups
 
+# Set file locations
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release/"
 aer_raw_output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/AER/raw_results/"
 aer_compiled_output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/AER/compiled_results/"
@@ -15,35 +10,21 @@ scripts_dir <- "analysis/model"
 dir.create(file.path(aer_raw_output_dir), recursive =TRUE, showWarnings = FALSE)
 dir.create(file.path(aer_compiled_output_dir), recursive =TRUE, showWarnings = FALSE)
 
-# fs::dir_create(here::here("output", "review", "AER_results"))
-# fs::dir_create(here::here("output", "not-for-review", "AER_results"))
-# 
-# hr_dir <- "output/review/model"
-# table_2_dir <- "output/review/descriptives"
-# aer_raw_results_dir <- "output/not-for-review/AER_results"
-# aer_results_dir <- "output/review/AER_results"
 
 #-------------------------Call AER function-------------------------------------
 source(file.path(scripts_dir,"Absolute_excess_risk_function.R"))
-
-#USE - TO CHECK SINGLE AER
-# event_of_interest="ate"
-# cohort_of_interest="vaccinated"
-# subgroup_of_interest="covid_pheno_non_hospitalised"
-# model_of_interest="mdl_max_adj"
 
 library(purrr)
 library(data.table)
 library(tidyverse)
 
-#-------------------------------
-#Step 1. AER for active analyses
-#-------------------------------
-#1. Define the active analyses
+
+#--------------------which analyses to calculate AER for------------------------
+
+#Define the active analyses
 active <- readr::read_rds("lib/active_analyses.rds")                             
 active <- active[active$active==TRUE,]   
 
-#Preprocess the active analyses
 active$event <- gsub("out_date_","",active$outcome_variable)                                                                                        
 active[,c("active","outcome","outcome_variable","prior_history_var","covariates","model","cohort")] <- NULL       
 
@@ -62,7 +43,7 @@ colnames(active) <- c("event", "subgroup", "model", "cohort")
 #Focus only on aer analyses
 active <- active %>% filter(startsWith(subgroup,"aer_") & model=="mdl_max_adj")
 
-#Add HR timepoint terms 
+#Add HR time point terms so that results can be left joined
 active_reduced <- crossing(active, c("days0_28","days28_197","days197_535"))
 colnames(active_reduced) <- c("event", "subgroup", "model", "cohort","term")
 active_reduced$time_points <- "reduced"
@@ -73,9 +54,9 @@ active_normal$time_points <- "normal"
 results <- rbind(active_reduced,active_normal)
 
 rm(active_reduced,active_normal)
-#----------------------
-#Step 2. Load results
-#----------------------
+
+#------------------------------------ Load results------------------------------
+
 #-----------------------------Input hazard ratios-------------------------------
 hr_files=list.files(path = results_dir, pattern = "suppressed_compiled_HR_results_*")
 hr_files=hr_files[endsWith(hr_files,".csv")]
@@ -97,12 +78,6 @@ input <- input %>%
          & estimate != "[Redacted]") %>%
   select(event,cohort,subgroup,model,time_points,term,estimate)
   
-
-#Focus for aer analyses
-#input <- input %>% filter(startsWith(subgroup, "aer_"))                             
-#input <- subset(input, input$model=="mdl_max_adj")                              # only require aer for full model
-#input <- input %>% select(-c("subgroup","total_covid19_cases"))                 # duplicate variables also available in Table 2 (more relevent)
-
 #---------------------------------Input Table 2---------------------------------
 table2_pre_vax <- read.csv(paste0(results_dir,"table2_pre_vaccination_cvd.csv"))
 table2_vax <- read.csv(paste0(results_dir,"table2_vaccinated.csv"))
@@ -116,27 +91,14 @@ table_2 <- rbind(table2_pre_vax, table2_vax,table2_unvax)
 rm(table2_pre_vax,table2_vax,table2_unvax)
 
 #-------------------Select required columns and term----------------------------
-#Focus for aer analyses
+
 table_2 <- table_2 %>% select(subgroup, event, cohort,unexposed_person_days,unexposed_event_count,total_covid19_cases) %>%
                       filter(startsWith(subgroup, "aer_"))
             
 table_2$event <- gsub("out_date_","",table_2$event)
 
-# # Non-hospitalised/hospitalised unexposed person days are the same as in the
-# # main analysis so copy these values and add onto table
-# 
-# for(i in unique(table_2$event)){
-#   tmp <- table_2 %>% filter(event==i & cohort=="vaccinated" & subgroup=="covid_pheno_non_hospitalised")
-#   if(nrow(tmp)>0){
-#     table_2[nrow(table_2)+1,] <- c("main", tmp[1,2:5])
-#   }
-#   
-#   tmp <- table_2 %>% filter(event==i & cohort=="electively_unvaccinated" & subgroup=="covid_pheno_non_hospitalised")
-#   if(nrow(tmp)>0){
-#     table_2[nrow(table_2)+1,] <- c("main", tmp[1,2:5])
-#   }
-# }
-
+# Split HR results into age/sex subgroups and overall main results
+# We calculate AER using both types of HR currently to see the difference and will later decide which HRs to use
 
 tmp <- input %>% filter(subgroup == "main")
 tmp$subgroup <- NULL
@@ -154,7 +116,6 @@ results <- results %>% left_join(table_2, by=c("event","cohort","subgroup"))
 
 
 results <- results %>% mutate(across(c(estimate_main,estimate_subgroup, unexposed_person_days, unexposed_event_count, total_covid19_cases), as.numeric))
-#input <- input %>% filter(!is.na(unexposed_person_days) & unexposed_event_count != "[Redacted]")
 
 #Determine which analyses have a complete set of results so that AER can be calculated
 df <- results %>% select(event, subgroup, model, cohort) %>% distinct
@@ -178,9 +139,8 @@ input <- input %>% filter(time_points == "reduced")
 # 
 # input <- input %>% filter(time_points == time_points_to_use) %>%
 #                   select(-time_points_to_use)
-#-------------------------
-#Step 3. Run AER function
-#-------------------------
+
+#-------------------------Run AER function--------------------------------------
 
 lapply(split(active_available,seq(nrow(active_available))),
        function(active_available)
@@ -192,9 +152,6 @@ lapply(split(active_available,seq(nrow(active_available))),
            input))
 
 
-#----------------------
-#Step 4. Compile results
-#----------------------
 #------------------------------Compile the results------------------------------
 AER_files=list.files(path = aer_raw_output_dir, pattern = "lifetable_")
 AER_files=paste0(aer_raw_output_dir,"/",AER_files)
@@ -204,27 +161,3 @@ AER_compiled_results <- purrr::pmap(list(AER_files),
                                       return(df)})
 AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
 write.csv(AER_compiled_results, paste0(aer_compiled_output_dir,"/AER_compiled_results.csv"), row.names = F)
-
-
-#--------------------------Compile results for AER figure-----------------------
-
-# lt_files=list.files(path = aer_raw_results_dir, pattern = "lifetable_*")
-# lt_files=paste0(aer_raw_results_dir,"/",lt_files)
-# compiled_lifetables <- purrr::pmap(list(lt_files),
-#                                    function(fpath){
-#                                      df <- fread(fpath)
-#                                      return(df)
-#                                    })
-# compiled_lifetables=rbindlist(compiled_lifetables, fill=TRUE)
-# 
-# #3.output the csv
-# write.csv(compiled_lifetables, paste0(aer_results_dir,"/Figure4_compiled_lifetables.csv"), row.names = F)
-
-
-
-#3.Clear the folder(except compiled results)
-#if (file.exists(AER_files)) { file.remove(AER_files)}
-#4.Sample the results
-#print(AER_compiled_results)                                                      #-ve AERs not expected with actual data, but possible.                                                    
-#table(AER_compiled_results$AER_196<0)                                            #264 obs with 5 variables as per active analysis list.
-
