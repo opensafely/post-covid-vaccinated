@@ -139,7 +139,7 @@ table_2_subgroups_output <- function(cohort_name){
       startsWith(subgroup, "aer") ~ "aer_subgroup",
       TRUE ~ as.character(subgroup)))
   
-  analyses_of_interest[,c("unexposed_person_days", "unexposed_event_count","post_exposure_event_count", "total_person_days","day_0_event_counts","total_covid19_cases")] <- NA
+  analyses_of_interest[,c("unexposed_person_days", "unexposed_event_count","post_exposure_event_count", "total_person_days","day_0_event_counts","total_covid19_cases","N_population_size")] <- NA
   
   #-----------Populate analyses_of_interest with events counts/follow up--------
   for(i in 1:nrow(analyses_of_interest)){
@@ -177,6 +177,7 @@ table_2_subgroups_output <- function(cohort_name){
     analyses_of_interest$total_person_days[i] <- table2_output[[4]]
     analyses_of_interest$day_0_event_counts[i] <- table2_output[[5]]
     analyses_of_interest$total_covid19_cases[i] <- table2_output[[6]]
+    analyses_of_interest$N_population_size[i] <- table2_output[[7]]
 
     setnames(survival_data,
              old = c("event_date",
@@ -315,6 +316,8 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
                                       data_active$event_date <= data_active$follow_up_end))
   
   
+  N_population_size <- length(unique(data_active$patient_id))
+  
   if(day_0_event_count <= 5 | (event_count_exposed - day_0_event_count) <=5){
     day_0_event_count <- "[Redacted]"
   }
@@ -327,7 +330,7 @@ table_2_calculation <- function(survival_data, event,cohort,subgroup, stratify_b
     event_count_exposed <- "[Redacted]"
   }
   
-  return(list(person_days_total_unexposed, event_count_unexposed, event_count_exposed, person_days_total, day_0_event_count, total_covid_cases))
+  return(list(person_days_total_unexposed, event_count_unexposed, event_count_exposed, person_days_total, day_0_event_count, total_covid_cases, N_population_size))
 }
 
 # Run function using specified commandArgs
