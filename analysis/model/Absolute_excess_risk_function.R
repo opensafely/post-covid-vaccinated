@@ -26,7 +26,7 @@
 # model_of_interest="mdl_max_adj"     #Should always be maximum adjusted model
 # subgroup_of_interest="aer_Female_40_59"
 
-excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest,subgroup_of_interest, input) {
+excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest,subgroup_of_interest,time_point_of_interest, input) {
   
   
   #-------------------------Check structure the input---------------------------
@@ -37,7 +37,8 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   input <- input[input$event == event_of_interest
                  & input$model == model_of_interest
                  & input$cohort == cohort_of_interest
-                 & input$subgroup == subgroup_of_interest,]
+                 & input$subgroup == subgroup_of_interest
+                 & input$time_points == time_point_of_interest,]
   
   #----Add start and end days for time periods which are needed for lifetable---
   for(i in c("time_period_start","time_period_end")){
@@ -60,6 +61,7 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   lifetable$cohort <- cohort_of_interest
   lifetable$model <- model_of_interest
   lifetable$subgroup <- subgroup_of_interest
+  lifetable$time_points <- time_point_of_interest
   
   
   #Step1. Calculate average daily incidence of outcome in unexposed age/sex subgroups
@@ -110,7 +112,7 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   #lifetable$total_AER = rowSums(select(lifetable, ends_with("_AER")))
   
   # write output for AER figure
-  write.csv(lifetable, file=paste0(aer_raw_output_dir, "/lifetable_" ,event_of_interest, "_" ,subgroup_of_interest, "_",cohort_of_interest, ".csv"), row.names = F)
+  write.csv(lifetable, file=paste0(aer_raw_output_dir, "/lifetable_" ,event_of_interest, "_" ,subgroup_of_interest, "_",cohort_of_interest,"_",time_point_of_interest, "_time_points.csv"), row.names = F)
 
   
   #AER_followup_end <- lifetable[nrow(lifetable),]$total_AER

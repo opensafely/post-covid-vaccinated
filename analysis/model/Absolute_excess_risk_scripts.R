@@ -40,17 +40,20 @@ active$model <- "mdl_max_adj"
 active <- crossing(active, c("pre_vaccination","vaccinated","electively_unvaccinated"))
 colnames(active) <- c("event", "subgroup", "model", "cohort")
 
+#Add time points
+time_points <- c("reduced","normal")
+active <- crossing(active,time_points)
+
 #Focus only on aer analyses
 active <- active %>% filter(startsWith(subgroup,"aer_") & model=="mdl_max_adj")
 
 #Add HR time point terms so that results can be left joined
-active_reduced <- crossing(active, c("days0_28","days28_197","days197_535"))
-colnames(active_reduced) <- c("event", "subgroup", "model", "cohort","term")
-active_reduced$time_points <- "reduced"
+term <- c("days0_28","days28_197","days197_535")
+active_reduced <- crossing(active[active$time_points == "reduced",],term )
 
-active_normal <- crossing(active, c("days0_7","days7_14","days14_28","days28_56","days56_84","days84_197","days197_535"))  
-colnames(active_normal) <- c("event", "subgroup", "model", "cohort","term")
-active_normal$time_points <- "normal"
+term <- c("days0_7","days7_14","days14_28","days28_56","days56_84","days84_197","days197_535")
+active_normal <- crossing(active[active$time_points == "normal",],term )  
+
 results <- rbind(active_reduced,active_normal)
 
 rm(active_reduced,active_normal)
@@ -118,7 +121,7 @@ results <- results %>% left_join(table_2, by=c("event","cohort","subgroup"))
 results <- results %>% mutate(across(c(estimate_main,estimate_subgroup, unexposed_person_days, unexposed_event_count, total_covid19_cases), as.numeric))
 
 #Determine which analyses have a complete set of results so that AER can be calculated
-df <- results %>% select(event, subgroup, model, cohort) %>% distinct
+df <- results %>% select(event, subgroup, model, cohort, time_points) %>% distinct
 active_available <- merge(active,df)
 active_unavailable <- active %>% anti_join(active_available)
 rm(active,table_2,df,input,tmp)
@@ -126,7 +129,6 @@ rm(active,table_2,df,input,tmp)
 input <- results
 rm(results)
 
-input <- input %>% filter(time_points == "reduced")
 #Need to update once we've decided if we're using age/sex subgroups HRs or overall HRs
 # Some events have results for both normal and reduced time points
 # Where possible use normal time points, otherwise used reduced
@@ -149,6 +151,7 @@ lapply(split(active_available,seq(nrow(active_available))),
            cohort_of_interest = active_available$cohort,
            model_of_interest = active_available$model,
            subgroup_of_interest = active_available$subgroup,
+           time_point_of_interest = active_available$time_points,
            input))
 
 
