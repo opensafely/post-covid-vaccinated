@@ -164,3 +164,26 @@ AER_compiled_results <- purrr::pmap(list(AER_files),
                                       return(df)})
 AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
 write.csv(AER_compiled_results, paste0(aer_compiled_output_dir,"/AER_compiled_results.csv"), row.names = F)
+
+# Calculate overall AER
+AER_compiled_results <- AER_compiled_results %>% select(days, event, cohort, subgroup, time_points, AER_main, AER_subgroup)
+table2_vax <- read.csv("output/review/descriptives/table2_vaccinated.csv")
+table2_vax <- table2_vax %>% select(subgroup, event, cohort_to_run, N_population_size) %>% rename(cohort = cohort_to_run)
+table2_vax$event <- gsub("out_date_","",table2_vax$event)
+
+AER_compiled_results <- AER_compiled_results %>% left_join(table2_vax, by=c("event","cohort","subgroup"))
+
+AER_compiled_results_overall <- AER_compiled_results %>% filter(!is.na(AER_main))
+AER_compiled_results_subgroup <- AER_compiled_results %>% filter(!is.na(AER_subgroup))
+
+AER_compiled_results_overall <- AER_compiled_results_overall %>% 
+  group_by(days, event, cohort,time_points) %>%
+  mutate(weight = N_population_size/sum(N_population_size))
+
+AER_compiled_results_overall <- AER_compiled_results_overall %>% 
+  group_by(days, event, cohort,time_points) %>%
+  summarise(weighted_mean = weighted.mean(AER_main,weight))
+ 
+
+tmp <- AER_compiled_results_overall %>% filter(event == "ate" & cohort == "vaccinated"  & days == "0" & time_points == "reduced")
+weighted.mean(tmp$AER_main,tmp$weight)
