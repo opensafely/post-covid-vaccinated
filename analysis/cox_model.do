@@ -11,7 +11,7 @@ Other output:			logfiles
 
 local cpf "`1'"
 
-/**Set filepaths
+*Set filepaths
 
 global projectdir `c(pwd)'
 di "$projectdir"
@@ -19,7 +19,7 @@ di "$projectdir"
 capture mkdir "$projectdir/output/tables"
 
 global logdir "$projectdir/logs"
-di "$logdir"*/
+di "$logdir"
 
 * Import data
 
@@ -43,7 +43,7 @@ rename non_hospitalised_censor_dat non_hosp_censor_date
 * Reformat variables
 
 foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end hosp_follow_up_end non_hosp_follow_up_end hosp_censor_date non_hosp_censor_date {
-	gen `var'_tmp = date(`var', "YMD")	
+	gen `var'_tmp = date(`var', "MDY")	
 	format `var'_tmp %td
 	drop `var'
 	rename `var'_tmp `var'
@@ -89,7 +89,7 @@ lab val expo_non_hosp expo_non_hosp
 tostring covariates_collapsed, replace
 
 * Reformating data to make dates make more sense if run in pseudo dataset
-do "analysis\pseudo_data.do"
+* do "analysis\pseudo_data.do" // used on local system
  
 gen region_tmp = .
 replace region_tmp = 1 if region=="East"
@@ -124,9 +124,9 @@ lab val ethnicity_collapsed cov_cat_ethnicity_collapsed
 
 gen cov_cat_deprivation_tmp = .
 replace cov_cat_deprivation_tmp = 1 if cov_cat_deprivation=="1-2 (most deprived)"
-replace cov_cat_deprivation_tmp = 2 if cov_cat_deprivation=="03-Apr"
-replace cov_cat_deprivation_tmp = 3 if cov_cat_deprivation=="05-Jun"
-replace cov_cat_deprivation_tmp = 4 if cov_cat_deprivation=="07-Aug"
+replace cov_cat_deprivation_tmp = 2 if cov_cat_deprivation=="2-4"
+replace cov_cat_deprivation_tmp = 3 if cov_cat_deprivation=="5-6"
+replace cov_cat_deprivation_tmp = 4 if cov_cat_deprivation=="7-8"
 replace cov_cat_deprivation_tmp = 5 if cov_cat_deprivation=="9-10 (least deprived)"
 lab def cov_cat_deprivation_tmp 1 "1-2 (most deprived)" 2 "3-4" 3 "5-6" 4 "7-8" 5 "9-10 (least deprived)"
 lab val cov_cat_deprivation_tmp cov_cat_deprivation_tmp
@@ -164,18 +164,17 @@ replace covariates_to_fit = subinstr(covariates_to_fit,"ethnicity","cov_cat_ethn
 replace covariates_to_fit = subinstr(covariates_to_fit,","," ",.) 
  
 * replacing collapsed covariates in covariates_to_fit (need to see what they look like) 
-foreach var of varlist cov_cat_ethnicity cov_cat_deprivation cov_cat_smoking_status {
-	replace covariates_to_fit = subinstr(covariates_to_fit,"`var'","`var'_collapsed",1) if substr(covariates_collapsed,1,.)==`var' 
-}
+*foreach var of varlist cov_cat_ethnicity cov_cat_deprivation cov_cat_smoking_status {
+*	replace covariates_to_fit = subinstr(covariates_to_fit,"`var'","`var'_collapsed",1) if *substr(covariates_collapsed,1,.)==`var' 
+*}
 
-* Creating a list of confounders included in covariates_to_fit, currently does not take into account factor variables
-vl create confounders = (sex)
+* Creating a list of confounders included in covariates_to_fit
+vl create factors = (sex)
 levelsof covariates_to_fit, miss local(vars)
 foreach l of local vars {
-	vl modify confounders = confounders + (i.`l')
-	}
-vl modify confounders = confounders - (i.cov_num_consultation_rate)
-vl modify confounders = confounders = (cov_num_consultation_rate)
+	vl modify factors = factors + (`l')
+	} 
+vl modify factors = factors - (cov_num_consulation_rate)
 	
 * Make failure variable
 
@@ -194,8 +193,14 @@ format follow_up_end %td
 centile age, centile(10 50 90)
 mkspline age_spline = age, cubic knots(`r(c_1)' `r(c_2)' `r(c_3)')
 
+*save "output/`cpf'.dta", replace
+save "output/test.dta", replace
+
 foreach var of varlist expo_hosp expo_non_hosp {
-    
+	
+	use "output/`cpf'.dta", clear
+* 	use "output/test.dta", clear  // used on local system
+	
 	* Apply stset // including IPW here as if unsampled dataset will be 1
 
 	stset follow_up_end [pweight=cox_weights] if `var'!=., failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(06,01,2021))
@@ -230,11 +235,11 @@ foreach var of varlist expo_hosp expo_non_hosp {
 
 	stcox days0_28 days28_197 i.sex age_spline1 age_spline2, strata(region) vce(r)
 	est store min, title(Age_Sex)
-	stcox days0_28 days28_197 age_spline1 age_spline2 $confounders, strata(region) vce(r)
+	stcox days0_28 days28_197 age_spline1 age_spline2 $factors cov_num_consulation_rate, strata(region) vce(r)
 	est store max, title(Maximal)
 	
-*	estout * using "output/`cpf'_`var'_cox_model.txt", cells ("b se t ci_l ci_u p"), replace 
-	estout * using "output/ami_`var'_cox_model.txt", cells ("b se t ci_l ci_u p"), replace 
+	estout * using "output/`cpf'_`var'_cox_model.txt", cells ("b se t ci_l ci_u p") replace 
+*	estout * using "output/ami_`var'_cox_model.txt", cells ("b se t ci_l ci_u p") replace // used on local system
 
 }
 *stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron
@@ -243,5 +248,5 @@ foreach var of varlist expo_hosp expo_non_hosp {
 
 log close
 
-drop $confounders
+drop $factors
 
