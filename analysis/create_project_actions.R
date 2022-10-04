@@ -22,6 +22,9 @@ outcomes_model <- active_analyses_table$outcome_variable %>% str_replace("out_da
 cohort_to_run <- c("vaccinated", "electively_unvaccinated")
 analyses <- c("main", "subgroups")
 analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv")
+analyses_to_run_stata <- analyses_to_run_stata[,c("outcome","subgroup","cohort","time_periods")]
+analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="hospitalised","covid_pheno_hospitalised",analyses_to_run_stata$subgroup)
+analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="non_hospitalised","covid_pheno_non_hospitalised",analyses_to_run_stata$subgroup)
 analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run)
 
 # create action functions ----
@@ -142,12 +145,12 @@ table2 <- function(cohort){
   )
 }
 
-stata_actions <- function(outcome, cohort, subgroup,time_periods){
+stata_actions <- function(outcome, cohort, subgroup, time_periods){
   splice(
-    comment(glue("Stata cox {outcome} {subgroup} {cohort} {time_periods}")),
+    #comment(glue("Stata cox {outcome} {subgroup} {cohort} {time_periods}")),
     action(
       name = glue("stata_cox_model_{outcome}_{subgroup}_{cohort}_{time_periods}"),
-      run = "stata-mp:latest analysis/model/stata.do",
+      run = "stata-mp:latest analysis/cox_model.do",
       arguments = c(glue("input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods")),
       needs = list(glue("Analysis_cox_{outcome}_{cohort}")),
       moderately_sensitive = list(
