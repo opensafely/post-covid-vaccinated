@@ -357,13 +357,13 @@ actions_list <- splice(
     unlist(lapply(outcomes_model, function(x) splice(unlist(lapply(cohort_to_run, function(y) apply_model_function(outcome = x, cohort = y)), recursive = FALSE))
       ),recursive = FALSE)),
   
-  lapply(split(analyses_to_run_stata,seq(nrow(analyses_to_run_stata))),
-         function(analyses_to_run_stata)
-           stata_actions(           
-             outcome=analyses_to_run_stata$outcome,           
-             cohort=analyses_to_run_stata$cohort,           
-             subgroup=analyses_to_run_stata$subgroup,           
-             time_periods=analyses_to_run_stata$time_periods))
+  splice(unlist(lapply(1:nrow(analyses_to_run_stata), 
+                       function(i) stata_actions(outcome = analyses_to_run_stata[i, "outcome"],
+                                                 subgroup = analyses_to_run_stata[i, "subgroup"],
+                                                 cohort = analyses_to_run_stata[i, "cohort"],
+                                                 time_periods = analyses_to_run_stata[i, "time_periods"])),
+                recursive = FALSE))
+  
   
   
   
