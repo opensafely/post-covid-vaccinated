@@ -148,7 +148,7 @@ stata_actions <- function(outcome, cohort, subgroup,time_periods){
     action(
       name = glue("stata_cox_model_{outcome}_{subgroup}_{cohort}_{time_periods}"),
       run = "stata-mp:latest analysis/model/stata.do",
-      arguments = c(glue("output/input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods.csv")),
+      arguments = c(glue("input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods")),
       needs = list(glue("Analysis_cox_{outcome}_{cohort}")),
       moderately_sensitive = list(
         stata_output = glue("output/review/model/stata_output_input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods.csv")
