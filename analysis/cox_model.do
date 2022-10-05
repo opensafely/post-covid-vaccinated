@@ -25,6 +25,8 @@ di "$logdir"
 
 import delim using "./output/`cpf'.csv" 
 
+des
+
 * Filter data
 
 keep patient_id sex age_at_cohort_start expo_date region_name follow_up_start event_date follow_up_end hospitalised_follow_up_end non_hospitalised_follow_up_end hospitalised_censor_date non_hospitalised_censor_date event_date expo_pheno ethnicity cov* covariates_to_fit covariates_collapsed cox_weights
@@ -193,13 +195,13 @@ format follow_up_end %td
 centile age, centile(10 50 90)
 mkspline age_spline = age, cubic knots(`r(c_1)' `r(c_2)' `r(c_3)')
 
-*save "output/`cpf'.dta", replace
-save "output/test.dta", replace
+save "output/`cpf'.dta", replace
+*save "output/test.dta", replace
 
 foreach var of varlist expo_hosp expo_non_hosp {
 	
-	use "output/`cpf'.dta", clear
-* 	use "output/test.dta", clear  // used on local system
+*	use "output/`cpf'.dta", clear
+ 	use "output/test.dta", clear  // used on local system
 	
 	* Apply stset // including IPW here as if unsampled dataset will be 1
 
@@ -224,9 +226,6 @@ foreach var of varlist expo_hosp expo_non_hosp {
 
 	* Run models
 	* Cannot use efron method with weights
-
-	cap log close
-	*log using ./output/stata_cox_model_ami, replace t
 
 	tab days outcome_status 
 
