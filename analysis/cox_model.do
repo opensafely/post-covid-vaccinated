@@ -48,37 +48,37 @@ foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end 
 }
 
 capture confirm variable cov_bin_antiplatelet_medications
-if (_rc == 0) {
+if !_rc {
 	rename cov_bin_antiplatelet_medications antiplate_med 
 }
 
 capture confirm variable cov_bin_anticoagulation_medicati
-if (_rc == 0) {
+if !_rc {
 	rename cov_bin_anticoagulation_medicati anticoag_med 
 }
 
 capture confirm variable cov_bin_combined_oral_contracept
-if (_rc == 0) {
+if !_rc {
 	rename cov_bin_combined_oral_contracept comb_oral_contra 
 }
 
 capture confirm variable cov_bin_hormone_replacement_ther 
-if (_rc == 0) {
+if !_rc  {
 	rename cov_bin_hormone_replacement_ther hormone_replace 
 }
 
 capture confirm variable cov_bin_other_arterial_embolism 
-if (_rc == 0) {
+if !_rc {
 	rename cov_bin_other_arterial_embolism other_art_embol
 }
 
 capture confirm variable cov_bin_chronic_obstructive_pulm
-if (_rc == 0) {
+if !_rc {
 	rename cov_bin_chronic_obstructive_pulm copd 
 }
 
 capture confirm variable cov_bin_chronic_kidney_disease
-if (_rc == 0) {
+if !_rc {
 	rename cov_bin_chronic_kidney_disease ckd 
 }
 
@@ -89,9 +89,12 @@ foreach var of varlist cov_bin* sex {
 }
 
 foreach var of varlist antiplate_med anticoag_med comb_oral_contra hormone_replace other_art_embol copd ckd {
-	encode `var', gen(`var'_tmp)
-	drop `var'
-	rename `var'_tmp cov_bin_`var'	
+	capture confirm variable `var'`
+	if !_rc {
+		encode `var', gen(`var'_tmp)
+		drop `var'
+		rename `var'_tmp cov_bin_`var'	
+	}
 }
 
 tostring covariates_collapsed, replace
