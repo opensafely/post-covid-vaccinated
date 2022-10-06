@@ -49,52 +49,43 @@ foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end 
 
 capture confirm variable cov_bin_antiplatelet_medications
 if !_rc {
-	rename cov_bin_antiplatelet_medications antiplate_med 
+	rename cov_bin_antiplatelet_medications cov_bin_antiplate_med 
 }
 
 capture confirm variable cov_bin_anticoagulation_medicati
 if !_rc {
-	rename cov_bin_anticoagulation_medicati anticoag_med 
+	rename cov_bin_anticoagulation_medicati cov_bin_anticoag_med 
 }
 
 capture confirm variable cov_bin_combined_oral_contracept
 if !_rc {
-	rename cov_bin_combined_oral_contracept comb_oral_contra 
+	rename cov_bin_combined_oral_contracept cov_bin_comb_oral_contra 
 }
 
 capture confirm variable cov_bin_hormone_replacement_ther 
 if !_rc  {
-	rename cov_bin_hormone_replacement_ther hormone_replace 
+	rename cov_bin_hormone_replacement_ther cov_bin_hormone_replace 
 }
 
 capture confirm variable cov_bin_other_arterial_embolism 
 if !_rc {
-	rename cov_bin_other_arterial_embolism other_art_embol
+	rename cov_bin_other_arterial_embolism cov_bin_other_art_embol
 }
 
 capture confirm variable cov_bin_chronic_obstructive_pulm
 if !_rc {
-	rename cov_bin_chronic_obstructive_pulm copd 
+	rename cov_bin_chronic_obstructive_pulm cov_bin_copd 
 }
 
 capture confirm variable cov_bin_chronic_kidney_disease
 if !_rc {
-	rename cov_bin_chronic_kidney_disease ckd 
+	rename cov_bin_chronic_kidney_disease cov_bin_ckd 
 }
 
 foreach var of varlist cov_bin* sex {
 	encode `var', gen(`var'_tmp)
 	drop `var'
 	rename `var'_tmp `var'
-}
-
-foreach var of varlist antiplate_med anticoag_med comb_oral_contra hormone_replace other_art_embol copd ckd {
-	capture confirm variable `var'
-	if !_rc {
-		encode "`var'", gen("`var'"_tmp)
-		drop "`var'"
-		rename "`var'" _tmp cov_bin_"`var'"	
-	}
 }
 
 tostring covariates_collapsed, replace
@@ -222,9 +213,9 @@ tab days outcome_status
 di "Total follow-up in days: " follow_up_total
 bysort days: summarize(follow_up), detail
 
-stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron strata(region) vce(r)
+stcox days0_28 days28_197 i.sex age_spline1 age_spline2, strata(region) vce(r)
 est store min, title(Age_Sex)
-stcox days0_28 days28_197 age_spline1 age_spline2 $factors cov_num_consulation_rate, efron strata(region) vce(r)
+stcox days0_28 days28_197 age_spline1 age_spline2 $factors cov_num_consulation_rate, strata(region) vce(r)
 est store max, title(Maximal)
 
 estout * using "output/`cpf'_cox_model.txt", cells ("b se t ci_l ci_u p") replace 
