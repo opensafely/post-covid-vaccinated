@@ -29,7 +29,7 @@ des
 
 * Filter data
 
-keep patient_id sex age_at_cohort_start expo_date region_name follow_up_start event_date follow_up_end hospitalised_follow_up_end non_hospitalised_follow_up_end hospitalised_censor_date non_hospitalised_censor_date event_date expo_pheno ethnicity cov* covariates_to_fit covariates_collapsed cox_weights
+keep patient_id sex age_at_cohort_start expo_date region_name follow_up_start event_date follow_up_end event_date ethnicity cov* covariates_to_fit covariates_collapsed cox_weights
 
 * Rename variables
 
@@ -71,23 +71,6 @@ foreach var of varlist antiplate_med anticoag_med comb_oral_contra hormone_repla
 	rename `var'_tmp cov_bin_`var'	
 }
 
-gen expo_pheno_tmp = .
-replace expo_pheno_tmp = 0 if expo_pheno=="no_infection"
-replace expo_pheno_tmp = 1 if expo_pheno=="non_hospitalised"
-replace expo_pheno_tmp = 2 if expo_pheno=="hospitalised"
-lab def expo_pheno_tmp 0 "no infection" 1"non hospitalised" 2"hospitalised"
-lab val expo_pheno_tmp expo_pheno_tmp
-drop expo_pheno
-rename expo_pheno_tmp expo_pheno 
-
-recode expo_pheno (1=.) (2=1), gen(expo_hosp)
-lab def expo_hosp 0"no infection" 1"hospitalised"
-lab val expo_hosp expo_hosp
-
-recode expo_pheno (2=.), gen(expo_non_hosp)
-lab def expo_non_hosp 0"no infection" 1"non hospitalised"
-lab val expo_non_hosp expo_non_hosp
-
 tostring covariates_collapsed, replace
 
 * Reformating data to make dates make more sense if run in pseudo dataset
@@ -120,10 +103,6 @@ lab val ethnicity_tmp ethnicity_tmp
 drop ethnicity
 rename ethnicity_tmp cov_cat_ethnicity
 
-recode cov_cat_ethnicity (2 3 4 5 = 2) (6=3), gen(ethnicity_collapsed)
-lab def ethnicity_collapsed 1 "White" 2 "Non-white" 3 "Missing" 
-lab val ethnicity_collapsed cov_cat_ethnicity_collapsed
-
 gen cov_cat_deprivation_tmp = .
 replace cov_cat_deprivation_tmp = 1 if cov_cat_deprivation=="1-2 (most deprived)"
 replace cov_cat_deprivation_tmp = 2 if cov_cat_deprivation=="2-4"
@@ -135,10 +114,6 @@ lab val cov_cat_deprivation_tmp cov_cat_deprivation_tmp
 drop cov_cat_deprivation
 rename cov_cat_deprivation_tmp cov_cat_deprivation
 
-recode cov_cat_deprivation (2=1) (3=2) (4 5=3), gen(cov_cat_deprivation_collapsed)
-lab def cov_cat_deprivation_collapsed 1 "1-4 (most deprived)" 2 "5-6" 3 "7-10 (least deprived)" 
-lab val cov_cat_deprivation_collapsed cov_cat_deprivation_collapsed
-
 gen cov_cat_smoking_status_tmp = .
 replace cov_cat_smoking_status_tmp = 1 if cov_cat_smoking_status=="Never smoker"
 replace cov_cat_smoking_status_tmp = 2 if cov_cat_smoking_status=="Ever smoker"
@@ -149,10 +124,6 @@ lab val cov_cat_smoking_status_tmp cov_cat_smoking_status_tmp
 drop cov_cat_smoking_status
 rename cov_cat_smoking_status_tmp cov_cat_smoking_status 
 
-recode cov_cat_smoking_status (3=2) (4=3), gen(cov_cat_smoking_status_collapsed)
-lab def cov_cat_smoking_status_collapsed 1 "Never smoker" 2 "Ever smoker" 3 "Missing"
-lab val cov_cat_smoking_status_collapsed cov_cat_smoking_status_collapsed 
-
 * replacing long covariate names in covariates_to_fit variable
 replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_antiplatelet_medications","cov_bin_antiplate_med",1) 
 replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_anticoagulation_medications","cov_bin_anticoag_med",1) 
@@ -162,7 +133,6 @@ replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_other_arterial_e
 replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_chronic_obstructive_pulmonary_disease","cov_bin_copd",1) 
 replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_chronic_kidney_disease","cov_bin_ckd",1) 
 replace covariates_to_fit = subinstr(covariates_to_fit,"ethnicity","cov_cat_ethnicity",1)
-
 replace covariates_to_fit = subinstr(covariates_to_fit,","," ",.) 
  
 * replacing collapsed covariates in covariates_to_fit (need to see what they look like) 
@@ -183,11 +153,9 @@ vl modify factors = factors - (cov_num_consulation_rate)
 gen outcome_status = 0
 replace outcome_status = 1 if outcome_date!=.
 
-* Update follow-up end to match R 
-gen date_expo_censor = hosp_follow_up_end if expo_hosp==1
-replace date_expo_censor = non_hosp_follow_up_end if expo_non_hosp==1
+* Update follow-up end
 
-replace follow_up_end = follow_up_end + 1 if !(date_expo_censor!=. & follow_up_end==date_expo_censor)
+replace follow_up_end = follow_up_end + 1
 format follow_up_end %td
 
 * Make age spline
@@ -196,12 +164,10 @@ centile age, centile(10 50 90)
 mkspline age_spline = age, cubic knots(`r(c_1)' `r(c_2)' `r(c_3)')
 
 save "output/`cpf'.dta", replace
-*save "output/test.dta", replace
 
 foreach var of varlist expo_hosp expo_non_hosp {
 	
-*	use "output/`cpf'.dta", clear
- 	use "output/test.dta", clear  // used on local system
+	use "output/`cpf'.dta", clear
 	
 	* Apply stset // including IPW here as if unsampled dataset will be 1
 
@@ -232,13 +198,12 @@ foreach var of varlist expo_hosp expo_non_hosp {
 	di "Total follow-up in days: " follow_up_total
 	bysort days: summarize(follow_up), detail
 
-	stcox days0_28 days28_197 i.sex age_spline1 age_spline2, strata(region) vce(r)
+	stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron strata(region) vce(r)
 	est store min, title(Age_Sex)
-	stcox days0_28 days28_197 age_spline1 age_spline2 $factors cov_num_consulation_rate, strata(region) vce(r)
+	stcox days0_28 days28_197 age_spline1 age_spline2 $factors cov_num_consulation_rate, efron strata(region) vce(r)
 	est store max, title(Maximal)
 	
 	estout * using "output/`cpf'_`var'_cox_model.txt", cells ("b se t ci_l ci_u p") replace 
-*	estout * using "output/ami_`var'_cox_model.txt", cells ("b se t ci_l ci_u p") replace // used on local system
 
 }
 *stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron
