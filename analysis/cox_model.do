@@ -89,7 +89,7 @@ foreach var of varlist cov_bin* sex {
 }
 
 foreach var of varlist antiplate_med anticoag_med comb_oral_contra hormone_replace other_art_embol copd ckd {
-	capture confirm variable `var'`
+	capture confirm variable `var'
 	if !_rc {
 		encode `var', gen(`var'_tmp)
 		drop `var'
