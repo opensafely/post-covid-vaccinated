@@ -37,14 +37,10 @@ rename age_at_cohort_start age
 rename expo_date exposure_date
 rename region_name region
 rename event_date outcome_date
-rename hospitalised_follow_up_end hosp_follow_up_end
-rename non_hospitalised_follow_up_end non_hosp_follow_up_end
-rename hospitalised_censor_date  hosp_censor_date
-rename non_hospitalised_censor_dat non_hosp_censor_date
 
 * Reformat variables
 
-foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end hosp_follow_up_end non_hosp_follow_up_end hosp_censor_date non_hosp_censor_date {
+foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end {
 	gen `var'_tmp = date(`var', "MDY")	
 	format `var'_tmp %td
 	drop `var'
@@ -164,48 +160,45 @@ centile age, centile(10 50 90)
 mkspline age_spline = age, cubic knots(`r(c_1)' `r(c_2)' `r(c_3)')
 
 save "output/`cpf'.dta", replace
-
-foreach var of varlist expo_hosp expo_non_hosp {
 	
-	use "output/`cpf'.dta", clear
-	
-	* Apply stset // including IPW here as if unsampled dataset will be 1
+use "output/`cpf'.dta", clear
 
-	stset follow_up_end [pweight=cox_weights] if `var'!=., failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(06,01,2021))
-	stsplit days, after(exposure_date) at(0 28 197)
+* Apply stset // including IPW here as if unsampled dataset will be 1
 
-	* Calculate study follow up
+stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(06,01,2021))
+stsplit days, after(exposure_date) at(0 28 197)
 
-	replace days = 197 if days==-1
-	gen follow_up = _t - _t0
-	egen follow_up_total = total(follow_up)  
+* Calculate study follow up
 
-	* Make days variables
+replace days = 197 if days==-1
+gen follow_up = _t - _t0
+egen follow_up_total = total(follow_up)  
 
-	gen days0_28 = 0
-	replace days0_28 = 1 if days==0
-	tab days0_28
+* Make days variables
 
-	gen days28_197 = 0
-	replace days28_197 = 1 if days==28
-	tab days28_197
+gen days0_28 = 0
+replace days0_28 = 1 if days==0
+tab days0_28
 
-	* Run models
-	* Cannot use efron method with weights
+gen days28_197 = 0
+replace days28_197 = 1 if days==28
+tab days28_197
 
-	tab days outcome_status 
+* Run models
+* Cannot use efron method with weights
 
-	di "Total follow-up in days: " follow_up_total
-	bysort days: summarize(follow_up), detail
+tab days outcome_status 
 
-	stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron strata(region) vce(r)
-	est store min, title(Age_Sex)
-	stcox days0_28 days28_197 age_spline1 age_spline2 $factors cov_num_consulation_rate, efron strata(region) vce(r)
-	est store max, title(Maximal)
-	
-	estout * using "output/`cpf'_`var'_cox_model.txt", cells ("b se t ci_l ci_u p") replace 
+di "Total follow-up in days: " follow_up_total
+bysort days: summarize(follow_up), detail
 
-}
+stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron strata(region) vce(r)
+est store min, title(Age_Sex)
+stcox days0_28 days28_197 age_spline1 age_spline2 $factors cov_num_consulation_rate, efron strata(region) vce(r)
+est store max, title(Maximal)
+
+estout * using "output/`cpf'_cox_model.txt", cells ("b se t ci_l ci_u p") replace 
+
 *stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron
 *stcox days0_28 days28_197 i.sex age_spline1 age_spline2 i.region, efronstrata(region) 
 *stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron strata(region)
