@@ -39,6 +39,7 @@ rename region_name region
 rename event_date outcome_date
 
 * Reformat variables
+list follow_up_start in f/10
 
 foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end {
 	gen `var'_tmp = date(`var', "DMY")	
