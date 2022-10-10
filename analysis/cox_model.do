@@ -46,8 +46,7 @@ foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end 
 	drop `var'
 	rename `var'_tmp `var'
 }
-gsort exposure_date
-list exposure_date in f/10
+list follow_up_start in f/10
 
 capture confirm variable cov_bin_antiplatelet_medications
 if !_rc {
