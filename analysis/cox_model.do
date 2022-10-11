@@ -39,7 +39,7 @@ rename region_name region
 rename event_date outcome_date
 
 * Reformat variables
-list follow_up_start in f/10
+list exposure_date outcome_date follow_up_start follow_up_end in f/10
 
 foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end {
 	gen `var'_tmp = date(`var', "DMY")	
@@ -50,7 +50,8 @@ foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end 
 	rename `var'_tmp `var'
 	list `var' in f/10
 }
-list follow_up_start in f/10
+list exposure_date outcome_date follow_up_start follow_up_end in f/10
+misstable summarize
 
 capture confirm variable cov_bin_antiplatelet_medications
 if !_rc {
