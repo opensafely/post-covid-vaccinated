@@ -13,3 +13,6 @@ venv/
 .Rproj.user*
 .Rproj.user
 analysis/stata_vs_R/*
+
+# Session Data files
+.RData
