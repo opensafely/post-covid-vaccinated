@@ -21,6 +21,10 @@ capture mkdir "$projectdir/output/tables"
 global logdir "$projectdir/logs"
 di "$logdir"
 
+* Set Ado file path
+
+adopath + "$projectdir/analysis/extra_ados"
+
 * Import data
 
 import delim using "./output/`cpf'.csv" 
@@ -43,11 +47,10 @@ rename event_date outcome_date
 ds , has(type string)
 foreach var of varlist `r(varlist)' {
 	replace `var' = "" if `var' == "NA"
-	}
+}
 
 	
 * Reformat variables
-list exposure_date outcome_date follow_up_start follow_up_end in f/10
 
 foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end {
 	split `var', gen(tmp_date) parse(-)
@@ -59,7 +62,7 @@ foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end 
 	drop `var' tmp_date* year month day
 	rename `var'_tmp `var'
 }
-list exposure_date outcome_date follow_up_start follow_up_end in f/10
+
 misstable summarize
 
 capture confirm variable cov_bin_antiplatelet_medications
