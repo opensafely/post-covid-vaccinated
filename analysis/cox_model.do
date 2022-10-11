@@ -38,17 +38,26 @@ rename expo_date exposure_date
 rename region_name region
 rename event_date outcome_date
 
+* Replace NA with missing value that Stata recognises
+
+ds , has(type string)
+foreach var of varlist `r(varlist)' {
+	replace `var' = "" if `var' == "NA"
+	}
+
+	
 * Reformat variables
 list exposure_date outcome_date follow_up_start follow_up_end in f/10
 
 foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end {
-	gen `var'_tmp = date(`var', "DMY")	
-	list `var'_tmp in f/10
-	format `var'_tmp %td
-	list `var'_tmp in f/10
-	drop `var'
+	split `var', gen(tmp_date) parse(-)
+	gen year = real(tmp_date1)
+	gen month = real(tmp_date2)
+	gen day = real(tmp_date3)
+	gen `var'_tmp = mdy(month, day, year)
+	format %td `var'_tmp
+	drop `var' tmp_date* year month day
 	rename `var'_tmp `var'
-	list `var' in f/10
 }
 list exposure_date outcome_date follow_up_start follow_up_end in f/10
 misstable summarize
