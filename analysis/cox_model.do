@@ -43,9 +43,12 @@ list follow_up_start in f/10
 
 foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end {
 	gen `var'_tmp = date(`var', "DMY")	
+	list `var'_tmp in f/10
 	format `var'_tmp %td
+	list `var'_tmp in f/10
 	drop `var'
 	rename `var'_tmp `var'
+	list `var' in f/10
 }
 list follow_up_start in f/10
 
