@@ -198,10 +198,6 @@ format follow_up_end %td
 centile age, centile(10 50 90)
 mkspline age_spline = age, cubic knots(`r(c_1)' `r(c_2)' `r(c_3)')
 
-save "output/`cpf'.dta", replace
-	
-use "output/`cpf'.dta", clear
-
 * Apply stset // including IPW here as if unsampled dataset will be 1
 
 stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(06,01,2021))
@@ -236,7 +232,7 @@ est store min, title(Age_Sex)
 stcox days0_28 days28_197 age_spline1 age_spline2 $factors cov_num_consulation_rate, strata(region) vce(r)
 est store max, title(Maximal)
 
-estout * using "output/`cpf'_cox_model.txt", cells ("b se t ci_l ci_u p") replace 
+estout * using "output/`cpf'_cox_model.txt", cells("b se t ci_l ci_u p") stats(risk N_fail N_sub N N_clust) replace 
 
 *stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron
 *stcox days0_28 days28_197 i.sex age_spline1 age_spline2 i.region, efronstrata(region) 
