@@ -5,27 +5,22 @@ Date:					08/09/2022
 Author:					Venexia Walker and Rachel Denholm
 Description:			Reformating of CSV file and running cox models
 Datasets used:			csv outcome files
-Datasets created:		cox_stata_OUTCOME.csv
+Datasets created:		*_cox_model.txt
 Other output:			logfiles
 -----------------------------------------------------------------------------*/
 
 local cpf "`1'"
 
-*Set filepaths
+* Set file paths
 
 global projectdir `c(pwd)'
 di "$projectdir"
-
-capture mkdir "$projectdir/output/tables"
-
-global logdir "$projectdir/logs"
-di "$logdir"
 
 * Set Ado file path
 
 adopath + "$projectdir/analysis/extra_ados"
 
-* Import data
+* Import and describe data
 
 import delim using "./output/`cpf'.csv" 
 
@@ -33,7 +28,7 @@ des
 
 * Filter data
 
-keep patient_id sex age_at_cohort_start expo_date region_name follow_up_start event_date follow_up_end event_date ethnicity cov* covariates_to_fit covariates_collapsed cox_weights
+keep patient_id sex age_at_cohort_start expo_date region_name follow_up_start event_date follow_up_end event_date ethnicity cov* cox_weights
 
 * Rename variables
 
@@ -64,6 +59,8 @@ foreach var of varlist exposure_date outcome_date follow_up_start follow_up_end 
 }
 
 misstable summarize
+
+* Shorten covariate names
 
 capture confirm variable cov_bin_antiplatelet_medications
 if !_rc {
@@ -106,11 +103,8 @@ foreach var of varlist cov_bin* sex {
 	rename `var'_tmp `var'
 }
 
-tostring covariates_collapsed, replace
+* Recode region
 
-* Reformating data to make dates make more sense if run in pseudo dataset
-* do "analysis\pseudo_data.do" // used on local system
- 
 gen region_tmp = .
 replace region_tmp = 1 if region=="East"
 replace region_tmp = 2 if region=="East Midlands"
@@ -126,6 +120,8 @@ label values region_tmp region_tmp
 drop region
 rename region_tmp region
 
+* Recode ethnicity
+
 gen ethnicity_tmp = .
 replace ethnicity_tmp = 1 if ethnicity=="White"
 replace ethnicity_tmp = 2 if ethnicity=="Mixed"
@@ -138,6 +134,8 @@ lab val ethnicity_tmp ethnicity_tmp
 drop ethnicity
 rename ethnicity_tmp cov_cat_ethnicity
 
+* Recode deprivation
+
 gen cov_cat_deprivation_tmp = .
 replace cov_cat_deprivation_tmp = 1 if cov_cat_deprivation=="1-2 (most deprived)"
 replace cov_cat_deprivation_tmp = 2 if cov_cat_deprivation=="2-4"
@@ -149,6 +147,8 @@ lab val cov_cat_deprivation_tmp cov_cat_deprivation_tmp
 drop cov_cat_deprivation
 rename cov_cat_deprivation_tmp cov_cat_deprivation
 
+* Recode smoking status
+
 gen cov_cat_smoking_status_tmp = .
 replace cov_cat_smoking_status_tmp = 1 if cov_cat_smoking_status=="Never smoker"
 replace cov_cat_smoking_status_tmp = 2 if cov_cat_smoking_status=="Ever smoker"
@@ -158,30 +158,6 @@ lab def cov_cat_smoking_status_tmp 1 "Never smoker" 2 "Ever smoker" 3 "Current s
 lab val cov_cat_smoking_status_tmp cov_cat_smoking_status_tmp
 drop cov_cat_smoking_status
 rename cov_cat_smoking_status_tmp cov_cat_smoking_status 
-
-* replacing long covariate names in covariates_to_fit variable
-replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_antiplatelet_medications","cov_bin_antiplate_med",1) 
-replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_anticoagulation_medications","cov_bin_anticoag_med",1) 
-replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_combined_oral_contraceptive_pill","cov_bin_comb_oral_contra",1) 
-replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_hormone_replacement_therapy","cov_bin_hormone_replace",1) 
-replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_other_arterial_embolism","cov_bin_other_art_embol",1)
-replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_chronic_obstructive_pulmonary_disease","cov_bin_copd",1) 
-replace covariates_to_fit = subinstr(covariates_to_fit,"cov_bin_chronic_kidney_disease","cov_bin_ckd",1) 
-replace covariates_to_fit = subinstr(covariates_to_fit,"ethnicity","cov_cat_ethnicity",1)
-replace covariates_to_fit = subinstr(covariates_to_fit,","," ",.) 
- 
-* replacing collapsed covariates in covariates_to_fit (need to see what they look like) 
-*foreach var of varlist cov_cat_ethnicity cov_cat_deprivation cov_cat_smoking_status {
-*	replace covariates_to_fit = subinstr(covariates_to_fit,"`var'","`var'_collapsed",1) if *substr(covariates_collapsed,1,.)==`var' 
-*}
-
-* Creating a list of confounders included in covariates_to_fit
-vl create factors = (sex)
-levelsof covariates_to_fit, miss local(vars)
-foreach l of local vars {
-	vl modify factors = factors + (`l')
-	} 
-vl modify factors = factors - (cov_num_consulation_rate)
 	
 * Make failure variable
 
@@ -219,8 +195,7 @@ gen days28_197 = 0
 replace days28_197 = 1 if days==28
 tab days28_197
 
-* Run models
-* Cannot use efron method with weights
+* Run models and save output [Note: cannot use efron method with weights]
 
 tab days outcome_status 
 
@@ -229,14 +204,7 @@ bysort days: summarize(follow_up), detail
 
 stcox days0_28 days28_197 i.sex age_spline1 age_spline2, strata(region) vce(r)
 est store min, title(Age_Sex)
-stcox days0_28 days28_197 age_spline1 age_spline2 $factors cov_num_consulation_rate, strata(region) vce(r)
+stcox days0_28 days28_197 i.sex age_spline1 age_spline2 i.cov_cat_ethnicity i.cov_cat_deprivation i.cov_cat_smoking_status cov_num_consulation_rate cov_bin_*, strata(region) vce(r)
 est store max, title(Maximal)
 
 estout * using "output/`cpf'_cox_model.txt", cells("b se t ci_l ci_u p") stats(risk N_fail N_sub N N_clust) replace 
-
-*stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron
-*stcox days0_28 days28_197 i.sex age_spline1 age_spline2 i.region, efronstrata(region) 
-*stcox days0_28 days28_197 i.sex age_spline1 age_spline2, efron strata(region)
-
-drop $factors
-
