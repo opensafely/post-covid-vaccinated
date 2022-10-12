@@ -63,6 +63,12 @@ for (f in files) {
   
   tmp <- merge(tmp, info, by = "source")
   
+  ## Add median follow up
+
+  f <- gsub("_cox_model.txt","_stata_median_fup.csv",f)
+  fup <- readr::read_csv(file = paste0("output/",f))
+  tmp <- merge(tmp, fup, by = "term", all.x = TRUE)
+  
   ## Apend to master dataframe
     
   df <- rbind(df, tmp)
@@ -71,7 +77,7 @@ for (f in files) {
 
 # Format master dataframe
 
-df <- df[,c("source","term",
+df <- df[,c("source","term","medianfup",
             paste0(c("b","se","t","lci","uci","p","persondays","outcomes","subjects","observations","clusters"),"_min"),
             paste0(c("b","se","t","lci","uci","p","persondays","outcomes","subjects","observations","clusters"),"_max"))]
 
@@ -84,7 +90,7 @@ df <- tidyr::pivot_longer(df,
                           values_to = "value")
 
 df <- tidyr::pivot_wider(df, 
-                         id_cols = c("source","term", "model"),
+                         id_cols = c("source","term", "model","medianfup"),
                          names_from = "stat", 
                          values_from = "value")
 
@@ -93,14 +99,15 @@ df <- tidyr::pivot_wider(df,
 df <- df[df$model=="max" | (df$model=="min" & df$term %in% c("days0_28","days28_197","1.sex","2.sex","age_spline1","age_spline2")),]
 
 df <- df[order(df$source, df$model),
-         c("source","term","model","b","se","lci","uci","subjects")]
+         c("source","term","model","b","lci","uci","se","medianfup","subjects")]
 
 df <- dplyr::rename(df,
                     "estimate" = "b",
                     "conf_low" = "lci",
                     "conf_high" = "uci",
                     "se_ln_hr" = "se",
-                    "N_sample_size" = "subjects")
+                    "N_sample_size" = "subjects",
+                    "median_follow_up" = "medianfup")
 
 # Save output ------------------------------------------------------------------
 

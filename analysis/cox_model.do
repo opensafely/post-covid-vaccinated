@@ -208,3 +208,21 @@ stcox days0_28 days28_197 i.sex age_spline1 age_spline2 i.cov_cat_ethnicity i.co
 est store max, title(Maximal)
 
 estout * using "output/`cpf'_cox_model.txt", cells("b se t ci_l ci_u p") stats(risk N_fail N_sub N N_clust) replace 
+
+* Calculate median follow-up
+
+keep if outcome_status==1
+drop if days0_28==0 & days28_197==0
+keep patient_id days0_28 days28_197 follow_up
+
+gen term = ""
+replace term = "days0_28" if days0_28==1 & days28_197==0
+replace term = "days28_197" if days0_28==0 & days28_197==1
+
+replace follow_up = follow_up + 28 if term == "days28_197"
+bysort term: egen medianfup = median(follow_up)
+
+keep term medianfup
+duplicates drop
+
+export delimited using "output/`cpf'_stata_median_fup", replace
