@@ -371,6 +371,18 @@ actions_list <- splice(
   action(
     name = "format_stata_output",
     run = "r:latest analysis/format_stata_output.R",
+    needs = 
+      setdiff(paste0("stata_cox_model_",analyses_to_run_stata$outcome,"_",analyses_to_run_stata$subgroup,"_",analyses_to_run_stata$cohort,"_",analyses_to_run_stata$time_periods),
+              c("stata_cox_model_angina_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_pe_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_vte_age_40_59_electively_unvaccinated_normal",
+                "stata_cox_model_vte_age_60_79_electively_unvaccinated_reduced",
+                "stata_cox_model_pe_covid_pheno_hospitalised_electively_unvaccinated_normal",
+                "stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_normal")),
     moderately_sensitive = list(
       stata_output = "output/stata_output.csv")
   )
@@ -430,4 +442,3 @@ x=as.yaml(project_list, indent=2) %>%
   str_replace_all("\\\n(\\w)", "\n\n\\1") %>%
   str_replace_all("\\\n\\s\\s(\\w)", "\n\n  \\1") %>%
   writeLines("project.yaml")
-

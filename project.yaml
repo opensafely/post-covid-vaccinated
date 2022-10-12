@@ -1327,6 +1327,47 @@ actions:
 
   format_stata_output:
     run: r:latest analysis/format_stata_output.R
+    needs:
+    - stata_cox_model_ami_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_stroke_isch_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_dvt_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_pe_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_angina_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_ami_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_stroke_isch_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_dvt_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_pe_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_hf_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_angina_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_ate_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_vte_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_ami_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_stroke_isch_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_dvt_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_hf_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_angina_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_ate_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_angina_covid_history_vaccinated_reduced
+    - stata_cox_model_pe_main_electively_unvaccinated_reduced
+    - stata_cox_model_pe_main_electively_unvaccinated_normal
+    - stata_cox_model_hf_main_electively_unvaccinated_normal
+    - stata_cox_model_hf_main_electively_unvaccinated_reduced
+    - stata_cox_model_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_vte_sex_Male_electively_unvaccinated_normal
+    - stata_cox_model_vte_sex_Male_electively_unvaccinated_reduced
+    - stata_cox_model_vte_ethnicity_White_electively_unvaccinated_normal
+    - stata_cox_model_vte_ethnicity_Black_electively_unvaccinated_reduced
+    - stata_cox_model_vte_prior_history_FALSE_electively_unvaccinated_normal
+    - stata_cox_model_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_vte_aer_Female_60_79_electively_unvaccinated_reduced
+    - stata_cox_model_vte_aer_Male_60_79_electively_unvaccinated_reduced
     outputs:
       moderately_sensitive:
         stata_output: output/stata_output.csv
