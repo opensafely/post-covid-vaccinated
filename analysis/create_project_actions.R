@@ -365,9 +365,17 @@ actions_list <- splice(
                                                  subgroup = analyses_to_run_stata[i, "subgroup"],
                                                  cohort = analyses_to_run_stata[i, "cohort"],
                                                  time_periods = analyses_to_run_stata[i, "time_periods"])),
-                recursive = FALSE))
+                recursive = FALSE)),
   
-  
+  #comment("Format Stata output")
+  action(
+    name = "format_stata_output",
+    run = "r:latest analysis/format_stata_output.R",
+    needs = paste0("stata_cox_model_",analyses_to_run_stata$outcome,"_",analyses_to_run_stata$subgroup,"_",analyses_to_run_stata$cohort,"_",analyses_to_run_stata$time_periods),
+    moderately_sensitive = list(
+      stata_output = "output/stata_output.csv")
+  )
+
   
   
   #comment("Hospitalised event counts by covariate level"),
