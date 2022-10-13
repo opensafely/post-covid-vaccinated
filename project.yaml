@@ -1302,23 +1302,23 @@ actions:
         medianfup: output/input_sampled_data_vte_sex_Male_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
         stata_output: output/input_sampled_data_vte_sex_Male_electively_unvaccinated_reduced_time_periods_cox_model.txt
 
-  stata_cox_model_vte_age_40_59_electively_unvaccinated_normal:
-    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_age_40_59_electively_unvaccinated_normal_time_periods
+  stata_cox_model_vte_agegp_40_59_electively_unvaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_agegp_40_59_electively_unvaccinated_normal_time_periods
     needs:
     - Analysis_cox_vte_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        medianfup: output/input_sampled_data_vte_age_40_59_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
-        stata_output: output/input_sampled_data_vte_age_40_59_electively_unvaccinated_normal_time_periods_cox_model.txt
+        medianfup: output/input_sampled_data_vte_agegp_40_59_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_agegp_40_59_electively_unvaccinated_normal_time_periods_cox_model.txt
 
-  stata_cox_model_vte_age_60_79_electively_unvaccinated_reduced:
-    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_age_60_79_electively_unvaccinated_reduced_time_periods
+  stata_cox_model_vte_agegp_60_79_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_agegp_60_79_electively_unvaccinated_reduced_time_periods
     needs:
     - Analysis_cox_vte_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        medianfup: output/input_sampled_data_vte_age_60_79_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
-        stata_output: output/input_sampled_data_vte_age_60_79_electively_unvaccinated_reduced_time_periods_cox_model.txt
+        medianfup: output/input_sampled_data_vte_agegp_60_79_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_agegp_60_79_electively_unvaccinated_reduced_time_periods_cox_model.txt
 
   stata_cox_model_vte_ethnicity_White_electively_unvaccinated_normal:
     run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_ethnicity_White_electively_unvaccinated_normal_time_periods
@@ -1411,6 +1411,8 @@ actions:
     - stata_cox_model_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
     - stata_cox_model_vte_sex_Male_electively_unvaccinated_normal
     - stata_cox_model_vte_sex_Male_electively_unvaccinated_reduced
+    - stata_cox_model_vte_agegp_40_59_electively_unvaccinated_normal
+    - stata_cox_model_vte_agegp_60_79_electively_unvaccinated_reduced
     - stata_cox_model_vte_ethnicity_White_electively_unvaccinated_normal
     - stata_cox_model_vte_ethnicity_Black_electively_unvaccinated_reduced
     - stata_cox_model_vte_prior_history_FALSE_electively_unvaccinated_normal
