@@ -99,7 +99,7 @@ df <- tidyr::pivot_wider(df,
 df <- df[df$model=="max" | (df$model=="min" & df$term %in% c("days0_28","days28_197","1.sex","2.sex","age_spline1","age_spline2")),]
 
 df <- df[order(df$source, df$model),
-         c("source","term","model","b","lci","uci","se","medianfup","subjects")]
+         c("source","term","model","b","lci","uci","se","medianfup","subjects","outcomes")]
 
 df <- dplyr::rename(df,
                     "estimate" = "b",
@@ -107,7 +107,8 @@ df <- dplyr::rename(df,
                     "conf_high" = "uci",
                     "se_ln_hr" = "se",
                     "N_sample_size" = "subjects",
-                    "median_follow_up" = "medianfup")
+                    "median_follow_up" = "medianfup",
+                    "N_outcomes" = "outcomes")
 
 # Save output ------------------------------------------------------------------
 
