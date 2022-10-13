@@ -380,8 +380,6 @@ actions_list <- splice(
                 "stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_normal",
                 "stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_normal",
                 "stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_normal",
-                "stata_cox_model_vte_age_40_59_electively_unvaccinated_normal",
-                "stata_cox_model_vte_age_60_79_electively_unvaccinated_reduced",
                 "stata_cox_model_pe_covid_pheno_hospitalised_electively_unvaccinated_normal",
                 "stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_normal")),
     moderately_sensitive = list(
