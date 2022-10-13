@@ -104,14 +104,14 @@ for (i in unique(main_estimates$event)) {
     #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
     ggplot2::geom_point(aes(),size = 2) +
     ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-    ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.25,0.25,conf_low), 
+    ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.5,0.5,conf_low), 
                                                               ymax = ifelse(conf_high>64,64,conf_high),  
                                                               width = 0), 
                            position = ggplot2::position_dodge(width = 0.5))+   
     #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
     ggplot2::geom_line() +
-    #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
-    ggplot2::scale_y_continuous(lim = c(0.25,32), breaks = c(0.25,0.5,1,2,4,8,16,32), trans = "log") +
+    #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
+    ggplot2::scale_y_continuous(lim = c(0.5,32), breaks = c(0.5,1,2,4,8,16,32), trans = "log") +
     ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
@@ -142,14 +142,14 @@ for (i in unique(main_estimates$event)) {
            #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
            ggplot2::geom_point(aes(),size = 2) +
            ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-           ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.25,0.25,conf_low), 
+           ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.5,0.5,conf_low), 
                                                                      ymax = ifelse(conf_high>64,64,conf_high),  
                                                                      width = 0), 
                                   position = ggplot2::position_dodge(width = 0.5))+   
            #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
            ggplot2::geom_line() +
-           #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
-           ggplot2::scale_y_continuous(lim = c(0.25,32), breaks = c(0.25,0.5,1,2,4,8,16,32), trans = "log") +
+           #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
+           ggplot2::scale_y_continuous(lim = c(0.5,32), breaks = c(0.5,1,2,4,8,16,32), trans = "log") +
            ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
            ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
            ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
@@ -183,14 +183,14 @@ for (i in unique(main_estimates$event)) {
            #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
            ggplot2::geom_point(aes(), size = 2) +
            ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-           ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.25,0.25,conf_low), 
+           ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.5,0.5,conf_low), 
                                                                      ymax = ifelse(conf_high>64,64,conf_high),  
                                                                      width = 0), 
                                   position = ggplot2::position_dodge(width = 0.5))+   
            #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
            ggplot2::geom_line() +
-           #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
-           ggplot2::scale_y_continuous(lim = c(0.25,32), breaks = c(0.25,0.5,1,2,4,8,16,32), trans = "log") +
+           #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
+           ggplot2::scale_y_continuous(lim = c(0.5,32), breaks = c(0.5,1,2,4,8,16,32), trans = "log") +
            ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
            ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
            ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
@@ -330,52 +330,3 @@ for(i in outcome_name_table$outcome){
   dev.off() 
   
 }
-
-
-
-# tab_add_footnote(text = "Pre-vaccinated (1 Jan 2020 to 18 June 2021), Vaccinated (1 Jun 2021 to 14 Dec 2021), Unvaccinated (1 Jun 2021 to 14 Dec 2021)", size = 7, face = "italic", hjust = 1.25)
-# levels(table2_merged$Cohort) <- list("Pre-vaccinated (2020-01-01 - 2021-06-18)"="Pre-Vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="Vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="Unvaccinated")
-
-# PLOTTING ----------------------------------------------------------------
-
-# MAIN PLOT 
-
-p1 <- ggpubr::ggarrange(main_ate, hosp, non_hosp, ncol=3, nrow=1, common.legend = FALSE, legend = "none",
-                        labels = c("A: All COVID-19", "B: Hospitalised-COVID-19", "C: Non-Hospitalised-COVID-19"),
-                        hjust = -0.1,
-                        font.label = list(size = 12)) 
-
-p1 <- ggpubr::ggarrange(main_ate, non_hospitalised_ate, ncol=2, nrow=1, common.legend = FALSE, legend = "none",
-                        labels = c("A: All COVID-19", "C: Non-Hospitalised-COVID-19"),
-                        hjust = -0.1,
-                        font.label = list(size = 12)) 
-
-# EXTRACT LEGEND
-
-g_legend<-function(a.gplot){
-  tmp <- ggplot_gtable(ggplot_build(a.gplot))
-  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
-  legend <- tmp$grobs[[leg]]
-  return(legend)}
-
-mylegend<- g_legend(non_hospitalised_ate) 
-
-table.p <- table.p + theme(plot.margin = margin(0,3,0.7,0, "cm"))
-
-# ADD BLANK TO GET SPACING CORRECT
-
-blank <- grid.rect(gp=gpar(col="white"))
-p2 <- ggarrange(blank, mylegend, table.p, ncol = 3, widths = c(0.1,0.0005,1))
-
-# SAVE PLOT WITH TABLE
-
-png(paste0(output_dir,"Figure_1_t2dm_3panel_with_table.png"),
-    units = "mm", width=330, height=195, res = 1000)
-ggpubr::ggarrange(p1, 
-                  p2,
-                  nrow = 2,
-                  heights = c(1, 0.15)) 
-# annotation_custom(ggplotGrob(table.p),
-#                   xmin = 5.5, ymin = 20,
-#                   xmax = 8)
-dev.off() 
