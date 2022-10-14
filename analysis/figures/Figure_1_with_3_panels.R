@@ -36,6 +36,13 @@ hr_file_paths <- pmap(list(hr_files),
                       })
 estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
+# Read in stata ouptut
+
+tmp <- read.csv(paste0(results_dir, "/stata_output_formatted"))
+tmp$X <- NULL
+tmp <- tmp %>% select(intersect(colnames(estimates),colnames(tmp)))
+estimates <- rbind(estimates, tmp, fill = TRUE)
+
 # Get estimates for main analyses and list of outcomes from active analyses
 main_estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospitalised","covid_pheno_hospitalised", "main") 
                                        & event %in% outcomes_to_plot 
@@ -43,7 +50,6 @@ main_estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospital
                                        & results_fitted == "fitted_successfully"
                                        & model == "mdl_max_adj") %>%
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,median_follow_up)
-
 
 main_estimates <- main_estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
 
@@ -97,6 +103,15 @@ levels(main_estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)
 # MAIN --------------------------------------------------------------------
 
 for (i in unique(main_estimates$event)) {
+  
+  if(i=="vte"){
+    ylim <- c(0.5,512)
+    ybreaks <- c(0.5,1,2,4,8,16,32,64,128,256,512)
+  }else{
+    ylim = c(0.5,64)
+    ybreaks <- c(0.5,1,2,4,8,16,32,64)
+  }
+  
   df <- main_estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "main")
   
   assign(paste0("main_",i), ggplot2::ggplot(data=df,
@@ -104,14 +119,14 @@ for (i in unique(main_estimates$event)) {
     #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
     ggplot2::geom_point(aes(),size = 2) +
     ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-    ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.5,0.5,conf_low), 
-                                                              ymax = ifelse(conf_high>64,64,conf_high),  
+    ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<min(ylim),min(ylim),conf_low), 
+                                                              ymax = ifelse(conf_high>max(ylim),max(ylim),conf_high),  
                                                               width = 0), 
                            position = ggplot2::position_dodge(width = 0.5))+   
     #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
     ggplot2::geom_line() +
     #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
-    ggplot2::scale_y_continuous(lim = c(0.5,32), breaks = c(0.5,1,2,4,8,16,32), trans = "log") +
+    ggplot2::scale_y_continuous(lim = ylim, breaks = ybreaks, trans = "log") +
     ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
@@ -135,7 +150,22 @@ for (i in unique(main_estimates$event)) {
 
 # HOSPITALISED ------------------------------------------------------------
 for (i in unique(main_estimates$event)) {
+  if(i=="vte"){
+    ylim <- c(0.5,512)
+    ybreaks <- c(0.5,1,2,4,8,16,32,64,128,256,512)
+    y_min <- 0.5
+    y_max <- 512
+  }else{
+    ylim = c(0.5,64)
+    ybreaks <- c(0.5,1,2,4,8,16,32,64)
+    y_min <- 0.5
+    y_max <- 64
+  }
+  
   df <- main_estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "covid_pheno_hospitalised")
+
+  df$cohort <- factor(df$cohort, levels = c("Vaccinated (2021-06-01 - 2021-12-14)","Unvaccinated (2021-06-01 - 2021-12-14)"))
+  df$colour <- factor(df$colour, levels=c("#58764c","#94273c"))
   
   assign(paste0("hospitalised_",i), ggplot2::ggplot(data=df,
                                             mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
@@ -143,13 +173,13 @@ for (i in unique(main_estimates$event)) {
            ggplot2::geom_point(aes(),size = 2) +
            ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
            ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.5,0.5,conf_low), 
-                                                                     ymax = ifelse(conf_high>64,64,conf_high),  
+                                                                     ymax = ifelse(conf_high>512,512,conf_high),  
                                                                      width = 0), 
                                   position = ggplot2::position_dodge(width = 0.5))+   
            #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
            ggplot2::geom_line() +
            #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
-           ggplot2::scale_y_continuous(lim = c(0.5,32), breaks = c(0.5,1,2,4,8,16,32), trans = "log") +
+           ggplot2::scale_y_continuous(lim = ylim, breaks = ybreaks, trans = "log") +
            ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
            ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
            ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
@@ -170,12 +200,20 @@ for (i in unique(main_estimates$event)) {
            theme(text = element_text(size = 12)) +
            theme(legend.text = element_blank()))
   
-  
 }
 
 
 # NON HOSPITALISED --------------------------------------------------------
 for (i in unique(main_estimates$event)) {
+  
+  if(i=="vte"){
+    ylim <- c(0.5,512)
+    ybreaks <- c(0.5,1,2,4,8,16,32,64,128,256,512)
+  }else{
+    ylim = c(0.5,64)
+    ybreaks <- c(0.5,1,2,4,8,16,32,64)
+  }
+  
   df <- main_estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "covid_pheno_non_hospitalised")
   
   assign(paste0("non_hospitalised_",i), ggplot2::ggplot(data=df,
@@ -183,14 +221,14 @@ for (i in unique(main_estimates$event)) {
            #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
            ggplot2::geom_point(aes(), size = 2) +
            ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-           ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.5,0.5,conf_low), 
-                                                                     ymax = ifelse(conf_high>64,64,conf_high),  
+           ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<min(ylim),min(ylim),conf_low), 
+                                                                     ymax = ifelse(conf_high>max(ylim),max(ylim),conf_high),  
                                                                      width = 0), 
                                   position = ggplot2::position_dodge(width = 0.5))+   
            #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
            ggplot2::geom_line() +
            #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
-           ggplot2::scale_y_continuous(lim = c(0.5,32), breaks = c(0.5,1,2,4,8,16,32), trans = "log") +
+           ggplot2::scale_y_continuous(lim = ylim, breaks = ybreaks, trans = "log") +
            ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
            ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
            ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
@@ -267,7 +305,7 @@ table2[,3:7] <- format(table2[,3:7], big.mark = ",", scientific = FALSE)
 #   theme(plot.margin = margin(0.5,0.5,0.5,0.5, "cm")) 
 
 # NO COLOURS
-
+i="Venous thrombosis event"
 for(i in outcome_name_table$outcome){
   short_outcome <- outcome_name_table[outcome_name_table$outcome ==i,]$outcome_name
   main <- get(paste0("main_",short_outcome))
