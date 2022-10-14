@@ -22,6 +22,7 @@ outcome_name_table <- active_analyses %>%
 
 outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name %in% c("ate","vte","ate_primary_position","vte_primary_position")]
 
+outcome_name_table$outcome <- gsub(" events","",outcome_name_table$outcome)
 
 #---------------------------------------------#
 # 3. Load and combine all estimates in 1 file #
@@ -93,12 +94,17 @@ main_estimates$linetype <- ifelse(main_estimates$subgroup=="covid_pheno_non_hosp
 
 # Factor variables for ordering
 main_estimates$cohort <- factor(main_estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
-main_estimates$colour <- factor(main_estimates$colour, levels=c("#d2ac47","#58764c","#94273c"))
+main_estimates$colour <- factor(main_estimates$colour, levels=c("#d2ac47","#58764c","#0018a8"))
 
 main_estimates$subgroup <- factor(main_estimates$subgroup,levels = c("main", "covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
 
 # Rename adjustment groups
 levels(main_estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
+
+#Adjust confidence intervals
+main_estimates$conf_high <- ifelse(main_estimates$event == "vte" & main_estimates$conf_high>512,512,main_estimates$conf_high)
+main_estimates$conf_high <- ifelse(main_estimates$event != "vte" & main_estimates$conf_high>64,64,main_estimates$conf_high)
+main_estimates$conf_low <- ifelse(main_estimates$conf_low<0.5,0.5,main_estimates$conf_low)
 
 # MAIN --------------------------------------------------------------------
 
@@ -119,10 +125,10 @@ for (i in unique(main_estimates$event)) {
     #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
     ggplot2::geom_point(aes(),size = 2) +
     ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-    ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<min(ylim),min(ylim),conf_low), 
-                                                              ymax = ifelse(conf_high>max(ylim),max(ylim),conf_high),  
+    ggplot2::geom_errorbar(size = 1, mapping = ggplot2::aes(ymin = conf_low, 
+                                                              ymax = conf_high,  
                                                               width = 0), 
-                           position = ggplot2::position_dodge(width = 0.5))+   
+                           position = ggplot2::position_dodge(width = 0.5))+ 
     #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
     ggplot2::geom_line() +
     #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
@@ -165,17 +171,17 @@ for (i in unique(main_estimates$event)) {
   df <- main_estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "covid_pheno_hospitalised")
 
   df$cohort <- factor(df$cohort, levels = c("Vaccinated (2021-06-01 - 2021-12-14)","Unvaccinated (2021-06-01 - 2021-12-14)"))
-  df$colour <- factor(df$colour, levels=c("#58764c","#94273c"))
+  df$colour <- factor(df$colour, levels=c("#58764c","#0018a8"))
   
   assign(paste0("hospitalised_",i), ggplot2::ggplot(data=df,
                                             mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
            #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
            ggplot2::geom_point(aes(),size = 2) +
            ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-           ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<0.5,0.5,conf_low), 
-                                                                     ymax = ifelse(conf_high>512,512,conf_high),  
+           ggplot2::geom_errorbar(size = 1, mapping = ggplot2::aes(ymin = conf_low, 
+                                                                     ymax = conf_high,  
                                                                      width = 0), 
-                                  position = ggplot2::position_dodge(width = 0.5))+   
+                                  position = ggplot2::position_dodge(width = 0.5))+
            #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
            ggplot2::geom_line() +
            #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
@@ -221,10 +227,10 @@ for (i in unique(main_estimates$event)) {
            #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
            ggplot2::geom_point(aes(), size = 2) +
            ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
-           ggplot2::geom_errorbar(size = 1.2, mapping = ggplot2::aes(ymin = ifelse(conf_low<min(ylim),min(ylim),conf_low), 
-                                                                     ymax = ifelse(conf_high>max(ylim),max(ylim),conf_high),  
+           ggplot2::geom_errorbar(size = 1, mapping = ggplot2::aes(ymin = conf_low, 
+                                                                     ymax = conf_high,  
                                                                      width = 0), 
-                                  position = ggplot2::position_dodge(width = 0.5))+   
+                                  position = ggplot2::position_dodge(width = 0.5))+
            #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
            ggplot2::geom_line() +
            #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
@@ -284,6 +290,8 @@ table2 <- rbind(table2, table2_primary_position)
 
 table2$cohort <- ifelse(table2$cohort == "Pre-vaccinated", "Pre-Vaccination (2020-01-01 - 2021-06-18)", ifelse(table2$cohort == "Vaccinated","Vaccinated (2021-06-01 - 2021-12-14)", "Unvaccinated (2021-06-01 - 2021-12-14)") )
 
+table2$Outcome <- gsub(" events","",table2$Outcome)
+
 table2 <- table2 %>%
   dplyr::filter(Outcome %in% outcome_name_table$outcome) %>%
   dplyr::mutate(`Events after COVID-19` = `After hospitalised COVID-19` + `After non-hospitalised COVID-19`) %>%
@@ -305,7 +313,7 @@ table2[,3:7] <- format(table2[,3:7], big.mark = ",", scientific = FALSE)
 #   theme(plot.margin = margin(0.5,0.5,0.5,0.5, "cm")) 
 
 # NO COLOURS
-i="Venous thrombosis event"
+i="Arterial thrombosis event - Primary position"
 for(i in outcome_name_table$outcome){
   short_outcome <- outcome_name_table[outcome_name_table$outcome ==i,]$outcome_name
   main <- get(paste0("main_",short_outcome))
@@ -368,3 +376,4 @@ for(i in outcome_name_table$outcome){
   dev.off() 
   
 }
+
