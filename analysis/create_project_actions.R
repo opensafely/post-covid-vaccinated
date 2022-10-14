@@ -388,7 +388,7 @@ actions_list <- splice(
   
   action(
     name = "tmp_ate_main_vaccinated_stata",
-    run = "stata-mp:latest analysis/cox_model.do output/input_sampled_data_ate_main_vaccinated_reduced_time_periods.csv",
+    run = "stata-mp:latest analysis/cox_model.do input_sampled_data_ate_main_vaccinated_reduced_time_periods.csv",
     needs = list("Analysis_cox_ate_vaccinated"),
     moderately_sensitive = list(
       medianfup = "output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_stata_median_fup.csv",
