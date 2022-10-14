@@ -384,6 +384,15 @@ actions_list <- splice(
                 "stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_normal")),
     moderately_sensitive = list(
       stata_output = "output/stata_output.csv")
+  ),
+  
+  action(
+    name = "tmp_ate_main_vaccinated_stata",
+    run = "stata-mp:latest analysis/cox_model.do output/input_sampled_data_ate_main_vaccinated_reduced_time_periods.csv",
+    needs = list("Analysis_cox_ate_vaccinated"),
+    moderately_sensitive = list(
+      medianfup = "output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_stata_median_fup.csv",
+      stata_output = "output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_cox_model.txt")
   )
 
   

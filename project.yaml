@@ -1423,3 +1423,12 @@ actions:
       moderately_sensitive:
         stata_output: output/stata_output.csv
 
+  tmp_ate_main_vaccinated_stata:
+    run: stata-mp:latest analysis/cox_model.do output/input_sampled_data_ate_main_vaccinated_reduced_time_periods.csv
+    needs:
+    - Analysis_cox_ate_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_cox_model.txt
+
