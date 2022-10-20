@@ -163,7 +163,7 @@ main_estimates <- main_estimates %>%
     any(time_period_to_plot == "reduced") ~ "reduced",
     TRUE ~ "normal"))
 
-outcome_name="ate"
+
 for(outcome_name in outcomes_to_plot){
   df=main_estimates %>% filter(event==outcome_name & time_points == time_period_to_plot)
   

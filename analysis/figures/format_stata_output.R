@@ -84,7 +84,7 @@ df$median_follow_up <- df$median_follow_up - df$remove_from_median
 #Remove duplicate rows
 df <- df[!duplicated(df), ]
 
-df <- df %>% filter(event != "pe" | subgroup != "main")
+#df <- df %>% filter(event != "pe" | subgroup != "main")
 df <- df %>% filter(event != "hf_primary_position" | subgroup != "covid_pheno_non_hospitalised" | cohort != "electively_unvaccinated")
 
 write.csv(df, file = paste0(results_dir,"/stata_output_formatted"),row.names = FALSE)
