@@ -6,6 +6,7 @@ library(dplyr)
 library(ggplot2)
 library(ggpubr)
 library(grid)
+library(plyr)
 
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
 output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
@@ -40,7 +41,6 @@ estimates <- rbindlist(hr_file_paths, fill=TRUE)
 # Read in stata ouptut
 
 tmp <- read.csv(paste0(results_dir, "/stata_output_formatted"))
-tmp$X <- NULL
 tmp <- tmp %>% select(intersect(colnames(estimates),colnames(tmp)))
 estimates <- rbind(estimates, tmp, fill = TRUE)
 
@@ -106,8 +106,12 @@ main_estimates$conf_high <- ifelse(main_estimates$event == "vte" & main_estimate
 main_estimates$conf_high <- ifelse(main_estimates$event != "vte" & main_estimates$conf_high>64,64,main_estimates$conf_high)
 main_estimates$conf_low <- ifelse(main_estimates$conf_low<0.5,0.5,main_estimates$conf_low)
 
-# MAIN --------------------------------------------------------------------
+# X axis limits
+xlim <- c(0,round_any(max(main_estimates$median_follow_up, na.rm = T),4, f= ceiling))
+xbreaks <- seq(0,round_any(max(main_estimates$median_follow_up, na.rm = T),4, f= ceiling),4)
 
+# MAIN --------------------------------------------------------------------
+i="vte"
 for (i in unique(main_estimates$event)) {
   
   if(i=="vte"){
@@ -133,7 +137,7 @@ for (i in unique(main_estimates$event)) {
     ggplot2::geom_line() +
     #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
     ggplot2::scale_y_continuous(lim = ylim, breaks = ybreaks, trans = "log") +
-    ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
+    ggplot2::scale_x_continuous(lim = xlim, breaks = xbreaks) +
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
     ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
@@ -169,9 +173,6 @@ for (i in unique(main_estimates$event)) {
   }
   
   df <- main_estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "covid_pheno_hospitalised")
-
-  df$cohort <- factor(df$cohort, levels = c("Vaccinated (2021-06-01 - 2021-12-14)","Unvaccinated (2021-06-01 - 2021-12-14)"))
-  df$colour <- factor(df$colour, levels=c("#58764c","#0018a8"))
   
   assign(paste0("hospitalised_",i), ggplot2::ggplot(data=df,
                                             mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
@@ -186,7 +187,7 @@ for (i in unique(main_estimates$event)) {
            ggplot2::geom_line() +
            #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
            ggplot2::scale_y_continuous(lim = ylim, breaks = ybreaks, trans = "log") +
-           ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
+           ggplot2::scale_x_continuous(lim = xlim, breaks = xbreaks) +
            ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
            ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
            ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
@@ -235,7 +236,7 @@ for (i in unique(main_estimates$event)) {
            ggplot2::geom_line() +
            #ggplot2::scale_y_continuous(lim = c(0.5,8), breaks = c(0.5,1,2,4,8), trans = "log") +
            ggplot2::scale_y_continuous(lim = ylim, breaks = ybreaks, trans = "log") +
-           ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
+           ggplot2::scale_x_continuous(lim = xlim, breaks = xbreaks) +
            ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
            ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
            ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
