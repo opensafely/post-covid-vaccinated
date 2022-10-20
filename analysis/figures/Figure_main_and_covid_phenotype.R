@@ -6,9 +6,6 @@ library(dplyr)
 library(ggplot2)
 
 # Using local path - for testing
-#dir <- "C:/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - stage 6 - Figure 1 - 2022.02"
-#setwd(dir)
-
 #results_dir <- "/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - stage 6 - Figures CVD - 2021.08/output/"
 #output_dir <- "/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - stage 6 - Figures CVD - 2021.08/figures/"
 
@@ -25,8 +22,8 @@ outcome_name_table <- active_analyses %>%
   mutate(outcome_name=active_analyses$outcome_variable %>% str_replace("out_date_", ""))
 
 # Focus on first 8 CVD outcomes (remove ate and vte)
-#outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name != c("ate","vte","ate_primary_position","vte_primary_position)]
-outcomes_to_plot <- outcome_name_table$outcome_name
+outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name %in% c("ate","vte","ate_primary_position","vte_primary_position")]
+#outcomes_to_plot <- outcome_name_table$outcome_name
 #---------------------------------------------#
 # 3. Load and combine all estimates in 1 file #
 #---------------------------------------------#
@@ -40,15 +37,8 @@ hr_file_paths <- pmap(list(hr_files),
                       })
 estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
-# Read in stata ouptut
-
-tmp <- read.csv(paste0(results_dir, "/stata_output_formatted"))
-tmp <- tmp %>% select(intersect(colnames(estimates),colnames(tmp)))
-estimates <- rbind(estimates, tmp, fill = TRUE)
-rm(tmp)
-
 # Get estimates for main analyses and list of outcomes from active analyses
-main_estimates <- estimates %>% filter(subgroup == "main" 
+main_estimates <- estimates %>% filter(subgroup %in% c("main","covid_pheno_non_hospitalised","covid_pheno_hospitalised") 
                                        & event %in% outcomes_to_plot 
                                        & term %in% term[grepl("^days",term)]
                                        & results_fitted == "fitted_successfully"
@@ -56,28 +46,37 @@ main_estimates <- estimates %>% filter(subgroup == "main"
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,median_follow_up)
 
 
-main_estimates <- main_estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
+main_estimates <- main_estimates %>% mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
 
 # We want to plot the figures using the same time-points across all cohorts so that they can be compared
 # If any cohort uses reduced time points then all cohorts will be plotted with reduced time points
-main_estimates <- main_estimates %>%
-  group_by(event,subgroup,cohort) %>%
-  dplyr::mutate(time_period_to_plot = case_when(
-    any(time_points == "normal") ~ "normal",
-    TRUE ~ "reduced"))
+# main_estimates <- main_estimates %>%
+#   group_by(event,subgroup,cohort) %>%
+#   dplyr::mutate(time_period_to_plot = case_when(
+#     any(time_points == "normal") ~ "normal",
+#     TRUE ~ "reduced"))
+# 
+# main_estimates <- main_estimates %>%
+#   group_by(event,subgroup) %>%
+#   dplyr::mutate(time_period_to_plot = case_when(
+#     any(time_period_to_plot == "reduced") ~ "reduced",
+#     TRUE ~ "normal"))
 
-main_estimates <- main_estimates %>%
-  group_by(event,subgroup) %>%
-  dplyr::mutate(time_period_to_plot = case_when(
-    any(time_period_to_plot == "reduced") ~ "reduced",
-    TRUE ~ "normal"))
-
-
+main_estimates <- main_estimates %>% filter(time_points == "reduced")
 #---------------------------Specify time to plot--------------------------------
 main_estimates$add_to_median <- sub("days","",main_estimates$term)
 main_estimates$add_to_median <- as.numeric(sub("\\_.*","",main_estimates$add_to_median))
 
 main_estimates$median_follow_up <- ((main_estimates$median_follow_up + main_estimates$add_to_median)-1)/7
+#main_estimates$median_follow_up <- ifelse(main_estimates$median_follow_up == 0, 0.001,main_estimates$median_follow_up )
+
+
+#term_to_time <- data.frame(term = c("days0_7","days7_14", "days14_28", "days28_56", "days56_84", "days84_197","days197_535", 
+#                                    "days0_28","days28_197","days28_535"),
+#                           time = c(0.5,1.5,3,6,10,20,52,
+#                                    2,16,40))
+#main_estimates <- merge(main_estimates, term_to_time, by = c("term"), all.x = TRUE)
+
 
 #------------------------------------------#
 # 4. Specify groups and their line colours #
@@ -85,50 +84,25 @@ main_estimates$median_follow_up <- ((main_estimates$median_follow_up + main_esti
 # Specify colours
 main_estimates$colour <- ""
 main_estimates$colour <- ifelse(main_estimates$cohort=="pre_vaccination","#d2ac47",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$cohort=="vaccinated","#58764c",main_estimates$colour) 
-main_estimates$colour <- ifelse(main_estimates$cohort=="electively_unvaccinated","#0018a8",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$cohort=="vaccinated","#58764c",main_estimates$colour)
+main_estimates$colour <- ifelse(main_estimates$cohort=="electively_unvaccinated","#94273c",main_estimates$colour)
 
 # Factor variables for ordering
 main_estimates$cohort <- factor(main_estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
 main_estimates$colour <- factor(main_estimates$colour, levels=c("#d2ac47","#58764c","#94273c"))
 
 # Rename adjustment groups
-levels(main_estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
+levels(main_estimates$cohort) <- list("Pre-vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
 
-# Order outcomes for plotting
-# Use the nice names from active_analyses table i.e. outcome_name_table
-main_estimates <- main_estimates %>% left_join(outcome_name_table %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
+# Rename subgroups
 
-main_estimates$outcome <- factor(main_estimates$outcome, levels=c("Arterial thrombosis event",
-                                                                            "Venous thrombosis event",
-                                                                            "Acute myocardial infarction",
-                                                                            "Ischaemic stroke",
-                                                                            "Pulmonary embolism",
-                                                                            "Deep vein thrombosis",
-                                                                            "Transient ischaemic attack",
-                                                                            "Subarachnoid haemorrhage and haemorrhagic stroke",
-                                                                            "Heart failure",
-                                                                            "Angina",
-                                                                            "Arterial thrombosis event - Primary position events",
-                                                                            "Venous thrombosis event - Primary position events",
-                                                                            "Acute myocardial infarction - Primary position events",
-                                                                            "Ischaemic stroke - Primary position events",
-                                                                            "Pulmonary embolism - Primary position events",
-                                                                            "Deep vein thrombosis - Primary position events",
-                                                                            "Transient ischaemic attack - Primary position events",
-                                                                            "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events",
-                                                                            "Heart failure - Primary position events",
-                                                                            "Angina - Primary position events"))
+main_estimates$subgroup <- ifelse(main_estimates$subgroup == "main", "All COVID-19",main_estimates$subgroup)
+main_estimates$subgroup <- ifelse(main_estimates$subgroup == "covid_pheno_non_hospitalised", "Non-hospitalised COVID-19",main_estimates$subgroup)
+main_estimates$subgroup <- ifelse(main_estimates$subgroup == "covid_pheno_hospitalised", "Hospitalised COVID-19",main_estimates$subgroup)
 
-
-for(i in c("any_position","primary_position")){
-  if(i == "any_position"){
-    df <- main_estimates %>% filter(!event %in% event[grepl("primary_position",event)]
-                                    & time_points == time_period_to_plot)
-  }else{
-    df <- main_estimates %>% filter(event %in% event[grepl("primary_position",event)]
-                                    & time_points == time_period_to_plot)
-  }
+i="ate"
+for(i in unique(main_estimates$event)){
+  df <- main_estimates %>% filter(event == i)
   
   ggplot2::ggplot(data=df,
                   mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
@@ -143,7 +117,7 @@ for(i in c("any_position","primary_position")){
     ggplot2::geom_line() +
     #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
     ggplot2::scale_y_continuous(lim = c(0.5,64), breaks = c(0.5,1,2,4,8,16,32,64), trans = "log") +
-    ggplot2::scale_x_continuous(lim = c(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling)), breaks = seq(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling),4)) +
+    ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
     ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
@@ -158,10 +132,12 @@ for(i in c("any_position","primary_position")){
                    legend.title = ggplot2::element_blank(),
                    legend.position="bottom",
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
-    ggplot2::facet_wrap(outcome~., ncol = 2)
+    ggplot2::facet_wrap(subgroup~., ncol = 3)
   
-  ggplot2::ggsave(paste0(output_dir,"Figure1_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+  ggplot2::ggsave(paste0(output_dir,"Figure_panel_covid_subgroups_",i,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
   
   
 }
+
+
 

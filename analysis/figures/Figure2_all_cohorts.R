@@ -40,6 +40,13 @@ hr_file_paths <- pmap(list(hr_files),
                       })
 estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
+# Read in stata ouptut
+
+tmp <- read.csv(paste0(results_dir, "/stata_output_formatted"))
+tmp <- tmp %>% select(intersect(colnames(estimates),colnames(tmp)))
+estimates <- rbind(estimates, tmp, fill = TRUE)
+rm(tmp)
+
 # Get estimates for main analyses and list of outcomes from active analyses
 main_estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospitalised","covid_pheno_hospitalised") 
                                        & event %in% outcomes_to_plot 
@@ -71,15 +78,6 @@ main_estimates$add_to_median <- sub("days","",main_estimates$term)
 main_estimates$add_to_median <- as.numeric(sub("\\_.*","",main_estimates$add_to_median))
 
 main_estimates$median_follow_up <- ((main_estimates$median_follow_up + main_estimates$add_to_median)-1)/7
-main_estimates$median_follow_up <- ifelse(main_estimates$median_follow_up == 0, 0.001,main_estimates$median_follow_up )
-
-
-#term_to_time <- data.frame(term = c("days0_7","days7_14", "days14_28", "days28_56", "days56_84", "days84_197","days197_535", 
-#                                    "days0_28","days28_197","days28_535"),
-#                           time = c(0.5,1.5,3,6,10,20,52,
-#                                    2,16,40))
-#main_estimates <- merge(main_estimates, term_to_time, by = c("term"), all.x = TRUE)
-
 
 #------------------------------------------#
 # 4. Specify groups and their line colours #
@@ -87,8 +85,8 @@ main_estimates$median_follow_up <- ifelse(main_estimates$median_follow_up == 0, 
 # Specify colours
 main_estimates$colour <- ""
 main_estimates$colour <- ifelse(main_estimates$cohort=="pre_vaccination","#d2ac47",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$cohort=="vaccinated","#58764c",main_estimates$colour) # Grey
-main_estimates$colour <- ifelse(main_estimates$cohort=="electively_unvaccinated","#94273c",main_estimates$colour) # Black
+main_estimates$colour <- ifelse(main_estimates$cohort=="vaccinated","#58764c",main_estimates$colour) 
+main_estimates$colour <- ifelse(main_estimates$cohort=="electively_unvaccinated","#0018a8",main_estimates$colour)
 
 #Specify lines
 main_estimates$linetype <- ""
@@ -99,10 +97,13 @@ main_estimates$linetype <- ifelse(main_estimates$subgroup=="covid_pheno_non_hosp
 main_estimates$cohort <- factor(main_estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
 main_estimates$colour <- factor(main_estimates$colour, levels=c("#d2ac47","#58764c","#94273c"))
 main_estimates$linetype <- factor(main_estimates$linetype,levels = c("solid","dashed"))
-main_estimates$subgroup <- factor(main_estimates$subgroup,levels = c("covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
+
+# Rename subgroups
+main_estimates$subgroup <- ifelse(main_estimates$subgroup == "covid_pheno_hospitalised", "Hospitalised COVID-19","Non-hospitalised COVID-19")
+main_estimates$subgroup <- factor(main_estimates$subgroup,levels = c("Hospitalised COVID-19","Non-hospitalised COVID-19"))
 
 # Rename adjustment groups
-levels(main_estimates$cohort) <- list("Pre-vaccinated (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Electively unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
+levels(main_estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
 
 # Order outcomes for plotting
 # Use the nice names from active_analyses table i.e. outcome_name_table
@@ -131,14 +132,17 @@ main_estimates$outcome <- factor(main_estimates$outcome, levels=c("Arterial thro
 
 
 
-i="any_position"
+#Plot hospitalised results
 for(i in c("any_position","primary_position")){
   if(i == "any_position"){
     df <- main_estimates %>% filter(!event %in% event[grepl("primary_position",event)]
-                                    & time_points == "reduced")
+                                    & time_points == time_period_to_plot
+                                    & subgroup == "Hospitalised COVID-19"
+                                    & event != "stroke_sah_hs")
   }else{
     df <- main_estimates %>% filter(event %in% event[grepl("primary_position",event)]
-                                    & time_points == "reduced")
+                                    & time_points == time_period_to_plot
+                                    & subgroup == "Hospitalised COVID-19")
   }
   
   ggplot2::ggplot(data=df,
@@ -148,13 +152,14 @@ for(i in c("any_position","primary_position")){
     ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
     ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf_low<0.25,0.25,conf_low), 
                                                   ymax = ifelse(conf_high>64,64,conf_high),  
-                                                  width = 0), 
-                           position = ggplot2::position_dodge(width = 1))+   
+                                                  width = 0)
+                           #,position = ggplot2::position_dodge(width = 1)
+                           )+   
     #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
     ggplot2::geom_line() +
     #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
-    ggplot2::scale_y_continuous(lim = c(0.5,64), breaks = c(0.5,1,2,4,8,16,32,64), trans = "log") +
-    ggplot2::scale_x_continuous(lim = c(0,56), breaks = seq(0,56,4)) +
+    ggplot2::scale_y_continuous(lim = c(0.5,128), breaks = c(0.5,1,2,4,8,16,32,64), trans = "log") +
+    ggplot2::scale_x_continuous(lim = c(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling)), breaks = seq(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling),4)) +
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
     ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
@@ -172,8 +177,56 @@ for(i in c("any_position","primary_position")){
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
     ggplot2::facet_wrap(outcome~., ncol = 2)
   
-  ggplot2::ggsave(paste0(output_dir,"Figure2_covid_pheno_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
-  
+  ggplot2::ggsave(paste0(output_dir,"Figure2_hospitalised_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
   
 }
+
+for(i in c("any_position","primary_position")){
+  if(i == "any_position"){
+    df <- main_estimates %>% filter(!event %in% event[grepl("primary_position",event)]
+                                    & time_points == time_period_to_plot
+                                    & subgroup == "Non-hospitalised COVID-19"
+                                    & event != "stroke_sah_hs")
+  }else{
+    df <- main_estimates %>% filter(event %in% event[grepl("primary_position",event)]
+                                    & time_points == time_period_to_plot
+                                    & subgroup == "Non-hospitalised COVID-19")
+  }
+  
+  ggplot2::ggplot(data=df,
+                  mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
+    #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
+    ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf_low<0.25,0.25,conf_low), 
+                                                  ymax = ifelse(conf_high>64,64,conf_high),  
+                                                  width = 0)
+                           #,position = ggplot2::position_dodge(width = 1)
+                           )+   
+    #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
+    ggplot2::geom_line() +
+    #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
+    ggplot2::scale_y_continuous(lim = c(0.5,128), breaks = c(0.5,1,2,4,8,16,32,64), trans = "log") +
+    ggplot2::scale_x_continuous(lim = c(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling)), breaks = seq(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling),4)) +
+    ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
+    ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
+    ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
+    #ggplot2::scale_linetype_manual(values = levels(df$linetype), labels = levels(df$subgroup)) +
+    ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
+    ggplot2::guides(fill=ggplot2::guide_legend(ncol = 3, byrow = TRUE)) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
+                   panel.grid.minor = ggplot2::element_blank(),
+                   panel.spacing.x = ggplot2::unit(0.5, "lines"),
+                   panel.spacing.y = ggplot2::unit(0, "lines"),
+                   legend.key = ggplot2::element_rect(colour = NA, fill = NA),
+                   legend.title = ggplot2::element_blank(),
+                   legend.position="bottom",
+                   plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
+    ggplot2::facet_wrap(outcome~., ncol = 2)
+  
+  ggplot2::ggsave(paste0(output_dir,"Figure2_non_hospitalised_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+  
+}
+
 

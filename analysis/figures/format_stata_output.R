@@ -63,16 +63,28 @@ df$conf_high <- exp(df$conf_high)
 
 #Some results have been run twice (once in stata and once in R so remove duplicates)
 
-active_analyses <- read_rds("lib/active_analyses.rds")
+stata_analyses <- read_csv("lib/analyses_to_run_in_stata.csv")
+stata_analyses <- stata_analyses %>% dplyr::rename(time_points=time_periods,
+                                                   event = outcome)
 
+stata_analyses$subgroup <- ifelse(stata_analyses$subgroup=="hospitalised","covid_pheno_hospitalised",stata_analyses$subgroup)
+stata_analyses$subgroup <- ifelse(stata_analyses$subgroup=="non_hospitalised","covid_pheno_non_hospitalised",stata_analyses$subgroup)
 
+df <- merge(df,stata_analyses, by=c("event","subgroup","cohort","time_points"))
 
+#Previous time period days have been added to the median which hasn't been done in the R HRs abd gets done
+# in the figure scripts. Removing here so that everything is the same
+df$remove_from_median <- NA
+df$remove_from_median <- ifelse(grepl("days",df$term),df$term,df$remove_from_median)
+df$remove_from_median <- sub("days","",df$remove_from_median)
+df$remove_from_median <- as.numeric(sub("\\_.*","",df$remove_from_median))
 
+df$median_follow_up <- df$median_follow_up - df$remove_from_median
 
+#Remove duplicate rows
+df <- df[!duplicated(df), ]
+
+df <- df %>% filter(event != "pe" | subgroup != "main")
+df <- df %>% filter(event != "hf_primary_position" | subgroup != "covid_pheno_non_hospitalised" | cohort != "electively_unvaccinated")
 
 write.csv(df, file = paste0(results_dir,"/stata_output_formatted"),row.names = FALSE)
-
-df <- df %>% filter(cohort == "pre_vaccination" 
-                    & event == "vte"
-                    & subgroup == "main")
-
