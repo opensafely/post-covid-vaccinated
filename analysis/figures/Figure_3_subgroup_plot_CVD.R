@@ -30,8 +30,16 @@ hr_file_paths <- pmap(list(hr_files),
                       })
 estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
+# Read in stata ouptut
+
+tmp <- read.csv(paste0(results_dir, "/stata_output_formatted"))
+tmp <- tmp %>% select(intersect(colnames(estimates),colnames(tmp)))
+estimates <- rbind(estimates, tmp, fill = TRUE)
+rm(tmp)
+
 #-------------------------Filter to active outcomes-----------------------------
 main_estimates <- estimates %>% filter(!subgroup %in% c("covid_history","main","covid_pheno_hospitalised","covid_pheno_non_hospitalised","ethnicity_Missing")
+                                       & !subgroup %in% subgroup[grepl("aer_",subgroup)]
                                        & event %in% outcomes_to_plot 
                                        & term %in% term[grepl("^days",term)]
                                        & results_fitted == "fitted_successfully"
@@ -69,7 +77,7 @@ main_estimates$subgroup <- ifelse(main_estimates$subgroup=="ethnicity_South_Asia
 main_estimates$subgroup <- ifelse(main_estimates$subgroup=="ethnicity_Black","Ethnicity: Black",main_estimates$subgroup)
 main_estimates$subgroup <- ifelse(main_estimates$subgroup=="ethnicity_Other","Ethnicity: Other Ethnic Groups",main_estimates$subgroup)
 main_estimates$subgroup <- ifelse(main_estimates$subgroup=="ethnicity_Missing","Ethnicity: Missing",main_estimates$subgroup)
-
+unique(main_estimates$subgroup)
 # Give ethnicity estimates extra space -----------------------------------------
 
 #main_estimates$time <- ifelse(main_estimates$subgroup=="Ethnicity: South Asian", main_estimates$time-0.25, main_estimates$time)
@@ -104,7 +112,7 @@ main_estimates$colour <- ifelse(main_estimates$subgroup=="Prior history of event
 main_estimates$colour <- ifelse(main_estimates$subgroup=="No prior history of event","#fdbf6f",main_estimates$colour)
 main_estimates$colour <- ifelse(main_estimates$subgroup=="Non-hospitalised COVID-19","#fb9a99",main_estimates$colour)
 main_estimates$colour <- ifelse(main_estimates$subgroup=="Hospitalised COVID-19","#e31a1c",main_estimates$colour)
-
+unique(main_estimates$colour)
 # Make event names 'nice' ------------------------------------------------------
 
 main_estimates <- main_estimates %>% left_join(active_analyses %>% select(outcome, outcome_variable), by = c("event"="outcome_variable"))
@@ -122,23 +130,23 @@ main_estimates$grouping=ifelse(startsWith(main_estimates$subgroup,"Sex")==T,"Sex
 main_estimates$grouping=ifelse(startsWith(main_estimates$subgroup,"Ethnicity")==T,"Ethnicity",main_estimates$grouping)
 
 main_estimates$grouping_name=""
-main_estimates$grouping_name <- ifelse(main_estimates$cohort == "pre_vaccination", paste0(main_estimates$grouping," - Pre-vaccinated"),main_estimates$grouping_name)
+main_estimates$grouping_name <- ifelse(main_estimates$cohort == "pre_vaccination", paste0(main_estimates$grouping," - Pre-vaccination"),main_estimates$grouping_name)
 main_estimates$grouping_name <- ifelse(main_estimates$cohort == "vaccinated", paste0(main_estimates$grouping," - Vaccinated"),main_estimates$grouping_name)
-main_estimates$grouping_name <- ifelse(main_estimates$cohort == "electively_unvaccinated", paste0(main_estimates$grouping," - Electively unvaccinated"),main_estimates$grouping_name)
+main_estimates$grouping_name <- ifelse(main_estimates$cohort == "electively_unvaccinated", paste0(main_estimates$grouping," - Unvaccinated"),main_estimates$grouping_name)
 
 #Set factor levels
-main_estimates$grouping_name <- factor(main_estimates$grouping_name, levels = c("Age group - Pre-vaccinated",
+main_estimates$grouping_name <- factor(main_estimates$grouping_name, levels = c("Age group - Pre-vaccination",
                                                                       "Age group - Vaccinated",
-                                                                      "Age group - Electively unvaccinated",
-                                                                      "Ethnicity - Pre-vaccinated",
+                                                                      "Age group - Unvaccinated",
+                                                                      "Ethnicity - Pre-vaccination",
                                                                       "Ethnicity - Vaccinated"  ,
-                                                                      "Ethnicity - Electively unvaccinated",
-                                                                      "Prior history of event - Pre-vaccinated",
+                                                                      "Ethnicity - Unvaccinated",
+                                                                      "Prior history of event - Pre-vaccination",
                                                                       "Prior history of event - Vaccinated" ,
-                                                                      "Prior history of event - Electively unvaccinated",
-                                                                      "Sex - Pre-vaccinated",
+                                                                      "Prior history of event - Unvaccinated",
+                                                                      "Sex - Pre-vaccination",
                                                                       "Sex - Vaccinated",
-                                                                      "Sex - Electively unvaccinated"
+                                                                      "Sex - Unvaccinated"
                                                                       ))
 
 # We want to plot the figures using the same time-points across all cohorts so that they can be compared
@@ -243,4 +251,5 @@ for(outcome_name in outcomes_to_plot){
   
   ggplot2::ggsave(paste0(output_dir,"Figure3_subgroups_",outcome_name,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
 }
+
 
