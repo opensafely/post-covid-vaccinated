@@ -25,7 +25,11 @@ analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv")
 analyses_to_run_stata <- analyses_to_run_stata[,c("outcome","subgroup","cohort","time_periods")]
 analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="hospitalised","covid_pheno_hospitalised",analyses_to_run_stata$subgroup)
 analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="non_hospitalised","covid_pheno_non_hospitalised",analyses_to_run_stata$subgroup)
-analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run)
+
+#The normal time period actions have been removed for now as the stata code is only set up to run the 
+#reduced time periods
+analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run
+                                                          & time_periods == "reduced")
 
 # create action functions ----
 
@@ -372,27 +376,9 @@ actions_list <- splice(
   action(
     name = "format_stata_output",
     run = "r:latest analysis/format_stata_output.R",
-    needs = 
-      setdiff(paste0("stata_cox_model_",analyses_to_run_stata$outcome,"_",analyses_to_run_stata$subgroup,"_",analyses_to_run_stata$cohort,"_",analyses_to_run_stata$time_periods),
-              c("stata_cox_model_angina_covid_pheno_hospitalised_vaccinated_normal",
-                "stata_cox_model_pe_covid_pheno_hospitalised_vaccinated_normal",
-                "stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_normal",
-                "stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_normal",
-                "stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_normal",
-                "stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_normal",
-                "stata_cox_model_pe_covid_pheno_hospitalised_electively_unvaccinated_normal",
-                "stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_normal")),
+    needs = paste0("stata_cox_model_",analyses_to_run_stata$outcome,"_",analyses_to_run_stata$subgroup,"_",analyses_to_run_stata$cohort,"_",analyses_to_run_stata$time_periods),
     moderately_sensitive = list(
       stata_output = "output/stata_output.csv")
-  ),
-  
-  action(
-    name = "tmp_ate_main_vaccinated_stata",
-    run = "stata-mp:latest analysis/cox_model.do input_sampled_data_ate_main_vaccinated_reduced_time_periods",
-    needs = list("Analysis_cox_ate_vaccinated"),
-    moderately_sensitive = list(
-      medianfup = "output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_stata_median_fup.csv",
-      stata_output = "output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_cox_model.txt")
   )
 
   
