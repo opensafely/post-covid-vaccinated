@@ -249,7 +249,7 @@ for(outcome_name in outcomes_to_plot){
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +
     ggplot2::facet_wrap(grouping_name~.,ncol=3)
   
-  ggplot2::ggsave(paste0(output_dir,"Figure3_subgroups_",outcome_name,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+  ggplot2::ggsave(paste0(output_dir,"Figure_3_subgroups_",outcome_name,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
 }
 
 

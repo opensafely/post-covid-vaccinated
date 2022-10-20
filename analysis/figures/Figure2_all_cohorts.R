@@ -177,7 +177,7 @@ for(i in c("any_position","primary_position")){
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
     ggplot2::facet_wrap(outcome~., ncol = 2)
   
-  ggplot2::ggsave(paste0(output_dir,"Figure2_hospitalised_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+  ggplot2::ggsave(paste0(output_dir,"Figure_2_hospitalised_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
   
 }
 
@@ -225,7 +225,7 @@ for(i in c("any_position","primary_position")){
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
     ggplot2::facet_wrap(outcome~., ncol = 2)
   
-  ggplot2::ggsave(paste0(output_dir,"Figure2_non_hospitalised_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+  ggplot2::ggsave(paste0(output_dir,"Figure_2_non_hospitalised_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
   
 }
 
