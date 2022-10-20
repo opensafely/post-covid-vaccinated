@@ -21,6 +21,11 @@ active_analyses_table <- subset(active_analyses, active_analyses$active =="TRUE"
 outcomes_model <- active_analyses_table$outcome_variable %>% str_replace("out_date_", "")
 cohort_to_run <- c("vaccinated", "electively_unvaccinated")
 analyses <- c("main", "subgroups")
+analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv")
+analyses_to_run_stata <- analyses_to_run_stata[,c("outcome","subgroup","cohort","time_periods")]
+analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="hospitalised","covid_pheno_hospitalised",analyses_to_run_stata$subgroup)
+analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="non_hospitalised","covid_pheno_non_hospitalised",analyses_to_run_stata$subgroup)
+analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run)
 
 # create action functions ----
 
@@ -108,6 +113,22 @@ table2 <- function(cohort){
       needs = list("stage1_data_cleaning_both",glue("stage1_end_date_table_{cohort}")),
       moderately_sensitive = list(
         input_table_2 = glue("output/review/descriptives/table2_{cohort}.csv")
+      )
+    )
+  )
+}
+
+stata_actions <- function(outcome, cohort, subgroup, time_periods){
+  splice(
+    #comment(glue("Stata cox {outcome} {subgroup} {cohort} {time_periods}")),
+    action(
+      name = glue("stata_cox_model_{outcome}_{subgroup}_{cohort}_{time_periods}"),
+      run = "stata-mp:latest analysis/cox_model.do",
+      arguments = c(glue("input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods")),
+      needs = list(glue("Analysis_cox_{outcome}_{cohort}")),
+      moderately_sensitive = list(
+        medianfup = glue("output/input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods_stata_median_fup.csv"),
+        stata_output = glue("output/input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods_cox_model.txt")
       )
     )
   )
@@ -298,6 +319,22 @@ actions_list <- splice(
     unlist(lapply(cohort_to_run, function(x) table2(cohort = x)), recursive = FALSE)
   ),
   
+  action(
+    name = "event_counts_by_time_period_vaccinated",
+    run = "r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated",
+    needs = list("stage1_data_cleaning_both", "stage1_end_date_table_vaccinated"),
+    moderately_sensitive = list(
+      event_counts = "output/review/descriptives/event_counts_by_time_period_vaccinated.csv")
+  ),
+  
+  action(
+    name = "event_counts_by_time_period_electively_unvaccinated",
+    run = "r:latest analysis/descriptives/event_counts_by_time_period.R electively_unvaccinated",
+    needs = list("stage1_data_cleaning_both", "stage1_end_date_table_electively_unvaccinated"),
+    moderately_sensitive = list(
+      event_counts = "output/review/descriptives/event_counts_by_time_period_electively_unvaccinated.csv")
+  ),
+  
   #comment("Stage 4 - Venn diagrams"),
   action(
     name = "stage4_venn_diagram_both",
@@ -306,13 +343,114 @@ actions_list <- splice(
     moderately_sensitive = list(
       venn_diagram = glue("output/review/venn-diagrams/venn_diagram_*"))
   ),
+  
+  #comment("Temporary Stage 5a - Prepare data for models using reusable action"),
+  #action(
+  #  name = "reusableaction_input",
+  #  run = "r:latest analysis/reusableaction_input.R ami vaccinated",
+  #  needs = list("stage1_data_cleaning_both","stage1_end_date_table_vaccinated"),
+  #  highly_sensitive = list(
+  #    cohort = glue("output/reusableaction_input_*"))
+  #),
+  
+  #comment("Temporary Stage 5b - Apply models using reusable action"),
+  #action(
+  #  name = "reusableaction_model_main",
+  #  run = "cox-ipw:v0.0.4 --df_input=reusableaction_input_vaccinated_ami_main_analysis.csv --outcome=out_date_ami --covariate_other=cov_num_consulation_rate;cov_bin_healthcare_worker;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease --covariate_protect=cov_cat_sex;cov_num_age;cov_cat_region;cov_cat_ethnicity --cox_start=index_date --cox_stop=follow_up_end --controls_per_case=20 --df_output=results_vaccinated_ami_main.csv",
+  #  needs = list("stage1_data_cleaning_both","stage1_end_date_table_vaccinated","reusableaction_input"),
+  #  moderately_sensitive = list(
+  #    arguments = glue("output/args-results_vaccinated_ami_main.csv"),
+  #    estimates = glue("output/results_vaccinated_ami_main.csv"))
+  #),
+  
+  #comment("Temporary Stage 5b - Apply models using reusable action"),
+  #action(
+  #  name = "reusableaction_model_hospitalised",
+  #  run = "cox-ipw:v0.0.4 --df_input=reusableaction_input_vaccinated_ami_hospitalised_analysis.csv --outcome=out_date_ami --covariate_other=cov_num_consulation_rate;cov_bin_healthcare_worker;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease --covariate_protect=cov_cat_sex;cov_num_age;cov_cat_region;cov_cat_ethnicity --cox_start=index_date --cox_stop=follow_up_end --controls_per_case=20 --df_output=results_vaccinated_ami_hospitalised.csv",
+  #  needs = list("stage1_data_cleaning_both","stage1_end_date_table_vaccinated","reusableaction_input"),
+  #  moderately_sensitive = list(
+  #    arguments = glue("output/args-results_vaccinated_ami_hospitalised.csv"),
+  #    estimates = glue("output/results_vaccinated_ami_hospitalised.csv"))
+  #),
 
   #comment("Stage 5 - Apply models"),
   splice(
     # over outcomes
     unlist(lapply(outcomes_model, function(x) splice(unlist(lapply(cohort_to_run, function(y) apply_model_function(outcome = x, cohort = y)), recursive = FALSE))
-      ),recursive = FALSE)))
+      ),recursive = FALSE)),
   
+  splice(unlist(lapply(1:nrow(analyses_to_run_stata), 
+                       function(i) stata_actions(outcome = analyses_to_run_stata[i, "outcome"],
+                                                 subgroup = analyses_to_run_stata[i, "subgroup"],
+                                                 cohort = analyses_to_run_stata[i, "cohort"],
+                                                 time_periods = analyses_to_run_stata[i, "time_periods"])),
+                recursive = FALSE)),
+  
+  #comment("Format Stata output")
+  action(
+    name = "format_stata_output",
+    run = "r:latest analysis/format_stata_output.R",
+    needs = 
+      setdiff(paste0("stata_cox_model_",analyses_to_run_stata$outcome,"_",analyses_to_run_stata$subgroup,"_",analyses_to_run_stata$cohort,"_",analyses_to_run_stata$time_periods),
+              c("stata_cox_model_angina_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_pe_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_normal",
+                "stata_cox_model_pe_covid_pheno_hospitalised_electively_unvaccinated_normal",
+                "stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_normal")),
+    moderately_sensitive = list(
+      stata_output = "output/stata_output.csv")
+  ),
+  
+  action(
+    name = "tmp_ate_main_vaccinated_stata",
+    run = "stata-mp:latest analysis/cox_model.do input_sampled_data_ate_main_vaccinated_reduced_time_periods",
+    needs = list("Analysis_cox_ate_vaccinated"),
+    moderately_sensitive = list(
+      medianfup = "output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_stata_median_fup.csv",
+      stata_output = "output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_cox_model.txt")
+  )
+
+  
+  
+  #comment("Hospitalised event counts by covariate level"),
+  # splice(
+  #   # over cohort
+  #   unlist(lapply(cohort_to_run, function(x) hosp_event_counts_by_covariate_level(cohort = x)), recursive = FALSE)
+  # ),
+  
+  #comment("Select covariates for hosp COVID)
+  # action(
+  #   name = "select_covariates_for_hosp_covid",
+  #   run = "r:latest analysis/descriptives/determine_covariates_for_hosp_covid.R both",
+  #   needs = list("hosp_event_counts_by_covariate_level_vaccinated","hosp_event_counts_by_covariate_level_electively_unvaccinated"),
+  #   moderately_sensitive = list(
+  #     covariates_for_hosp_covid_vacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_vaccinated.csv",
+  #     covariates_for_hosp_covid_electively_unvacc = "output/not-for-review/covariates_to_adjust_for_hosp_covid_electively_unvaccinated.csv")
+  # ),
+  # 
+  
+  #action(
+  #  name = "stset_cox_model",
+  #  run = "r:latest analysis/stset_cox_model.R",
+  #   needs = list("stata_model"),
+  #   moderately_sensitive = list(
+  #     stset_cox_model = "output/stset_cox_model.csv")
+  # ),
+  # 
+  # action(
+  #   name = "stata_r_cox_input_difference",
+  #   run = "r:latest analysis/stata_r_input_data_difference.R",
+  #   needs = list("stata_model","Analysis_cox_ami_electively_unvaccinated"),
+  #   moderately_sensitive = list(
+  #     input_difference = "output/stata_r_input_difference.csv")
+  # ),
+  
+  
+)
+
 
 ## combine everything ----
 project_list <- splice(
@@ -323,7 +461,7 @@ project_list <- splice(
 #####################################################################################
 ## convert list to yaml, reformat comments and white space, and output a .yaml file #
 #####################################################################################
-as.yaml(project_list, indent=2) %>%
+x=as.yaml(project_list, indent=2) %>%
   # convert comment actions to comments
   convert_comment_actions() %>%
   # add one blank line before level 1 and level 2 keys

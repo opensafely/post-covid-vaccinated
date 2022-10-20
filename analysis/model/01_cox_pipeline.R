@@ -85,6 +85,11 @@ analyses_to_run <- analyses_to_run %>%
     TRUE ~ as.character(reduced_timepoint)))
 
 
+#Remove hospitalised analysis with normal timepoints as this will be run in stata and we don't need the saved data sets
+#from this.
+
+analyses_to_run <- analyses_to_run %>% filter(subgroup != "covid_pheno_hospitalised" | reduced_timepoint != "normal")
+
 # Source remainder of relevant files --------------------------------------------------------
 
 source(file.path(scripts_dir,paste0("03_01_cox_subgrouping.R"))) # Model specification

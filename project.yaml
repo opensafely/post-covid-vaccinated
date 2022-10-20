@@ -171,6 +171,24 @@ actions:
       moderately_sensitive:
         input_table_2: output/review/descriptives/table2_electively_unvaccinated.csv
 
+  event_counts_by_time_period_vaccinated:
+    run: r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        event_counts: output/review/descriptives/event_counts_by_time_period_vaccinated.csv
+
+  event_counts_by_time_period_electively_unvaccinated:
+    run: r:latest analysis/descriptives/event_counts_by_time_period.R electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        event_counts: output/review/descriptives/event_counts_by_time_period_electively_unvaccinated.csv
+
   stage4_venn_diagram_both:
     run: r:latest analysis/descriptives/venn_diagram.R both
     needs:
@@ -183,7 +201,7 @@ actions:
       moderately_sensitive:
         venn_diagram: output/review/venn-diagrams/venn_diagram_*
 
-  ## Apply cox model for ami - vaccinated cohort 
+  ## Cox model for ami - vaccinated 
 
   Analysis_cox_ami_vaccinated:
     run: r:latest analysis/model/01_cox_pipeline.R ami vaccinated
@@ -463,4 +481,884 @@ actions:
         compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_electively_unvaccinated_to_release.csv
         compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_electively_unvaccinated.csv
 
+  ## Cox model for ami_primary_position - vaccinated 
+
+  Analysis_cox_ami_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R ami_primary_position vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_ami_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ami_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ami_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ami_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_ami_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_ami_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_ami_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_ami_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for ami_primary_position - electively_unvaccinated 
+
+  Analysis_cox_ami_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R ami_primary_position electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_ami_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ami_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ami_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ami_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_ami_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_ami_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_ami_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_ami_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  ## Cox model for stroke_isch_primary_position - vaccinated 
+
+  Analysis_cox_stroke_isch_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R stroke_isch_primary_position vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_stroke_isch_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_isch_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_isch_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_isch_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_stroke_isch_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_stroke_isch_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for stroke_isch_primary_position - electively_unvaccinated 
+
+  Analysis_cox_stroke_isch_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R stroke_isch_primary_position electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_stroke_isch_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_isch_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_isch_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_isch_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_stroke_isch_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_stroke_isch_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_stroke_isch_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_stroke_isch_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  ## Cox model for dvt_primary_position - vaccinated 
+
+  Analysis_cox_dvt_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R dvt_primary_position vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_dvt_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_dvt_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_dvt_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_dvt_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_dvt_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_dvt_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_dvt_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_dvt_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for dvt_primary_position - electively_unvaccinated 
+
+  Analysis_cox_dvt_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R dvt_primary_position electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_dvt_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_dvt_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_dvt_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_dvt_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_dvt_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_dvt_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_dvt_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_dvt_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  ## Cox model for pe_primary_position - vaccinated 
+
+  Analysis_cox_pe_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R pe_primary_position vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_pe_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_pe_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_pe_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_pe_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_pe_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_pe_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_pe_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_pe_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for pe_primary_position - electively_unvaccinated 
+
+  Analysis_cox_pe_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R pe_primary_position electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_pe_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_pe_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_pe_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_pe_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_pe_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_pe_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_pe_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_pe_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  ## Cox model for tia_primary_position - vaccinated 
+
+  Analysis_cox_tia_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R tia_primary_position vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_tia_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_tia_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_tia_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_tia_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_tia_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_tia_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_tia_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_tia_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for tia_primary_position - electively_unvaccinated 
+
+  Analysis_cox_tia_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R tia_primary_position electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_tia_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_tia_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_tia_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_tia_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_tia_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_tia_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_tia_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_tia_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  ## Cox model for stroke_sah_hs_primary_position - vaccinated 
+
+  Analysis_cox_stroke_sah_hs_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R stroke_sah_hs_primary_position
+      vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_sah_hs_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_stroke_sah_hs_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_stroke_sah_hs_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for stroke_sah_hs_primary_position - electively_unvaccinated 
+
+  Analysis_cox_stroke_sah_hs_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R stroke_sah_hs_primary_position
+      electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_stroke_sah_hs_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_stroke_sah_hs_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_stroke_sah_hs_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_stroke_sah_hs_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_stroke_sah_hs_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_stroke_sah_hs_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_stroke_sah_hs_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  ## Cox model for hf_primary_position - vaccinated 
+
+  Analysis_cox_hf_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R hf_primary_position vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_hf_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_hf_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_hf_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_hf_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_hf_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_hf_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_hf_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_hf_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for hf_primary_position - electively_unvaccinated 
+
+  Analysis_cox_hf_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R hf_primary_position electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_hf_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_hf_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_hf_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_hf_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_hf_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_hf_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_hf_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_hf_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  ## Cox model for angina_primary_position - vaccinated 
+
+  Analysis_cox_angina_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R angina_primary_position vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_angina_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_angina_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_angina_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_angina_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_angina_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_angina_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_angina_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_angina_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for angina_primary_position - electively_unvaccinated 
+
+  Analysis_cox_angina_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R angina_primary_position electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_angina_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_angina_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_angina_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_angina_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_angina_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_angina_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_angina_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_angina_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  ## Cox model for ate_primary_position - vaccinated 
+
+  Analysis_cox_ate_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R ate_primary_position vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_ate_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ate_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ate_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ate_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_ate_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_ate_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_ate_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_ate_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for ate_primary_position - electively_unvaccinated 
+
+  Analysis_cox_ate_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R ate_primary_position electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_ate_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_ate_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_ate_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_ate_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_ate_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_ate_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_ate_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_ate_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  ## Cox model for vte_primary_position - vaccinated 
+
+  Analysis_cox_vte_primary_position_vaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R vte_primary_position vaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_vaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_vte_primary_position_vaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_vte_primary_position_vaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_primary_position_vaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_primary_position_vaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_vte_primary_position_vaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_vte_primary_position_*_vaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_vte_primary_position_*_vaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_vte_primary_position_*_vaccinated_*_time_periods.csv
+
+  ## Cox model for vte_primary_position - electively_unvaccinated 
+
+  Analysis_cox_vte_primary_position_electively_unvaccinated:
+    run: r:latest analysis/model/01_cox_pipeline.R vte_primary_position electively_unvaccinated
+    needs:
+    - stage1_data_cleaning_both
+    - stage1_end_date_table_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        analyses_not_run: output/review/model/analyses_not_run_vte_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv: output/review/model/suppressed_compiled_HR_results_vte_primary_position_electively_unvaccinated.csv
+        compiled_hrs_csv_to_release: output/review/model/suppressed_compiled_HR_results_vte_primary_position_electively_unvaccinated_to_release.csv
+        compiled_event_counts_csv: output/review/model/suppressed_compiled_event_counts_vte_primary_position_electively_unvaccinated.csv
+        compiled_event_counts_csv_non_supressed: output/review/model/compiled_event_counts_vte_primary_position_electively_unvaccinated.csv
+        describe_data_surv: output/not-for-review/describe_data_surv_vte_primary_position_*_electively_unvaccinated_*_time_periods.txt
+      highly_sensitive:
+        dataset: output/input_vte_primary_position_*_electively_unvaccinated_*_time_periods.csv
+        sampled_dataset: output/input_sampled_data_vte_primary_position_*_electively_unvaccinated_*_time_periods.csv
+
+  stata_cox_model_ami_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_ami_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ami_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ami_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ami_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_stroke_isch_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_stroke_isch_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_stroke_isch_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_stroke_isch_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_stroke_isch_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_dvt_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_dvt_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_dvt_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_dvt_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_dvt_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_pe_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_pe_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_pe_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_pe_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_pe_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_hf_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_hf_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_hf_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_angina_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_angina_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_angina_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_angina_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_angina_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_ate_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ate_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ate_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ate_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_ami_primary_position_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_ami_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ami_primary_position_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ami_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ami_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_stroke_isch_primary_position_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_stroke_isch_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_stroke_isch_primary_position_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_stroke_isch_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_stroke_isch_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_dvt_primary_position_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_dvt_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_dvt_primary_position_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_dvt_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_dvt_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_pe_primary_position_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_pe_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_pe_primary_position_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_pe_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_pe_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_hf_primary_position_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_hf_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_hf_primary_position_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_hf_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_angina_primary_position_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_angina_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_angina_primary_position_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_angina_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_angina_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_ate_primary_position_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_ate_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ate_primary_position_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ate_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ate_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_primary_position_covid_pheno_hospitalised_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_primary_position_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_primary_position_covid_pheno_hospitalised_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_pe_covid_pheno_hospitalised_vaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_pe_covid_pheno_hospitalised_vaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_pe_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_pe_covid_pheno_hospitalised_vaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_pe_covid_pheno_hospitalised_vaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_hf_covid_pheno_hospitalised_vaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_hf_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_covid_pheno_hospitalised_vaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_hf_covid_pheno_hospitalised_vaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_angina_covid_pheno_hospitalised_vaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_angina_covid_pheno_hospitalised_vaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_angina_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_angina_covid_pheno_hospitalised_vaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_angina_covid_pheno_hospitalised_vaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_ate_covid_pheno_hospitalised_vaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_ate_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ate_covid_pheno_hospitalised_vaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ate_covid_pheno_hospitalised_vaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_covid_pheno_hospitalised_vaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_vte_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_covid_pheno_hospitalised_vaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_covid_pheno_hospitalised_vaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_ami_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_ami_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ami_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ami_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ami_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_stroke_isch_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_stroke_isch_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_stroke_isch_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_stroke_isch_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_stroke_isch_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_dvt_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_dvt_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_dvt_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_dvt_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_dvt_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_pe_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_hf_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_hf_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_hf_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_hf_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_angina_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_angina_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_angina_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_angina_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_angina_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ate_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_ate_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_ate_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ate_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ate_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ate_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_pe_covid_pheno_hospitalised_electively_unvaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_pe_covid_pheno_hospitalised_electively_unvaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_pe_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_pe_covid_pheno_hospitalised_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_pe_covid_pheno_hospitalised_electively_unvaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_covid_pheno_hospitalised_electively_unvaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_covid_pheno_hospitalised_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_covid_pheno_hospitalised_electively_unvaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_angina_covid_history_vaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_angina_covid_history_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_angina_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_angina_covid_history_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_angina_covid_history_vaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_pe_main_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_pe_main_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_pe_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_pe_main_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_pe_main_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_pe_main_electively_unvaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_pe_main_electively_unvaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_pe_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_pe_main_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_pe_main_electively_unvaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_hf_main_electively_unvaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_hf_main_electively_unvaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_hf_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_main_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_hf_main_electively_unvaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_hf_main_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_hf_main_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_hf_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_main_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_hf_main_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_hf_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_sex_Male_electively_unvaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_sex_Male_electively_unvaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_sex_Male_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_sex_Male_electively_unvaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_vte_sex_Male_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_sex_Male_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_sex_Male_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_sex_Male_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_agegp_40_59_electively_unvaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_agegp_40_59_electively_unvaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_agegp_40_59_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_agegp_40_59_electively_unvaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_vte_agegp_60_79_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_agegp_60_79_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_agegp_60_79_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_agegp_60_79_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_ethnicity_White_electively_unvaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_ethnicity_White_electively_unvaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_ethnicity_White_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_ethnicity_White_electively_unvaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_vte_ethnicity_Black_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_ethnicity_Black_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_ethnicity_Black_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_ethnicity_Black_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_prior_history_FALSE_electively_unvaccinated_normal:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_prior_history_FALSE_electively_unvaccinated_normal_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_prior_history_FALSE_electively_unvaccinated_normal_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_prior_history_FALSE_electively_unvaccinated_normal_time_periods_cox_model.txt
+
+  stata_cox_model_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_hf_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_aer_Female_60_79_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_aer_Female_60_79_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_aer_Female_60_79_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_aer_Female_60_79_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  stata_cox_model_vte_aer_Male_60_79_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_vte_aer_Male_60_79_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_aer_Male_60_79_electively_unvaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_vte_aer_Male_60_79_electively_unvaccinated_reduced_time_periods_cox_model.txt
+
+  format_stata_output:
+    run: r:latest analysis/format_stata_output.R
+    needs:
+    - stata_cox_model_ami_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_stroke_isch_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_dvt_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_pe_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_hf_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_angina_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_ami_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_stroke_isch_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_dvt_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_pe_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_hf_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_angina_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_ate_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_vte_primary_position_covid_pheno_hospitalised_vaccinated_reduced
+    - stata_cox_model_ami_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_stroke_isch_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_dvt_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_pe_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_hf_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_angina_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_ate_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_ate_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_angina_covid_history_vaccinated_reduced
+    - stata_cox_model_pe_main_electively_unvaccinated_reduced
+    - stata_cox_model_pe_main_electively_unvaccinated_normal
+    - stata_cox_model_hf_main_electively_unvaccinated_normal
+    - stata_cox_model_hf_main_electively_unvaccinated_reduced
+    - stata_cox_model_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_vte_sex_Male_electively_unvaccinated_normal
+    - stata_cox_model_vte_sex_Male_electively_unvaccinated_reduced
+    - stata_cox_model_vte_agegp_40_59_electively_unvaccinated_normal
+    - stata_cox_model_vte_agegp_60_79_electively_unvaccinated_reduced
+    - stata_cox_model_vte_ethnicity_White_electively_unvaccinated_normal
+    - stata_cox_model_vte_ethnicity_Black_electively_unvaccinated_reduced
+    - stata_cox_model_vte_prior_history_FALSE_electively_unvaccinated_normal
+    - stata_cox_model_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_model_vte_aer_Female_60_79_electively_unvaccinated_reduced
+    - stata_cox_model_vte_aer_Male_60_79_electively_unvaccinated_reduced
+    outputs:
+      moderately_sensitive:
+        stata_output: output/stata_output.csv
+
+  tmp_ate_main_vaccinated_stata:
+    run: stata-mp:latest analysis/cox_model.do input_sampled_data_ate_main_vaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ate_vaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_stata_median_fup.csv
+        stata_output: output/input_sampled_data_ate_main_vaccinated_reduced_time_periods_cox_model.txt
 
