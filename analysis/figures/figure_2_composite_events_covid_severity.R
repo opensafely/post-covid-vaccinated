@@ -4,13 +4,9 @@ library(data.table)
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
+library(ggpubr)
+library(grid)
 
-# Using local path - for testing
-#dir <- "C:/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - stage 6 - Figure 1 - 2022.02"
-#setwd(dir)
-
-#results_dir <- "/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - stage 6 - Figures CVD - 2021.08/output/"
-#output_dir <- "/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - stage 6 - Figures CVD - 2021.08/figures/"
 
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
 output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
@@ -22,23 +18,22 @@ active_analyses <- read_rds("lib/active_analyses.rds") %>% filter(active == "TRU
 
 outcome_name_table <- active_analyses %>% 
   select(outcome, outcome_variable) %>% 
-  mutate(outcome_name=active_analyses$outcome_variable %>% str_replace("out_date_", ""))
+  mutate(outcome_name=active_analyses$outcome_variable %>% str_replace("out_date_", "")) %>%
+  filter(outcome_name %in% c("ate","vte","ate_primary_position","vte_primary_position"))
 
-# Focus on first 8 CVD outcomes (remove ate and vte)
-outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name != c("ate","vte","ate_primary_position","vte_primary_position")]
-#outcomes_to_plot <- outcome_name_table$outcome_name
+outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name %in% c("ate","vte","ate_primary_position","vte_primary_position")]
 
+outcome_name_table$outcome <- gsub(" events","",outcome_name_table$outcome)
 
 # Load all estimates
 estimates <- read.csv(paste0(results_dir,"/hr_output_formatted.csv"))
 
 # Get estimates for main analyses and list of outcomes from active analyses
-estimates <- estimates %>% filter(subgroup == "main" 
-                                  & event %in% outcomes_to_plot 
-                                  & term %in% term[grepl("^days",term)]
-                                  & model == "mdl_max_adj") %>%
+estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospitalised","covid_pheno_hospitalised", "main") 
+                                       & event %in% outcomes_to_plot 
+                                       & term %in% term[grepl("^days",term)]
+                                       & model == "mdl_max_adj") %>%
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,median_follow_up)
-
 
 estimates <- estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
 
@@ -56,59 +51,39 @@ estimates <- estimates %>%
     any(time_period_to_plot == "reduced") ~ "reduced",
     TRUE ~ "normal"))
 
+
+
 #------------------------------------------#
-# 4. Specify groups and their line colours #
+# Specify groups and their line colours #
 #------------------------------------------#
 # Specify colours
 estimates$colour <- ""
 estimates$colour <- ifelse(estimates$cohort=="pre_vaccination","#d2ac47",estimates$colour)
-estimates$colour <- ifelse(estimates$cohort=="vaccinated","#58764c",estimates$colour) 
-estimates$colour <- ifelse(estimates$cohort=="electively_unvaccinated","#0018a8",estimates$colour)
+estimates$colour <- ifelse(estimates$cohort=="vaccinated","#58764c",estimates$colour) # Grey
+estimates$colour <- ifelse(estimates$cohort=="electively_unvaccinated","#0018a8",estimates$colour) # Black
 
 # Factor variables for ordering
 estimates$cohort <- factor(estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
-estimates$colour <- factor(estimates$colour, levels=c("#d2ac47","#58764c","#94273c"))
+estimates$colour <- factor(estimates$colour, levels=c("#d2ac47","#58764c","#0018a8"))
+
+estimates$subgroup <- factor(estimates$subgroup,levels = c("main", "covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
 
 # Rename adjustment groups
 levels(estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
+levels(estimates$subgroup) <- list("All COVID-19"="main", "Hospitalised COVID-19"="covid_pheno_hospitalised","Non-hospitalised COVID-19"="covid_pheno_non_hospitalised")
 
-# Order outcomes for plotting
-# Use the nice names from active_analyses table i.e. outcome_name_table
-estimates <- estimates %>% left_join(outcome_name_table %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
-
-estimates$outcome <- factor(estimates$outcome, levels=c("Acute myocardial infarction",
-                                                        "Ischaemic stroke",
-                                                        "Pulmonary embolism",
-                                                        "Deep vein thrombosis",
-                                                        "Transient ischaemic attack",
-                                                        "Subarachnoid haemorrhage and haemorrhagic stroke",
-                                                        "Heart failure",
-                                                        "Angina",
-                                                        "Acute myocardial infarction - Primary position events",
-                                                        "Ischaemic stroke - Primary position events",
-                                                        "Pulmonary embolism - Primary position events",
-                                                        "Deep vein thrombosis - Primary position events",
-                                                        "Transient ischaemic attack - Primary position events",
-                                                        "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events",
-                                                        "Heart failure - Primary position events",
-                                                        "Angina - Primary position events"))
-                                                                           
-                                                                            
-
-
-for(i in c("any_position","primary_position")){
-  if(i == "any_position"){
-    df <- estimates %>% filter(!event %in% event[grepl("primary_position",event)]
-                                    & time_points == time_period_to_plot)
-    ylim <- 256
-    ybreaks <- c(0.5,1,2,4,8,16,32,64,128)
-  }else{
-    df <- estimates %>% filter(event %in% event[grepl("primary_position",event)]
-                                    & time_points == time_period_to_plot)
-    ylim <- 64
-    ybreaks <- c(0.5,1,2,4,8,16,32)
-  }
+i="vte"
+for(i in outcomes_to_plot){
   
+  if(i=="vte"){
+    ylim <- 512
+    ybreaks <- c(0.5,1,2,4,8,16,32,64,128,256)
+  }else{
+    ylim = 64
+    ybreaks <- c(0.5,1,2,4,8,16,32,64)
+  }
+  df <- estimates %>% filter(event == i
+                             & time_points == time_period_to_plot)
   
   ggplot2::ggplot(data=df,
                   mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
@@ -119,7 +94,7 @@ for(i in c("any_position","primary_position")){
                                                   ymax = ifelse(conf_high>ylim,ylim,conf_high),  
                                                   width = 0)
                            #,position = ggplot2::position_dodge(width = 1)
-                           )+   
+    )+   
     #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
     ggplot2::geom_line() +
     #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
@@ -129,7 +104,7 @@ for(i in c("any_position","primary_position")){
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
     ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
     ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-    ggplot2::guides(fill=ggplot2::guide_legend(ncol = 2, byrow = TRUE)) +
+    ggplot2::guides(fill=ggplot2::guide_legend(ncol = 3, byrow = TRUE)) +
     ggplot2::theme_minimal() +
     ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
                    panel.grid.minor = ggplot2::element_blank(),
@@ -139,10 +114,11 @@ for(i in c("any_position","primary_position")){
                    legend.title = ggplot2::element_blank(),
                    legend.position="bottom",
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
-    ggplot2::facet_wrap(outcome~., ncol = 2)
+    ggplot2::facet_wrap(subgroup~., ncol = 3)
   
-  ggplot2::ggsave(paste0(output_dir,"Figure_1_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+  ggplot2::ggsave(paste0(output_dir,"Figure_2_",i,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
   
   
 }
+
 
