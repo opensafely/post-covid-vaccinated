@@ -48,7 +48,7 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   
   input$time_period_start <- gsub("\\_.*", "",input[,i])                        #Remove everything after _
   input$time_period_end <- gsub(".*_", "",input[,i])                            #Remove everything before _
-  input <- input %>% mutate(across(c("time_period_start", "time_period_end"), as.numeric))
+  input <- input %>% dplyr::mutate(across(c("time_period_start", "time_period_end"), as.numeric))
   
   
   #---------------------------------------------------------------
@@ -77,6 +77,7 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   for(i in 1:nrow(input)){
     tmp <- input[i,]
     lifetable$hr_main <- ifelse(lifetable$days >= tmp$time_period_start & lifetable$days < tmp$time_period_end, tmp$estimate_main, lifetable$hr_main)
+    lifetable$hr_main <- as.numeric(lifetable$hr_main)
   }
   
   lifetable$hr_subgroup <- NA
@@ -84,6 +85,7 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   for(i in 1:nrow(input)){
     tmp <- input[i,]
     lifetable$hr_subgroup <- ifelse(lifetable$days >= tmp$time_period_start & lifetable$days < tmp$time_period_end, tmp$estimate_subgroup, lifetable$hr_subgroup)
+    lifetable$hr_subgroup <- as.numeric(lifetable$hr_subgroup)
   }
   
   #Occasionally HR is redacted, is so set to null

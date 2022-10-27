@@ -71,7 +71,13 @@ hr_file_paths <- pmap(list(hr_files),
                       })
 input <- rbindlist(hr_file_paths, fill=TRUE)
 
-                                                            
+# Read in stata ouptut
+
+tmp <- read.csv(paste0(results_dir, "/stata_output_formatted"))
+tmp <- tmp %>% select(intersect(colnames(input),colnames(tmp)))
+input <- rbind(input, tmp, fill = TRUE)
+rm(tmp)
+
 #-------------------Select required columns and term----------------------------
 input <- input %>% 
   filter(str_detect(term, "^days")
@@ -86,16 +92,16 @@ table2_pre_vax <- read.csv(paste0(results_dir,"table2_pre_vaccination_cvd.csv"))
 table2_vax <- read.csv(paste0(results_dir,"table2_vaccinated.csv"))
 table2_unvax <- read.csv(paste0(results_dir,"table2_electively_unvaccinated.csv"))
 
-table2_pre_vax <- rename(table2_pre_vax, cohort = cohort_name)
-table2_vax <- rename(table2_vax, cohort = cohort_to_run)
-table2_unvax <- rename(table2_unvax, cohort = cohort_to_run)
+table2_pre_vax <- dplyr::rename(table2_pre_vax, cohort = cohort_name)
+table2_vax <- dplyr::rename(table2_vax, cohort = cohort_to_run)
+table2_unvax <- dplyr::rename(table2_unvax, cohort = cohort_to_run)
 
 table_2 <- rbind(table2_pre_vax, table2_vax,table2_unvax)
 rm(table2_pre_vax,table2_vax,table2_unvax)
 
 #-------------------Select required columns and term----------------------------
 
-table_2 <- table_2 %>% select(subgroup, event, cohort,unexposed_person_days,unexposed_event_count,total_covid19_cases) %>%
+table_2 <- table_2 %>% select(subgroup, event, cohort,unexposed_person_days,unexposed_event_count,total_covid19_cases, N_population_size) %>%
                       filter(startsWith(subgroup, "aer_"))
             
 table_2$event <- gsub("out_date_","",table_2$event)
@@ -106,11 +112,11 @@ table_2$event <- gsub("out_date_","",table_2$event)
 tmp <- input %>% filter(subgroup == "main")
 tmp$subgroup <- NULL
 results <- results %>% left_join(tmp, by=c("event","cohort","model","time_points","term"))
-results <- results %>% rename(estimate_main = estimate)
+results <- results %>% dplyr::rename(estimate_main = estimate)
 
 tmp <- input %>% filter(subgroup != "main")
 results <- results %>% left_join(tmp, by=c("event","cohort","model","time_points","term","subgroup"))
-results <- results %>% rename(estimate_subgroup = estimate)
+results <- results %>% dplyr::rename(estimate_subgroup = estimate)
 
 #Remove any rows where both HR estimates are NA
 results <- results %>% filter(!is.na(estimate_main) | !is.na(estimate_subgroup))
@@ -124,7 +130,7 @@ results <- results %>% mutate(across(c(estimate_main,estimate_subgroup, unexpose
 df <- results %>% select(event, subgroup, model, cohort, time_points) %>% distinct
 active_available <- merge(active,df)
 active_unavailable <- active %>% anti_join(active_available)
-rm(active,table_2,df,input,tmp)
+rm(active,df,input,tmp)
 
 input <- results
 rm(results)
@@ -141,9 +147,12 @@ rm(results)
 # 
 # input <- input %>% filter(time_points == time_points_to_use) %>%
 #                   select(-time_points_to_use)
-
+# event_of_interest = active_available$event[1]
+# cohort_of_interest = active_available$cohort[1]
+# model_of_interest = active_available$model[1]
+# subgroup_of_interest = active_available$subgroup[1]
+# time_point_of_interest = active_available$time_points[1]
 #-------------------------Run AER function--------------------------------------
-
 lapply(split(active_available,seq(nrow(active_available))),
        function(active_available)
          excess_risk(   
@@ -163,27 +172,39 @@ AER_compiled_results <- purrr::pmap(list(AER_files),
                                       df <- fread(fpath)
                                       return(df)})
 AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
-write.csv(AER_compiled_results, paste0(aer_compiled_output_dir,"/AER_compiled_results.csv"), row.names = F)
 
 # Calculate overall AER
-AER_compiled_results <- AER_compiled_results %>% select(days, event, cohort, subgroup, time_points, AER_main, AER_subgroup)
-table2_vax <- read.csv("output/review/descriptives/table2_vaccinated.csv")
-table2_vax <- table2_vax %>% select(subgroup, event, cohort_to_run, N_population_size) %>% rename(cohort = cohort_to_run)
-table2_vax$event <- gsub("out_date_","",table2_vax$event)
+AER_combined <- AER_compiled_results %>% select(days, event, cohort, subgroup, time_points, excess_risk_main, excess_risk_subgroup)
+table_2 <- table_2 %>% select(event, cohort, subgroup, N_population_size)
 
-AER_compiled_results <- AER_compiled_results %>% left_join(table2_vax, by=c("event","cohort","subgroup"))
+AER_combined <- AER_combined %>% left_join(table_2, by=c("event","cohort","subgroup"))
 
-AER_compiled_results_overall <- AER_compiled_results %>% filter(!is.na(AER_main))
-AER_compiled_results_subgroup <- AER_compiled_results %>% filter(!is.na(AER_subgroup))
+AER_combined_overall <- AER_combined %>% filter(!is.na(excess_risk_main))
+AER_combined_subgroup <- AER_combined %>% filter(!is.na(excess_risk_subgroup))
 
-AER_compiled_results_overall <- AER_compiled_results_overall %>% 
+AER_combined_overall <- AER_combined_overall %>% 
   group_by(days, event, cohort,time_points) %>%
   mutate(weight = N_population_size/sum(N_population_size))
 
-AER_compiled_results_overall <- AER_compiled_results_overall %>% 
-  group_by(days, event, cohort,time_points) %>%
-  summarise(weighted_mean = weighted.mean(AER_main,weight))
- 
+AER_combined_overall <- AER_combined_overall %>% 
+  dplyr::group_by(days, event, cohort,time_points) %>%
+  dplyr::summarise(weighted_mean = weighted.mean(excess_risk_main,weight))
 
-tmp <- AER_compiled_results_overall %>% filter(event == "ate" & cohort == "vaccinated"  & days == "0" & time_points == "reduced")
-weighted.mean(tmp$AER_main,tmp$weight)
+AER_combined_subgroup <- AER_combined_subgroup %>% 
+  group_by(days, event, cohort,time_points) %>%
+  mutate(weight = N_population_size/sum(N_population_size))
+
+AER_combined_subgroup <- AER_combined_subgroup %>% 
+  dplyr::group_by(days, event, cohort,time_points) %>%
+  dplyr::summarise(weighted_mean = weighted.mean(excess_risk_subgroup,weight))
+
+#Join all results together 
+AER_combined_overall$subgroup <- "aer_overall"
+AER_combined_subgroup$subgroup <- "aer_overall"
+
+AER_combined_overall <- AER_combined_overall %>% dplyr::rename(excess_risk_main = weighted_mean )
+AER_combined_subgroup <- AER_combined_subgroup %>% dplyr::rename(excess_risk_subgroup = weighted_mean )
+
+AER_compiled_results <- rbind(AER_compiled_results,AER_combined_overall,AER_combined_subgroup, fill = TRUE)
+
+write.csv(AER_compiled_results, paste0(aer_compiled_output_dir,"/AER_compiled_results.csv"), row.names = F)

@@ -27,27 +27,27 @@ lifetables$excess_risk_subgroup <- lifetables$excess_risk_subgroup *100
 #-------------------------Make event names 'nice' ------------------------------
 lifetables <- lifetables %>% left_join(active_analyses %>% select(outcome, outcome_variable), by = c("event"="outcome_variable"))
 lifetables$outcome <- factor(lifetables$outcome, levels = c("Arterial thrombosis event","Venous thrombosis event","Arterial thrombosis event - Primary position events","Venous thrombosis event - Primary position events"))
+
 #-------------------------------Format group names--------------------------
 lifetables$agegroup <- NA
 lifetables$agegroup <- ifelse(grepl("18_39",lifetables$subgroup),"Age group: 18-39",lifetables$agegroup)
 lifetables$agegroup <- ifelse(grepl("40_59",lifetables$subgroup),"Age group: 40-59",lifetables$agegroup)
 lifetables$agegroup <- ifelse(grepl("60_79",lifetables$subgroup),"Age group: 60-79",lifetables$agegroup)
 lifetables$agegroup <- ifelse(grepl("80_110",lifetables$subgroup),"Age group: 80-110",lifetables$agegroup)
-
+lifetables$agegroup <- ifelse(grepl("aer_overall",lifetables$subgroup),"Combined",lifetables$agegroup)
+unique(lifetables$agegroup)
+#-------------------------------Format sex group names--------------------------
 lifetables$sex <- NA
 lifetables$sex <- ifelse(grepl("Female",lifetables$subgroup),"Sex: Female",lifetables$sex)
 lifetables$sex <- ifelse(grepl("Male",lifetables$subgroup),"Sex: Male",lifetables$sex)
-
+lifetables$sex <- ifelse(grepl("aer_overall",lifetables$subgroup),"Sex: Male",lifetables$sex)
+unique(lifetables$sex)
 #-------------------------------Format cohort names--------------------------
 lifetables$cohort <- ifelse(lifetables$cohort == "electively_unvaccinated" ,"Unvaccinated (2021-06-01 - 2021-12-14)",lifetables$cohort)
 lifetables$cohort <- ifelse(lifetables$cohort == "vaccinated" ,"Vaccinated (2021-06-01 - 2021-12-14)",lifetables$cohort)
 lifetables$cohort <- ifelse(lifetables$cohort == "pre_vaccination" ,"Pre-vaccination (2020-01-01 - 2021-06-18)",lifetables$cohort)
 lifetables$cohort <- factor(lifetables$cohort, levels = c("Pre-vaccination (2020-01-01 - 2021-06-18)","Vaccinated (2021-06-01 - 2021-12-14)","Unvaccinated (2021-06-01 - 2021-12-14)"))
 
-#-------------------------------Format sex group names--------------------------
-lifetables$sex <- NA
-lifetables$sex <- ifelse(grepl("Female",lifetables$subgroup),"Sex: Female",lifetables$sex)
-lifetables$sex <- ifelse(grepl("Male",lifetables$subgroup),"Sex: Male",lifetables$sex)
 
 # Specify line colours ---------------------------------------------------------
 
@@ -56,6 +56,8 @@ lifetables$colour <- ifelse(lifetables$agegroup=="Age group: 18-39","#006d2c",li
 lifetables$colour <- ifelse(lifetables$agegroup=="Age group: 40-59","#31a354",lifetables$colour)
 lifetables$colour <- ifelse(lifetables$agegroup=="Age group: 60-79","#74c476",lifetables$colour)
 lifetables$colour <- ifelse(lifetables$agegroup=="Age group: 80-110","#bae4b3",lifetables$colour)
+lifetables$colour <- ifelse(lifetables$agegroup=="Combined","#000000",lifetables$colour)
+unique(lifetables$colour)
 
 # Specify line types ---------------------------------------------------------
 lifetables$linetype <- NA
@@ -67,8 +69,8 @@ lifetables$weeks <- lifetables$days /7
 
 #Filter the lifetables to non-NA results split by using the HRs from the overall results (hr_main)
 # & using the age/sex HRs (hr_subgroup)
-lifetables_main <- lifetables %>% filter(!is.na(hr_main))
-lifetables_subgroup <- lifetables %>% filter(!is.na(hr_subgroup))
+lifetables_main <- lifetables %>% filter(!is.na(excess_risk_main))
+lifetables_subgroup <- lifetables %>% filter(!is.na(excess_risk_subgroup))
 
 #--------------Option 1: Indivdual plots for each outcome and cohort------------
 
@@ -87,7 +89,7 @@ for(outcome_position in c("any_position","primary_position")){
     if(nrow(df)>0){
       #Set agegroup levels as factor
       agegroup_levels <-c()
-      for(i in c("Age group: 18-39","Age group: 40-59","Age group: 60-79","Age group: 80-110")){
+      for(i in c("Age group: 18-39","Age group: 40-59","Age group: 60-79","Age group: 80-110","Combined")){
         levels_available <- unique(df$agegroup)
         if(i %in% levels_available){
           agegroup_levels <- append(agegroup_levels,i)
@@ -109,7 +111,7 @@ for(outcome_position in c("any_position","primary_position")){
       
       #Set colour levels as factor
       colour_levels <-c()
-      for(i in c("#006d2c","#31a354","#74c476","#bae4b3")){
+      for(i in c("#006d2c","#31a354","#74c476","#bae4b3","#000000")){
         levels_available <- unique(df$colour)
         if(i %in% levels_available){
           colour_levels <- append(colour_levels,i)
@@ -183,7 +185,7 @@ for(outcome_position in c("any_position","primary_position")){
     if(nrow(df)>0){
       #Set agegroup levels as factor
       agegroup_levels <-c()
-      for(i in c("Age group: 18-39","Age group: 40-59","Age group: 60-79","Age group: 80-110")){
+      for(i in c("Age group: 18-39","Age group: 40-59","Age group: 60-79","Age group: 80-110","Combined")){
         levels_available <- unique(df$agegroup)
         if(i %in% levels_available){
           agegroup_levels <- append(agegroup_levels,i)
@@ -205,7 +207,7 @@ for(outcome_position in c("any_position","primary_position")){
       
       #Set colour levels as factor
       colour_levels <-c()
-      for(i in c("#006d2c","#31a354","#74c476","#bae4b3")){
+      for(i in c("#006d2c","#31a354","#74c476","#bae4b3","#000000")){
         levels_available <- unique(df$colour)
         if(i %in% levels_available){
           colour_levels <- append(colour_levels,i)
