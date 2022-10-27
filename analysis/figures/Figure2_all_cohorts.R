@@ -25,122 +25,96 @@ outcome_name_table <- active_analyses %>%
   mutate(outcome_name=active_analyses$outcome_variable %>% str_replace("out_date_", ""))
 
 # Focus on first 8 CVD outcomes (remove ate and vte)
-#outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name != c("ate","vte","ate_primary_position","vte_primary_position)]
-outcomes_to_plot <- outcome_name_table$outcome_name
-#---------------------------------------------#
-# 3. Load and combine all estimates in 1 file #
-#---------------------------------------------#
-hr_files=list.files(path = results_dir, pattern = "suppressed_compiled_HR_results_*")
-hr_files=hr_files[endsWith(hr_files,".csv")]
-hr_files=paste0(results_dir,"/", hr_files)
-hr_file_paths <- pmap(list(hr_files),
-                      function(fpath){
-                        df <- fread(fpath)
-                        return(df)
-                      })
-estimates <- rbindlist(hr_file_paths, fill=TRUE)
+outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name != c("ate","vte","ate_primary_position","vte_primary_position")]
+#outcomes_to_plot <- outcome_name_table$outcome_name
 
-# Read in stata ouptut
-
-tmp <- read.csv(paste0(results_dir, "/stata_output_formatted"))
-tmp <- tmp %>% select(intersect(colnames(estimates),colnames(tmp)))
-estimates <- rbind(estimates, tmp, fill = TRUE)
-rm(tmp)
+# Load all estimates
+estimates <- read.csv(paste0(results_dir,"/hr_output_formatted.csv"))
 
 # Get estimates for main analyses and list of outcomes from active analyses
-main_estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospitalised","covid_pheno_hospitalised") 
+estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospitalised","covid_pheno_hospitalised") 
                                        & event %in% outcomes_to_plot 
                                        & term %in% term[grepl("^days",term)]
-                                       & results_fitted == "fitted_successfully"
                                        & model == "mdl_max_adj") %>%
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,median_follow_up)
 
 
-main_estimates <- main_estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
+estimates <- estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
 
 # We want to plot the figures using the same time-points across all cohorts so that they can be compared
 # If any cohort uses reduced time points then all cohorts will be plotted with reduced time points
-main_estimates <- main_estimates %>%
+estimates <- estimates %>%
   group_by(event,subgroup,cohort) %>%
   dplyr::mutate(time_period_to_plot = case_when(
     any(time_points == "normal") ~ "normal",
     TRUE ~ "reduced"))
 
-main_estimates <- main_estimates %>%
+estimates <- estimates %>%
   group_by(event,subgroup) %>%
   dplyr::mutate(time_period_to_plot = case_when(
     any(time_period_to_plot == "reduced") ~ "reduced",
     TRUE ~ "normal"))
 
 
-#---------------------------Specify time to plot--------------------------------
-main_estimates$add_to_median <- sub("days","",main_estimates$term)
-main_estimates$add_to_median <- as.numeric(sub("\\_.*","",main_estimates$add_to_median))
-
-main_estimates$median_follow_up <- ((main_estimates$median_follow_up + main_estimates$add_to_median)-1)/7
-
 #------------------------------------------#
 # 4. Specify groups and their line colours #
 #------------------------------------------#
 # Specify colours
-main_estimates$colour <- ""
-main_estimates$colour <- ifelse(main_estimates$cohort=="pre_vaccination","#d2ac47",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$cohort=="vaccinated","#58764c",main_estimates$colour) 
-main_estimates$colour <- ifelse(main_estimates$cohort=="electively_unvaccinated","#0018a8",main_estimates$colour)
+estimates$colour <- ""
+estimates$colour <- ifelse(estimates$cohort=="pre_vaccination","#d2ac47",estimates$colour)
+estimates$colour <- ifelse(estimates$cohort=="vaccinated","#58764c",estimates$colour) 
+estimates$colour <- ifelse(estimates$cohort=="electively_unvaccinated","#0018a8",estimates$colour)
 
 #Specify lines
-main_estimates$linetype <- ""
-main_estimates$linetype <- ifelse(main_estimates$subgroup=="covid_pheno_hospitalised","solid",main_estimates$linetype)
-main_estimates$linetype <- ifelse(main_estimates$subgroup=="covid_pheno_non_hospitalised","dashed",main_estimates$linetype)
+estimates$linetype <- ""
+estimates$linetype <- ifelse(estimates$subgroup=="covid_pheno_hospitalised","solid",estimates$linetype)
+estimates$linetype <- ifelse(estimates$subgroup=="covid_pheno_non_hospitalised","dashed",estimates$linetype)
 
 # Factor variables for ordering
-main_estimates$cohort <- factor(main_estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
-main_estimates$colour <- factor(main_estimates$colour, levels=c("#d2ac47","#58764c","#94273c"))
-main_estimates$linetype <- factor(main_estimates$linetype,levels = c("solid","dashed"))
+estimates$cohort <- factor(estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
+estimates$colour <- factor(estimates$colour, levels=c("#d2ac47","#58764c","#0018a8"))
+estimates$linetype <- factor(estimates$linetype,levels = c("solid","dashed"))
 
 # Rename subgroups
-main_estimates$subgroup <- ifelse(main_estimates$subgroup == "covid_pheno_hospitalised", "Hospitalised COVID-19","Non-hospitalised COVID-19")
-main_estimates$subgroup <- factor(main_estimates$subgroup,levels = c("Hospitalised COVID-19","Non-hospitalised COVID-19"))
+estimates$subgroup <- ifelse(estimates$subgroup == "covid_pheno_hospitalised", "Hospitalised COVID-19","Non-hospitalised COVID-19")
+estimates$subgroup <- factor(estimates$subgroup,levels = c("Hospitalised COVID-19","Non-hospitalised COVID-19"))
 
 # Rename adjustment groups
-levels(main_estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
+levels(estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
 
 # Order outcomes for plotting
 # Use the nice names from active_analyses table i.e. outcome_name_table
-main_estimates <- main_estimates %>% left_join(outcome_name_table %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
+estimates <- estimates %>% left_join(outcome_name_table %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
 
-main_estimates$outcome <- factor(main_estimates$outcome, levels=c("Arterial thrombosis event",
-                                                                  "Venous thrombosis event",
-                                                                  "Acute myocardial infarction",
-                                                                  "Ischaemic stroke",
-                                                                  "Pulmonary embolism",
-                                                                  "Deep vein thrombosis",
-                                                                  "Transient ischaemic attack",
-                                                                  "Subarachnoid haemorrhage and haemorrhagic stroke",
-                                                                  "Heart failure",
-                                                                  "Angina",
-                                                                  "Arterial thrombosis event - Primary position events",
-                                                                  "Venous thrombosis event - Primary position events",
-                                                                  "Acute myocardial infarction - Primary position events",
-                                                                  "Ischaemic stroke - Primary position events",
-                                                                  "Pulmonary embolism - Primary position events",
-                                                                  "Deep vein thrombosis - Primary position events",
-                                                                  "Transient ischaemic attack - Primary position events",
-                                                                  "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events",
-                                                                  "Heart failure - Primary position events",
-                                                                  "Angina - Primary position events"))
+estimates$outcome <- factor(estimates$outcome, levels=c("Acute myocardial infarction",
+                                                        "Ischaemic stroke",
+                                                        "Pulmonary embolism",
+                                                        "Deep vein thrombosis",
+                                                        "Transient ischaemic attack",
+                                                        "Subarachnoid haemorrhage and haemorrhagic stroke",
+                                                        "Heart failure",
+                                                        "Angina",
+                                                        "Acute myocardial infarction - Primary position events",
+                                                        "Ischaemic stroke - Primary position events",
+                                                        "Pulmonary embolism - Primary position events",
+                                                        "Deep vein thrombosis - Primary position events",
+                                                        "Transient ischaemic attack - Primary position events",
+                                                        "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events",
+                                                        "Heart failure - Primary position events",
+                                                        "Angina - Primary position events"))
+                                                                  
 
 
 
 #Plot hospitalised results
 for(i in c("any_position","primary_position")){
   if(i == "any_position"){
-    df <- main_estimates %>% filter(!event %in% event[grepl("primary_position",event)]
+    df <- estimates %>% filter(!event %in% event[grepl("primary_position",event)]
                                     & time_points == time_period_to_plot
                                     & subgroup == "Hospitalised COVID-19"
                                     & event != "stroke_sah_hs")
   }else{
-    df <- main_estimates %>% filter(event %in% event[grepl("primary_position",event)]
+    df <- estimates %>% filter(event %in% event[grepl("primary_position",event)]
                                     & time_points == time_period_to_plot
                                     & subgroup == "Hospitalised COVID-19")
   }
@@ -183,12 +157,12 @@ for(i in c("any_position","primary_position")){
 
 for(i in c("any_position","primary_position")){
   if(i == "any_position"){
-    df <- main_estimates %>% filter(!event %in% event[grepl("primary_position",event)]
+    df <- estimates %>% filter(!event %in% event[grepl("primary_position",event)]
                                     & time_points == time_period_to_plot
                                     & subgroup == "Non-hospitalised COVID-19"
                                     & event != "stroke_sah_hs")
   }else{
-    df <- main_estimates %>% filter(event %in% event[grepl("primary_position",event)]
+    df <- estimates %>% filter(event %in% event[grepl("primary_position",event)]
                                     & time_points == time_period_to_plot
                                     & subgroup == "Non-hospitalised COVID-19")
   }

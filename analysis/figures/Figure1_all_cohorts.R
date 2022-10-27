@@ -67,7 +67,7 @@ estimates$colour <- ifelse(estimates$cohort=="electively_unvaccinated","#0018a8"
 
 # Factor variables for ordering
 estimates$cohort <- factor(estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
-estimates$colour <- factor(estimates$colour, levels=c("#d2ac47","#58764c","#94273c"))
+estimates$colour <- factor(estimates$colour, levels=c("#d2ac47","#58764c","#0018a8"))
 
 # Rename adjustment groups
 levels(estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")

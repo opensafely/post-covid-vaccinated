@@ -23,23 +23,14 @@ outcome_name_table <- active_analyses %>%
 #outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name != c("ate","vte","ate_primary_position","vte_primary_position")]
 outcomes_to_plot <- outcome_name_table$outcome_name
 
-#------------------------------Load all estimates-------------------------------
+# Load all estimates
+estimates <- read.csv(paste0(results_dir,"/hr_output_formatted.csv"))
 
-hr_files=list.files(path = results_dir, pattern = "suppressed_compiled_HR_results_*")
-hr_files=hr_files[endsWith(hr_files,".csv")]
-hr_files=paste0(results_dir,"/", hr_files)
-hr_file_paths <- pmap(list(hr_files),
-                      function(fpath){
-                        df <- fread(fpath)
-                        return(df)
-                      })
-estimates <- rbindlist(hr_file_paths, fill=TRUE)
 
-main_estimates <- estimates %>% filter(((subgroup == "main" & model %in% c("mdl_max_adj","mdl_age_sex_region"))
+estimates <- estimates %>% filter(((subgroup == "main" & model %in% c("mdl_max_adj","mdl_age_sex_region"))
                                             | (subgroup %in% c("covid_pheno_hospitalised","covid_pheno_non_hospitalised") & model=="mdl_max_adj")) 
                                             & event %in% outcomes_to_plot 
-                                            & term %in% term[grepl("^days",term)]
-                                            & results_fitted == "fitted_successfully")%>%
+                                            & term %in% term[grepl("^days",term)])%>%
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,model)
 
 #----------------------Add empty rows for missing results-----------------------
@@ -55,25 +46,25 @@ colnames(df2) <- c("event","subgroup","cohort","time_points","model","term")
 
 df<- rbind(df1,df2)
 
-main_estimates <- df %>% left_join(main_estimates)
+estimates <- df %>% left_join(estimates)
 
-main_estimates <- main_estimates %>% filter((subgroup == "main" & model %in% c("mdl_max_adj","mdl_age_sex_region"))
+estimates <- estimates %>% filter((subgroup == "main" & model %in% c("mdl_max_adj","mdl_age_sex_region"))
                                             | (subgroup %in% c("covid_pheno_hospitalised","covid_pheno_non_hospitalised") & model=="mdl_max_adj")) %>% 
   dplyr::mutate(across(c(estimate,conf_low,conf_high),as.numeric))
 
 rm(df1,df2,df)
 #------------------------------Tidy event names---------------------------------
-main_estimates <- main_estimates %>% left_join(outcome_name_table %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
+estimates <- estimates %>% left_join(outcome_name_table %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
 
 #-------------------------------Specify estimate format ------------------------  
 
-main_estimates$est <- ifelse(is.na(main_estimates$estimate),NA,paste0(ifelse(main_estimates$estimate>=10,sprintf("%.1f",main_estimates$estimate),sprintf("%.2f",main_estimates$estimate)),
-                  " (",ifelse(main_estimates$conf_low>=10,sprintf("%.1f",main_estimates$conf_low),sprintf("%.2f",main_estimates$conf_low)),
-                  "-",ifelse(main_estimates$conf_high>=10,sprintf("%.1f",main_estimates$conf_high),sprintf("%.2f",main_estimates$conf_high)),")"))
+estimates$est <- ifelse(is.na(estimates$estimate),NA,paste0(ifelse(estimates$estimate>=10,sprintf("%.1f",estimates$estimate),sprintf("%.2f",estimates$estimate)),
+                  " (",ifelse(estimates$conf_low>=10,sprintf("%.1f",estimates$conf_low),sprintf("%.2f",estimates$conf_low)),
+                  "-",ifelse(estimates$conf_high>=10,sprintf("%.1f",estimates$conf_high),sprintf("%.2f",estimates$conf_high)),")"))
 
 
 # Specify estimate order -----------------------------------------------------
-main_estimates$outcome <- factor(main_estimates$outcome, levels=c("Arterial thrombosis event",
+estimates$outcome <- factor(estimates$outcome, levels=c("Arterial thrombosis event",
                                                                   "Acute myocardial infarction",
                                                                   "Ischaemic stroke",
                                                                   "Venous thrombosis event",
@@ -95,23 +86,23 @@ main_estimates$outcome <- factor(main_estimates$outcome, levels=c("Arterial thro
                                                                   "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events")) 
 
 
-main_estimates$subgroup <- ifelse(main_estimates$model == "mdl_max_adj" & main_estimates$subgroup == "main", "All",main_estimates$subgroup)
-main_estimates$subgroup <- ifelse(main_estimates$model == "mdl_age_sex_region" & main_estimates$subgroup == "main", "All, age/sex/region adjusted",main_estimates$subgroup)
-main_estimates$subgroup <- ifelse(main_estimates$subgroup == "covid_pheno_hospitalised", "Hospitalised COVID-19",main_estimates$subgroup)
-main_estimates$subgroup <- ifelse(main_estimates$subgroup == "covid_pheno_non_hospitalised", "Non-hospitalised COVID-19",main_estimates$subgroup)
+estimates$subgroup <- ifelse(estimates$model == "mdl_max_adj" & estimates$subgroup == "main", "All",estimates$subgroup)
+estimates$subgroup <- ifelse(estimates$model == "mdl_age_sex_region" & estimates$subgroup == "main", "All, age/sex/region adjusted",estimates$subgroup)
+estimates$subgroup <- ifelse(estimates$subgroup == "covid_pheno_hospitalised", "Hospitalised COVID-19",estimates$subgroup)
+estimates$subgroup <- ifelse(estimates$subgroup == "covid_pheno_non_hospitalised", "Non-hospitalised COVID-19",estimates$subgroup)
 
-main_estimates$subgroup <- factor(main_estimates$subgroup, levels = c("All",
+estimates$subgroup <- factor(estimates$subgroup, levels = c("All",
                                                                       "All, age/sex/region adjusted",
                                                                       "Hospitalised COVID-19",
                                                                       "Non-hospitalised COVID-19"))
 
-main_estimates$cohort <- factor(main_estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
-levels(main_estimates$cohort) <- list("Pre-vaccinated"="pre_vaccination", "Vaccinated"="vaccinated","Electively unvaccinated"="electively_unvaccinated")
+estimates$cohort <- factor(estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
+levels(estimates$cohort) <- list("Pre-vaccination"="pre_vaccination", "Vaccinated"="vaccinated","Unvaccinated"="electively_unvaccinated")
 
 
 # Remove unnecessary variables -----------------------------------------------
 
-main_estimates[,c("event","estimate","conf_low","conf_high","model")] <- NULL
+estimates[,c("event","estimate","conf_low","conf_high","model")] <- NULL
 
 # Convert long to wide -------------------------------------------------------
 
@@ -180,20 +171,20 @@ format_hr_table <- function(df, time_periods,outcome_position){
   write.csv(tmp, file = paste0(output_dir,"table3_main_formatted_hr_",outcome_position,"_",time_periods,"_time_periods.csv"),row.names = F)
 }
 
-main_estimates_reduced <- main_estimates %>% filter(time_points == "reduced" 
+estimates_reduced <- estimates %>% filter(time_points == "reduced" 
                                                     & !outcome %in% outcome[grepl("Primary position",outcome)])
 
-main_estimates_reduced_primary_position <- main_estimates %>% filter(time_points == "reduced" 
+estimates_reduced_primary_position <- estimates %>% filter(time_points == "reduced" 
                                                     & outcome %in% outcome[grepl("Primary position",outcome)])
 
-main_estimates_normal <- main_estimates %>% filter(time_points == "normal" 
+estimates_normal <- estimates %>% filter(time_points == "normal" 
                                                     & !outcome %in% outcome[grepl("Primary position",outcome)])
 
-main_estimates_normal_primary_position <- main_estimates %>% filter(time_points == "normal" 
+estimates_normal_primary_position <- estimates %>% filter(time_points == "normal" 
                                                                      & outcome %in% outcome[grepl("Primary position",outcome)])
 
 
-format_hr_table(main_estimates_reduced,"reduced","any_position")
-format_hr_table(main_estimates_reduced_primary_position,"reduced","primary_position")
-format_hr_table(main_estimates_normal,"normal","any_position")
-format_hr_table(main_estimates_normal_primary_position,"normal","primary_position")
+format_hr_table(estimates_reduced,"reduced","any_position")
+format_hr_table(estimates_reduced_primary_position,"reduced","primary_position")
+format_hr_table(estimates_normal,"normal","any_position")
+format_hr_table(estimates_normal_primary_position,"normal","primary_position")
