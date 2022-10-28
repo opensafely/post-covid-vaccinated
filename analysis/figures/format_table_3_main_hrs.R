@@ -86,15 +86,15 @@ estimates$outcome <- factor(estimates$outcome, levels=c("Arterial thrombosis eve
                                                                   "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events")) 
 
 
-estimates$subgroup <- ifelse(estimates$model == "mdl_max_adj" & estimates$subgroup == "main", "All",estimates$subgroup)
+estimates$subgroup <- ifelse(estimates$model == "mdl_max_adj" & estimates$subgroup == "main", "All, maximally adjusted",estimates$subgroup)
 estimates$subgroup <- ifelse(estimates$model == "mdl_age_sex_region" & estimates$subgroup == "main", "All, age/sex/region adjusted",estimates$subgroup)
 estimates$subgroup <- ifelse(estimates$subgroup == "covid_pheno_hospitalised", "Hospitalised COVID-19",estimates$subgroup)
 estimates$subgroup <- ifelse(estimates$subgroup == "covid_pheno_non_hospitalised", "Non-hospitalised COVID-19",estimates$subgroup)
 
-estimates$subgroup <- factor(estimates$subgroup, levels = c("All",
-                                                                      "All, age/sex/region adjusted",
-                                                                      "Hospitalised COVID-19",
-                                                                      "Non-hospitalised COVID-19"))
+estimates$subgroup <- factor(estimates$subgroup, levels = c("All, age/sex/region adjusted",
+                                                            "All, maximally adjusted",
+                                                            "Hospitalised COVID-19",
+                                                            "Non-hospitalised COVID-19"))
 
 estimates$cohort <- factor(estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
 levels(estimates$cohort) <- list("Pre-vaccination"="pre_vaccination", "Vaccinated"="vaccinated","Unvaccinated"="electively_unvaccinated")
@@ -108,14 +108,25 @@ estimates[,c("event","estimate","conf_low","conf_high","model")] <- NULL
 
 format_hr_table <- function(df, time_periods,outcome_position){
   df$time_points <- NULL
-  df <- tidyr::pivot_wider(df, names_from = term, values_from = est)
-  df <- df[order(df$outcome,df$subgroup,df$cohort),]
+  df <- tidyr::pivot_wider(df, names_from = cohort, values_from = est)
+  df <- df %>% select("outcome","subgroup","term", "Pre-vaccination","Vaccinated","Unvaccinated")
+  
   if(grepl("reduced", time_periods)){
-    df <- df %>% select("outcome","subgroup","cohort","days0_28","days28_197","days197_535")
+    df$term <- factor(df$term, levels = c("days0_28",
+                                          "days28_197",
+                                          "days197_535"))
+    
   }else{
-    df <- df %>% select("outcome","subgroup","cohort","days0_7","days7_14","days14_28","days28_56","days56_84","days84_197","days197_535")
+    df$term <- factor(df$term, levels = c("days0_7",
+                                          "days7_14",
+                                          "days14_28",
+                                          "days28_56",
+                                          "days56_84",
+                                          "days84_197",
+                                          "days197_535"))
   }
   
+  df <- df[order(df$outcome,df$subgroup,df$term),]
   tmp <- as.data.frame(matrix(ncol=ncol(df),nrow=0))
   colnames(tmp) <- colnames(df)
   

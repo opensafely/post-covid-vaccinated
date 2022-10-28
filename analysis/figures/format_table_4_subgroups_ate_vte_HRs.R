@@ -99,13 +99,25 @@ estimates[,c("event","estimate","conf_low","conf_high","model")] <- NULL
 
 format_hr_table <- function(df, time_periods,event){
   df$time_points <- NULL
-  df <- tidyr::pivot_wider(df, names_from = term, values_from = est)
-  df <- df[order(df$subgroup,df$cohort),]
-  if(time_periods == "reduced"){
-    df <- df %>% select("outcome","subgroup","cohort","days0_28","days28_197","days197_535")
+  df <- tidyr::pivot_wider(df, names_from = cohort, values_from = est)
+  df <- df %>% select("outcome","subgroup","term", "Pre-vaccination","Vaccinated","Unvaccinated")
+  
+  if(grepl("reduced", time_periods)){
+    df$term <- factor(df$term, levels = c("days0_28",
+                                          "days28_197",
+                                          "days197_535"))
+    
   }else{
-    df <- df %>% select("outcome","subgroup","cohort","days0_7","days7_14","days14_28","days28_56","days56_84","days84_197","days197_535")
+    df$term <- factor(df$term, levels = c("days0_7",
+                                          "days7_14",
+                                          "days14_28",
+                                          "days28_56",
+                                          "days56_84",
+                                          "days84_197",
+                                          "days197_535"))
   }
+  df <- df[order(df$subgroup,df$term),]
+  
   write.csv(df, file = paste0(output_dir,"table4_subgroups_hr_formatted_",event,"_",time_periods,"_time_periods.csv"),row.names = F)
 }
 
