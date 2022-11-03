@@ -188,7 +188,8 @@ for(outcome_position in c("any_position","primary_position")){
                    legend.title = ggplot2::element_blank(),
                    legend.position="bottom",
                    plot.background = ggplot2::element_rect(fill = "white", colour = "white"),
-                   plot.title = element_text(hjust = 0.5))+
+                   plot.title = element_text(hjust = 0.5),
+                   text=element_text(size=13))+
     ggplot2::facet_wrap(~ grouping_name,labeller=as_labeller(names), ncol = 3, scales = "free_x") +
     geom_blank(aes(x = x_min)) +
     geom_blank(aes(x = x_max))
