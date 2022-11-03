@@ -25,88 +25,62 @@ outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_n
 
 outcome_name_table$outcome <- gsub(" events","",outcome_name_table$outcome)
 
-#---------------------------------------------#
-# 3. Load and combine all estimates in 1 file #
-#---------------------------------------------#
-hr_files=list.files(path = results_dir, pattern = "suppressed_compiled_HR_results_*")
-hr_files=hr_files[endsWith(hr_files,".csv")]
-hr_files=paste0(results_dir,"/", hr_files)
-hr_file_paths <- pmap(list(hr_files),
-                      function(fpath){
-                        df <- fread(fpath)
-                        return(df)
-                      })
-estimates <- rbindlist(hr_file_paths, fill=TRUE)
-
-# Read in stata ouptut
-
-tmp <- read.csv(paste0(results_dir, "/stata_output_formatted"))
-tmp <- tmp %>% select(intersect(colnames(estimates),colnames(tmp)))
-estimates <- rbind(estimates, tmp, fill = TRUE)
+# Load all estimates
+estimates <- read.csv(paste0(results_dir,"/hr_output_formatted.csv"))
 
 # Get estimates for main analyses and list of outcomes from active analyses
-main_estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospitalised","covid_pheno_hospitalised", "main") 
+estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospitalised","covid_pheno_hospitalised", "main") 
                                        & event %in% outcomes_to_plot 
                                        & term %in% term[grepl("^days",term)]
-                                       & results_fitted == "fitted_successfully"
                                        & model == "mdl_max_adj") %>%
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,median_follow_up)
 
-main_estimates <- main_estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
+estimates <- estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
 
 
 # We want to plot the figures using the same time-points across all cohorts so that they can be compared
 # If any cohort uses reduced time points then all cohorts will be plotted with reduced time points
-main_estimates <- main_estimates %>%
+estimates <- estimates %>%
   group_by(event,subgroup,cohort) %>%
   dplyr::mutate(time_period_to_plot = case_when(
     any(time_points == "normal") ~ "normal",
     TRUE ~ "reduced"))
 
-main_estimates <- main_estimates %>%
+estimates <- estimates %>%
   group_by(event,subgroup) %>%
   dplyr::mutate(time_period_to_plot = case_when(
     any(time_period_to_plot == "reduced") ~ "reduced",
     TRUE ~ "normal"))
 
-
-#---------------------------Specify time to plot--------------------------------
-main_estimates$add_to_median <- sub("days","",main_estimates$term)
-main_estimates$add_to_median <- as.numeric(sub("\\_.*","",main_estimates$add_to_median))
-
-main_estimates$median_follow_up <- ((main_estimates$median_follow_up + main_estimates$add_to_median)-1)/7
-main_estimates$median_follow_up <- ifelse(main_estimates$median_follow_up == 0, 0.001,main_estimates$median_follow_up )
-
-
 #------------------------------------------#
 # 4. Specify groups and their line colours #
 #------------------------------------------#
 # Specify colours
-main_estimates$colour <- ""
-main_estimates$colour <- ifelse(main_estimates$cohort=="pre_vaccination","#d2ac47",main_estimates$colour)
-main_estimates$colour <- ifelse(main_estimates$cohort=="vaccinated","#58764c",main_estimates$colour) # Grey
-main_estimates$colour <- ifelse(main_estimates$cohort=="electively_unvaccinated","#0018a8",main_estimates$colour) # Black
+estimates$colour <- ""
+estimates$colour <- ifelse(estimates$cohort=="pre_vaccination","#d2ac47",estimates$colour)
+estimates$colour <- ifelse(estimates$cohort=="vaccinated","#58764c",estimates$colour) # Grey
+estimates$colour <- ifelse(estimates$cohort=="electively_unvaccinated","#0018a8",estimates$colour) # Black
 
 # Factor variables for ordering
-main_estimates$cohort <- factor(main_estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
-main_estimates$colour <- factor(main_estimates$colour, levels=c("#d2ac47","#58764c","#0018a8"))
+estimates$cohort <- factor(estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
+estimates$colour <- factor(estimates$colour, levels=c("#d2ac47","#58764c","#0018a8"))
 
-main_estimates$subgroup <- factor(main_estimates$subgroup,levels = c("main", "covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
+estimates$subgroup <- factor(estimates$subgroup,levels = c("main", "covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
 
 # Rename adjustment groups
-levels(main_estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
+levels(estimates$cohort) <- list("Pre-vaccination (1 Jan 2020 - 18 Jun 2021)"="pre_vaccination", "Vaccinated (1 Jun 2021 - 14 Dec 2021)"="vaccinated","Unvaccinated (1 Jun 2021 - 14 Dec 2021)"="electively_unvaccinated")
 
 #Adjust confidence intervals
-main_estimates$conf_high <- ifelse(main_estimates$event == "vte" & main_estimates$conf_high>512,512,main_estimates$conf_high)
-main_estimates$conf_high <- ifelse(main_estimates$event != "vte" & main_estimates$conf_high>64,64,main_estimates$conf_high)
-main_estimates$conf_low <- ifelse(main_estimates$conf_low<0.5,0.5,main_estimates$conf_low)
+estimates$conf_high <- ifelse(estimates$event == "vte" & estimates$conf_high>512,512,estimates$conf_high)
+estimates$conf_high <- ifelse(estimates$event != "vte" & estimates$conf_high>64,64,estimates$conf_high)
+estimates$conf_low <- ifelse(estimates$conf_low<0.5,0.5,estimates$conf_low)
 
 # X axis limits
-xlim <- c(0,round_any(max(main_estimates$median_follow_up, na.rm = T),4, f= ceiling))
-xbreaks <- seq(0,round_any(max(main_estimates$median_follow_up, na.rm = T),4, f= ceiling),4)
+xlim <- c(0,round_any(max(estimates$median_follow_up, na.rm = T),4, f= ceiling))
+xbreaks <- seq(0,round_any(max(estimates$median_follow_up, na.rm = T),4, f= ceiling),4)
 
 # MAIN --------------------------------------------------------------------
-for (i in unique(main_estimates$event)) {
+for (i in unique(estimates$event)) {
   
   if(i=="vte"){
     ylim <- c(0.5,512)
@@ -116,7 +90,7 @@ for (i in unique(main_estimates$event)) {
     ybreaks <- c(0.5,1,2,4,8,16,32,64)
   }
   
-  df <- main_estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "main")
+  df <- estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "main")
   
   assign(paste0("main_",i), ggplot2::ggplot(data=df,
                   mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
@@ -153,7 +127,7 @@ for (i in unique(main_estimates$event)) {
 }
 
 # HOSPITALISED ------------------------------------------------------------
-for (i in unique(main_estimates$event)) {
+for (i in unique(estimates$event)) {
   if(i=="vte"){
     ylim <- c(0.5,512)
     ybreaks <- c(0.5,1,2,4,8,16,32,64,128,256,512)
@@ -166,7 +140,7 @@ for (i in unique(main_estimates$event)) {
     y_max <- 64
   }
   
-  df <- main_estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "covid_pheno_hospitalised")
+  df <- estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "covid_pheno_hospitalised")
   
   assign(paste0("hospitalised_",i), ggplot2::ggplot(data=df,
                                             mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
@@ -205,7 +179,7 @@ for (i in unique(main_estimates$event)) {
 
 
 # NON HOSPITALISED --------------------------------------------------------
-for (i in unique(main_estimates$event)) {
+for (i in unique(estimates$event)) {
   
   if(i=="vte"){
     ylim <- c(0.5,512)
@@ -215,7 +189,7 @@ for (i in unique(main_estimates$event)) {
     ybreaks <- c(0.5,1,2,4,8,16,32,64)
   }
   
-  df <- main_estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "covid_pheno_non_hospitalised")
+  df <- estimates %>% filter(event ==i & time_points == time_period_to_plot & subgroup == "covid_pheno_non_hospitalised")
   
   assign(paste0("non_hospitalised_",i), ggplot2::ggplot(data=df,
                                                     mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
@@ -252,38 +226,13 @@ for (i in unique(main_estimates$event)) {
            theme(legend.text = element_blank()))
 }
 
-# PLOT WITHOUT TABLE ------------------------------------------------------
-# for(i in unique(main_estimates$event)){
-#   main <- get(paste0("main_",i))
-#   hospitalised <- get(paste0("hospitalised_",i))
-#   non_hospitalised <- get(paste0("non_hospitalised_",i))
-#   
-#   ggpubr::ggarrange(main, non_hospitalised, ncol=2, nrow=1, common.legend = TRUE, legend="bottom",
-#                     labels = c("A: All COVID-19", "B: Hospitalised-COVID-19", "C: Non-Hospitalised-COVID-19"),
-#                     hjust = -0.1,
-#                     font.label = list(size = 12)) +
-#     theme(plot.margin = margin(0.5,0.5,0.5,0.5, "cm"))
-#   ggplot2::ggsave(paste0(output_dir,"Figure_1_",i,"_3_panel.png"), units = "mm", width=330, height=195)
-#   
-#   
-#   
-#   # png(paste0(output_dir,"Figure_1_",i,"_3_panel.png"),
-#   #     units = "mm", width=330, height=195, res = 1000)
-#   # ggpubr::ggarrange(main, non_hospitalised, ncol=2, nrow=1, common.legend = TRUE, legend="bottom",
-#   #                   labels = c("A: All COVID-19", "B: Hospitalised-COVID-19", "C: Non-Hospitalised-COVID-19"),
-#   #                   hjust = -0.1,
-#   #                   font.label = list(size = 12)) +
-#   #   theme(plot.margin = margin(0.5,0.5,0.5,0.5, "cm")) 
-#   # dev.off()
-# }
-
 
 # ADD EVENT COUNTS TO PLOT TABLE  -------------------------------------------------------
 table2 <- read.csv("C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/table_2/formatted_table_2.csv", check.names = FALSE)
 table2_primary_position <- read.csv("C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/table_2/formatted_table_2_primary_position.csv", check.names = FALSE)
 table2 <- rbind(table2, table2_primary_position)
 
-table2$cohort <- ifelse(table2$cohort == "Pre-vaccinated", "Pre-Vaccination (2020-01-01 - 2021-06-18)", ifelse(table2$cohort == "Vaccinated","Vaccinated (2021-06-01 - 2021-12-14)", "Unvaccinated (2021-06-01 - 2021-12-14)") )
+table2$cohort <- ifelse(table2$cohort == "Pre-vaccinated", "Pre-vaccination (2020-01-01 - 2021-06-18)", ifelse(table2$cohort == "Vaccinated","Vaccinated (2021-06-01 - 2021-12-14)", "Unvaccinated (2021-06-01 - 2021-12-14)") )
 
 table2$Outcome <- gsub(" events","",table2$Outcome)
 
@@ -293,7 +242,7 @@ table2 <- table2 %>%
   dplyr::rename(`Total events` = Total,
                 Cohort = cohort) %>%
   dplyr::select(-c(`No COVID-19`)) %>%
-  mutate(`Number of people` = ifelse(Cohort == "Pre-Vaccination (2020-01-01 - 2021-06-18)", 18210937,
+  mutate(`Number of people` = ifelse(Cohort == "Pre-vaccination (2020-01-01 - 2021-06-18)", 18210937,
                                      ifelse(Cohort == "Vaccinated (2021-06-01 - 2021-12-14)", 13572399,
                                             ifelse(Cohort == "Unvaccinated (2021-06-01 - 2021-12-14)",3161485, NA)))) %>%
   relocate(`Total events`, .after = `Cohort`) %>%
@@ -301,14 +250,7 @@ table2 <- table2 %>%
   relocate(`Events after COVID-19`, .after = `Total events`)
 table2[,3:7] <- format(table2[,3:7], big.mark = ",", scientific = FALSE)
 
-# COLOURED ROWS
-
-# table.p <- ggtexttable(table2, rows = NULL,
-#                        theme = ttheme(tbody.style = tbody_style(color = "white", fill = c("#d2ac47","#58764c","#0018a8")))) +
-#   theme(plot.margin = margin(0.5,0.5,0.5,0.5, "cm")) 
-
-# NO COLOURS
-
+i="Arterial thrombosis event"
 for(i in outcome_name_table$outcome){
   short_outcome <- outcome_name_table[outcome_name_table$outcome ==i,]$outcome_name
   main <- get(paste0("main_",short_outcome))
@@ -322,15 +264,15 @@ for(i in outcome_name_table$outcome){
   
   table.p <- ggtexttable(tmp_table2, rows = NULL,
                          theme = ttheme(
-                           tbody.style = tbody_style(hjust=0, x=0.01, fill = "white", size = 8),
-                           colnames.style = colnames_style(hjust=0, x=0.01, fill = "white", size = 8))) 
+                           tbody.style = tbody_style(hjust=0, x=0.01, fill = "white", size = 9),
+                           colnames.style = colnames_style(hjust=0, x=0.01, fill = "white", size = 9))) 
   
   # PLOTTING ----------------------------------------------------------------
   
   # MAIN PLOT 
   
    p1 <- ggpubr::ggarrange(main, hospitalised, non_hospitalised, ncol=3, nrow=1, common.legend = FALSE, legend = "none",
-                           labels = c("A: All COVID-19", "B: Hospitalised-COVID-19", "C: Non-Hospitalised-COVID-19"),
+                           labels = c("All COVID-19", "Hospitalised COVID-19", "Non-Hospitalised COVID-19"),
                            hjust = -0.1,
                            font.label = list(size = 12)) 
   
@@ -349,21 +291,21 @@ for(i in outcome_name_table$outcome){
   
   mylegend<- g_legend(non_hospitalised) 
   
-  table.p <- table.p + theme(plot.margin = margin(0,3,0.7,0, "cm"))
+  table.p <- table.p + theme(plot.margin = margin(0,1,0.7,0, "cm"))
   
   # ADD BLANK TO GET SPACING CORRECT
   
   blank <- grid.rect(gp=gpar(col="white"))
-  p2 <- ggarrange(blank, mylegend, table.p, ncol = 3, widths = c(0.1,0.0005,1))
+  p2 <- ggarrange(blank, mylegend, table.p, ncol = 3, widths = c(0.02,0.15,1))
   
   # SAVE PLOT WITH TABLE
   
-  png(paste0(output_dir,"Figure_1_3panel_with_table_",short_outcome,".png"),
+  png(paste0(output_dir,"Figure_2_with_table_",short_outcome,".png"),
       units = "mm", width=330, height=195, res = 1000)
   print(ggpubr::ggarrange(p1, 
                     p2,
                     nrow = 2,
-                    heights = c(1, 0.15)) )
+                    heights = c(1, 0.2)) )
   # annotation_custom(ggplotGrob(table.p),
   #                   xmin = 5.5, ymin = 20,
   #                   xmax = 8)

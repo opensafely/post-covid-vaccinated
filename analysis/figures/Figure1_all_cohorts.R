@@ -70,7 +70,7 @@ estimates$cohort <- factor(estimates$cohort, levels=c("pre_vaccination","vaccina
 estimates$colour <- factor(estimates$colour, levels=c("#d2ac47","#58764c","#0018a8"))
 
 # Rename adjustment groups
-levels(estimates$cohort) <- list("Pre-Vaccination (2020-01-01 - 2021-06-18)"="pre_vaccination", "Vaccinated (2021-06-01 - 2021-12-14)"="vaccinated","Unvaccinated (2021-06-01 - 2021-12-14)"="electively_unvaccinated")
+levels(estimates$cohort) <- list("Pre-vaccination (1 Jan 2020 - 18 Jun 2021)"="pre_vaccination", "Vaccinated (1 Jun 2021 - 14 Dec 2021)"="vaccinated","Unvaccinated (1 Jun 2021 - 14 Dec 2021)"="electively_unvaccinated")
 
 # Order outcomes for plotting
 # Use the nice names from active_analyses table i.e. outcome_name_table
@@ -80,18 +80,18 @@ estimates$outcome <- factor(estimates$outcome, levels=c("Acute myocardial infarc
                                                         "Ischaemic stroke",
                                                         "Pulmonary embolism",
                                                         "Deep vein thrombosis",
-                                                        "Transient ischaemic attack",
-                                                        "Subarachnoid haemorrhage and haemorrhagic stroke",
                                                         "Heart failure",
                                                         "Angina",
+                                                        "Transient ischaemic attack",
+                                                        "Subarachnoid haemorrhage and haemorrhagic stroke",
                                                         "Acute myocardial infarction - Primary position events",
                                                         "Ischaemic stroke - Primary position events",
                                                         "Pulmonary embolism - Primary position events",
                                                         "Deep vein thrombosis - Primary position events",
-                                                        "Transient ischaemic attack - Primary position events",
-                                                        "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events",
                                                         "Heart failure - Primary position events",
-                                                        "Angina - Primary position events"))
+                                                        "Angina - Primary position events",
+                                                        "Transient ischaemic attack - Primary position events",
+                                                        "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events"))
                                                                            
                                                                             
 
@@ -108,7 +108,7 @@ for(i in c("any_position","primary_position")){
     ylim <- 64
     ybreaks <- c(0.5,1,2,4,8,16,32)
   }
-  
+
   
   ggplot2::ggplot(data=df,
                   mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
@@ -129,7 +129,7 @@ for(i in c("any_position","primary_position")){
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
     ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
     ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-    ggplot2::guides(fill=ggplot2::guide_legend(ncol = 2, byrow = TRUE)) +
+    ggplot2::guides(fill=ggplot2::guide_legend(ncol = 1, byrow = TRUE)) +
     ggplot2::theme_minimal() +
     ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
                    panel.grid.minor = ggplot2::element_blank(),
@@ -138,7 +138,9 @@ for(i in c("any_position","primary_position")){
                    legend.key = ggplot2::element_rect(colour = NA, fill = NA),
                    legend.title = ggplot2::element_blank(),
                    legend.position="bottom",
-                   plot.background = ggplot2::element_rect(fill = "white", colour = "white")) +    
+                   #legend.justification = "left",
+                   plot.background = ggplot2::element_rect(fill = "white", colour = "white"),
+                   text=element_text(size=13)) +
     ggplot2::facet_wrap(outcome~., ncol = 2)
   
   ggplot2::ggsave(paste0(output_dir,"Figure_1_all_cohorts_",i,".png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
