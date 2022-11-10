@@ -230,9 +230,10 @@ for (i in unique(estimates$event)) {
 # ADD EVENT COUNTS TO PLOT TABLE  -------------------------------------------------------
 table2 <- read.csv("C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/table_2/formatted_table_2.csv", check.names = FALSE)
 table2_primary_position <- read.csv("C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/table_2/formatted_table_2_primary_position.csv", check.names = FALSE)
+
 table2 <- rbind(table2, table2_primary_position)
 
-table2$cohort <- ifelse(table2$cohort == "Pre-vaccinated", "Pre-vaccination (2020-01-01 - 2021-06-18)", ifelse(table2$cohort == "Vaccinated","Vaccinated (2021-06-01 - 2021-12-14)", "Unvaccinated (2021-06-01 - 2021-12-14)") )
+table2$cohort <- ifelse(table2$cohort == "Pre-vaccinated", "Pre-vaccination (1 Jan 2020 - 18 Jun 2021)", ifelse(table2$cohort == "Vaccinated","Vaccinated (1 Jun 2021 - 14 Dec 2021)", "Unvaccinated (1 Jun 2021 - 14 Dec 2021)") )
 
 table2$Outcome <- gsub(" events","",table2$Outcome)
 
@@ -242,9 +243,9 @@ table2 <- table2 %>%
   dplyr::rename(`Total events` = Total,
                 Cohort = cohort) %>%
   dplyr::select(-c(`No COVID-19`)) %>%
-  mutate(`Number of people` = ifelse(Cohort == "Pre-vaccination (2020-01-01 - 2021-06-18)", 18210937,
-                                     ifelse(Cohort == "Vaccinated (2021-06-01 - 2021-12-14)", 13572399,
-                                            ifelse(Cohort == "Unvaccinated (2021-06-01 - 2021-12-14)",3161485, NA)))) %>%
+  mutate(`Number of people` = ifelse(Cohort == "Pre-vaccination (1 Jan 2020 - 18 Jun 2021)", 18210937,
+                                     ifelse(Cohort == "Vaccinated (1 Jun 2021 - 14 Dec 2021)", 13572399,
+                                            ifelse(Cohort == "Unvaccinated (1 Jun 2021 - 14 Dec 2021)",3161485, NA)))) %>%
   relocate(`Total events`, .after = `Cohort`) %>%
   relocate(`Number of people`, .after = `Cohort`) %>%
   relocate(`Events after COVID-19`, .after = `Total events`)
@@ -264,8 +265,8 @@ for(i in outcome_name_table$outcome){
   
   table.p <- ggtexttable(tmp_table2, rows = NULL,
                          theme = ttheme(
-                           tbody.style = tbody_style(hjust=0, x=0.01, fill = "white", size = 9),
-                           colnames.style = colnames_style(hjust=0, x=0.01, fill = "white", size = 9))) 
+                           tbody.style = tbody_style(hjust=0, x=0.01, fill = "white", size = 9.8),
+                           colnames.style = colnames_style(hjust=0, x=0.01, fill = "white", size = 9.8))) 
   
   # PLOTTING ----------------------------------------------------------------
   
@@ -296,7 +297,7 @@ for(i in outcome_name_table$outcome){
   # ADD BLANK TO GET SPACING CORRECT
   
   blank <- grid.rect(gp=gpar(col="white"))
-  p2 <- ggarrange(blank, mylegend, table.p, ncol = 3, widths = c(0.02,0.15,1))
+  p2 <- ggarrange(blank, mylegend, table.p, ncol = 3, widths = c(0.02,0.05,1))
   
   # SAVE PLOT WITH TABLE
   
