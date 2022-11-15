@@ -98,6 +98,9 @@ names <- c(
   "Venous thrombosis event - Primary position events - Vaccinated" = "Venous thrombosis event - Primary position events" ,
   "Venous thrombosis event - Primary position events - Unvaccinated" = "")
 
+# Filter out days 197 and over
+lifetables <- lifetables %>% filter(days <= 196)
+
 # Change days to weeks
 lifetables$weeks <- lifetables$days /7
 
@@ -164,7 +167,7 @@ for(outcome_position in c("any_position","primary_position")){
   
   df$x_min <- 0
   df$x_max <- NA
-  df$x_max <- ifelse(df$cohort == "pre_vaccination",80,df$x_max)
+  df$x_max <- ifelse(df$cohort == "pre_vaccination",30,df$x_max)
   df$x_max <- ifelse(df$cohort != "pre_vaccination",30,df$x_max)
   
   ggplot2::ggplot(data = df, 
