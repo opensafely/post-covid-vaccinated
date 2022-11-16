@@ -167,8 +167,8 @@ for(outcome_position in c("any_position","primary_position")){
   
   df$x_min <- 0
   df$x_max <- NA
-  df$x_max <- ifelse(df$cohort == "pre_vaccination",30,df$x_max)
-  df$x_max <- ifelse(df$cohort != "pre_vaccination",30,df$x_max)
+  df$x_max <- ifelse(df$cohort == "pre_vaccination",28,df$x_max)
+  df$x_max <- ifelse(df$cohort != "pre_vaccination",28,df$x_max)
   
   ggplot2::ggplot(data = df, 
                   mapping = ggplot2::aes(x = weeks, y = excess_risk_main, color = agegroup, shape = agegroup, fill = agegroup, linetype = sex)) +
@@ -176,6 +176,7 @@ for(outcome_position in c("any_position","primary_position")){
     #geom_ribbon(aes(ymin = CIp.low, ymax = CIp.high), alpha = 0.1)+
     ggplot2::geom_line() +
     #ggplot2::scale_x_continuous(lim = c(0,round_any(max(df$weeks, na.rm = T),10, f= ceiling)), breaks = seq(0,round_any(max(df$weeks, na.rm = T),10, f= ceiling),10))+ 
+    ggplot2::scale_x_continuous(breaks=c(0,14,28))+ 
     ggplot2::scale_y_continuous(lim = c(0,round_any(max(df$excess_risk_main, na.rm = T),1, f= ceiling)), breaks = seq(0,round_any(max(df$excess_risk_main, na.rm = T),1, f= ceiling),1))+ 
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$agegroup)) +
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$agegroup)) +
