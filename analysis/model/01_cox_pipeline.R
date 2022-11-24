@@ -80,6 +80,11 @@ rm(analyses_to_run_normal_timepoint)
 
 analyses_to_run <- analyses_to_run %>% filter(subgroup != "covid_pheno_hospitalised" | reduced_timepoint != "normal")
 
+# Add day zero analyses
+day_zero_analyses <- analyses_to_run %>% filter(subgroup == "main")
+day_zero_analyses$reduced_timepoint <- paste0("day_zero_",day_zero_analyses$reduced_timepoint)
+analyses_to_run <- rbind(analyses_to_run, day_zero_analyses)
+rm(day_zero_analyses)
 # Source remainder of relevant files --------------------------------------------------------
 
 source(file.path(scripts_dir,paste0("03_01_cox_subgrouping.R"))) # Model specification
@@ -95,7 +100,9 @@ if(nrow(analyses_to_run>0)){
              stratify_by=analyses_to_run$strata,           
              time_point=analyses_to_run$reduced_timepoint,       
              input,covar_names,
-             cuts_days_since_expo,cuts_days_since_expo_reduced,mdl))
+             cuts_days_since_expo,cuts_days_since_expo_reduced,
+             cuts_days_since_expo_day_zero,cuts_days_since_expo_reduced_day_zero,
+             mdl))
 }
 
 #Save csv of anlayses not run
