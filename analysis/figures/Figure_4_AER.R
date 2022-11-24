@@ -177,7 +177,7 @@ for(outcome_position in c("any_position","primary_position")){
     ggplot2::geom_line() +
     #ggplot2::scale_x_continuous(lim = c(0,round_any(max(df$weeks, na.rm = T),10, f= ceiling)), breaks = seq(0,round_any(max(df$weeks, na.rm = T),10, f= ceiling),10))+ 
     ggplot2::scale_x_continuous(breaks=c(0,14,28))+ 
-    ggplot2::scale_y_continuous(lim = c(0,round_any(max(df$excess_risk_main, na.rm = T),1, f= ceiling)), breaks = seq(0,round_any(max(df$excess_risk_main, na.rm = T),1, f= ceiling),1))+ 
+    ggplot2::scale_y_continuous(lim = c(0,ceiling(max(df$excess_risk_main, na.rm = T))), breaks = seq(0,ceiling(max(df$excess_risk_main, na.rm = T)),1))+ 
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$agegroup)) +
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$agegroup)) +
     ggplot2::scale_linetype_manual(values = levels(df$linetype), labels = levels(df$sex))+
