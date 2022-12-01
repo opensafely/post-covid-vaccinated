@@ -10,10 +10,13 @@ results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/Open
 df <- readr::read_csv(paste0(aer_output_dir,"/AER_compiled_results.csv"))
 
 #Select max day of follow up (196 for vax/unvax, 534 for pre-vax)
-df <- df %>% 
-  group_by(event, subgroup, time_points, cohort) %>%
-  filter(days == max(days) & subgroup != "aer_overall" & !is.na(AER_main) ) %>%
-  select(event, subgroup, cohort, subgroup, AER_main, time_points, days)%>% ungroup()
+# df <- df %>%
+#   group_by(event, subgroup, time_points, cohort) %>%
+#   filter(days == max(days) & subgroup != "aer_overall" & !is.na(AER_main) ) %>%
+#   select(event, subgroup, cohort, subgroup, AER_main, time_points, days)%>% ungroup()
+
+df <- df %>% filter(days == 196 & subgroup != "aer_overall" & !is.na(AER_main)) %>%
+  select(event, subgroup, cohort, subgroup, AER_main, time_points, days) %>% distinct()
 
 #Sum over all subgroups to get total
 df <- df %>% 

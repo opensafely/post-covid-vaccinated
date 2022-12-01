@@ -144,7 +144,7 @@ for(i in c("any_position","primary_position")){
       ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
       ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
       ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-      ggplot2::ggtitle(paste0(i," postion events, ",j," time periods")) +
+      ggplot2::ggtitle(paste0(i," events, ",j," time periods")) +
       ggplot2::guides(fill=ggplot2::guide_legend(ncol = 1, byrow = TRUE)) +
       ggplot2::theme_minimal() +
       ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
