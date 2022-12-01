@@ -149,6 +149,21 @@ table2 <- function(cohort){
   )
 }
 
+days_to_event_histogram <- function(cohort){
+  splice(
+    comment(glue("Post-exposure days to event histogram data - {cohort}")),
+    action(
+      name = glue("days_to_event_histogram_{cohort}"),
+      run = "r:latest analysis/descriptives/histogram_data_post_exposure_days_to_event.R",
+      arguments = c(cohort),
+      needs = list("stage1_data_cleaning_both",glue("stage1_end_date_table_{cohort}")),
+      moderately_sensitive = list(
+        input_table_2 = glue("output/review/descriptives/histogram_data_{cohort}.csv")
+      )
+    )
+  )
+}
+
 stata_actions <- function(outcome, cohort, subgroup, time_periods){
   splice(
     #comment(glue("Stata cox {outcome} {subgroup} {cohort} {time_periods}")),
@@ -299,27 +314,33 @@ actions_list <- splice(
     )
   ),
   
-  #comment("Stage 4 - Create input for table2"),
+  #comment("Stage 4 - Create table2"),
   splice(
-    # over outcomes
+    # over cohort
     unlist(lapply(cohort_to_run, function(x) table2(cohort = x)), recursive = FALSE)
   ),
   
-  action(
-    name = "event_counts_by_time_period_vaccinated",
-    run = "r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated",
-    needs = list("stage1_data_cleaning_both", "stage1_end_date_table_vaccinated"),
-    moderately_sensitive = list(
-      event_counts = "output/review/descriptives/event_counts_by_time_period_vaccinated.csv")
+  #comment("create post exposure time to event histogram data"),
+  splice(
+    # over cohort
+    unlist(lapply(cohort_to_run, function(x) days_to_event_histogram(cohort = x)), recursive = FALSE)
   ),
   
-  action(
-    name = "event_counts_by_time_period_electively_unvaccinated",
-    run = "r:latest analysis/descriptives/event_counts_by_time_period.R electively_unvaccinated",
-    needs = list("stage1_data_cleaning_both", "stage1_end_date_table_electively_unvaccinated"),
-    moderately_sensitive = list(
-      event_counts = "output/review/descriptives/event_counts_by_time_period_electively_unvaccinated.csv")
-  ),
+  # action(
+  #   name = "event_counts_by_time_period_vaccinated",
+  #   run = "r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated",
+  #   needs = list("stage1_data_cleaning_both", "stage1_end_date_table_vaccinated"),
+  #   moderately_sensitive = list(
+  #     event_counts = "output/review/descriptives/event_counts_by_time_period_vaccinated.csv")
+  # ),
+  # 
+  # action(
+  #   name = "event_counts_by_time_period_electively_unvaccinated",
+  #   run = "r:latest analysis/descriptives/event_counts_by_time_period.R electively_unvaccinated",
+  #   needs = list("stage1_data_cleaning_both", "stage1_end_date_table_electively_unvaccinated"),
+  #   moderately_sensitive = list(
+  #     event_counts = "output/review/descriptives/event_counts_by_time_period_electively_unvaccinated.csv")
+  # ),
   
   #comment("Stage 4 - Venn diagrams"),
   action(

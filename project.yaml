@@ -141,23 +141,29 @@ actions:
       moderately_sensitive:
         input_table_2: output/review/descriptives/table2_electively_unvaccinated.csv
 
-  event_counts_by_time_period_vaccinated:
-    run: r:latest analysis/descriptives/event_counts_by_time_period.R vaccinated
+  ## Post-exposure days to event histogram data - vaccinated 
+
+  days_to_event_histogram_vaccinated:
+    run: r:latest analysis/descriptives/histogram_data_post_exposure_days_to_event.R
+      vaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_vaccinated
     outputs:
       moderately_sensitive:
-        event_counts: output/review/descriptives/event_counts_by_time_period_vaccinated.csv
+        input_table_2: output/review/descriptives/histogram_data_vaccinated.csv
 
-  event_counts_by_time_period_electively_unvaccinated:
-    run: r:latest analysis/descriptives/event_counts_by_time_period.R electively_unvaccinated
+  ## Post-exposure days to event histogram data - electively_unvaccinated 
+
+  days_to_event_histogram_electively_unvaccinated:
+    run: r:latest analysis/descriptives/histogram_data_post_exposure_days_to_event.R
+      electively_unvaccinated
     needs:
     - stage1_data_cleaning_both
     - stage1_end_date_table_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        event_counts: output/review/descriptives/event_counts_by_time_period_electively_unvaccinated.csv
+        input_table_2: output/review/descriptives/histogram_data_electively_unvaccinated.csv
 
   stage4_venn_diagram_both:
     run: r:latest analysis/descriptives/venn_diagram.R both
