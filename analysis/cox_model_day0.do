@@ -213,7 +213,7 @@ est store min, title(Age_Sex)
 stcox days0 days1_28 days28_197 i.sex age_spline1 age_spline2 i.cov_cat_ethnicity i.cov_cat_deprivation i.cov_cat_smoking_status cov_num_consulation_rate cov_bin_*, strata(region) vce(r)
 est store max, title(Maximal)
 
-estout * using "output/`cpf'_cox_model.txt", cells("b se t ci_l ci_u p") stats(risk N_fail N_sub N N_clust) replace 
+estout * using "output/`cpf'_cox_model_day_zero.txt", cells("b se t ci_l ci_u p") stats(risk N_fail N_sub N N_clust) replace 
 
 * Calculate median follow-up
 
@@ -232,4 +232,4 @@ bysort term: egen medianfup = median(follow_up)
 keep term medianfup
 duplicates drop
 
-export delimited using "output/`cpf'_stata_median_fup", replace
+export delimited using "output/`cpf'_stata_median_fup_day_zero", replace

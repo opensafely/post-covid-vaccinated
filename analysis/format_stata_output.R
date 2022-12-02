@@ -1,6 +1,6 @@
 # List files to be combined
 
-files <- list.files(path = "output/", pattern = "_cox_model.txt")
+files <- list.files(path = "output/", pattern = "_cox_model.txt|_cox_model_day_zero.txt")
 
 # Create empty master data frame
 
@@ -65,7 +65,7 @@ for (f in files) {
   
   ## Add median follow up
 
-  f <- gsub("_cox_model.txt","_stata_median_fup.csv",f)
+  f <- gsub("_cox_model.txt","_stata_median_fup",f)
   fup <- readr::read_csv(file = paste0("output/",f))
   tmp <- merge(tmp, fup, by = "term", all.x = TRUE)
   
