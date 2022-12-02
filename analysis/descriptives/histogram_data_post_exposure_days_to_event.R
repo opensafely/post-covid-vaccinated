@@ -59,7 +59,7 @@ histogram_events <- function(cohort_name){
   analyses_of_interest <- crossing(outcomes, cohort_name, c("main","covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
   colnames(analyses_of_interest) <- c("event","cohort","subgroup")
   analyses_of_interest$stratify_by <- NA
-  analyses_of_interest$stratify_by <- ifelse(analyses_of_interest$subgroup == "covid_pheno_hospitalised", "hospitalised", ifelse(analyses_of_interest$subgroup == "covid_pheno_nonhospitalised","non_hospitalised","main"))
+  analyses_of_interest$stratify_by <- ifelse(analyses_of_interest$subgroup == "covid_pheno_hospitalised", "hospitalised", ifelse(analyses_of_interest$subgroup == "covid_pheno_non_hospitalised","non_hospitalised","main"))
   
   # Create empty results data frame
   output <- as.data.frame(matrix(ncol = 5, nrow = 0))
