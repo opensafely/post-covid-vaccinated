@@ -65,7 +65,8 @@ for (f in files) {
   
   ## Add median follow up
 
-  f <- gsub("_cox_model.txt","_stata_median_fup",f)
+  f <- gsub("_cox_model","_stata_median_fup",f)
+  f <- gsub(".txt",".csv",f)
   fup <- readr::read_csv(file = paste0("output/",f))
   tmp <- merge(tmp, fup, by = "term", all.x = TRUE)
   
