@@ -411,8 +411,8 @@ actions_list <- splice(
   action(
     name = "format_stata_output",
     run = "r:latest analysis/format_stata_output.R",
-    needs = list(paste0("stata_cox_model_",analyses_to_run_stata$outcome,"_",analyses_to_run_stata$subgroup,"_",analyses_to_run_stata$cohort,"_",analyses_to_run_stata$time_periods),
-                 paste0("stata_cox_day_zero_",analyses_to_run_stata_day_zero$outcome,"_",analyses_to_run_stata_day_zero$subgroup,"_",analyses_to_run_stata_day_zero$cohort,"_",analyses_to_run_stata_day_zero$time_periods)),
+    needs = c(paste0("stata_cox_model_",analyses_to_run_stata$outcome,"_",analyses_to_run_stata$subgroup,"_",analyses_to_run_stata$cohort,"_",analyses_to_run_stata$time_periods),
+              paste0("stata_cox_day_zero_",analyses_to_run_stata_day_zero$outcome,"_",analyses_to_run_stata_day_zero$subgroup,"_",analyses_to_run_stata_day_zero$cohort,"_",analyses_to_run_stata_day_zero$time_periods)),
     moderately_sensitive = list(
       stata_output = "output/stata_output.csv")
   )
