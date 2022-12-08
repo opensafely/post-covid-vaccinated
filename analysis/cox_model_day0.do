@@ -189,9 +189,9 @@ egen follow_up_total = total(follow_up)
 
 * Make days variables
 
-gen days0 = 0
-replace days0 = 1 if days==0
-tab days0
+gen days0_1 = 0
+replace days0_1 = 1 if days==0
+tab days0_1
 
 gen days1_28 = 0
 replace days1_28 = 1 if days==1
@@ -208,9 +208,9 @@ tab days outcome_status
 di "Total follow-up in days: " follow_up_total
 bysort days: summarize(follow_up), detail
 
-stcox days0 days1_28 days28_197 i.sex age_spline1 age_spline2, strata(region) vce(r)
+stcox days0_1 days1_28 days28_197 i.sex age_spline1 age_spline2, strata(region) vce(r)
 est store min, title(Age_Sex)
-stcox days0 days1_28 days28_197 i.sex age_spline1 age_spline2 i.cov_cat_ethnicity i.cov_cat_deprivation i.cov_cat_smoking_status cov_num_consulation_rate cov_bin_*, strata(region) vce(r)
+stcox days0_1 days1_28 days28_197 i.sex age_spline1 age_spline2 i.cov_cat_ethnicity i.cov_cat_deprivation i.cov_cat_smoking_status cov_num_consulation_rate cov_bin_*, strata(region) vce(r)
 est store max, title(Maximal)
 
 estout * using "output/`cpf'_cox_model_day_zero.txt", cells("b se t ci_l ci_u p") stats(risk N_fail N_sub N N_clust) replace 
@@ -218,14 +218,15 @@ estout * using "output/`cpf'_cox_model_day_zero.txt", cells("b se t ci_l ci_u p"
 * Calculate median follow-up
 
 keep if outcome_status==1
-drop if days0==0 & days1_28==0 & days28_197==0
-keep patient_id days0 days1_28 days28_197 follow_up
+drop if days0_1==0 & days1_28==0 & days28_197==0
+keep patient_id days0_1 days1_28 days28_197 follow_up
 
 gen term = ""
-replace term = "days0" if days0==1 & days1_28==0 & days28_197==0
-replace term = "days1_28" if days0==0 & days1_28==1 & days28_197==0
-replace term = "days28_197" if days0==0 & days1_28==0 & days28_197==1
+replace term = "days0_1" if days0_1==1 & days1_28==0 & days28_197==0
+replace term = "days1_28" if days0_1==0 & days1_28==1 & days28_197==0
+replace term = "days28_197" if days0_1==0 & days1_28==0 & days28_197==1
 
+replace follow_up = follow_up + 1 if term == "days1_28"
 replace follow_up = follow_up + 28 if term == "days28_197"
 bysort term: egen medianfup = median(follow_up)
 
