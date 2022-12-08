@@ -15,7 +15,8 @@ for (f in files) {
   tmp <- readr::read_tsv(file = paste0("output/",f), skip = 2,
                          col_names = c("term",
                                        "b_min","se_min","t_min","lci_min","uci_min","p_min",
-                                       "b_max","se_max","t_max","lci_max","uci_max","p_max"))
+                                       "b_max","se_max","t_max","lci_max","uci_max","p_max"),
+                         show_col_types = FALSE)
   
   ## Make variables numeric
   
@@ -67,7 +68,8 @@ for (f in files) {
 
   f <- gsub("_cox_model","_stata_median_fup",f)
   f <- gsub(".txt",".csv",f)
-  fup <- readr::read_csv(file = paste0("output/",f))
+  print(f)
+  fup <- readr::read_csv(file = paste0("output/",f), show_col_types = FALSE)
   tmp <- merge(tmp, fup, by = "term", all.x = TRUE)
   
   ## Apend to master dataframe
