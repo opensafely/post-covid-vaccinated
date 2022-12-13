@@ -436,9 +436,18 @@ actions_list <- splice(
               paste0("stata_cox_day_zero_",analyses_to_run_stata_day_zero$outcome,"_",analyses_to_run_stata_day_zero$subgroup,"_",analyses_to_run_stata_day_zero$cohort,"_",analyses_to_run_stata_day_zero$time_periods)),
     moderately_sensitive = list(
       stata_output = "output/stata_output.csv")
+  ),
+  
+  action(
+    name = "format_R_output",
+    run = "r:latest analysis/model/07_combine_HRs_to_one_file.R",
+    needs = c(paste0("Analysis_cox_",outcomes_model,"_vaccinated"),
+              paste0("Analysis_cox_",outcomes_model,"_electively_unvaccinated")),
+    moderately_sensitive = list(
+      R_output = "output/review/model/R_HR_output.csv")
   )
 
-  
+ 
   
   #comment("Hospitalised event counts by covariate level"),
   # splice(

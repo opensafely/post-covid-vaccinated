@@ -1696,3 +1696,50 @@ actions:
       moderately_sensitive:
         stata_output: output/stata_output.csv
 
+  format_R_output:
+    run: r:latest analysis/model/07_combine_HRs_to_one_file.R
+    needs:
+    - Analysis_cox_ami_vaccinated
+    - Analysis_cox_stroke_isch_vaccinated
+    - Analysis_cox_dvt_vaccinated
+    - Analysis_cox_pe_vaccinated
+    - Analysis_cox_tia_vaccinated
+    - Analysis_cox_stroke_sah_hs_vaccinated
+    - Analysis_cox_hf_vaccinated
+    - Analysis_cox_angina_vaccinated
+    - Analysis_cox_ate_vaccinated
+    - Analysis_cox_vte_vaccinated
+    - Analysis_cox_ami_primary_position_vaccinated
+    - Analysis_cox_stroke_isch_primary_position_vaccinated
+    - Analysis_cox_dvt_primary_position_vaccinated
+    - Analysis_cox_pe_primary_position_vaccinated
+    - Analysis_cox_tia_primary_position_vaccinated
+    - Analysis_cox_stroke_sah_hs_primary_position_vaccinated
+    - Analysis_cox_hf_primary_position_vaccinated
+    - Analysis_cox_angina_primary_position_vaccinated
+    - Analysis_cox_ate_primary_position_vaccinated
+    - Analysis_cox_vte_primary_position_vaccinated
+    - Analysis_cox_ami_electively_unvaccinated
+    - Analysis_cox_stroke_isch_electively_unvaccinated
+    - Analysis_cox_dvt_electively_unvaccinated
+    - Analysis_cox_pe_electively_unvaccinated
+    - Analysis_cox_tia_electively_unvaccinated
+    - Analysis_cox_stroke_sah_hs_electively_unvaccinated
+    - Analysis_cox_hf_electively_unvaccinated
+    - Analysis_cox_angina_electively_unvaccinated
+    - Analysis_cox_ate_electively_unvaccinated
+    - Analysis_cox_vte_electively_unvaccinated
+    - Analysis_cox_ami_primary_position_electively_unvaccinated
+    - Analysis_cox_stroke_isch_primary_position_electively_unvaccinated
+    - Analysis_cox_dvt_primary_position_electively_unvaccinated
+    - Analysis_cox_pe_primary_position_electively_unvaccinated
+    - Analysis_cox_tia_primary_position_electively_unvaccinated
+    - Analysis_cox_stroke_sah_hs_primary_position_electively_unvaccinated
+    - Analysis_cox_hf_primary_position_electively_unvaccinated
+    - Analysis_cox_angina_primary_position_electively_unvaccinated
+    - Analysis_cox_ate_primary_position_electively_unvaccinated
+    - Analysis_cox_vte_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        R_output: output/review/model/R_HR_output.csv
+
