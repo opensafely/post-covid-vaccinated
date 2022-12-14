@@ -1614,6 +1614,132 @@ actions:
         medianfup: output/input_sampled_data_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
         stata_output: output/input_sampled_data_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
 
+  stata_cox_day_zero_ami_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_ami_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ami_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ami_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_ami_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_stroke_isch_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_stroke_isch_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_stroke_isch_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_stroke_isch_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_stroke_isch_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_dvt_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_dvt_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_dvt_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_dvt_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_dvt_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_pe_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_pe_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_pe_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_pe_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_pe_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_hf_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_angina_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_angina_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_angina_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_angina_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_angina_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_ate_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_ate_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ate_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ate_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_ate_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_vte_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_vte_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_vte_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_ami_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_ami_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ami_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ami_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_ami_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_stroke_isch_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_stroke_isch_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_stroke_isch_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_stroke_isch_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_stroke_isch_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_pe_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_pe_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_pe_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_pe_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_pe_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_hf_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_ate_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_ate_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_ate_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_ate_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_ate_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
+  stata_cox_day_zero_vte_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced:
+    run: stata-mp:latest analysis/cox_model_day0.do input_sampled_data_vte_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods
+    needs:
+    - Analysis_cox_vte_primary_position_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        medianfup: output/input_sampled_data_vte_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_stata_median_fup_day_zero.csv
+        stata_output: output/input_sampled_data_vte_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced_time_periods_cox_model_day_zero.txt
+
   format_stata_output:
     run: r:latest analysis/format_stata_output.R
     needs:
@@ -1692,6 +1818,20 @@ actions:
     - stata_cox_day_zero_vte_covid_pheno_hospitalised_electively_unvaccinated_reduced
     - stata_cox_day_zero_ate_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced
     - stata_cox_day_zero_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_ami_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_stroke_isch_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_dvt_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_pe_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_hf_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_angina_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_ate_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_vte_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_ami_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_stroke_isch_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_pe_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_ate_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
+    - stata_cox_day_zero_vte_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_reduced
     outputs:
       moderately_sensitive:
         stata_output: output/stata_output.csv
