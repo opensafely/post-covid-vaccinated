@@ -33,8 +33,7 @@ outcomes_to_plot <- outcome_name_table$outcome_name
 estimates <- read.csv(paste0(results_dir,"/hr_output_formatted.csv"))
 
 # Get estimates for main analyses and list of outcomes from active analyses
-estimates <- estimates %>% filter(subgroup == "main" 
-                                  & event %in% outcomes_to_plot 
+estimates <- estimates %>% filter(event %in% outcomes_to_plot 
                                   & term %in% term[grepl("^days",term)]
                                   & model == "mdl_max_adj"
                                   & time_points %in% time_points[grepl("^day_zero",time_points)]) %>%
@@ -104,16 +103,16 @@ estimates$outcome <- factor(estimates$outcome, levels=c("Arterial thrombosis eve
                                                         "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events"))
                                                                            
                                                                             
-
+# Plot day zero main results
 
 for(i in c("any_position","primary_position")){
   for(j in c("reduced","normal")){
     if(i == "any_position"){
-      df <- estimates %>% filter(!event %in% event[grepl("primary_position",event)])
+      df <- estimates %>% filter(!event %in% event[grepl("primary_position",event)] & subgroup == "main")
       ylim <- 256
       ybreaks <- c(0.5,1,2,4,8,16,32,64,128)
     }else{
-      df <- estimates %>% filter(event %in% event[grepl("primary_position",event)])
+      df <- estimates %>% filter(event %in% event[grepl("primary_position",event)] & subgroup == "main")
       ylim <- 64
       ybreaks <- c(0.5,1,2,4,8,16,32)
     }
@@ -144,7 +143,7 @@ for(i in c("any_position","primary_position")){
       ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
       ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
       ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
-      ggplot2::ggtitle(paste0(i," events, ",j," time periods")) +
+      #ggplot2::ggtitle(paste0(i," events, ",j," time periods")) +
       ggplot2::guides(fill=ggplot2::guide_legend(ncol = 1, byrow = TRUE)) +
       ggplot2::theme_minimal() +
       ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
@@ -159,11 +158,124 @@ for(i in c("any_position","primary_position")){
                      text=element_text(size=13)) +
       ggplot2::facet_wrap(outcome~., ncol = 2)
     
-    ggplot2::ggsave(paste0(output_dir,"Figure_5_day_zero_",i,"_",j, "_time_points.png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
-    
-    
+    ggplot2::ggsave(paste0(output_dir,"Figure_5_day_zero_main_",i,"_",j, "_time_points.png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
   }
-  
-  
 }
-  
+
+# Plot day zero hospitalised results
+
+for(i in c("any_position","primary_position")){
+  for(j in c("reduced","normal")){
+    if(i == "any_position"){
+      df <- estimates %>% filter(!event %in% event[grepl("primary_position",event)] & subgroup == "covid_pheno_hospitalised")
+      ylim <- 256
+      ybreaks <- c(0.5,1,2,4,8,16,32,64,128)
+    }else{
+      df <- estimates %>% filter(event %in% event[grepl("primary_position",event)] & subgroup == "covid_pheno_hospitalised")
+      ylim <- 64
+      ybreaks <- c(0.5,1,2,4,8,16,32)
+    }
+    
+    if(j == "reduced"){
+      df <- df %>% filter(time_points == "day_zero_reduced")
+    }else{
+      df <- df %>% filter(time_points == "day_zero_normal")
+    }
+    
+    
+    ggplot2::ggplot(data=df,
+                    mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
+      #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
+      ggplot2::geom_point() +
+      ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
+      ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf_low<0.25,0.25,conf_low), 
+                                                    ymax = ifelse(conf_high>ylim,ylim,conf_high),  
+                                                    width = 0)
+                             #,position = ggplot2::position_dodge(width = 1)
+      )+   
+      #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
+      ggplot2::geom_line() +
+      #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
+      ggplot2::scale_y_continuous(lim = c(0.5,ylim), breaks = ybreaks, trans = "log") +
+      ggplot2::scale_x_continuous(lim = c(0,ceiling(max(df$median_follow_up, na.rm = T) / 4) * 4), breaks = seq(0,ceiling(max(df$median_follow_up, na.rm = T) / 4) * 4,4)) +
+      ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
+      ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
+      ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
+      ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
+      #ggplot2::ggtitle(paste0(i," events, ",j," time periods")) +
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol = 1, byrow = TRUE)) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     panel.spacing.x = ggplot2::unit(0.5, "lines"),
+                     panel.spacing.y = ggplot2::unit(0, "lines"),
+                     legend.key = ggplot2::element_rect(colour = NA, fill = NA),
+                     legend.title = ggplot2::element_blank(),
+                     legend.position="bottom",
+                     #legend.justification = "left",
+                     plot.background = ggplot2::element_rect(fill = "white", colour = "white"),
+                     text=element_text(size=13)) +
+      ggplot2::facet_wrap(outcome~., ncol = 2)
+    
+    ggplot2::ggsave(paste0(output_dir,"Figure_5_day_zero_hospitalised_",i,"_",j, "_time_points.png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+  }
+}
+
+# Plot day zero non-hospitalised results
+
+for(i in c("any_position","primary_position")){
+  for(j in c("reduced","normal")){
+    if(i == "any_position"){
+      df <- estimates %>% filter(!event %in% event[grepl("primary_position",event)] & subgroup == "covid_pheno_non__hospitalised")
+      ylim <- 256
+      ybreaks <- c(0.5,1,2,4,8,16,32,64,128)
+    }else{
+      df <- estimates %>% filter(event %in% event[grepl("primary_position",event)] & subgroup == "covid_pheno_non_hospitalised")
+      ylim <- 64
+      ybreaks <- c(0.5,1,2,4,8,16,32)
+    }
+    
+    if(j == "reduced"){
+      df <- df %>% filter(time_points == "day_zero_reduced")
+    }else{
+      df <- df %>% filter(time_points == "day_zero_normal")
+    }
+    
+    
+    ggplot2::ggplot(data=df,
+                    mapping = ggplot2::aes(x=median_follow_up, y = estimate, color = cohort, shape= cohort, fill= cohort))+
+      #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1)) +
+      ggplot2::geom_point() +
+      ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
+      ggplot2::geom_errorbar(mapping = ggplot2::aes(ymin = ifelse(conf_low<0.25,0.25,conf_low), 
+                                                    ymax = ifelse(conf_high>ylim,ylim,conf_high),  
+                                                    width = 0)
+                             #,position = ggplot2::position_dodge(width = 1)
+      )+   
+      #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1)) + 
+      ggplot2::geom_line() +
+      #ggplot2::scale_y_continuous(lim = c(0.25,8), breaks = c(0.5,1,2,4,8), trans = "log") +
+      ggplot2::scale_y_continuous(lim = c(0.5,ylim), breaks = ybreaks, trans = "log") +
+      ggplot2::scale_x_continuous(lim = c(0,ceiling(max(df$median_follow_up, na.rm = T) / 4) * 4), breaks = seq(0,ceiling(max(df$median_follow_up, na.rm = T) / 4) * 4,4)) +
+      ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
+      ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
+      ggplot2::scale_shape_manual(values = c(rep(21,22)), labels = levels(df$cohort)) +
+      ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
+      #ggplot2::ggtitle(paste0(i," events, ",j," time periods")) +
+      ggplot2::guides(fill=ggplot2::guide_legend(ncol = 1, byrow = TRUE)) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     panel.spacing.x = ggplot2::unit(0.5, "lines"),
+                     panel.spacing.y = ggplot2::unit(0, "lines"),
+                     legend.key = ggplot2::element_rect(colour = NA, fill = NA),
+                     legend.title = ggplot2::element_blank(),
+                     legend.position="bottom",
+                     #legend.justification = "left",
+                     plot.background = ggplot2::element_rect(fill = "white", colour = "white"),
+                     text=element_text(size=13)) +
+      ggplot2::facet_wrap(outcome~., ncol = 2)
+    
+    ggplot2::ggsave(paste0(output_dir,"Figure_5_day_zero_non_hospitalised_",i,"_",j, "_time_points.png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+  }
+}
