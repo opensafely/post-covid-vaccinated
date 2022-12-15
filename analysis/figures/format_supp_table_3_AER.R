@@ -38,25 +38,21 @@ table2 <- table2 %>% select(event, subgroup, cohort_to_run, total_person_days, u
 
 table2$exposed_person_days <- table2$total_person_days - table2$unexposed_person_days
 table2$total_person_days <- NULL
-table2 <- pivot_longer(table2, cols = c("unexposed_person_days","exposed_person_days"), names_to = "time_periods", values_to = "follow_up")
-
-#Unexposed person days is the same for both hospitalised and non-hospitalised analysis
-table2 <- table2 %>% filter(subgroup == "covid_pheno_hospitalised"
-                            | (subgroup == "covid_pheno_non_hospitalised" & time_periods == "exposed_person_days"))
+table2$unexposed_person_days <- NULL
 
 #Sum follow up
 table2 <- table2 %>% group_by(event, cohort_to_run) %>%
-  summarise(total_follow_up = sum(follow_up))
+  summarise(total_exposed_follow_up = sum(exposed_person_days))
 
 #Convert from days to years
-table2$total_follow_up <- table2$total_follow_up/365.2
+table2$total_exposed_follow_up <- table2$total_exposed_follow_up/365.2
 table2$event <- gsub("out_date_","",table2$event)
 
 #Left join follow up onto AER table
 df <- df %>% left_join(table2, by = c("event"="event", "cohort"="cohort_to_run"))
-df$excess_events_per_1000_person_years <- df$total * (1000/df$total_follow_up)
+df$excess_events_per_1000_person_years <- df$total * (1000/df$total_exposed_follow_up)
 
-df <- pivot_longer(df, cols = c(total, total_follow_up, excess_events_per_1000_person_years), names_to = "summary", values_to = "total")
+df <- pivot_longer(df, cols = c(total, total_exposed_follow_up, excess_events_per_1000_person_years), names_to = "summary", values_to = "total")
 df <- pivot_wider(df, names_from = cohort, values_from = total)
 
 df <- df %>% rename("Pre-vaccination cohort"="pre_vaccination",
@@ -64,7 +60,7 @@ df <- df %>% rename("Pre-vaccination cohort"="pre_vaccination",
                     "Unvaccinated cohort"="electively_unvaccinated")
 
 df$summary <- ifelse(df$summary == "total", "Total excess events",df$summary)
-df$summary <- ifelse(df$summary == "total_follow_up", "Total follow up (years)",df$summary)
+df$summary <- ifelse(df$summary == "total_exposed_follow_up", "Total post exposure follow up (years)",df$summary)
 df$summary <- ifelse(df$summary == "excess_events_per_1000_person_years", "Excess events per 1000 person years",df$summary)
 
 #Get tidy names
