@@ -192,7 +192,7 @@ actions:
 
   reusableaction_model:
     run: cox-ipw:v0.0.18 --df_input=reusableaction_input_vaccinated_ami_main_analysis.csv
-      --ipw=TRUE --exposure=exp_date --outcome=out_date_ami --strata=cov_cat_region
+      --ipw=TRUE --exposure=exp_date_covid19_confirmed --outcome=out_date_ami --strata=cov_cat_region
       --covariate_sex=cov_cat_sex --covariate_age=cov_num_age --covariate_other=cov_num_consulation_rate;cov_bin_healthcare_worker;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease
       --cox_start=index_date --cox_stop=follow_up_end --study_start=2020-01-01 --study_stop=2021-06-18
       --cut_points=28;197;535 --controls_per_case=20 --total_event_threshold=50 --episode_event_threshold=5
