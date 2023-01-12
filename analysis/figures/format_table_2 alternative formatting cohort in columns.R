@@ -125,4 +125,4 @@ table2_transposed$period <- factor(table2_transposed$period, levels = c("No COVI
 
 table2_transposed <- table2_transposed[order(table2_transposed$Outcome, table2_transposed$period),]
 
-write.csv(table2_transposed, paste0(output_dir,"formatted_table_2_cohorts_in_columns.csv"),row.names = F)
+write.csv(table2_transposed, paste0(output_dir,"formatted_table_2_cohorts_in_columns_updated.csv"),row.names = F)
