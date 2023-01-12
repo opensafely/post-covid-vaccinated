@@ -10,7 +10,7 @@ library(tidyverse)
 
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
 df <- read.csv(paste0(results_dir,"/stata_output.csv"))
-df_prevax <- read.csv(paste0(results_dir,"/stata_output_prevax.csv"))
+df_prevax <- read.csv(paste0(results_dir,"/stata_output_pre_vax.csv"))
 df <- rbind(df, df_prevax)
 df$X <- NULL
 
@@ -89,18 +89,18 @@ df$median_follow_up <- df$median_follow_up - df$remove_from_median
 df$source <- "stata"
 
 #Read in R HRs
-hr_files=list.files(path = results_dir, pattern = "suppressed_compiled_HR_results_*")
-hr_files=hr_files[endsWith(hr_files,".csv")]
-hr_files=paste0(results_dir,"/", hr_files)
-hr_file_paths <- pmap(list(hr_files),
-                      function(fpath){
-                        df <- fread(fpath)
-                        return(df)
-                      })
-estimates <- rbindlist(hr_file_paths, fill=TRUE)
+vax_results <- read.csv(paste0(results_dir,"/R_HR_output.csv"))
+vax_results$cox_weight <- NULL
+
+pre_vax_results <- read.csv(paste0(results_dir,"/R_HR_output_pre_vax.csv"))
+pre_vax_results$total_covid_cases <- NULL
+
+estimates <- rbind(vax_results,pre_vax_results)
 estimates$source <- "R"
+rm(vax_results,pre_vax_results)
 
 df <- df %>% select(intersect(colnames(estimates),colnames(df)))
+estimates <- estimates %>% select(intersect(colnames(estimates),colnames(df)))
 estimates <- rbind(estimates, df, fill = TRUE)
 rm(df)
 
