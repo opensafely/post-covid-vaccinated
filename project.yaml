@@ -1909,4 +1909,5 @@ actions:
     outputs:
       moderately_sensitive:
         R_output: output/review/model/R_HR_output.csv
+        R_event_counts: output/review/model/R_event_count_output.csv
 
