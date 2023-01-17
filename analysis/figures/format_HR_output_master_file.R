@@ -69,6 +69,9 @@ df$conf_high <- exp(df$conf_high)
 #Only use results that are in the analyses_to_run_in_stata files
 
 stata_analyses <- read_csv("lib/analyses_to_run_in_stata.csv")
+stata_analyses_extended_follow_up <- read_csv("lib/analyses_to_run_in_stata_extended_follow_up.csv")
+stata_analyses <- rbind(stata_analyses,stata_analyses_extended_follow_up)
+
 stata_analyses <- stata_analyses %>% dplyr::rename(time_points=time_periods,
                                                    event = outcome)
 
@@ -145,9 +148,10 @@ table2_pre_vax <- read.csv(paste0(results_dir,"/table2_pre_vaccination_cvd.csv")
 table2_vax <- read.csv(paste0(results_dir,"/table2_vaccinated.csv"))
 table2_unvax <- read.csv(paste0(results_dir,"/table2_electively_unvaccinated.csv"))
 
-table2_pre_vax <- table2_pre_vax %>% rename(cohort_to_run = cohort_name)
+#table2_pre_vax <- table2_pre_vax %>% rename(cohort_to_run = cohort_name)
 table2 <- rbind(table2_unvax,table2_vax,table2_pre_vax)
-table2 <- table2 %>% rename(cohort = cohort_to_run)
+#table2 <- table2 %>% rename(cohort = cohort_to_run)
+table2$cohort <- table2$cohort_to_run
 table2 <- table2 %>% select(event, subgroup, cohort, post_exposure_event_count)
 table2$event <- gsub("out_date_","",table2$event)
 
