@@ -54,8 +54,12 @@ unique(df$subgroup)
 # Rename model
 df$model <- ifelse(df$model == "max", "mdl_max_adj","mdl_age_sex_region")
 
-#Fomat columns
+
+#Format columns
 df$time_points <- "reduced"
+# Flag day_zero analysis
+df$time_points <- ifelse(grepl("day_zero",df$source),"reduced_day_zero",df$time_points)
+  
 df$results_fitted <- "fitted_successfully"
 df$source <- NULL
 df$N_outcomes <- NULL
@@ -70,7 +74,8 @@ df$conf_high <- exp(df$conf_high)
 
 stata_analyses <- read_csv("lib/analyses_to_run_in_stata.csv")
 stata_analyses_extended_follow_up <- read_csv("lib/analyses_to_run_in_stata_extended_follow_up.csv")
-stata_analyses <- rbind(stata_analyses,stata_analyses_extended_follow_up)
+stata_analyses_day_zero <- read_csv("lib/analyses_to_run_in_stata_day_zero.csv")
+stata_analyses <- rbind(stata_analyses,stata_analyses_extended_follow_up,stata_analyses_day_zero)
 
 stata_analyses <- stata_analyses %>% dplyr::rename(time_points=time_periods,
                                                    event = outcome)
