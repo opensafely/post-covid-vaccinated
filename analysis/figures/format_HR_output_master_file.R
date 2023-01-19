@@ -58,7 +58,7 @@ df$model <- ifelse(df$model == "max", "mdl_max_adj","mdl_age_sex_region")
 #Format columns
 df$time_points <- "reduced"
 # Flag day_zero analysis
-df$time_points <- ifelse(grepl("day_zero",df$source),"reduced_day_zero",df$time_points)
+df$time_points <- ifelse(grepl("day_zero",df$source),"day_zero_reduced",df$time_points)
   
 df$results_fitted <- "fitted_successfully"
 df$source <- NULL
