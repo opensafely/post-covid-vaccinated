@@ -261,12 +261,14 @@ for (i in unique(estimates$event)) {
 # ADD EVENT COUNTS TO PLOT TABLE  -------------------------------------------------------
 #table2 <- read.csv("C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/table_2/formatted_table_2.csv", check.names = FALSE)
 #table2_primary_position <- read.csv("C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/table_2/formatted_table_2_primary_position.csv", check.names = FALSE)
-table2 <- read.csv("C:/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - tables-figures formatting/formatted_table_2.csv", check.names = FALSE)
+
+#table2 <- read.csv("C:/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - tables-figures formatting/formatted_table_2.csv", check.names = FALSE)
+table2 <- read.csv("C:/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - tables-figures formatting/formatted_table_2_extended_FU.csv", check.names = FALSE)
 table2_primary_position <- read.csv("C:/Users/gic30/OneDrive - University of Cambridge/2. Long Covid/Code/Post-covid-vaccinated - tables-figures formatting/formatted_table_2_primary_position.csv", check.names = FALSE)
 
 table2 <- rbind(table2, table2_primary_position)
 
-table2$cohort <- ifelse(table2$cohort == "Pre-vaccinated", "Pre-vaccination (1 Jan 2020 - 18 Jun 2021)", ifelse(table2$cohort == "Vaccinated","Vaccinated (1 Jun 2021 - 14 Dec 2021)", "Unvaccinated (1 Jun 2021 - 14 Dec 2021)") )
+table2$cohort <- ifelse(table2$cohort == "Pre-vaccinated", "Pre-vaccination (1 Jan 2020 - 14 Dec 2021)", ifelse(table2$cohort == "Vaccinated","Vaccinated (1 Jun 2021 - 14 Dec 2021)", "Unvaccinated (1 Jun 2021 - 14 Dec 2021)") )
 
 table2$Outcome <- gsub(" events","",table2$Outcome)
 
@@ -276,7 +278,7 @@ table2 <- table2 %>%
   dplyr::rename(`Total events` = Total,
                 Cohort = cohort) %>%
   dplyr::select(-c(`No COVID-19`)) %>%
-  mutate(`Number of people` = ifelse(Cohort == "Pre-vaccination (1 Jan 2020 - 18 Jun 2021)", 18210937,
+  mutate(`Number of people` = ifelse(Cohort == "Pre-vaccination (1 Jan 2020 - 14 Dec 2021)", 18210937,
                                      ifelse(Cohort == "Vaccinated (1 Jun 2021 - 14 Dec 2021)", 13572399,
                                             ifelse(Cohort == "Unvaccinated (1 Jun 2021 - 14 Dec 2021)",3161485, NA)))) %>%
   relocate(`Total events`, .after = `Cohort`) %>%
