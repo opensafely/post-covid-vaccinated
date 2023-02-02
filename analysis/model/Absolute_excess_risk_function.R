@@ -30,7 +30,7 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   
   
   #-------------------------Check structure the input---------------------------
-  input <- input %>% mutate(across(c("estimate_main","estimate_subgroup","unexposed_person_days","unexposed_event_count","total_covid19_cases"), as.numeric))
+  input <- input %>% mutate(across(c("estimate","unexposed_person_days","unexposed_event_count","total_covid19_cases"), as.numeric))
   input <- as.data.frame(input)
   
   #---------------------------------Subset to relevant data---------------------
@@ -72,43 +72,26 @@ excess_risk <- function(event_of_interest, cohort_of_interest, model_of_interest
   lifetable$cumulative_survival_unexp <- cumprod(1 - lifetable$incidence_unexp) 
   
   #Step3. Carry over maximally adjusted hazard ratio estimates (time varying) for event after COVID exposure
-  lifetable$hr_main <- NA
+  lifetable$hr <- NA
   
   for(i in 1:nrow(input)){
     tmp <- input[i,]
-    lifetable$hr_main <- ifelse(lifetable$days >= tmp$time_period_start & lifetable$days < tmp$time_period_end, tmp$estimate_main, lifetable$hr_main)
-    lifetable$hr_main <- as.numeric(lifetable$hr_main)
+    lifetable$hr <- ifelse(lifetable$days >= tmp$time_period_start & lifetable$days < tmp$time_period_end, tmp$estimate, lifetable$hr)
+    lifetable$hr <- as.numeric(lifetable$hr)
   }
-  
-  lifetable$hr_subgroup <- NA
-  
-  for(i in 1:nrow(input)){
-    tmp <- input[i,]
-    lifetable$hr_subgroup <- ifelse(lifetable$days >= tmp$time_period_start & lifetable$days < tmp$time_period_end, tmp$estimate_subgroup, lifetable$hr_subgroup)
-    lifetable$hr_subgroup <- as.numeric(lifetable$hr_subgroup)
-  }
-  
-  #Occasionally HR is redacted, is so set to null
-  # These have been removed at an earlier stage
-  
-  #lifetable$hr <- ifelse(lifetable$hr=="[Redacted]",NA,lifetable$hr)
-  #lifetable$hr <- as.numeric(lifetable$hr)
   
   #Step4. Calculate predicted incidence of outcome after COVID exposure in age/sex subgroups
   #Multiply daily incidence in unexposed by maximally adjusted hazard ratios (time varying) for event after COVID exposure
-  lifetable$cumulative_survival_exp_main <- cumprod(1 - (lifetable$hr_main * lifetable$incidence_unexp))
-  lifetable$cumulative_survival_exp_subgroup <- cumprod(1 - (lifetable$hr_subgroup * lifetable$incidence_unexp))
-  
+  lifetable$cumulative_survival_exp <- cumprod(1 - (lifetable$hr * lifetable$incidence_unexp))
+
   #Step5. Calculate daily excess risk
   #As difference in cumulative survival unexposed and expected cumulative survival in unexposed
-  lifetable$excess_risk_main <- lifetable$cumulative_survival_unexp - lifetable$cumulative_survival_exp_main
-  lifetable$excess_risk_subgroup <- lifetable$cumulative_survival_unexp - lifetable$cumulative_survival_exp_subgroup
-  
+  lifetable$excess_risk <- lifetable$cumulative_survival_unexp - lifetable$cumulative_survival_exp
+
   #Step6. Carry over total number of COVID cases in age/sex subgroup, calculate subgroup-specific absolute excess risk
   lifetable$total_covid19_cases <- input$total_covid19_cases[1]
-  lifetable$AER_main <- lifetable$excess_risk_main * lifetable$total_covid19_cases
-  lifetable$AER_subgroup <- lifetable$excess_risk_subgroup * lifetable$total_covid19_cases
-  
+  lifetable$AER <- lifetable$excess_risk * lifetable$total_covid19_cases
+
   #Step7. Total AER as total of all subgroups
   
   #lifetable$total_AER = rowSums(select(lifetable, ends_with("_AER")))
