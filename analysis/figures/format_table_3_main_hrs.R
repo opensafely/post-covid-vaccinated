@@ -11,17 +11,27 @@ output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenS
 dir.create(file.path(output_dir), recursive =TRUE, showWarnings = FALSE)
 
 #----------------------------Get CVD outcomes-----------------------------------
-
 active_analyses <- read_rds("lib/active_analyses.rds") %>% filter(active == "TRUE")
 
-outcome_name_table <- active_analyses %>% 
+active_analyses <- active_analyses %>% 
   select(outcome, outcome_variable) %>% 
   mutate(outcome_name=active_analyses$outcome_variable %>% str_replace("out_date_", ""))
 
+active_analyses$outcome <- gsub("Arterial thrombosis event","All arterial thromboses",active_analyses$outcome)
+active_analyses$outcome <- gsub("Venous thrombosis event","All venous thromboses",active_analyses$outcome)
 
-#---------------Focus on first 8 CVD outcomes (remove ate and vte)--------------
+
+active_analyses_pre_vax <- read_rds("lib/active_analyses_pre_vax.rds") %>% filter(active == "TRUE")
+
+active_analyses_pre_vax <- active_analyses_pre_vax %>% 
+  select(outcome, outcome_variable) %>% 
+  mutate(outcome_name=active_analyses_pre_vax$outcome_variable %>% str_replace("out_date_", ""))%>%
+  filter(grepl("extended_follow_up",outcome_variable))
+
+#---------------Focus on all outcomes--------------
 #outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name != c("ate","vte","ate_primary_position","vte_primary_position")]
-outcomes_to_plot <- outcome_name_table$outcome_name
+outcomes_to_plot <- active_analyses$outcome_name
+outcomes_to_plot_pre_vax <- active_analyses_pre_vax$outcome_name
 
 # Load all estimates
 estimates <- read.csv(paste0(results_dir,"/hr_output_formatted.csv"))
@@ -29,22 +39,32 @@ estimates <- read.csv(paste0(results_dir,"/hr_output_formatted.csv"))
 
 estimates <- estimates %>% filter(((subgroup == "main" & model %in% c("mdl_max_adj","mdl_age_sex_region"))
                                             | (subgroup %in% c("covid_pheno_hospitalised","covid_pheno_non_hospitalised") & model=="mdl_max_adj")) 
-                                            & event %in% outcomes_to_plot 
+                                            & ((event %in% outcomes_to_plot & cohort %in% c("vaccinated","electively_unvaccinated")) | (event %in% outcomes_to_plot_pre_vax & cohort %in% c("pre_vaccination")))
                                             & term %in% term[grepl("^days",term)])%>%
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,model)
 
 #----------------------Add empty rows for missing results-----------------------
-df1 <- crossing(outcomes_to_plot,c("main","covid_pheno_non_hospitalised","covid_pheno_hospitalised"),c("pre_vaccination","vaccinated","electively_unvaccinated"),
-               c("reduced"),c("mdl_max_adj","mdl_age_sex_region"),c("days0_28","days28_197","days197_535"))
+df1 <- crossing(outcomes_to_plot,c("main","covid_pheno_non_hospitalised","covid_pheno_hospitalised"),c("vaccinated","electively_unvaccinated"),
+               c("reduced"),c("mdl_max_adj","mdl_age_sex_region"),c("days0_28","days28_197"))
 
 colnames(df1) <- c("event","subgroup","cohort","time_points","model","term")
 
-df2 <- crossing(outcomes_to_plot,c("main","covid_pheno_non_hospitalised","covid_pheno_hospitalised"),c("pre_vaccination","vaccinated","electively_unvaccinated"),
-                c("normal"),c("mdl_max_adj","mdl_age_sex_region"),c("days0_7","days7_14","days14_28","days28_56","days56_84","days84_197","days197_535"))
+df2 <- crossing(outcomes_to_plot_pre_vax,c("main","covid_pheno_non_hospitalised","covid_pheno_hospitalised"),c("pre_vaccination"),
+                c("reduced"),c("mdl_max_adj","mdl_age_sex_region"),c("days0_28","days28_197","days197_365","days365_714"))
 
 colnames(df2) <- c("event","subgroup","cohort","time_points","model","term")
 
-df<- rbind(df1,df2)
+df3 <- crossing(outcomes_to_plot,c("main","covid_pheno_non_hospitalised","covid_pheno_hospitalised"),c("vaccinated","electively_unvaccinated"),
+                c("normal"),c("mdl_max_adj","mdl_age_sex_region"),c("days0_7","days7_14","days14_28","days28_56","days56_84","days84_197"))
+
+colnames(df3) <- c("event","subgroup","cohort","time_points","model","term")
+
+df4 <- crossing(outcomes_to_plot_pre_vax,c("main","covid_pheno_non_hospitalised","covid_pheno_hospitalised"),c("pre_vaccination"),
+                c("normal"),c("mdl_max_adj","mdl_age_sex_region"),c("days0_7","days7_14","days14_28","days28_56","days56_84","days84_197","days197_365","days365_714"))
+
+colnames(df4) <- c("event","subgroup","cohort","time_points","model","term")
+
+df<- rbind(df1,df2,df3,df4)
 
 estimates <- df %>% left_join(estimates)
 
@@ -52,9 +72,13 @@ estimates <- estimates %>% filter((subgroup == "main" & model %in% c("mdl_max_ad
                                             | (subgroup %in% c("covid_pheno_hospitalised","covid_pheno_non_hospitalised") & model=="mdl_max_adj")) %>% 
   dplyr::mutate(across(c(estimate,conf_low,conf_high),as.numeric))
 
-rm(df1,df2,df)
+rm(df1,df2,df3,df4,df)
+
 #------------------------------Tidy event names---------------------------------
-estimates <- estimates %>% left_join(outcome_name_table %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
+#Remove extended follow up from outcome name as this will not be written in the final table
+estimates$event <- gsub("_extended_follow_up","",estimates$event)
+
+estimates <- estimates %>% left_join(active_analyses %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
 
 #-------------------------------Specify estimate format ------------------------  
 
@@ -64,20 +88,20 @@ estimates$est <- ifelse(is.na(estimates$estimate),NA,paste0(ifelse(estimates$est
 
 
 # Specify estimate order -----------------------------------------------------
-estimates$outcome <- factor(estimates$outcome, levels=c("Arterial thrombosis event",
+estimates$outcome <- factor(estimates$outcome, levels=c("All arterial thromboses",
                                                                   "Acute myocardial infarction",
                                                                   "Ischaemic stroke",
-                                                                  "Venous thrombosis event",
+                                                                  "All venous thromboses",
                                                                   "Pulmonary embolism",
                                                                   "Deep vein thrombosis",
                                                                   "Heart failure",
                                                                   "Angina",
                                                                   "Transient ischaemic attack",
                                                                   "Subarachnoid haemorrhage and haemorrhagic stroke",
-                                                                  "Arterial thrombosis event - Primary position events",
+                                                                  "All arterial thromboses - Primary position events",
                                                                   "Acute myocardial infarction - Primary position events",
                                                                   "Ischaemic stroke - Primary position events",
-                                                                  "Venous thrombosis event - Primary position events",
+                                                                  "All venous thromboses - Primary position events",
                                                                   "Pulmonary embolism - Primary position events",
                                                                   "Deep vein thrombosis - Primary position events",
                                                                   "Heart failure - Primary position events",
@@ -99,75 +123,85 @@ estimates$subgroup <- factor(estimates$subgroup, levels = c("All, age/sex/region
 estimates$cohort <- factor(estimates$cohort, levels=c("pre_vaccination","vaccinated","electively_unvaccinated")) 
 levels(estimates$cohort) <- list("Pre-vaccination"="pre_vaccination", "Vaccinated"="vaccinated","Unvaccinated"="electively_unvaccinated")
 
+unique(estimates$term)
+estimates <- estimates %>% mutate(term = case_when(term == "days0_28" ~ "1-4",
+                                                   term == "days28_197" ~ "5-28",
+                                                   term == "days197_365" ~ "29-52",
+                                                   term == "days365_714" ~ "53-102",
+                                                   term == "days0_7" ~ "1",
+                                                   term == "days7_14" ~ "2",
+                                                   term == "days14_28" ~ "3-4",
+                                                   term == "days28_56" ~ "5-8",
+                                                   term == "days56_84" ~ "9-12",
+                                                   term == "days84_197" ~ "13-28",
+                                                   TRUE ~ term))
+ 
 
 # Remove unnecessary variables -----------------------------------------------
 
 estimates[,c("event","estimate","conf_low","conf_high","model")] <- NULL
 
 # Convert long to wide -------------------------------------------------------
-
-format_hr_table <- function(df, time_periods,outcome_position){
+df = estimates_reduced_supplementary
+format_hr_table <- function(df, time_periods,outcome_position, save_name){
   df$time_points <- NULL
   df <- tidyr::pivot_wider(df, names_from = cohort, values_from = est)
   df <- df %>% select("outcome","subgroup","term", "Pre-vaccination","Vaccinated","Unvaccinated")
   
   if(grepl("reduced", time_periods)){
-    df$term <- factor(df$term, levels = c("days0_28",
-                                          "days28_197",
-                                          "days197_535"))
+    df$term <- factor(df$term, levels = c("1-4",
+                                          "5-28",
+                                          "29-52",
+                                          "53-102"))
     
   }else{
-    df$term <- factor(df$term, levels = c("days0_7",
-                                          "days7_14",
-                                          "days14_28",
-                                          "days28_56",
-                                          "days56_84",
-                                          "days84_197",
-                                          "days197_535"))
+    df$term <- factor(df$term, levels = c("1",
+                                          "2",
+                                          "3-4",
+                                          "5-8",
+                                          "9-12",
+                                          "13-28",
+                                          "29-52",
+                                          "53-102"))
   }
   
   df <- df[order(df$outcome,df$subgroup,df$term),]
-  tmp <- as.data.frame(matrix(ncol=ncol(df),nrow=0))
-  colnames(tmp) <- colnames(df)
   
-  for (i in unique(df$outcome)) {
-    df1 <- df %>% filter(outcome == i)
-    tmp[nrow(tmp)+1,] <- i
-    tmp <- rbind(tmp,df1)
-  }
+  
+  df <- df %>% mutate(across(c("outcome","subgroup","term"),as.character))
   
   if(outcome_position == "any_position"){
-    tmp[nrow(tmp)+1,] <- "Arterial thrombosis events"
-    tmp[nrow(tmp)+1,] <- "Venous thromboembolism events"
-    tmp[nrow(tmp)+1,] <- "Other vascular events"
+    df[nrow(df)+1,] <- "Arterial thrombotic events"
+    df[nrow(df)+1,] <- "Venous thrombotic events"
+    df[nrow(df)+1,] <- "Other cardiovascular events"
     
-    tmp$outcome <- factor(tmp$outcome, levels=c("Arterial thrombosis events",
-                                                "Arterial thrombosis event",
+    df$outcome <- factor(df$outcome, levels=c("Arterial thrombotic events",
+                                                "All arterial thromboses",
                                                 "Acute myocardial infarction",
                                                 "Ischaemic stroke",
-                                                "Venous thromboembolism events",
-                                                "Venous thrombosis event",
+                                                "Venous thrombotic events",
+                                                "All venous thromboses",
                                                 "Pulmonary embolism",
                                                 "Deep vein thrombosis",
-                                                "Other vascular events",
+                                                "Other cardiovascular events",
                                                 "Heart failure",
                                                 "Angina",
                                                 "Transient ischaemic attack",
                                                 "Subarachnoid haemorrhage and haemorrhagic stroke"))
   }else{
-    tmp[nrow(tmp)+1,] <- "Arterial thrombosis events - Primary position events"
-    tmp[nrow(tmp)+1,] <- "Venous thromboembolism events - Primary position events"
-    tmp[nrow(tmp)+1,] <- "Other vascular events - Primary position events"
+    df[nrow(df)+1,] <- "Arterial thrombotic events - Primary position events"
+    df[nrow(df)+1,] <- "Venous thrombotic events - Primary position events"
+    df[nrow(df)+1,] <- "Other cardiovascular events - Primary position events"
     
-    tmp$outcome <- factor(tmp$outcome, levels=c("Arterial thrombosis events - Primary position events",
-                                                "Arterial thrombosis event - Primary position events",
+    df$outcome <- factor(df$outcome, levels=c("Arterial thrombotic events - Primary position events",
+                                                "All arterial thromboses - Primary position events",
                                                 "Acute myocardial infarction - Primary position events",
                                                 "Ischaemic stroke - Primary position events",
-                                                "Venous thromboembolism events - Primary position events",
-                                                "Venous thrombosis event - Primary position events",
+                                                "Venous thrombotic events - Primary position events",
+                                                "All venous thromboses - Primary position events",
                                                 "Pulmonary embolism - Primary position events",
                                                 "Deep vein thrombosis - Primary position events",
-                                                "Other vascular events - Primary position events",
+                                                "Other cardiovascular events - Primary position events",
                                                 "Heart failure - Primary position events",
                                                 "Angina - Primary position events",
                                                 "Transient ischaemic attack - Primary position events",
@@ -175,27 +209,55 @@ format_hr_table <- function(df, time_periods,outcome_position){
   }
   
   
-  tmp <- tmp[order(tmp$outcome),]
-  tmp$outcome <- NULL
-  tmp <- tmp %>% dplyr::rename("Event" = "subgroup")
+  df <- df[order(df$outcome),]
   
-  write.csv(tmp, file = paste0(output_dir,"table3_main_formatted_hr_",outcome_position,"_",time_periods,"_time_periods.csv"),row.names = F)
+  write.csv(df, file = paste0(output_dir,save_name,outcome_position,"_",time_periods,"_time_periods.csv"),row.names = F)
 }
 
-estimates_reduced <- estimates %>% filter(time_points == "reduced" 
-                                                    & !outcome %in% outcome[grepl("Primary position",outcome)])
-
-estimates_reduced_primary_position <- estimates %>% filter(time_points == "reduced" 
-                                                    & outcome %in% outcome[grepl("Primary position",outcome)])
-
-estimates_normal <- estimates %>% filter(time_points == "normal" 
-                                                    & !outcome %in% outcome[grepl("Primary position",outcome)])
-
-estimates_normal_primary_position <- estimates %>% filter(time_points == "normal" 
-                                                                     & outcome %in% outcome[grepl("Primary position",outcome)])
+estimates_reduced_main_paper <- estimates %>% filter(time_points == "reduced" 
+                                                    & !outcome %in% outcome[grepl("Primary position",outcome)]
+                                                    & (subgroup == "All, maximally adjusted" | (subgroup %in% c("Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
+                                                    
 
 
-format_hr_table(estimates_reduced,"reduced","any_position")
-format_hr_table(estimates_reduced_primary_position,"reduced","primary_position")
-format_hr_table(estimates_normal,"normal","any_position")
-format_hr_table(estimates_normal_primary_position,"normal","primary_position")
+estimates_reduced_primary_position_main_paper <- estimates %>% filter(time_points == "reduced" 
+                                                    & outcome %in% outcome[grepl("Primary position",outcome)]
+                                                    & (subgroup == "All, maximally adjusted" | (subgroup %in% c("Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
+
+estimates_normal_main_paper <- estimates %>% filter(time_points == "normal" 
+                                         & !outcome %in% outcome[grepl("Primary position",outcome)]
+                                         & (subgroup == "All, maximally adjusted" | (subgroup %in% c("Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
+
+estimates_normal_primary_position_main_paper <- estimates %>% filter(time_points == "normal"
+                                                          & outcome %in% outcome[grepl("Primary position",outcome)]
+                                                          & (subgroup == "All, maximally adjusted" | (subgroup %in% c("Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
+
+estimates_reduced_supplementary <- estimates %>% filter(time_points == "reduced" 
+                                               & !outcome %in% outcome[grepl("Primary position",outcome)]
+                                               & !outcome %in% c("All arterial thromboses" ,"All venous thromboses")
+                                               & subgroup != "All, maximally adjusted")
+
+estimates_reduced_primary_position_supplementary <- estimates %>% filter(time_points == "reduced"
+                                                                & outcome %in% outcome[grepl("Primary position",outcome)]
+                                                                & !outcome %in% c("All arterial thromboses" ,"All venous thromboses")
+                                                                & subgroup != "All, maximally adjusted")
+
+estimates_normal_supplementary <- estimates %>% filter(time_points == "normal" 
+                                                       & !outcome %in% outcome[grepl("Primary position",outcome)]
+                                                       & !outcome %in% c("All arterial thromboses" ,"All venous thromboses")
+                                                       & subgroup != "All, maximally adjusted")
+
+estimates_normal_primary_position_supplementary <- estimates %>% filter(time_points == "normal"
+                                                                        & outcome %in% outcome[grepl("Primary position",outcome)]
+                                                                        & !outcome %in% c("All arterial thromboses" ,"All venous thromboses")
+                                                                        & subgroup != "All, maximally adjusted")
+
+format_hr_table(estimates_reduced_main_paper,"reduced","any_position","table3_main_formatted_hr_")
+format_hr_table(estimates_reduced_primary_position_main_paper,"reduced","primary_position","table3_main_formatted_hr_")
+format_hr_table(estimates_normal_main_paper,"normal","any_position","table3_main_formatted_hr_")
+format_hr_table(estimates_normal_primary_position_main_paper,"normal","primary_position","table3_main_formatted_hr_")
+
+format_hr_table(estimates_reduced_supplementary,"reduced","any_position","table3_supplementary_formatted_hr_")
+format_hr_table(estimates_reduced_primary_position_supplementary,"reduced","primary_position","table3_supplementary_formatted_hr_")
+format_hr_table(estimates_normal_supplementary,"normal","any_position","table3_supplementary_formatted_hr_")
+format_hr_table(estimates_normal_primary_position_supplementary,"normal","primary_position","table3_supplementary_formatted_hr_")
