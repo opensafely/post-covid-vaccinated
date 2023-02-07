@@ -11,7 +11,7 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  cohort_name <- "vaccinated"
+  cohort_name <- "electively_unvaccinated"
 } else {
   cohort_name <- args[[1]]
 }
@@ -246,6 +246,19 @@ df <- df %>%
 
 print("Consultation variable after QC")
 summary(df$cov_num_consulation_rate)
+
+# Create unvaccinated sensitivity outcome columns
+if(cohort_name == "electively_unvaccinated"){
+  print("Adding unvaccinated sensitivity outcomes")
+  
+  active_analyses <- read_rds("lib/active_analyses.rds")
+  active_analyses <- active_analyses %>% filter(!outcome_variable %in% outcome_variable[grepl("_unvax_sens", outcome_variable)])
+  
+  for(i in 1:nrow(active_analyses)){
+    outcome <- active_analyses$outcome_variable[i]
+    df[,paste0(outcome,"_unvax_sens")] <- df[,outcome]
+  }
+}
 
 # Convert dates to date format -------------------------------------------------
 
