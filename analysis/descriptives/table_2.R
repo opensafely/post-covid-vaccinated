@@ -23,8 +23,8 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  cohort_name <- "vaccinated"
-  #cohort_name = "electively_unvaccinated"
+  #cohort_name <- "vaccinated"
+  cohort_name = "electively_unvaccinated"
 }else{
   cohort_name <- args[[1]]
 }
@@ -85,7 +85,7 @@ table_2_subgroups_output <- function(cohort_name){
     if(analyses_to_run$cohort=="all"){
       cohort_to_run=c("vaccinated", "electively_unvaccinated")
     }else{
-      analyses_to_run=active_analyses$cohort
+      cohort_to_run=active_analyses$cohort
     }  
     
     # Transpose active_analyses to single column so can filter to analysis models to run
