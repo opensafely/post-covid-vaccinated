@@ -257,7 +257,7 @@ format_hr_table(estimates_reduced_primary_position_main_paper,"reduced","primary
 format_hr_table(estimates_normal_main_paper,"normal","any_position","table3_main_formatted_hr_")
 format_hr_table(estimates_normal_primary_position_main_paper,"normal","primary_position","table3_main_formatted_hr_")
 
-format_hr_table(estimates_reduced_supplementary,"reduced","any_position","table3_supplementary_formatted_hr_")
-format_hr_table(estimates_reduced_primary_position_supplementary,"reduced","primary_position","table3_supplementary_formatted_hr_")
-format_hr_table(estimates_normal_supplementary,"normal","any_position","table3_supplementary_formatted_hr_")
-format_hr_table(estimates_normal_primary_position_supplementary,"normal","primary_position","table3_supplementary_formatted_hr_")
+format_hr_table(estimates_reduced_supplementary,"reduced","any_position","table2_supplementary_formatted_hr_")
+format_hr_table(estimates_reduced_primary_position_supplementary,"reduced","primary_position","table2_supplementary_formatted_hr_")
+format_hr_table(estimates_normal_supplementary,"normal","any_position","table2_supplementary_formatted_hr_")
+format_hr_table(estimates_normal_primary_position_supplementary,"normal","primary_position","table2_supplementary_formatted_hr_")
