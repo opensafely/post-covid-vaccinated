@@ -216,21 +216,19 @@ format_hr_table <- function(df, time_periods,outcome_position, save_name){
 
 estimates_reduced_main_paper <- estimates %>% filter(time_points == "reduced" 
                                                     & !outcome %in% outcome[grepl("Primary position",outcome)]
-                                                    & (subgroup == "All, maximally adjusted" | (subgroup %in% c("Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
-                                                    
-
+                                                    & (subgroup == "All, maximally adjusted" | (subgroup %in% c("All, age/sex/region adjusted","Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
 
 estimates_reduced_primary_position_main_paper <- estimates %>% filter(time_points == "reduced" 
                                                     & outcome %in% outcome[grepl("Primary position",outcome)]
-                                                    & (subgroup == "All, maximally adjusted" | (subgroup %in% c("Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
+                                                    & (subgroup == "All, maximally adjusted" | (subgroup %in% c("All, age/sex/region adjusted","Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
 
 estimates_normal_main_paper <- estimates %>% filter(time_points == "normal" 
                                          & !outcome %in% outcome[grepl("Primary position",outcome)]
-                                         & (subgroup == "All, maximally adjusted" | (subgroup %in% c("Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
+                                         & (subgroup == "All, maximally adjusted" | (subgroup %in% c("All, age/sex/region adjusted","Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
 
 estimates_normal_primary_position_main_paper <- estimates %>% filter(time_points == "normal"
                                                           & outcome %in% outcome[grepl("Primary position",outcome)]
-                                                          & (subgroup == "All, maximally adjusted" | (subgroup %in% c("Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
+                                                          & (subgroup == "All, maximally adjusted" | (subgroup %in% c("All, age/sex/region adjusted","Hospitalised COVID-19","Non-hospitalised COVID-19") & outcome %in% c("All arterial thromboses" ,"All venous thromboses"))))
 
 estimates_reduced_supplementary <- estimates %>% filter(time_points == "reduced" 
                                                & !outcome %in% outcome[grepl("Primary position",outcome)]
