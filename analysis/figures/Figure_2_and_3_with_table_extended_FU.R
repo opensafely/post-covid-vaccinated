@@ -96,7 +96,7 @@ estimates$colour <- factor(estimates$colour, levels=c("#d2ac47","#58764c","#0018
 estimates$subgroup <- factor(estimates$subgroup,levels = c("main", "covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
 
 # Rename adjustment groups
-levels(estimates$cohort) <- list("Pre-vaccination (1 Jan 2020 - 14 Dec 2021)"="pre_vaccination", "Vaccinated (1 Jun 2021 - 14 Dec 2021)"="vaccinated","Unvaccinated (1 Jun 2021 - 14 Dec 2021)"="electively_unvaccinated")
+levels(estimates$cohort) <- list("Pre-vaccination (Jan 1 2020 - Dec 14 2021)"="pre_vaccination", "Vaccinated (Jun 1 2021 - Dec 14 2021)"="vaccinated","Unvaccinated (Jun 1 2021 - Dec 14 2021)"="electively_unvaccinated")
 
 #Adjust confidence intervals
 estimates$conf_high <- ifelse(estimates$event == "vte" & estimates$conf_high>512,512,estimates$conf_high)
@@ -268,7 +268,7 @@ table2_primary_position <- read.csv("C:/Users/gic30/OneDrive - University of Cam
 
 table2 <- rbind(table2, table2_primary_position)
 
-table2$cohort <- ifelse(table2$cohort == "Pre-vaccinated", "Pre-vaccination (1 Jan 2020 - 14 Dec 2021)", ifelse(table2$cohort == "Vaccinated","Vaccinated (1 Jun 2021 - 14 Dec 2021)", "Unvaccinated (1 Jun 2021 - 14 Dec 2021)") )
+table2$cohort <- ifelse(table2$cohort == "Pre-vaccinated", "Pre-vaccination (Jan 1 2020 - Dec 14 2021)", ifelse(table2$cohort == "Vaccinated","Vaccinated (Jun 1 2021 - Dec 14 2021)", "Unvaccinated (Jun 1 2021 - Dec 14 2021)") )
 
 table2$Outcome <- gsub(" events","",table2$Outcome)
 
@@ -278,9 +278,9 @@ table2 <- table2 %>%
   dplyr::rename(`Total events` = Total,
                 Cohort = cohort) %>%
   dplyr::select(-c(`No COVID-19`)) %>%
-  mutate(`Number of people` = ifelse(Cohort == "Pre-vaccination (1 Jan 2020 - 14 Dec 2021)", 18210937,
-                                     ifelse(Cohort == "Vaccinated (1 Jun 2021 - 14 Dec 2021)", 13572399,
-                                            ifelse(Cohort == "Unvaccinated (1 Jun 2021 - 14 Dec 2021)",3161485, NA)))) %>%
+  mutate(`Number of people` = ifelse(Cohort == "Pre-vaccination (Jan 1 2020 - Dec 14 2021)", 18210937,
+                                     ifelse(Cohort == "Vaccinated (Jun 1 2021 - Dec 14 2021)", 13572399,
+                                            ifelse(Cohort == "Unvaccinated (Jun 1 2021 - Dec 14 2021)",3161485, NA)))) %>%
   relocate(`Total events`, .after = `Cohort`) %>%
   relocate(`Number of people`, .after = `Cohort`) %>%
   relocate(`Events after COVID-19`, .after = `Total events`)
