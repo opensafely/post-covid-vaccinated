@@ -1,4 +1,7 @@
 library(dplyr)
+library(purrr)
+library(data.table)
+library(tidyverse)
 # Calculates AER within age/sex subgroups
 
 # Set file locations
@@ -13,11 +16,6 @@ dir.create(file.path(aer_compiled_output_dir), recursive =TRUE, showWarnings = F
 
 #-------------------------Call AER function-------------------------------------
 source(file.path(scripts_dir,"Absolute_excess_risk_function.R"))
-
-library(purrr)
-library(data.table)
-library(tidyverse)
-
 
 #--------------------which analyses to calculate AER for------------------------
 
@@ -71,8 +69,12 @@ input <- input %>%
             | (cohort != "pre_vaccination" & event %in% c("ate","vte","ate_primary_position","vte_primary_position")))) %>%
   select(event,cohort,subgroup,model,time_points,term,estimate)
 
+input$event <- gsub("_extended_follow_up","",input$event)
 #---------------------------------Input Table 2---------------------------------
-table2_pre_vax <- read.csv(paste0(results_dir,"table2_pre_vaccination_extended_follow_up_outcomes_cvd.csv"))
+table2_pre_vax <- read.csv(paste0(results_dir,"table2_pre_vaccination_extended_follow_up_any_position_events.csv"))
+table2_pre_vax_primary <- read.csv(paste0(results_dir,"table2_pre_vaccination_extended_follow_up_primary_position_events.csv"))
+table2_pre_vax <- rbind(table2_pre_vax,table2_pre_vax_primary)
+
 table2_vax <- read.csv(paste0(results_dir,"table2_vaccinated.csv"))
 table2_unvax <- read.csv(paste0(results_dir,"table2_electively_unvaccinated.csv"))
 
@@ -81,7 +83,7 @@ table2_vax <- dplyr::rename(table2_vax, cohort = cohort_to_run)
 table2_unvax <- dplyr::rename(table2_unvax, cohort = cohort_to_run)
 
 table_2 <- rbind(table2_pre_vax, table2_vax,table2_unvax)
-rm(table2_pre_vax,table2_vax,table2_unvax)
+rm(table2_pre_vax,table2_vax,table2_unvax,table2_pre_vax_primary)
 
 #-------------------Select required columns and term----------------------------
 
@@ -89,6 +91,7 @@ table_2 <- table_2 %>% select(subgroup, event, cohort,unexposed_person_days,unex
   filter(startsWith(subgroup, "aer_"))
 
 table_2$event <- gsub("out_date_","",table_2$event)
+table_2$event <- gsub("_extended_follow_up","",table_2$event)
 
 input$subgroup <- NULL
 results <- results %>% left_join(input, by=c("event","cohort","model","time_points","term"))
@@ -128,7 +131,7 @@ AER_compiled_results <- purrr::pmap(list(AER_files),
 AER_compiled_results=rbindlist(AER_compiled_results, fill=TRUE)
 
 # Calculate overall AER
-AER_combined <- AER_compiled_results %>% select(days, event, cohort, subgroup, time_points, excess_risk)
+AER_combined <- AER_compiled_results %>% select(days, event, cohort, subgroup, time_points, excess_risk, AER)
 table_2 <- table_2 %>% select(event, cohort, subgroup, N_population_size)
 
 #Standardize AER and use pre-vax subgroup sizes for all cohorts
@@ -147,5 +150,10 @@ AER_combined_overall <- AER_combined_overall %>%
 
 
 AER_combined_overall <- AER_combined_overall %>% dplyr::rename(excess_risk = weighted_mean )
+AER_combined_overall$subgroup <- "aer_overall"
+AER_combined_overall$AER <- NA
+AER_combined$N_population_size <- NULL
+
+AER_combined_overall <- rbind(AER_combined,AER_combined_overall)
 
 write.csv(AER_combined_overall, paste0(aer_compiled_output_dir,"/AER_compiled_results.csv"), row.names = F)

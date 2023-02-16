@@ -22,8 +22,7 @@ active_analyses$outcome_variable <- gsub("out_date_","",active_analyses$outcome_
 lifetables <- readr::read_csv(paste0(aer_output_dir,"/AER_compiled_results.csv"))
 
 #???? Do we need to do this ?????
-lifetables$excess_risk_main <- lifetables$excess_risk_main *100
-lifetables$excess_risk_subgroup <- lifetables$excess_risk_subgroup *100
+lifetables$excess_risk <- lifetables$excess_risk *100
 #-------------------------Make event names 'nice' ------------------------------
 lifetables <- lifetables %>% left_join(active_analyses %>% select(outcome, outcome_variable), by = c("event"="outcome_variable"))
 lifetables$outcome <- factor(lifetables$outcome, levels = c("Arterial thrombosis event","Venous thrombosis event","Arterial thrombosis event - Primary position events","Venous thrombosis event - Primary position events"))
@@ -79,7 +78,7 @@ lifetables$grouping_name <- factor(lifetables$grouping_name, levels = c("Arteria
 
 
 names <- c(
-  "Arterial thrombosis event - Pre-vaccination" = "Pre-vaccination (1 Jan 2020 - 18 Jun 2021)
+  "Arterial thrombosis event - Pre-vaccination" = "Pre-vaccination (1 Jan 2020 - 14 Dec 2021)
   ",
   "Arterial thrombosis event - Vaccinated" = "Vaccinated (1 Jun 2021 - 14 Dec 2021)
   Arterial thrombosis event",
@@ -88,7 +87,7 @@ names <- c(
   "Venous thrombosis event - Pre-vaccination" = "",
   "Venous thrombosis event - Vaccinated" = "Venous thrombosis event",
   "Venous thrombosis event - Unvaccinated" = "",
-  "Arterial thrombosis event - Primary position events - Pre-vaccination" = "Pre-vaccination (1 Jan 2020 - 18 Jun 2021)
+  "Arterial thrombosis event - Primary position events - Pre-vaccination" = "Pre-vaccination (1 Jan 2020 - 14 Dec 2021)
   ",
   "Arterial thrombosis event - Primary position events - Vaccinated" = "Vaccinated (1 Jun 2021 - 14 Dec 2021)
   Arterial thrombosis event - Primary position events",
@@ -104,19 +103,14 @@ lifetables <- lifetables %>% filter(days <= 196)
 # Change days to weeks
 lifetables$weeks <- lifetables$days /7
 
-#Filter the lifetables to non-NA results split by using the HRs from the overall results (hr_main)
-# & using the age/sex HRs (hr_subgroup)
-lifetables_main <- lifetables %>% filter(!is.na(excess_risk_main))
-lifetables_subgroup <- lifetables %>% filter(!is.na(excess_risk_subgroup))
-
 #Plot for any position events using reduced time periods and overall HRs
 
 for(outcome_position in c("any_position","primary_position")){
   
   if(outcome_position == "any_position"){
-    df=lifetables_main %>% filter(!str_detect(event, "primary_position") & time_points == "reduced")
+    df=lifetables %>% filter(!str_detect(event, "primary_position") & time_points == "reduced")
   }else{
-    df=lifetables_main %>% filter(str_detect(event, "primary_position") & time_points == "reduced")
+    df=lifetables %>% filter(str_detect(event, "primary_position") & time_points == "reduced")
   }
 
   agegroup_levels <-c()
@@ -171,13 +165,13 @@ for(outcome_position in c("any_position","primary_position")){
   df$x_max <- ifelse(df$cohort != "pre_vaccination",28,df$x_max)
   
   ggplot2::ggplot(data = df, 
-                  mapping = ggplot2::aes(x = weeks, y = excess_risk_main, color = agegroup, shape = agegroup, fill = agegroup, linetype = sex)) +
+                  mapping = ggplot2::aes(x = weeks, y = excess_risk, color = agegroup, shape = agegroup, fill = agegroup, linetype = sex)) +
     #ggplot2::geom_hline(colour = "#A9A9A9") +
     #geom_ribbon(aes(ymin = CIp.low, ymax = CIp.high), alpha = 0.1)+
     ggplot2::geom_line() +
     #ggplot2::scale_x_continuous(lim = c(0,round_any(max(df$weeks, na.rm = T),10, f= ceiling)), breaks = seq(0,round_any(max(df$weeks, na.rm = T),10, f= ceiling),10))+ 
     ggplot2::scale_x_continuous(breaks=c(0,14,28))+ 
-    ggplot2::scale_y_continuous(lim = c(0,ceiling(max(df$excess_risk_main, na.rm = T))), breaks = seq(0,ceiling(max(df$excess_risk_main, na.rm = T)),1))+ 
+    ggplot2::scale_y_continuous(lim = c(0,ceiling(max(df$excess_risk, na.rm = T))), breaks = seq(0,ceiling(max(df$excess_risk, na.rm = T)),1))+ 
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$agegroup)) +
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$agegroup)) +
     ggplot2::scale_linetype_manual(values = levels(df$linetype), labels = levels(df$sex))+
@@ -198,7 +192,7 @@ for(outcome_position in c("any_position","primary_position")){
     geom_blank(aes(x = x_min)) +
     geom_blank(aes(x = x_max))
   
-  ggsave(paste0(aer_output_dir, "/Figure_4_",outcome_position,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+  ggsave(paste0(aer_output_dir, "/Figure_4_",outcome_position,"_extended_follow_up.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
 }
   
 
