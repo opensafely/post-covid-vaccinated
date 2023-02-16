@@ -405,7 +405,8 @@ actions_list <- splice(
     needs = c(paste0("Analysis_cox_",active_analyses$outcome_variable,"_",active_analyses$cohort)),
     moderately_sensitive = list(
       R_output = "output/review/model/R_HR_output.csv",
-      R_event_counts = "output/review/model/R_event_count_output.csv")
+      R_event_counts = "output/review/model/R_event_count_output.csv",
+      R_event_counts_day_zero = "output/review/model/R_event_count_day_zero_output.csv")
   )
   
 )
