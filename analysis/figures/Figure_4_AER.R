@@ -78,20 +78,20 @@ lifetables$grouping_name <- factor(lifetables$grouping_name, levels = c("Arteria
 
 
 names <- c(
-  "Arterial thrombosis event - Pre-vaccination" = "Pre-vaccination (1 Jan 2020 - 14 Dec 2021)
+  "Arterial thrombosis event - Pre-vaccination" = "Pre-vaccination (Jan 1 2020 - Dec 14 2021)
   ",
-  "Arterial thrombosis event - Vaccinated" = "Vaccinated (1 Jun 2021 - 14 Dec 2021)
+  "Arterial thrombosis event - Vaccinated" = "Vaccinated (Jun 1 2021 - Dec 14 2021)
   Arterial thrombosis event",
-  "Arterial thrombosis event - Unvaccinated" = "Unvaccinated (1 Jun 2021 - 14 Dec 2021)
+  "Arterial thrombosis event - Unvaccinated" = "Unvaccinated (Jun 1 2021 - Dec 14 2021)
   ",
   "Venous thrombosis event - Pre-vaccination" = "",
   "Venous thrombosis event - Vaccinated" = "Venous thrombosis event",
   "Venous thrombosis event - Unvaccinated" = "",
-  "Arterial thrombosis event - Primary position events - Pre-vaccination" = "Pre-vaccination (1 Jan 2020 - 14 Dec 2021)
+  "Arterial thrombosis event - Primary position events - Pre-vaccination" = "Pre-vaccination (Jan 1 2020 - Dec 14 2021)
   ",
-  "Arterial thrombosis event - Primary position events - Vaccinated" = "Vaccinated (1 Jun 2021 - 14 Dec 2021)
+  "Arterial thrombosis event - Primary position events - Vaccinated" = "Vaccinated (Jun 1 2021 - Dec 14 2021)
   Arterial thrombosis event - Primary position events",
-  "Arterial thrombosis event - Primary position events - Unvaccinated" = "Unvaccinated (1 Jun 2021 - 14 Dec 2021)
+  "Arterial thrombosis event - Primary position events - Unvaccinated" = "Unvaccinated (Jun 1 2021 - Dec 14 2021)
   ",
   "Venous thrombosis event - Primary position events - Pre-vaccination" = "",
   "Venous thrombosis event - Primary position events - Vaccinated" = "Venous thrombosis event - Primary position events" ,
