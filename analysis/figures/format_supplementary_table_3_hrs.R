@@ -39,7 +39,7 @@ outcomes_to_plot_pre_vax <- active_analyses_pre_vax$outcome_name
 
 # Load all estimates
 estimates <- read.csv(paste0(results_dir,"/hr_output_formatted.csv"))
-
+estimates <- estimates %>% filter(time_points == "day_zero_reduced")
 
 estimates <- estimates %>% filter(((subgroup == "main" & model %in% c("mdl_max_adj","mdl_age_sex_region"))
                                    | (subgroup %in% c("covid_pheno_hospitalised","covid_pheno_non_hospitalised") & model=="mdl_max_adj")) 

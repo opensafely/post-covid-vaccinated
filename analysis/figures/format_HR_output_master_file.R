@@ -11,7 +11,7 @@ library(tidyverse)
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
 df <- read.csv(paste0(results_dir,"/stata_output.csv"))
 df_prevax <- read.csv(paste0(results_dir,"/stata_output_pre_vax.csv"))
-df <- rbind(df, df_prevax)
+df <- plyr::rbind.fill(df, df_prevax)
 df$X <- NULL
 
 rm(df_prevax)
@@ -58,8 +58,7 @@ df$model <- ifelse(df$model == "max", "mdl_max_adj","mdl_age_sex_region")
 #Format columns
 df$time_points <- "reduced"
 # Flag day_zero analysis
-df$time_points <- ifelse(grepl("day_zero",df$source),"day_zero_reduced",df$time_points)
-  
+df$time_points <- ifelse(grepl("day_zero|day0TRUE",df$source),"day_zero_reduced",df$time_points)
 df$results_fitted <- "fitted_successfully"
 df$source <- NULL
 df$N_outcomes <- NULL
@@ -73,12 +72,15 @@ df$conf_high <- exp(df$conf_high)
 #Only use results that are in the analyses_to_run_in_stata files
 
 stata_analyses <- read_csv("lib/analyses_to_run_in_stata.csv")
-stata_analyses_extended_follow_up <- read_csv("lib/analyses_to_run_in_stata_extended_follow_up.csv")
 stata_analyses_day_zero <- read_csv("lib/analyses_to_run_in_stata_day_zero.csv")
-stata_analyses_day_zero_pre_vax <- read_csv("lib/analyses_to_run_in_stata_day_zero_pre_vax.csv")
-stata_analyses <- rbind(stata_analyses,stata_analyses_extended_follow_up,stata_analyses_day_zero,stata_analyses_day_zero_pre_vax)
+stata_analyses_pre_vax <- read_csv("lib/analyses_to_run_in_stata_pre_vax.csv")
 
-rm(stata_analyses_extended_follow_up,stata_analyses_day_zero,stata_analyses_day_zero_pre_vax)
+stata_analyses_pre_vax$time_periods <- ifelse(stata_analyses_pre_vax$day0 == TRUE,"day_zero_reduced",stata_analyses_pre_vax$time_periods)
+stata_analyses_pre_vax[c("day0","extf")] <- NULL
+
+stata_analyses <- rbind(stata_analyses,stata_analyses_day_zero,stata_analyses_pre_vax)
+
+rm(stata_analyses_day_zero,stata_analyses_pre_vax)
 stata_analyses <- stata_analyses %>% dplyr::rename(time_points=time_periods,
                                                    event = outcome)
 
