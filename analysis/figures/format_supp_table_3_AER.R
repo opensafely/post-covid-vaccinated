@@ -31,22 +31,24 @@ table2_pre_vax <- rbind(table2_pre_vax,table2_pre_vax_primary)
 table2_vax <- read.csv(paste0(results_dir,"table2_vaccinated.csv"))
 table2_unvax <- read.csv(paste0(results_dir,"table2_electively_unvaccinated.csv"))
 
-table2_pre_vax <- dplyr::rename(table2_pre_vax, cohort = cohort_name) %>% select(!total_person_days_to_day_197)
+table2_pre_vax <- table2_pre_vax %>% rename(cohort = cohort_name)
+
 table2_vax <- dplyr::rename(table2_vax, cohort = cohort_to_run)
 table2_unvax <- dplyr::rename(table2_unvax, cohort = cohort_to_run)
 
-table_2 <- rbind(table2_pre_vax, table2_vax,table2_unvax)
+table_2 <- plyr::rbind.fill(table2_pre_vax, table2_vax,table2_unvax)
 rm(table2_pre_vax,table2_vax,table2_unvax,table2_pre_vax_primary)
 
 table_2$event <- gsub("_extended_follow_up","",table_2$event)
 
 #To get total follow up for main analysis need to sum unexposed person days of follow up & exposed person days
-table_2 <- table_2 %>% select(event, subgroup, cohort, total_person_days, unexposed_person_days) %>% 
+table_2 <- table_2 %>% select(event, subgroup, cohort, total_person_days, unexposed_person_days, total_person_days_to_day_197) %>% 
   filter(subgroup %in% c("covid_pheno_hospitalised","covid_pheno_non_hospitalised"))
 
-table_2$exposed_person_days <- table_2$total_person_days - table_2$unexposed_person_days
+table_2$exposed_person_days <- ifelse(table_2$cohort != "pre_vaccination", table_2$total_person_days - table_2$unexposed_person_days, table_2$total_person_days_to_day_197)
 table_2$total_person_days <- NULL
 table_2$unexposed_person_days <- NULL
+table_2$total_person_days_to_day_197 <- NULL
 
 #Sum follow up
 table_2 <- table_2 %>% group_by(event, cohort) %>%
