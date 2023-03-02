@@ -69,6 +69,15 @@ estimates <- estimates %>% filter((subgroup == "main" & model %in% c("mdl_max_ad
 
 rm(df1,df2,df)
 
+#---------------------------Left join event counts------------------------------
+event_counts_pre_vax <- read.csv(paste0(results_dir, "/R_event_count_day_zero_output_pre_vax.csv"))
+event_counts <- read.csv(paste0(results_dir, "/R_event_count_day_zero_output.csv"))
+
+event_counts <- rbind(event_counts, event_counts_pre_vax)
+rm(event_counts_pre_vax)
+
+estimates <- estimates %>% left_join(event_counts, by= c("event"="event","subgroup"="subgroup","cohort"="cohort",
+                                                         "term"="expo_week","time_points"="time_points"))
 #------------------------------Tidy event names---------------------------------
 #Remove extended follow up from outcome name as this will not be written in the final table
 estimates$event <- gsub("_extended_follow_up","",estimates$event)
@@ -119,8 +128,11 @@ estimates[,c("event","estimate","conf_low","conf_high","model")] <- NULL
 
 format_hr_table <- function(df, time_periods,outcome_position, save_name){
   df$time_points <- NULL
-  df <- tidyr::pivot_wider(df, names_from = cohort, values_from = est)
-  df <- df %>% select("outcome","subgroup","term", "Pre-vaccination","Vaccinated","Unvaccinated")
+
+  df <- tidyr::pivot_wider(df, names_from = cohort, values_from = c("est","events_total"))
+  df <- df %>% select("outcome","subgroup","term","events_total_Pre-vaccination",
+                      "est_Pre-vaccination","events_total_Vaccinated", "est_Vaccinated",
+                      "events_total_Unvaccinated", "est_Unvaccinated")
   
   if(grepl("reduced", time_periods)){
     df$term <- factor(df$term, levels = c("Day 0",
@@ -143,7 +155,7 @@ format_hr_table <- function(df, time_periods,outcome_position, save_name){
   df <- df[order(df$outcome,df$subgroup,df$term),]
   
   
-  df <- df %>% mutate(across(c("outcome","subgroup","term"),as.character))
+  df <- df %>% mutate(across(colnames(df),as.character))
   
   if(outcome_position == "any_position"){
     df[nrow(df)+1,] <- "Arterial thrombotic events"

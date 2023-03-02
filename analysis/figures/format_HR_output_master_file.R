@@ -108,6 +108,7 @@ pre_vax_results <- read.csv(paste0(results_dir,"/R_HR_output_pre_vax.csv"))
 pre_vax_results$total_covid_cases <- NULL
 
 estimates <- rbind(vax_results,pre_vax_results)
+estimates <- estimates %>% filter(model != "mdl_age_sex")
 estimates$source <- "R"
 rm(vax_results,pre_vax_results)
 
@@ -168,5 +169,8 @@ table2$event <- gsub("out_date_","",table2$event)
 estimates$post_exposure_event_count <- NULL
 estimates <- estimates %>% left_join(table2) %>%
   select(event, subgroup, cohort, model, time_points, source,term, estimate, conf_low, conf_high, post_exposure_event_count, median_follow_up)
+
+#change _unvax_sens to _extended_follow_up in event name
+estimates$event <- sub("_unvax_sens","_extended_follow_up",estimates$event)
 
 write.csv(estimates, file = paste0(results_dir,"/hr_output_formatted.csv"),row.names = FALSE)
