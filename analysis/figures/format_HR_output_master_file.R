@@ -158,10 +158,10 @@ table2_pre_vax <- read.csv(paste0(results_dir,"/table2_pre_vaccination_cvd.csv")
 table2_vax <- read.csv(paste0(results_dir,"/table2_vaccinated.csv"))
 table2_unvax <- read.csv(paste0(results_dir,"/table2_electively_unvaccinated.csv"))
 
-table2_pre_vax <- table2_pre_vax %>% rename(cohort_to_run = cohort_name)
+table2_pre_vax <- table2_pre_vax %>% dplyr::rename(cohort_to_run = cohort_name)
 
 table2 <- rbind(table2_unvax,table2_vax,table2_pre_vax)
-table2 <- table2 %>% rename(cohort = cohort_to_run)
+table2 <- table2 %>% dplyr::rename(cohort = cohort_to_run)
 #table2$cohort <- table2$cohort_to_run
 table2 <- table2 %>% select(event, subgroup, cohort, post_exposure_event_count)
 table2$event <- gsub("out_date_","",table2$event)
@@ -169,8 +169,5 @@ table2$event <- gsub("out_date_","",table2$event)
 estimates$post_exposure_event_count <- NULL
 estimates <- estimates %>% left_join(table2) %>%
   select(event, subgroup, cohort, model, time_points, source,term, estimate, conf_low, conf_high, post_exposure_event_count, median_follow_up)
-
-#change _unvax_sens to _extended_follow_up in event name
-estimates$event <- sub("_unvax_sens","_extended_follow_up",estimates$event)
 
 write.csv(estimates, file = paste0(results_dir,"/hr_output_formatted.csv"),row.names = FALSE)

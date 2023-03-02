@@ -9,38 +9,51 @@ library(plyr)
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
 output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
 
+#----------------------------Get CVD outcomes-----------------------------------
 active_analyses <- read_rds("lib/active_analyses.rds") %>% filter(active == "TRUE")
 
-outcome_name_table <- active_analyses %>% 
+active_analyses <- active_analyses %>% 
   select(outcome, outcome_variable) %>% 
-  mutate(outcome_name=active_analyses$outcome_variable %>% str_replace("out_date_", ""))
+  mutate(outcome_name=active_analyses$outcome_variable %>% str_replace("out_date_", "")) %>%
+  filter(outcome_variable %in% c("out_date_ate","out_date_vte","out_date_ate_primary_position","out_date_vte_primary_position")) 
 
-# Focus on ATE and VTE
-outcomes_to_plot <- outcome_name_table$outcome_name[outcome_name_table$outcome_name %in% c("ate","vte","ate_primary_position","vte_primary_position")]
 
+active_analyses$outcome <- gsub("Arterial thrombosis event","All arterial thromboses",active_analyses$outcome)
+active_analyses$outcome <- gsub("Venous thrombosis event","All venous thromboses",active_analyses$outcome)
+
+
+active_analyses_pre_vax <- read_rds("lib/active_analyses_pre_vax.rds") %>% filter(active == "TRUE")
+
+active_analyses_pre_vax <- active_analyses_pre_vax %>% 
+  select(outcome, outcome_variable) %>% 
+  mutate(outcome_name=active_analyses_pre_vax$outcome_variable %>% str_replace("out_date_", ""))%>%
+  filter(grepl("extended_follow_up",outcome_variable) 
+         & outcome_variable %in% c("out_date_ate_extended_follow_up","out_date_vte_extended_follow_up",
+                                   "out_date_ate_primary_position_extended_follow_up","out_date_vte_primary_position_extended_follow_up"))
+
+
+#----------------------------Focus on ATE & VTE---------------------------------
+outcomes_to_plot <- active_analyses$outcome_name
+outcomes_to_plot_pre_vax <- active_analyses_pre_vax$outcome_name
 
 # Load all estimates
 estimates <- read.csv(paste0(results_dir,"/hr_output_formatted.csv"))
 
 #-------------------------Filter to active outcomes-----------------------------
 estimates <- estimates %>% filter(!subgroup %in% c("covid_history","main","covid_pheno_hospitalised","covid_pheno_non_hospitalised","ethnicity_Missing")
-                                       & !subgroup %in% subgroup[grepl("aer_",subgroup)]
-                                       & event %in% outcomes_to_plot 
-                                       & term %in% term[grepl("^days",term)]
-                                       & model == "mdl_max_adj"
-                                       & estimate != "[Redacted]") %>%
-  select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,median_follow_up,model)
+                                  & !grepl("aer_",subgroup)
+                                  & ((event %in% outcomes_to_plot & cohort %in% c("vaccinated","electively_unvaccinated")) | (event %in% outcomes_to_plot_pre_vax & cohort %in% c("pre_vaccination")))
+                                  & term %in% term[grepl("^days",term)]
+                                  & model == "mdl_max_adj"
+                                  & time_points == "reduced") %>%
+  select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,model,median_follow_up)
 
-estimates <- estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
-
+#------------------------------Tidy event names---------------------------------
+estimates$event <- gsub("_extended_follow_up","",estimates$event)
+estimates <- estimates %>% left_join(active_analyses %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
 
 # Rename subgroup to 'nice' format------------------------------------------------
-
-estimates$subgroup <- ifelse(estimates$subgroup=="main" & estimates$model== "mdl_max_adj","Maximal adjustment",estimates$subgroup)
-estimates$subgroup <- ifelse(estimates$subgroup=="main" & estimates$model== "mdl_age_sex_region","Age/sex/region adjustment",estimates$subgroup)
-estimates$subgroup <- ifelse(estimates$subgroup=="covid_history" ,"Prior history of COVID-19",estimates$subgroup)
-estimates$subgroup <- ifelse(estimates$subgroup=="covid_pheno_non_hospitalised","Non-hospitalised COVID-19",estimates$subgroup)
-estimates$subgroup <- ifelse(estimates$subgroup=="covid_pheno_hospitalised","Hospitalised COVID-19",estimates$subgroup)
+unique(estimates$subgroup)
 estimates$subgroup <- ifelse(estimates$subgroup=="prior_history_FALSE","No prior history of event",estimates$subgroup)
 estimates$subgroup <- ifelse(estimates$subgroup=="prior_history_TRUE","Prior history of event",estimates$subgroup)
 estimates$subgroup <- ifelse(estimates$subgroup=="agegp_18_39","Age group: 18-39",estimates$subgroup)
@@ -55,7 +68,7 @@ estimates$subgroup <- ifelse(estimates$subgroup=="ethnicity_South_Asian","Ethnic
 estimates$subgroup <- ifelse(estimates$subgroup=="ethnicity_Black","Ethnicity: Black",estimates$subgroup)
 estimates$subgroup <- ifelse(estimates$subgroup=="ethnicity_Other","Ethnicity: Other Ethnic Groups",estimates$subgroup)
 estimates$subgroup <- ifelse(estimates$subgroup=="ethnicity_Missing","Ethnicity: Missing",estimates$subgroup)
-unique(estimates$subgroup)
+
 # Give ethnicity estimates extra space -----------------------------------------
 
 #estimates$time <- ifelse(estimates$subgroup=="Ethnicity: South Asian", estimates$time-0.25, estimates$time)
@@ -72,8 +85,6 @@ unique(estimates$subgroup)
 # Specify line colours ---------------------------------------------------------
 
 estimates$colour <- ""
-estimates$colour <- ifelse(estimates$subgroup=="Maximal adjustment","#000000",estimates$colour)
-estimates$colour <- ifelse(estimates$subgroup=="Age/sex adjustment","#bababa",estimates$colour)
 estimates$colour <- ifelse(estimates$subgroup=="Age group: 18-39","#0808c9",estimates$colour)
 estimates$colour <- ifelse(estimates$subgroup=="Age group: 40-59","#0085ff",estimates$colour)
 estimates$colour <- ifelse(estimates$subgroup=="Age group: 60-79","#00c9df",estimates$colour)
@@ -88,20 +99,11 @@ estimates$colour <- ifelse(estimates$subgroup=="Ethnicity: Mixed","#c3a1ff",esti
 #estimates$colour <- ifelse(estimates$subgroup=="Ethnicity: Missing","#c5dfed",estimates$colour)
 estimates$colour <- ifelse(estimates$subgroup=="Prior history of event","#ff7f00",estimates$colour)
 estimates$colour <- ifelse(estimates$subgroup=="No prior history of event","#fdbf6f",estimates$colour)
-estimates$colour <- ifelse(estimates$subgroup=="Non-hospitalised COVID-19","#fb9a99",estimates$colour)
-estimates$colour <- ifelse(estimates$subgroup=="Hospitalised COVID-19","#e31a1c",estimates$colour)
-unique(estimates$colour)
-# Make event names 'nice' ------------------------------------------------------
 
-estimates <- estimates %>% left_join(active_analyses %>% select(outcome, outcome_variable), by = c("event"="outcome_variable"))
 
 #Add in which subgroup stratified-----------------------------------------------------------
 
 estimates$grouping=""
-estimates$grouping=ifelse(estimates$subgroup=="Maximal adjustment","Overall",estimates$grouping)
-estimates$grouping=ifelse(estimates$subgroup=="Age/sex adjustment","Overall",estimates$grouping)
-estimates$grouping=ifelse(estimates$subgroup=="Hospitalised COVID-19","Hospitalised/Non-hospitalised COVID-19",estimates$grouping)
-estimates$grouping=ifelse(estimates$subgroup=="Non-hospitalised COVID-19","Hospitalised/Non-hospitalised COVID-19",estimates$grouping)
 estimates$grouping=ifelse(endsWith(estimates$subgroup,"event")==T,"Prior history of event",estimates$grouping)
 estimates$grouping=ifelse(startsWith(estimates$subgroup,"Age group")==T,"Age group",estimates$grouping)
 estimates$grouping=ifelse(startsWith(estimates$subgroup,"Sex")==T,"Sex",estimates$grouping)
@@ -127,20 +129,6 @@ estimates$grouping_name <- factor(estimates$grouping_name, levels = c("Age group
                                                                       "Sex - Unvaccinated"
                                                                       ))
 
-# We want to plot the figures using the same time-points across all cohorts so that they can be compared
-# If any cohort uses reduced time points then all cohorts will be plotted with reduced time points
-estimates <- estimates %>%
-  group_by(event,subgroup,cohort) %>%
-  dplyr::mutate(time_period_to_plot = case_when(
-    any(time_points == "normal") ~ "normal",
-    TRUE ~ "reduced"))
-
-estimates <- estimates %>%
-  group_by(event,grouping) %>%
-  dplyr::mutate(time_period_to_plot = case_when(
-    any(time_period_to_plot == "reduced") ~ "reduced",
-    TRUE ~ "normal"))
-
 names <- c(
   `Age group - Pre-vaccination` = "Pre-vaccination
   ",
@@ -161,8 +149,9 @@ names <- c(
 
 
 outcome_name="ate"
+
 for(outcome_name in outcomes_to_plot){
-  df=estimates %>% filter(event==outcome_name & time_points == time_period_to_plot)
+  df=estimates %>% filter(event==outcome_name)
   
   sub_group_levels <-c()
   for(i in c("Age group: 18-39","Age group: 40-59","Age group: 60-79","Age group: 80-110",
@@ -243,7 +232,7 @@ for(outcome_name in outcomes_to_plot){
     #ggplot2::geom_line(position = ggplot2::position_dodge(width = 1.5)) +
     ggplot2::geom_line() +
     ggplot2::scale_y_continuous(lim = y_lim, breaks = y_lim_breaks, trans = "log") +
-    ggplot2::scale_x_continuous(lim = c(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling)), breaks = seq(0,round_any(max(df$median_follow_up, na.rm = T),4, f= ceiling),4)) +
+    ggplot2::scale_x_continuous(lim = c(0,ceiling(max(df$median_follow_up, na.rm = T) / 4) * 4), breaks = seq(0,ceiling(max(df$median_follow_up, na.rm = T) / 4) * 4,4)) +
     ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$subgroup))+ 
     ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
     ggplot2::scale_shape_manual(values = c(rep(21,length(unique(df$subgroup)))),labels = levels(df$subgroup)) +
@@ -261,7 +250,7 @@ for(outcome_name in outcomes_to_plot){
                    text=element_text(size=13)) +
     ggplot2::facet_wrap(grouping_name~.,labeller=as_labeller(names), ncol=3)
   
-  ggplot2::ggsave(paste0(output_dir,"Figure_3_subgroups_",outcome_name,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+  ggplot2::ggsave(paste0(output_dir,"supplementary_figure_3_subgroups_",outcome_name,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
 }
 
 
