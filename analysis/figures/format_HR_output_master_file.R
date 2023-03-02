@@ -87,6 +87,7 @@ stata_analyses <- stata_analyses %>% dplyr::rename(time_points=time_periods,
 stata_analyses$subgroup <- ifelse(stata_analyses$subgroup=="hospitalised","covid_pheno_hospitalised",stata_analyses$subgroup)
 stata_analyses$subgroup <- ifelse(stata_analyses$subgroup=="non_hospitalised","covid_pheno_non_hospitalised",stata_analyses$subgroup)
 
+
 df <- merge(df,stata_analyses, by=c("event","subgroup","cohort","time_points"))
 
 #Previous time period days have been added to the median which hasn't been done in the R HRs and gets done
@@ -144,6 +145,8 @@ estimates$median_follow_up <- ((estimates$median_follow_up + estimates$add_to_me
 estimates$add_to_median <- NULL
 
 estimates <- as.data.frame(estimates)
+estimates <- estimates[!duplicated(estimates), ]
+
 df <- estimates %>% select(term,event,subgroup,cohort, time_points,model)
 df <- as.data.frame(df)
 df <- df[duplicated(df),]

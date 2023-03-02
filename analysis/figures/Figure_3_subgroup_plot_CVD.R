@@ -4,7 +4,6 @@ library(data.table)
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
-library(plyr)
 
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
 output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
