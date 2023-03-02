@@ -12,7 +12,7 @@ args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
   # use for interactive testing
-  cohort_name <- "vaccinated"
+  cohort_name <- "electively_unvaccinated"
 } else {
   cohort_name <- args[[1]]
 }
@@ -54,9 +54,15 @@ follow_up_end_dates <- function(cohort_name){
       input$follow_up_end_unexposed <- as.Date(input$follow_up_end_unexposed)
       input$follow_up_end <- as.Date(input$follow_up_end)
       
-    }else if(cohort_name=="electively_unvaccinated"){
+    }else if(cohort_name=="electively_unvaccinated" & !grepl("unvax_sens", event)){
       input$follow_up_end_unexposed <- apply(input[,c("vax_date_covid_1","event_date", "expo_date", "death_date","cohort_end_date")],1, min,na.rm=TRUE)
       input$follow_up_end <- apply(input[,c("vax_date_covid_1","event_date", "death_date","cohort_end_date")],1, min, na.rm=TRUE)
+      
+      input$follow_up_end_unexposed <- as.Date(input$follow_up_end_unexposed)
+      input$follow_up_end <- as.Date(input$follow_up_end)
+    }else if(cohort_name=="electively_unvaccinated" & grepl("unvax_sens", event)){
+      input$follow_up_end_unexposed <- apply(input[,c("event_date", "expo_date", "death_date","cohort_end_date")],1, min,na.rm=TRUE)
+      input$follow_up_end <- apply(input[,c("event_date", "death_date","cohort_end_date")],1, min, na.rm=TRUE)
       
       input$follow_up_end_unexposed <- as.Date(input$follow_up_end_unexposed)
       input$follow_up_end <- as.Date(input$follow_up_end)

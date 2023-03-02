@@ -81,9 +81,6 @@ for (i in 1:length(outcomes)) {
                        "CVD")
 }
 
-df$prior_history_var <- ifelse(df$outcome=="Arterial thrombosis event" ,"sub_bin_ate",df$prior_history_var)
-df$prior_history_var <- ifelse(df$outcome=="Venous thrombosis event","cov_bin_vte",df$prior_history_var)
-
 # Add cardiovascular outcomes (primary position) -----------------------------------
 
 outcomes <- c("Acute myocardial infarction - Primary position events",
@@ -125,8 +122,96 @@ for (i in 1:length(outcomes)) {
                        "CVD")
 }
 
-df$prior_history_var <- ifelse(df$outcome=="Arterial thrombosis event - Primary position events","sub_bin_ate",df$prior_history_var)
-df$prior_history_var <- ifelse(df$outcome=="Venous thrombosis event - Primary position events","cov_bin_vte",df$prior_history_var)
+# Add unvaccinated sensitivity analyses
+
+outcomes <- c("Acute myocardial infarction - Unvaccinated sensitivity",
+              "Ischaemic stroke - Unvaccinated sensitivity",
+              "Deep vein thrombosis - Unvaccinated sensitivity",
+              "Pulmonary embolism - Unvaccinated sensitivity",
+              "Transient ischaemic attack - Unvaccinated sensitivity",
+              "Subarachnoid haemorrhage and haemorrhagic stroke - Unvaccinated sensitivity",
+              "Heart failure - Unvaccinated sensitivity",
+              "Angina - Unvaccinated sensitivity")
+
+outcomes_short <- c("ami_unvax_sens","stroke_isch_unvax_sens","dvt_unvax_sens","pe_unvax_sens","tia_unvax_sens","stroke_sah_hs_unvax_sens","hf_unvax_sens","angina_unvax_sens")
+
+for (i in 1:length(outcomes)) {
+  df[nrow(df)+1,] <- c(TRUE,
+                       outcomes[i],
+                       paste0("out_date_",outcomes_short[i]),
+                       "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_cat_sex",
+                       "all",
+                       "electively_unvaccinated",
+                       rep(TRUE,4),
+                       rep(FALSE,22),
+                       "",
+                       "CVD")
+}
+
+outcomes <- c("Arterial thrombosis event - Unvaccinated sensitivity",
+              "Venous thrombosis event - Unvaccinated sensitivity")
+
+outcomes_short <- c("ate_unvax_sens","vte_unvax_sens")
+
+for (i in 1:length(outcomes)) {
+  df[nrow(df)+1,] <- c(TRUE,
+                       outcomes[i],
+                       paste0("out_date_",outcomes_short[i]),
+                       "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_cat_sex",
+                       "all",
+                       "electively_unvaccinated",
+                       rep(TRUE,26),
+                       "",
+                       "CVD")
+}
+
+# Add unvaccinated sensitivity analyses (primary position) ---------------------
+
+outcomes <- c("Acute myocardial infarction - Primary position events, Unvaccinated sensitivity",
+              "Ischaemic stroke - Primary position events, Unvaccinated sensitivity",
+              "Deep vein thrombosis - Primary position events, Unvaccinated sensitivity",
+              "Pulmonary embolism - Primary position events, Unvaccinated sensitivity",
+              "Transient ischaemic attack - Primary position events, Unvaccinated sensitivity",
+              "Subarachnoid haemorrhage and haemorrhagic stroke - Primary position events, Unvaccinated sensitivity",
+              "Heart failure - Primary position events, Unvaccinated sensitivity",
+              "Angina - Primary position events, Unvaccinated sensitivity")
+
+outcomes_short <- c("ami_primary_position_unvax_sens","stroke_isch_primary_position_unvax_sens","dvt_primary_position_unvax_sens",
+                    "pe_primary_position_unvax_sens","tia_primary_position_unvax_sens","stroke_sah_hs_primary_position_unvax_sens",
+                    "hf_primary_position_unvax_sens","angina_primary_position_unvax_sens")
+
+for (i in 1:length(outcomes)) {
+  df[nrow(df)+1,] <- c(TRUE,
+                       outcomes[i],
+                       paste0("out_date_",outcomes_short[i]),
+                       "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_cat_sex",
+                       "all",
+                       "electively_unvaccinated",
+                       rep(TRUE,4),
+                       rep(FALSE,22),
+                       "",
+                       "CVD")
+}
+
+outcomes <- c("Arterial thrombosis event - Primary position events, Unvaccinated sensitivity",
+              "Venous thrombosis event - Primary position events, Unvaccinated sensitivity")
+
+outcomes_short <- c("ate_primary_position_unvax_sens","vte_primary_position_unvax_sens")
+
+for (i in 1:length(outcomes)) {
+  df[nrow(df)+1,] <- c(TRUE,
+                       outcomes[i],
+                       paste0("out_date_",outcomes_short[i]),
+                       "cov_num_consulation_rate;cov_bin_healthcare_worker;cov_num_age;cov_cat_ethnicity;cov_cat_deprivation;cov_cat_region;cov_cat_smoking_status;cov_bin_carehome_status;cov_bin_lipid_medications;cov_bin_antiplatelet_medications;cov_bin_anticoagulation_medications;cov_bin_combined_oral_contraceptive_pill;cov_bin_hormone_replacement_therapy;cov_bin_ami;cov_bin_all_stroke;cov_bin_other_arterial_embolism;cov_bin_vte;cov_bin_hf;cov_bin_angina;cov_bin_dementia;cov_bin_liver_disease;cov_bin_chronic_kidney_disease;cov_bin_cancer;cov_bin_hypertension;cov_bin_diabetes;cov_bin_obesity;cov_bin_depression;cov_bin_chronic_obstructive_pulmonary_disease;cov_cat_sex",
+                       "all",
+                       "electively_unvaccinated",
+                       rep(TRUE,26),
+                       "",
+                       "CVD")
+}
+
+df$prior_history_var <- ifelse(grepl("Arterial thrombosis event",df$outcome),"sub_bin_ate",df$prior_history_var)
+df$prior_history_var <- ifelse(grepl("Venous thrombosis event",df$outcome),"cov_bin_vte",df$prior_history_var)
 
 # Save active analyses list ----------------------------------------------------
 

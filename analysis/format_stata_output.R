@@ -1,6 +1,6 @@
 # List files to be combined
 
-files <- list.files(path = "output/", pattern = "_cox_model.txt")
+files <- list.files(path = "output/", pattern = "_cox_model.txt|_cox_model_day_zero.txt")
 
 # Create empty master data frame
 
@@ -65,7 +65,9 @@ for (f in files) {
   
   ## Add median follow up
 
-  f <- gsub("_cox_model.txt","_stata_median_fup.csv",f)
+  f <- gsub("_cox_model","_stata_median_fup",f)
+  f <- gsub(".txt",".csv",f)
+  print(f)
   fup <- readr::read_csv(file = paste0("output/",f))
   tmp <- merge(tmp, fup, by = "term", all.x = TRUE)
   
@@ -96,7 +98,7 @@ df <- tidyr::pivot_wider(df,
 
 # Make names match R output ----------------------------------------------------
 
-df <- df[df$model=="max" | (df$model=="min" & df$term %in% c("days0_28","days28_197","1.sex","2.sex","age_spline1","age_spline2")),]
+df <- df[df$model=="max" | (df$model=="min" & df$term %in% c(unique(df$term[grepl("days",df$term)]),"1.sex","2.sex","age_spline1","age_spline2")),]
 
 df <- df[order(df$source, df$model),
          c("source","term","model","b","lci","uci","se","medianfup","subjects","outcomes")]
