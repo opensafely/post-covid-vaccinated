@@ -18,7 +18,11 @@ covar_names <-covar_names[!covar_names %in% c("cov_num_age","cov_cat_ethnicity",
 ##Set which models and cohorts are required
 
 if(active_analyses$model=="all"){
-  mdl=c("mdl_age_sex","mdl_age_sex_region","mdl_max_adj")
+  if(grepl("ate|vte",event_name)){
+    mdl=c("mdl_age_sex","mdl_age_sex_region","mdl_age_sex_obesity", "mdl_max_adj")
+  }else{
+    mdl=c("mdl_age_sex","mdl_age_sex_region","mdl_max_adj")
+  }
 }else{
   mdl=active_analyses$model
 }
