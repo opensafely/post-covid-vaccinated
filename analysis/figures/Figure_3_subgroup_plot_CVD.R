@@ -47,6 +47,9 @@ estimates <- estimates %>% filter(!subgroup %in% c("covid_history","main","covid
                                   & time_points == "reduced") %>%
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,model,median_follow_up)
 
+#Second time period is redacted so remove single estimate
+estimates <- estimates %>% filter(!(event == "vte" & subgroup == "ethnicity_South_Asian" & cohort == "electively_unvaccinated"))
+
 #------------------------------Tidy event names---------------------------------
 estimates$event <- gsub("_extended_follow_up","",estimates$event)
 estimates <- estimates %>% left_join(active_analyses %>% select(outcome, outcome_name), by = c("event"="outcome_name"))
@@ -147,7 +150,7 @@ names <- c(
 )
 
 
-outcome_name="ate"
+outcome_name="vte"
 
 for(outcome_name in outcomes_to_plot){
   df=estimates %>% filter(event==outcome_name)

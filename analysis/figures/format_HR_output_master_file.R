@@ -109,7 +109,7 @@ pre_vax_results <- read.csv(paste0(results_dir,"/R_HR_output_pre_vax.csv"))
 pre_vax_results$total_covid_cases <- NULL
 
 estimates <- rbind(vax_results,pre_vax_results)
-#estimates <- estimates %>% filter(model != "mdl_age_sex")
+estimates <- estimates %>% filter(model != "mdl_age_sex")
 estimates$source <- "R"
 rm(vax_results,pre_vax_results)
 
@@ -124,6 +124,14 @@ estimates <- estimates %>%
   dplyr::mutate(results_fitted = case_when(
     any(results_fitted == "fitted_unsuccessfully") ~ "fitted_unsuccessfully",
     TRUE ~ "fitted_successfully")) %>% ungroup()
+
+#Check that all models that fit unsuccessfully have been run in stata
+estimates_unsuccessful <- estimates %>% filter(term %in% term[grepl("^days",term)]
+                                               & results_fitted == "fitted_unsuccessfully"
+                                               & !time_points %in% time_points[grepl("normal",time_points)]) %>%
+  select(event,subgroup,cohort,time_points) %>% distinct()
+
+tmp <- estimates_unsuccessful %>% anti_join(stata_analyses)
 
 #Filter to columns and terms of interest
 estimates <- estimates %>% filter(term %in% term[grepl("^days",term)]
