@@ -117,9 +117,9 @@ ggplot2::ggplot(data = df,
   ggplot2::geom_line() +
   ggplot2::scale_y_continuous(lim = y_lim, breaks = y_lim_breaks, trans = "log") +
   ggplot2::scale_x_continuous(lim = c(0,ceiling(max(df$median_follow_up, na.rm = T) / 8) * 8), breaks = seq(0,ceiling(max(df$median_follow_up, na.rm = T) / 8) * 8,8)) +
-  ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$subgroup))+ 
-  ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$subgroup)) +
-  ggplot2::scale_shape_manual(values = c(rep(21,length(unique(df$subgroup)))),labels = levels(df$subgroup)) +
+  ggplot2::scale_fill_manual(values = levels(df$colour), labels = levels(df$cohort))+ 
+  ggplot2::scale_color_manual(values = levels(df$colour), labels = levels(df$cohort)) +
+  ggplot2::scale_shape_manual(values = c(rep(21,length(unique(df$cohort)))),labels = levels(df$cohort)) +
   ggplot2::labs(x = "\nWeeks since COVID-19 diagnosis", y = "Hazard ratio and 95% confidence interval") +
   ggplot2::guides(fill=ggplot2::guide_legend(ncol = 6, byrow = TRUE)) +
   ggplot2::theme_minimal() +
