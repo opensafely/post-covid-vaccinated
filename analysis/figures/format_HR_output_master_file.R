@@ -109,7 +109,7 @@ pre_vax_results <- read.csv(paste0(results_dir,"/R_HR_output_pre_vax.csv"))
 pre_vax_results$total_covid_cases <- NULL
 
 estimates <- rbind(vax_results,pre_vax_results)
-estimates <- estimates %>% filter(model != "mdl_age_sex")
+#estimates <- estimates %>% filter(model != "mdl_age_sex")
 estimates$source <- "R"
 rm(vax_results,pre_vax_results)
 
