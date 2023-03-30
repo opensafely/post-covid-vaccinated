@@ -86,11 +86,11 @@ names <- c(
   `All COVID-19 - ate` = "All COVID-19
   ",
   `Hospitalised COVID-19 - ate` = "Hospitalised COVID-19
-  All arterial thromboses",
+  Arterial thrombotic events",
   `Non-hospitalised COVID-19 - ate` = "Non-hospitalised COVID-19
   ",
   `All COVID-19 - vte` = "",
-  `Hospitalised COVID-19 - vte` = "All venous thromboses",
+  `Hospitalised COVID-19 - vte` = "Venous thrombotic events",
   `Non-hospitalised COVID-19 - vte` = ""
 )
 
@@ -134,4 +134,4 @@ ggplot2::ggplot(data = df,
                  text=element_text(size=13)) +
   ggplot2::facet_wrap(grouping_name~.,labeller=as_labeller(names), ncol=3)
 
-ggplot2::ggsave(paste0(output_dir,"Figure_2_3_combined.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+ggplot2::ggsave(paste0(output_dir,"Figure_1.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
