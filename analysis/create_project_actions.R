@@ -407,6 +407,16 @@ actions_list <- splice(
       R_output = "output/review/model/R_HR_output.csv",
       R_event_counts = "output/review/model/R_event_count_output.csv",
       R_event_counts_day_zero = "output/review/model/R_event_count_day_zero_output.csv")
+  ),
+  
+  action(
+    name = "check_table2_matches_cox_event_counts",
+    run = "r:latest analysis/descriptives/check_table2_matches_cox_event_counts.R",
+    needs = c(paste0("Analysis_cox_",active_analyses$outcome_variable,"_",active_analyses$cohort),
+                 "stage4_table_2_vaccinated", "stage4_table_2_electively_unvaccinated"),
+    moderately_sensitive = list(
+      check_table2_cox_event_counts = "output/not-for-review/descriptives/table2_cox_model_event_counts_comparison.csv"
+    )
   )
   
 )
