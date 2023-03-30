@@ -2411,3 +2411,72 @@ actions:
         R_event_counts: output/review/model/R_event_count_output.csv
         R_event_counts_day_zero: output/review/model/R_event_count_day_zero_output.csv
 
+  check_table2_matches_cox_event_counts:
+    run: r:latest analysis/descriptives/check_table2_matches_cox_event_counts.R
+    needs:
+    - Analysis_cox_ami_electively_unvaccinated
+    - Analysis_cox_ami_vaccinated
+    - Analysis_cox_ami_primary_position_electively_unvaccinated
+    - Analysis_cox_ami_primary_position_vaccinated
+    - Analysis_cox_angina_electively_unvaccinated
+    - Analysis_cox_angina_vaccinated
+    - Analysis_cox_angina_primary_position_electively_unvaccinated
+    - Analysis_cox_angina_primary_position_vaccinated
+    - Analysis_cox_ate_electively_unvaccinated
+    - Analysis_cox_ate_vaccinated
+    - Analysis_cox_ate_primary_position_electively_unvaccinated
+    - Analysis_cox_ate_primary_position_vaccinated
+    - Analysis_cox_dvt_electively_unvaccinated
+    - Analysis_cox_dvt_vaccinated
+    - Analysis_cox_dvt_primary_position_electively_unvaccinated
+    - Analysis_cox_dvt_primary_position_vaccinated
+    - Analysis_cox_hf_electively_unvaccinated
+    - Analysis_cox_hf_vaccinated
+    - Analysis_cox_hf_primary_position_electively_unvaccinated
+    - Analysis_cox_hf_primary_position_vaccinated
+    - Analysis_cox_pe_electively_unvaccinated
+    - Analysis_cox_pe_vaccinated
+    - Analysis_cox_pe_primary_position_electively_unvaccinated
+    - Analysis_cox_pe_primary_position_vaccinated
+    - Analysis_cox_stroke_isch_electively_unvaccinated
+    - Analysis_cox_stroke_isch_vaccinated
+    - Analysis_cox_stroke_isch_primary_position_electively_unvaccinated
+    - Analysis_cox_stroke_isch_primary_position_vaccinated
+    - Analysis_cox_stroke_sah_hs_electively_unvaccinated
+    - Analysis_cox_stroke_sah_hs_vaccinated
+    - Analysis_cox_stroke_sah_hs_primary_position_electively_unvaccinated
+    - Analysis_cox_stroke_sah_hs_primary_position_vaccinated
+    - Analysis_cox_tia_electively_unvaccinated
+    - Analysis_cox_tia_vaccinated
+    - Analysis_cox_tia_primary_position_electively_unvaccinated
+    - Analysis_cox_tia_primary_position_vaccinated
+    - Analysis_cox_vte_electively_unvaccinated
+    - Analysis_cox_vte_vaccinated
+    - Analysis_cox_vte_primary_position_electively_unvaccinated
+    - Analysis_cox_vte_primary_position_vaccinated
+    - Analysis_cox_ami_unvax_sens_electively_unvaccinated
+    - Analysis_cox_stroke_isch_unvax_sens_electively_unvaccinated
+    - Analysis_cox_dvt_unvax_sens_electively_unvaccinated
+    - Analysis_cox_pe_unvax_sens_electively_unvaccinated
+    - Analysis_cox_tia_unvax_sens_electively_unvaccinated
+    - Analysis_cox_stroke_sah_hs_unvax_sens_electively_unvaccinated
+    - Analysis_cox_hf_unvax_sens_electively_unvaccinated
+    - Analysis_cox_angina_unvax_sens_electively_unvaccinated
+    - Analysis_cox_ate_unvax_sens_electively_unvaccinated
+    - Analysis_cox_vte_unvax_sens_electively_unvaccinated
+    - Analysis_cox_ami_primary_position_unvax_sens_electively_unvaccinated
+    - Analysis_cox_stroke_isch_primary_position_unvax_sens_electively_unvaccinated
+    - Analysis_cox_dvt_primary_position_unvax_sens_electively_unvaccinated
+    - Analysis_cox_pe_primary_position_unvax_sens_electively_unvaccinated
+    - Analysis_cox_tia_primary_position_unvax_sens_electively_unvaccinated
+    - Analysis_cox_stroke_sah_hs_primary_position_unvax_sens_electively_unvaccinated
+    - Analysis_cox_hf_primary_position_unvax_sens_electively_unvaccinated
+    - Analysis_cox_angina_primary_position_unvax_sens_electively_unvaccinated
+    - Analysis_cox_ate_primary_position_unvax_sens_electively_unvaccinated
+    - Analysis_cox_vte_primary_position_unvax_sens_electively_unvaccinated
+    - stage4_table_2_vaccinated
+    - stage4_table_2_electively_unvaccinated
+    outputs:
+      moderately_sensitive:
+        check_table2_cox_event_counts: output/not-for-review/descriptives/table2_cox_model_event_counts_comparison.csv
+
