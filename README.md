@@ -17,7 +17,7 @@ Below is a description of each action in the [`project.yaml`](./project.yaml). A
   * Runs [`vax_eligibility_inputs.R`](./analysis/vax_eligibility_inputs.R) which creates metadata for aspects of the study design which are required for the `generate_study_population` actions.
   * Creates dataframes that contain dates for each phase of vaccination and conditions for defining JCVI vacciantion groups
   
-* `generate_study_population`
+* `generate_study_population_{cohort}`
   * There are three `generate_study_population` scripts that are run to create the two study populations: vaccinated and unvaccinated. These are [`study_definition_vaccinated.py`](./analysis/study_definition_vaccinated.py), [`study_definition_electively_unvaccinated.py`](./analysis/study_definition_electively_unvaccinated.py) and [`study_definition_index.py`](./analysis/study_definition_index.py).
   * These scripts are used to define JCVI groups, vaccine variables, variables used to apply eligibility criteria, outcome variables and covariate variables. Common variables used in all three scripts can be found in [`common_variables.py`](./analysis/common_variables.py).
   
@@ -28,7 +28,29 @@ Below is a description of each action in the [`project.yaml`](./project.yaml). A
 * `stage1_data_cleaning_both`
   * Runs [`Stage1_data_cleaning.R`](./analysis/preprocess/Stage1_data_cleaning.R)
   * Applies quality assurance rule and inclusion/exclusion criteria
-  * Ouputted dataset is analysis ready
+  * Outputted dataset is analysis ready
+  
+* `stage1_end_date_table_{cohort}`
+  * Runs [`create_follow_up_end_date.R`](./analysis/preprocess/create_follow_up_end_date.R) which creates a dataframe of patient study end dates for each outcome of interest.
+  
+* `stage2_missing_table1_both`
+  * Runs [`Stage2_missing_table1.R`](./analysis/descriptives/Stage2_missing_table1.R)
+  *Check for missing data within variables 
+  * Creates the summary statistics for Table 1 of the manuscript which can then be outputted
+  
+* `stage4_table_2_{cohort}`
+  * Runs [`table_2.R`](./analysis/descriptives/table_2.R) which calculates pre- and post-exposure event counts and person days of follow-up for all outcomes and subgroups.
+  * Used for Table 2 in the manuscript
+  
+* `stage4_venn_diagram_both`
+
+* `Analysis_cox_{outcome}_{cohort}`
+
+* `stata_cox_model_{outcome}_{subgroup}_{cohort}_{time_periods}`
+
+* `format_stata_output`
+
+* `format_R_output`
 
 
 [View on OpenSAFELY](https://jobs.opensafely.org/repo/https%253A%252F%252Fgithub.com%252Fopensafely%252Fpost-covid-vaccinated)
