@@ -1,6 +1,16 @@
 # Impact of vaccination on the association of COVID-19 with arterial and venous thrombotic diseases: an OpenSAFELY cohort study using linked electronic health records
 
+Abstract: The incidence of cardiovascular diseases increases after COVID-19 diagnosis. How COVID-19 vaccination and different SARS-CoV-2 variants impact on this increase is unclear. The objective was to quantify associations between COVID-19 diagnosis and cardiovascular diseases in different vaccination and variant eras in England.
+
 You can run this project via [Gitpod](https://gitpod.io) in a web browser by clicking on this badge: [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/opensafely/post-covid-vaccinated)
+
+* The preprint can be found
+* Analysis scripts are in the [`analysis`](./analysis) directory
+* If you are interested in how we defined our code lists, look in the [codelists](https://github.com/opensafely/post-covid-vaccinated/tree/main/codelists) directory
+
+### project.yaml
+The [`project.yaml](./project.yaml) defines project actions, run-order and dependencies for all analysis scripts. **This file should *not* be edited directly**. To make changes to the yaml, edit and run the [`create_project.R`](./analysis/create_project.R) script instead. Project actions are then run securely using [OpenSAFELY Jobs](https://jobs.opensafely.org/).
+
 
 [View on OpenSAFELY](https://jobs.opensafely.org/repo/https%253A%252F%252Fgithub.com%252Fopensafely%252Fpost-covid-vaccinated)
 
