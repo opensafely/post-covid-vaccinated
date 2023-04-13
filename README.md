@@ -35,7 +35,7 @@ Below is a description of each action in the [`project.yaml`](./project.yaml). A
   
 * `stage2_missing_table1_both`
   * Runs [`Stage2_missing_table1.R`](./analysis/descriptives/Stage2_missing_table1.R)
-  *Check for missing data within variables 
+  * Check for missing data within variables 
   * Creates the summary statistics for Table 1 of the manuscript which can then be outputted
   
 * `stage4_table_2_{cohort}`
