@@ -99,9 +99,14 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
   combined_results <- as.data.frame(matrix(ncol=10,nrow=0))
   colnames(combined_results) <- c("term","estimate","conf_low","conf_high","se_ln_hr","robust_se_ln_hr","results_fitted","model","covariates_removed","cat_covars_collapsed")
   
+  #Only run age/sex/obesity model for main and covid phenotype analyses
+  if(!subgroup %in% c("main","covid_pheno_hospitalised","covid_pheno_non_hospitalised")){
+   mdl <- mdl[mdl != "mdl_age_sex_obesity"]
+  }
+  
   for(model in mdl){
     #Base formula
-    if(model %in% c("mdl_age_sex","mdl_age_sex_region")){
+    if(model %in% c("mdl_age_sex","mdl_age_sex_region","mdl_age_sex_obesity")){
       surv_formula <- paste0(
         "Surv(tstart, tstop, event) ~ ",
         paste(interval_names, collapse="+"))
@@ -132,6 +137,12 @@ coxfit <- function(data_surv, interval_names, covar_names, subgroup, mdl){
     }else if (startsWith(subgroup,"agegp_") | startsWith(subgroup,"aer")){
       surv_formula <- paste(surv_formula, "age + age_sq", sep="+")
     }
+    
+    #If subgroup is age/sex/obesity then add obesity into model
+    if(model == "mdl_age_sex_obesity"){
+      surv_formula <- paste(surv_formula, "cov_bin_obesity", sep="+")
+    }
+    
 
     print(surv_formula)
 
