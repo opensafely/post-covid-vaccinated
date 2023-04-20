@@ -112,7 +112,7 @@ estimates$outcome <- factor(estimates$outcome, levels=c("Acute myocardial infarc
                                                                            
                                                                             
 
-#i <- "any_position"
+i <- "any_position"
 #for(i in c("any_position","primary_position")){
 for(i in c("any_position")){
     
