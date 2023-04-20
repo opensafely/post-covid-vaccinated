@@ -2,6 +2,8 @@
 
 Abstract: The incidence of cardiovascular diseases increases after COVID-19 diagnosis. How COVID-19 vaccination and different SARS-CoV-2 variants impact on this increase is unclear. The objective was to quantify associations between COVID-19 diagnosis and cardiovascular diseases in different vaccination and variant eras in England.
 
+This project compares three cohorts: pre-vaccination, unvaccinated and vaccinated. This repository creates the results for the unvaccinated and vaccinated cohorts. The pre-vaccination repository can be found [`here`](https://github.com/opensafely/post-covid-pre-vaccinated-cardiovascular)
+
 You can run this project via [Gitpod](https://gitpod.io) in a web browser by clicking on this badge: [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/opensafely/post-covid-vaccinated)
 
 -   The preprint can be found
