@@ -5,6 +5,7 @@ Abstract: The incidence of cardiovascular diseases increases after COVID-19 diag
 You can run this project via [Gitpod](https://gitpod.io) in a web browser by clicking on this badge: [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/opensafely/post-covid-vaccinated)
 
 -   The preprint can be found
+-   The project protocol whih contains in depth deatils of the anlaysis plan can be found [`here`](./protocol)
 -   Analysis scripts are in the [`analysis`](./analysis) directory
 -   If you are interested in how we defined our code lists, look in the [codelists](https://github.com/opensafely/post-covid-vaccinated/tree/main/codelists) directory
 -   Developers and epidemiologists interested in the framework should review the [`OpenSAFELY documentation`](https://docs.opensafely.org/)
@@ -43,7 +44,7 @@ Below is a description of each action in the [`project.yaml`](./project.yaml). A
 -   `Analysis_cox_{outcome}_{cohort}`
     -   Runs [`01_cox_pipeline.R`](./analysis/model/01_cox_pipeline.R)
     -   Each action runs all subgroups for the outcome and cohort of interest
-    -   Detailed descriptions of each script used to fit the cox models can be in the models [`README`](./analysis/model/README_model_scripts.md) file
+    -   Detailed descriptions of each script used to fit the cox models can be in the model [`README`](./analysis/model/README_model_scripts.md) file
 -   `stata_cox_model_{outcome}_{subgroup}_{cohort}_{time_periods}`
     -   Runs [`cox_model.do`](./analysis/cox_model.do) and [`cox_model_day0.do`](./analysis/cox_model_day0.do)
     -   When models do not fit successfully in R they are run in stata instead
