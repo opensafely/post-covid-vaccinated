@@ -11,6 +11,7 @@ library(gridExtra)
 #library(plyr)
 
 aer_output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/AER/compiled_results/"
+output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/Final/"
 
 event_of_interest <- c("ate","vte","ate_primary_position","vte_primary_position")
 cohort_name <- c("pre_vaccination", "vaccinated","electively_unvaccinated")
@@ -192,7 +193,7 @@ for(outcome_position in c("any_position","primary_position")){
     geom_blank(aes(x = x_min)) +
     geom_blank(aes(x = x_max))
   
-  ggsave(paste0(aer_output_dir, "/Figure_4_",outcome_position,"_extended_follow_up.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+  ggsave(paste0(output_dir, "/supplementary_figure_5_",outcome_position,".png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
 }
   
 

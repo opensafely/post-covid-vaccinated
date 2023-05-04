@@ -6,7 +6,7 @@ library(dplyr)
 library(ggplot2)
 
 results_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/release"
-output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/"
+output_dir <- "C:/Users/zy21123/OneDrive - University of Bristol/Documents/OpenSAFELY/Outputs/Figures/Final/"
 
 #----------------------------Get CVD outcomes-----------------------------------
 active_analyses <- read_rds("lib/active_analyses.rds") %>% filter(active == "TRUE")
