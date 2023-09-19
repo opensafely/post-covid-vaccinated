@@ -80,11 +80,17 @@ rm(analyses_to_run_normal_timepoint)
 
 analyses_to_run <- analyses_to_run %>% filter(subgroup != "covid_pheno_hospitalised" | reduced_timepoint != "normal")
 
-# Add day zero analyses
+# Add day zero analyses and first month split analyses
 day_zero_analyses <- analyses_to_run %>% filter(subgroup %in% c("main","covid_pheno_non_hospitalised"))
 day_zero_analyses$reduced_timepoint <- paste0("day_zero_",day_zero_analyses$reduced_timepoint)
-analyses_to_run <- rbind(analyses_to_run, day_zero_analyses)
+
+month1_split_analyses <- analyses_to_run %>% filter(subgroup %in% c("main","covid_pheno_non_hospitalised"))
+month1_split_analyses$reduced_timepoint <- paste0("month1_split_",month1_split_analyses$reduced_timepoint)
+
+analyses_to_run <- rbind(analyses_to_run, day_zero_analyses, month1_split_analyses)
 rm(day_zero_analyses)
+rm(month1_split_analyses)
+
 # Source remainder of relevant files --------------------------------------------------------
 
 source(file.path(scripts_dir,paste0("03_01_cox_subgrouping.R"))) # Model specification
@@ -102,10 +108,11 @@ if(nrow(analyses_to_run>0)){
              input,covar_names,
              cuts_days_since_expo,cuts_days_since_expo_reduced,
              cuts_days_since_expo_day_zero,cuts_days_since_expo_reduced_day_zero,
+             cuts_days_since_expo_month1_split,cuts_days_since_expo_reduced_month1_split,
              mdl))
 }
 
-#Save csv of anlayses not run
+#Save csv of analyses not run
 write.csv(analyses_not_run, paste0(output_dir,"/analyses_not_run_" , event_name ,"_",cohort,".csv"), row.names = T)
 
 if(nrow(analyses_to_run)==0){
