@@ -5,7 +5,7 @@
 ## =============================================================================
 source(file.path(scripts_dir,"04_01_(a)_cox_fit_model.R"))
 
-get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_point,input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced,cuts_days_since_expo_day_zero,cuts_days_since_expo_reduced_day_zero,mdl){
+get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_point,input,covar_names,cuts_days_since_expo,cuts_days_since_expo_reduced,cuts_days_since_expo_day_zero,cuts_days_since_expo_reduced_day_zero,cuts_days_since_expo_month1_split,cuts_days_since_expo_reduced_month1_split,mdl){
   print(paste0("Working on subgroup: ", subgroup, " ", cohort))
   print(paste0("Using ",time_point," time point"))
   
@@ -115,6 +115,10 @@ get_vacc_res <- function(event,subgroup,stratify_by_subgroup,stratify_by,time_po
     res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_reduced_day_zero,covar_names,time_point)
   }else if(time_point == "day_zero_normal"){
     res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_day_zero,covar_names,time_point)
+  }else if(time_point == "month1_split_reduced"){
+    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_reduced_month1_split,covar_names,time_point)
+  }else if(time_point == "month1_split_normal"){
+    res_vacc <- fit_model_reducedcovariates(event,subgroup,stratify_by_subgroup,stratify_by,mdl, survival_data,input,cuts_days_since_expo=cuts_days_since_expo_month1_split,covar_names,time_point)
   }
 
   print(paste0("Finished working on subgroup: ", subgroup, ", ",mdl,", ", cohort))
