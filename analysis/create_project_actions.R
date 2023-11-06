@@ -44,6 +44,13 @@ analyses_to_run_stata_day_zero$subgroup <- ifelse(analyses_to_run_stata_day_zero
 analyses_to_run_stata_day_zero$subgroup <- ifelse(analyses_to_run_stata_day_zero$subgroup=="non_hospitalised","covid_pheno_non_hospitalised",analyses_to_run_stata_day_zero$subgroup)
 analyses_to_run_stata_day_zero$time_periods <- gsub("day_zero_","",analyses_to_run_stata_day_zero$time_periods)
 
+# Analyses to run in stata - first month split into more time periods
+analyses_to_run_stata_m1split <- read.csv("lib/analyses_to_run_in_stata_m1split.csv")
+analyses_to_run_stata_m1split <- analyses_to_run_stata_m1split[,c("outcome","subgroup","cohort","time_periods")]
+analyses_to_run_stata_m1split$subgroup <- ifelse(analyses_to_run_stata_m1split$subgroup=="hospitalised","covid_pheno_hospitalised",analyses_to_run_stata_m1split$subgroup)
+analyses_to_run_stata_m1split$subgroup <- ifelse(analyses_to_run_stata_m1split$subgroup=="non_hospitalised","covid_pheno_non_hospitalised",analyses_to_run_stata_m1split$subgroup)
+analyses_to_run_stata_m1split$time_periods <- gsub("m1split_","",analyses_to_run_stata_m1split$time_periods)
+
 
 # create action functions ----
 
@@ -210,6 +217,21 @@ stata_actions_day_zero <- function(outcome, cohort, subgroup, time_periods){
   )
 }
 
+stata_actions_m1split <- function(outcome, cohort, subgroup, time_periods){
+  splice(
+    #comment(glue("Stata cox {outcome} {subgroup} {cohort} {time_periods}")),
+    action(
+      name = glue("stata_cox_m1split_{outcome}_{subgroup}_{cohort}_{time_periods}"),
+      run = "stata-mp:latest analysis/cox_model_m1split.do",
+      arguments = c(glue("input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods")),
+      needs = list(glue("Analysis_cox_{outcome}_{cohort}")),
+      moderately_sensitive = list(
+        medianfup = glue("output/input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods_stata_median_fup_m1split.csv"),
+        stata_output = glue("output/input_sampled_data_{outcome}_{subgroup}_{cohort}_{time_periods}_time_periods_cox_model_m1split.txt")
+      )
+    )
+  )
+}
 
 ##########################################################
 ## Define and combine all actions into a list of actions #
@@ -387,15 +409,23 @@ actions_list <- splice(
                                                  cohort = analyses_to_run_stata_day_zero[i, "cohort"],
                                                  time_periods = analyses_to_run_stata_day_zero[i, "time_periods"])),
                 recursive = FALSE)),
-  
+
+  #Stata m1split analyses
+  splice(unlist(lapply(1:nrow(analyses_to_run_stata_m1split), 
+                       function(i) stata_actions_m1split(outcome = analyses_to_run_stata_m1split[i, "outcome"],
+                                                          subgroup = analyses_to_run_stata_m1split[i, "subgroup"],
+                                                          cohort = analyses_to_run_stata_m1split[i, "cohort"],
+                                                          time_periods = analyses_to_run_stata_m1split[i, "time_periods"])),
+                recursive = FALSE)),  
   
   #comment("Format Stata output")
   action(
     name = "format_stata_output",
     run = "r:latest analysis/format_stata_output.R",
     needs = c(paste0("stata_cox_model_",analyses_to_run_stata$outcome,"_",analyses_to_run_stata$subgroup,"_",analyses_to_run_stata$cohort,"_",analyses_to_run_stata$time_periods),
-              paste0("stata_cox_day_zero_",analyses_to_run_stata_day_zero$outcome,"_",analyses_to_run_stata_day_zero$subgroup,"_",analyses_to_run_stata_day_zero$cohort,"_",analyses_to_run_stata_day_zero$time_periods)),
-    moderately_sensitive = list(
+              paste0("stata_cox_day_zero_",analyses_to_run_stata_day_zero$outcome,"_",analyses_to_run_stata_day_zero$subgroup,"_",analyses_to_run_stata_day_zero$cohort,"_",analyses_to_run_stata_day_zero$time_periods),
+              paste0("stata_cox_m1split_",analyses_to_run_stata_m1split$outcome,"_",analyses_to_run_stata_m1split$subgroup,"_",analyses_to_run_stata_m1split$cohort,"_",analyses_to_run_stata_m1split$time_periods)),
+  moderately_sensitive = list(
       stata_output = "output/stata_output.csv")
   ),
   

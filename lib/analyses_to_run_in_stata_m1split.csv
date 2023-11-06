@@ -1,0 +1,13 @@
+outcome,cohort,subgroup,time_periods
+ate,electively_unvaccinated,main,m1split_reduced
+vte,electively_unvaccinated,main,m1split_reduced
+ate,electively_unvaccinated,hospitalised,m1split_reduced
+vte,electively_unvaccinated,hospitalised,m1split_reduced
+ate,electively_unvaccinated,non_hospitalised,m1split_reduced
+vte,electively_unvaccinated,non_hospitalised,m1split_reduced
+ate,vaccinated,main,m1split_reduced
+vte,vaccinated,main,m1split_reduced
+ate,vaccinated,hospitalised,m1split_reduced
+vte,vaccinated,hospitalised,m1split_reduced
+ate,vaccinated,non_hospitalised,m1split_reduced
+vte,vaccinated,non_hospitalised,m1split_reduced
