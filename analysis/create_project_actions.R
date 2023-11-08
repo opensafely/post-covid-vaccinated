@@ -48,7 +48,7 @@ analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_day0
 analyses_to_run_stata_m1split <- read.csv("lib/analyses_to_run_in_stata_m1split.csv")
 analyses_to_run_stata_m1split$time_periods <- gsub("m1split_", "", analyses_to_run_stata_m1split$time_periods)
 analyses_to_run_stata_m1split$extf <- TRUE
-analyses_to_run_stata_m1split$day0 <- FALSE
+analyses_to_run_stata_m1split$day0 <- TRUE
 analyses_to_run_stata_m1split$m1split <- TRUE
 analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_m1split)
 

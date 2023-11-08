@@ -3226,229 +3226,229 @@ actions:
         medianfup: output/stata_median_fup_vte_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv
         stata_output: output/stata_cox_model_vte_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.txt
 
-  d_ate_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: r:latest analysis/stata_data.R ate main electively_unvaccinated FALSE TRUE
+  d_ate_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: r:latest analysis/stata_data.R ate main electively_unvaccinated TRUE TRUE
       TRUE
     needs:
     - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_ate_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_ate_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_ate_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: stata-mp:latest analysis/cox_model.do ate main electively_unvaccinated FALSE
+  s_ate_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: stata-mp:latest analysis/cox_model.do ate main electively_unvaccinated TRUE
       TRUE TRUE
     needs:
-    - d_ate_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_ate_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_ate_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_ate_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_ate_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_ate_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_vte_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: r:latest analysis/stata_data.R vte main electively_unvaccinated FALSE TRUE
+  d_vte_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: r:latest analysis/stata_data.R vte main electively_unvaccinated TRUE TRUE
       TRUE
     needs:
     - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_vte_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_vte_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_vte_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: stata-mp:latest analysis/cox_model.do vte main electively_unvaccinated FALSE
+  s_vte_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: stata-mp:latest analysis/cox_model.do vte main electively_unvaccinated TRUE
       TRUE TRUE
     needs:
-    - d_vte_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_vte_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_vte_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_vte_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_vte_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_vte_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  d_ate_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: r:latest analysis/stata_data.R ate covid_pheno_hospitalised electively_unvaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
     - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_ate_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  s_ate_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: stata-mp:latest analysis/cox_model.do ate covid_pheno_hospitalised electively_unvaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
-    - d_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_ate_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_ate_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_ate_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  d_vte_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: r:latest analysis/stata_data.R vte covid_pheno_hospitalised electively_unvaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
     - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_vte_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  s_vte_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: stata-mp:latest analysis/cox_model.do vte covid_pheno_hospitalised electively_unvaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
-    - d_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_vte_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_vte_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_vte_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  d_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: r:latest analysis/stata_data.R ate covid_pheno_non_hospitalised electively_unvaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
     - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  s_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: stata-mp:latest analysis/cox_model.do ate covid_pheno_non_hospitalised electively_unvaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
-    - d_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  d_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: r:latest analysis/stata_data.R vte covid_pheno_non_hospitalised electively_unvaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
     - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  s_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: stata-mp:latest analysis/cox_model.do vte covid_pheno_non_hospitalised electively_unvaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
-    - d_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: r:latest analysis/stata_data.R ate main vaccinated FALSE TRUE TRUE
+  d_ate_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: r:latest analysis/stata_data.R ate main vaccinated TRUE TRUE TRUE
     needs:
     - Analysis_cox_ate_vaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_ate_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: stata-mp:latest analysis/cox_model.do ate main vaccinated FALSE TRUE TRUE
+  s_ate_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: stata-mp:latest analysis/cox_model.do ate main vaccinated TRUE TRUE TRUE
     needs:
-    - d_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_ate_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_ate_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_ate_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: r:latest analysis/stata_data.R vte main vaccinated FALSE TRUE TRUE
+  d_vte_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: r:latest analysis/stata_data.R vte main vaccinated TRUE TRUE TRUE
     needs:
     - Analysis_cox_vte_vaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_vte_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: stata-mp:latest analysis/cox_model.do vte main vaccinated FALSE TRUE TRUE
+  s_vte_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: stata-mp:latest analysis/cox_model.do vte main vaccinated TRUE TRUE TRUE
     needs:
-    - d_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_vte_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_vte_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_vte_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: r:latest analysis/stata_data.R ate covid_pheno_hospitalised vaccinated FALSE
+  d_ate_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: r:latest analysis/stata_data.R ate covid_pheno_hospitalised vaccinated TRUE
       TRUE TRUE
     needs:
     - Analysis_cox_ate_vaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_ate_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  s_ate_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: stata-mp:latest analysis/cox_model.do ate covid_pheno_hospitalised vaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
-    - d_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_ate_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_ate_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_ate_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
-    run: r:latest analysis/stata_data.R vte covid_pheno_hospitalised vaccinated FALSE
+  d_vte_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
+    run: r:latest analysis/stata_data.R vte covid_pheno_hospitalised vaccinated TRUE
       TRUE TRUE
     needs:
     - Analysis_cox_vte_vaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_vte_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  s_vte_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: stata-mp:latest analysis/cox_model.do vte covid_pheno_hospitalised vaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
-    - d_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_vte_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_vte_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_vte_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_ate_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  d_ate_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: r:latest analysis/stata_data.R ate covid_pheno_non_hospitalised vaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
     - Analysis_cox_ate_vaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_ate_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_ate_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_ate_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  s_ate_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: stata-mp:latest analysis/cox_model.do ate covid_pheno_non_hospitalised vaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
-    - d_ate_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_ate_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_ate_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_ate_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_ate_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_ate_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
-  d_vte_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  d_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: r:latest analysis/stata_data.R vte covid_pheno_non_hospitalised vaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
     - Analysis_cox_vte_vaccinated
     outputs:
       highly_sensitive:
-        stata_input: output/input_stata_vte_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
+        stata_input: output/input_stata_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv.gz
 
-  s_vte_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
+  s_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE:
     run: stata-mp:latest analysis/cox_model.do vte covid_pheno_non_hospitalised vaccinated
-      FALSE TRUE TRUE
+      TRUE TRUE TRUE
     needs:
-    - d_vte_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - d_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        medianfup: output/stata_median_fup_vte_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv
-        stata_output: output/stata_cox_model_vte_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.txt
+        medianfup: output/stata_median_fup_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.csv
+        stata_output: output/stata_cox_model_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE.txt
 
   format_stata_output:
     run: r:latest analysis/format_stata_output.R all
@@ -3552,18 +3552,18 @@ actions:
     - s_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE
     - s_ate_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE
     - s_vte_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE
-    - s_ate_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - s_ate_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
         stata_output: output/stata_output_pre_vax.csv
@@ -3571,18 +3571,18 @@ actions:
   format_stata_output_m1split:
     run: r:latest analysis/format_stata_output.R m1split
     needs:
-    - s_ate_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_ate_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
-    - s_vte_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE
+    - s_ate_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_main_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_ate_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
+    - s_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
         stata_output: output/stata_output_m1split_pre_vax.csv
