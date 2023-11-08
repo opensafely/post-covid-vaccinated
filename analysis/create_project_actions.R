@@ -27,10 +27,35 @@ colnames(tmp) <- c("outcome_variable", "cohort")
 active_analyses <- rbind(tmp, active_analyses)
 active_analyses <- active_analyses %>% filter(cohort != "all")
 
-analyses_to_run_stata <-
-  read.csv("lib/analyses_to_run_in_stata.csv")
-analyses_to_run_stata <-
-  analyses_to_run_stata[, c("outcome", "subgroup", "cohort", "time_periods")]
+# Analyses to run in Stata
+
+## Load standard models
+analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv")
+analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run & time_periods == "reduced")
+analyses_to_run_stata$extf <- TRUE
+analyses_to_run_stata$day0 <- FALSE
+analyses_to_run_stata$m1split <- FALSE
+
+## Load day0 models
+analyses_to_run_stata_day0 <- read.csv("lib/analyses_to_run_in_stata_day_zero.csv")
+analyses_to_run_stata_day0$time_periods <- gsub("day_zero_", "", analyses_to_run_stata_day0$time_periods)
+analyses_to_run_stata_day0$extf <- TRUE
+analyses_to_run_stata_day0$day0 <- TRUE
+analyses_to_run_stata_day0$m1split <- FALSE
+analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_day0)
+
+## Load first month split models
+analyses_to_run_stata_m1split <- read.csv("lib/analyses_to_run_in_stata_m1split.csv")
+analyses_to_run_stata_m1split$time_periods <- gsub("m1split_", "", analyses_to_run_stata_m1split$time_periods)
+analyses_to_run_stata_m1split$extf <- TRUE
+analyses_to_run_stata_m1split$day0 <- FALSE
+analyses_to_run_stata_m1split$m1split <- TRUE
+analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_m1split)
+
+## Remove unnecessary data frames
+rm(analyses_to_run_stata_day0,analyses_to_run_stata_m1split)
+
+## Correct subgroup names
 analyses_to_run_stata$subgroup <-
   ifelse(
     analyses_to_run_stata$subgroup == "hospitalised",
@@ -44,67 +69,7 @@ analyses_to_run_stata$subgroup <-
     analyses_to_run_stata$subgroup
   )
 
-
-analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run & time_periods == "reduced")
-analyses_to_run_stata$extf <- TRUE
-analyses_to_run_stata$day0 <- FALSE
-analyses_to_run_stata$m1split <- FALSE
-
-# Analyses to run in stata - day zero
-analyses_to_run_stata_day0 <- read.csv("lib/analyses_to_run_in_stata_day_zero.csv")
-
-analyses_to_run_stata_day0 <- analyses_to_run_stata_day0[, c("outcome", "subgroup", "cohort", "time_periods")]
-
-analyses_to_run_stata_day0$subgroup <-
-  ifelse(
-    analyses_to_run_stata_day0$subgroup == "hospitalised",
-    "covid_pheno_hospitalised",
-    analyses_to_run_stata_day0$subgroup
-  )
-
-analyses_to_run_stata_day0$subgroup <-
-  ifelse(
-    analyses_to_run_stata_day0$subgroup == "non_hospitalised",
-    "covid_pheno_non_hospitalised",
-    analyses_to_run_stata_day0$subgroup
-  )
-
-analyses_to_run_stata_day0$time_periods <-
-  gsub("day0_", "", analyses_to_run_stata_day0$time_periods)
-
-analyses_to_run_stata_day0$extf <- TRUE
-analyses_to_run_stata_day0$day0 <- TRUE
-analyses_to_run_stata_day0$m1split <- FALSE
-analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_day0)
-
-# Analyses to run in stata - first month split into more time periods
-analyses_to_run_stata_m1split <- read.csv("lib/analyses_to_run_in_stata_m1split.csv")
-
-analyses_to_run_stata_m1split <- analyses_to_run_stata_m1split[, c("outcome", "subgroup", "cohort", "time_periods")]
-
-analyses_to_run_stata_m1split$subgroup <-
-  ifelse(
-    analyses_to_run_stata_m1split$subgroup == "hospitalised",
-    "covid_pheno_hospitalised",
-    analyses_to_run_stata_m1split$subgroup
-  )
-
-analyses_to_run_stata_m1split$subgroup <-
-  ifelse(
-    analyses_to_run_stata_m1split$subgroup == "non_hospitalised",
-    "covid_pheno_non_hospitalised",
-    analyses_to_run_stata_m1split$subgroup
-  )
-
-analyses_to_run_stata_m1split$time_periods <-
-  gsub("m1split_", "", analyses_to_run_stata_m1split$time_periods)
-
-analyses_to_run_stata_m1split$extf <- TRUE
-analyses_to_run_stata_m1split$day0 <- FALSE
-analyses_to_run_stata_m1split$m1split <- TRUE
-analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_m1split)
-
-rm(analyses_to_run_stata_day0,analyses_to_run_stata_m1split)
+## Create m1split only dataframe (to reduce action size)
 analyses_to_run_stata_m1split <- analyses_to_run_stata[analyses_to_run_stata$m1split==TRUE,]
 
 # create action functions ----
@@ -296,7 +261,7 @@ stata_actions <-
           "r:latest analysis/stata_data.R {outcome} {subgroup} {cohort} {day0} {extf} {m1split}"
         ),
         needs = c(as.list(glue(
-          "Analysis_cox_{outcome}"
+          "Analysis_cox_{outcome}_{cohort}"
         ))),
         highly_sensitive = list(
           stata_input = glue(
@@ -511,7 +476,7 @@ actions_list <- splice(
       "stage1_end_date_table_electively_unvaccinated"
     ),
     moderately_sensitive = list(
-      venn_diagram = glue("output/review/venn-diagrams/venn_diagram_*")
+      venn_diagram = glue("output/review/venn-diagrams/venn_diagram_*.svg")
     )
   ),
   

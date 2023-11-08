@@ -175,7 +175,7 @@ actions:
     - stage1_end_date_table_electively_unvaccinated
     outputs:
       moderately_sensitive:
-        venn_diagram: output/review/venn-diagrams/venn_diagram_*
+        venn_diagram: output/review/venn-diagrams/venn_diagram_*.svg
 
   ## Cox model for ami - electively_unvaccinated 
 
@@ -1349,7 +1349,7 @@ actions:
     run: r:latest analysis/stata_data.R ami covid_pheno_hospitalised vaccinated FALSE
       TRUE FALSE
     needs:
-    - Analysis_cox_ami
+    - Analysis_cox_ami_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1368,7 +1368,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch covid_pheno_hospitalised vaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch
+    - Analysis_cox_stroke_isch_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1387,7 +1387,7 @@ actions:
     run: r:latest analysis/stata_data.R dvt covid_pheno_hospitalised vaccinated FALSE
       TRUE FALSE
     needs:
-    - Analysis_cox_dvt
+    - Analysis_cox_dvt_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_dvt_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1406,7 +1406,7 @@ actions:
     run: r:latest analysis/stata_data.R pe covid_pheno_hospitalised vaccinated FALSE
       TRUE FALSE
     needs:
-    - Analysis_cox_pe
+    - Analysis_cox_pe_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1425,7 +1425,7 @@ actions:
     run: r:latest analysis/stata_data.R hf covid_pheno_hospitalised vaccinated FALSE
       TRUE FALSE
     needs:
-    - Analysis_cox_hf
+    - Analysis_cox_hf_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1444,7 +1444,7 @@ actions:
     run: r:latest analysis/stata_data.R angina covid_pheno_hospitalised vaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_angina
+    - Analysis_cox_angina_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1463,7 +1463,7 @@ actions:
     run: r:latest analysis/stata_data.R ate covid_pheno_hospitalised vaccinated FALSE
       TRUE FALSE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1482,7 +1482,7 @@ actions:
     run: r:latest analysis/stata_data.R vte covid_pheno_hospitalised vaccinated FALSE
       TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1501,7 +1501,7 @@ actions:
     run: r:latest analysis/stata_data.R ami_primary_position covid_pheno_hospitalised
       vaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_ami_primary_position
+    - Analysis_cox_ami_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_primary_position_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1520,7 +1520,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch_primary_position covid_pheno_hospitalised
       vaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch_primary_position
+    - Analysis_cox_stroke_isch_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_primary_position_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1539,7 +1539,7 @@ actions:
     run: r:latest analysis/stata_data.R dvt_primary_position covid_pheno_hospitalised
       vaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_dvt_primary_position
+    - Analysis_cox_dvt_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_dvt_primary_position_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1558,7 +1558,7 @@ actions:
     run: r:latest analysis/stata_data.R pe_primary_position covid_pheno_hospitalised
       vaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_pe_primary_position
+    - Analysis_cox_pe_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_primary_position_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1577,7 +1577,7 @@ actions:
     run: r:latest analysis/stata_data.R hf_primary_position covid_pheno_hospitalised
       vaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_hf_primary_position
+    - Analysis_cox_hf_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_primary_position_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1596,7 +1596,7 @@ actions:
     run: r:latest analysis/stata_data.R angina_primary_position covid_pheno_hospitalised
       vaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_angina_primary_position
+    - Analysis_cox_angina_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_primary_position_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1615,7 +1615,7 @@ actions:
     run: r:latest analysis/stata_data.R ate_primary_position covid_pheno_hospitalised
       vaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_ate_primary_position
+    - Analysis_cox_ate_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_primary_position_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1634,7 +1634,7 @@ actions:
     run: r:latest analysis/stata_data.R vte_primary_position covid_pheno_hospitalised
       vaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_vte_primary_position
+    - Analysis_cox_vte_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_primary_position_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1653,7 +1653,7 @@ actions:
     run: r:latest analysis/stata_data.R ami covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_ami
+    - Analysis_cox_ami_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1672,7 +1672,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch
+    - Analysis_cox_stroke_isch_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1691,7 +1691,7 @@ actions:
     run: r:latest analysis/stata_data.R dvt covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_dvt
+    - Analysis_cox_dvt_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_dvt_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1710,7 +1710,7 @@ actions:
     run: r:latest analysis/stata_data.R pe covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_pe
+    - Analysis_cox_pe_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1729,7 +1729,7 @@ actions:
     run: r:latest analysis/stata_data.R hf covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_hf
+    - Analysis_cox_hf_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1748,7 +1748,7 @@ actions:
     run: r:latest analysis/stata_data.R angina covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_angina
+    - Analysis_cox_angina_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1767,7 +1767,7 @@ actions:
     run: r:latest analysis/stata_data.R ate covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1786,7 +1786,7 @@ actions:
     run: r:latest analysis/stata_data.R vte covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1805,7 +1805,7 @@ actions:
     run: r:latest analysis/stata_data.R ate_primary_position covid_pheno_hospitalised
       electively_unvaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_ate_primary_position
+    - Analysis_cox_ate_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_primary_position_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1824,7 +1824,7 @@ actions:
     run: r:latest analysis/stata_data.R vte_primary_position covid_pheno_hospitalised
       electively_unvaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_vte_primary_position
+    - Analysis_cox_vte_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1843,7 +1843,7 @@ actions:
     run: r:latest analysis/stata_data.R angina covid_history vaccinated FALSE TRUE
       FALSE
     needs:
-    - Analysis_cox_angina
+    - Analysis_cox_angina_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_covid_history_vaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1862,7 +1862,7 @@ actions:
     run: r:latest analysis/stata_data.R pe main electively_unvaccinated FALSE TRUE
       FALSE
     needs:
-    - Analysis_cox_pe
+    - Analysis_cox_pe_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1881,7 +1881,7 @@ actions:
     run: r:latest analysis/stata_data.R hf main electively_unvaccinated FALSE TRUE
       FALSE
     needs:
-    - Analysis_cox_hf
+    - Analysis_cox_hf_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1900,7 +1900,7 @@ actions:
     run: r:latest analysis/stata_data.R hf covid_pheno_non_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_hf
+    - Analysis_cox_hf_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1919,7 +1919,7 @@ actions:
     run: r:latest analysis/stata_data.R vte sex_Male electively_unvaccinated FALSE
       TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_sex_Male_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1938,7 +1938,7 @@ actions:
     run: r:latest analysis/stata_data.R vte agegp_60_79 electively_unvaccinated FALSE
       TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_agegp_60_79_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1957,7 +1957,7 @@ actions:
     run: r:latest analysis/stata_data.R vte ethnicity_Black electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_ethnicity_Black_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1976,7 +1976,7 @@ actions:
     run: r:latest analysis/stata_data.R hf_primary_position covid_pheno_non_hospitalised
       electively_unvaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_hf_primary_position
+    - Analysis_cox_hf_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -1995,7 +1995,7 @@ actions:
     run: r:latest analysis/stata_data.R vte aer_Female_60_79 electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_aer_Female_60_79_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2014,7 +2014,7 @@ actions:
     run: r:latest analysis/stata_data.R vte aer_Male_60_79 electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_aer_Male_60_79_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2033,7 +2033,7 @@ actions:
     run: r:latest analysis/stata_data.R ami_unvax_sens covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_ami_unvax_sens
+    - Analysis_cox_ami_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2052,7 +2052,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch_unvax_sens covid_pheno_hospitalised
       electively_unvaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch_unvax_sens
+    - Analysis_cox_stroke_isch_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2071,7 +2071,7 @@ actions:
     run: r:latest analysis/stata_data.R dvt_unvax_sens covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_dvt_unvax_sens
+    - Analysis_cox_dvt_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_dvt_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2090,7 +2090,7 @@ actions:
     run: r:latest analysis/stata_data.R pe_unvax_sens covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_pe_unvax_sens
+    - Analysis_cox_pe_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2109,7 +2109,7 @@ actions:
     run: r:latest analysis/stata_data.R hf_unvax_sens covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_hf_unvax_sens
+    - Analysis_cox_hf_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2128,7 +2128,7 @@ actions:
     run: r:latest analysis/stata_data.R angina_unvax_sens covid_pheno_hospitalised
       electively_unvaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_angina_unvax_sens
+    - Analysis_cox_angina_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2147,7 +2147,7 @@ actions:
     run: r:latest analysis/stata_data.R ate_unvax_sens covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_ate_unvax_sens
+    - Analysis_cox_ate_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2166,7 +2166,7 @@ actions:
     run: r:latest analysis/stata_data.R vte_unvax_sens covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE FALSE
     needs:
-    - Analysis_cox_vte_unvax_sens
+    - Analysis_cox_vte_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2185,7 +2185,7 @@ actions:
     run: r:latest analysis/stata_data.R ate_primary_position_unvax_sens covid_pheno_hospitalised
       electively_unvaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_ate_primary_position_unvax_sens
+    - Analysis_cox_ate_primary_position_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_primary_position_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2204,7 +2204,7 @@ actions:
     run: r:latest analysis/stata_data.R vte_primary_position_unvax_sens covid_pheno_hospitalised
       electively_unvaccinated FALSE TRUE FALSE
     needs:
-    - Analysis_cox_vte_primary_position_unvax_sens
+    - Analysis_cox_vte_primary_position_unvax_sens_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_primary_position_unvax_sens_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitFALSE.csv.gz
@@ -2223,7 +2223,7 @@ actions:
     run: r:latest analysis/stata_data.R ami main electively_unvaccinated TRUE TRUE
       FALSE
     needs:
-    - Analysis_cox_ami
+    - Analysis_cox_ami_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2242,7 +2242,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch main electively_unvaccinated TRUE
       TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch
+    - Analysis_cox_stroke_isch_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2261,7 +2261,7 @@ actions:
     run: r:latest analysis/stata_data.R dvt main electively_unvaccinated TRUE TRUE
       FALSE
     needs:
-    - Analysis_cox_dvt
+    - Analysis_cox_dvt_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_dvt_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2280,7 +2280,7 @@ actions:
     run: r:latest analysis/stata_data.R pe main electively_unvaccinated TRUE TRUE
       FALSE
     needs:
-    - Analysis_cox_pe
+    - Analysis_cox_pe_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2299,7 +2299,7 @@ actions:
     run: r:latest analysis/stata_data.R hf main electively_unvaccinated TRUE TRUE
       FALSE
     needs:
-    - Analysis_cox_hf
+    - Analysis_cox_hf_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2318,7 +2318,7 @@ actions:
     run: r:latest analysis/stata_data.R angina main electively_unvaccinated TRUE TRUE
       FALSE
     needs:
-    - Analysis_cox_angina
+    - Analysis_cox_angina_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2337,7 +2337,7 @@ actions:
     run: r:latest analysis/stata_data.R ate main electively_unvaccinated TRUE TRUE
       FALSE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2356,7 +2356,7 @@ actions:
     run: r:latest analysis/stata_data.R vte main electively_unvaccinated TRUE TRUE
       FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2375,7 +2375,7 @@ actions:
     run: r:latest analysis/stata_data.R ami_primary_position main electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ami_primary_position
+    - Analysis_cox_ami_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_primary_position_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2394,7 +2394,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch_primary_position main electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch_primary_position
+    - Analysis_cox_stroke_isch_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_primary_position_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2413,7 +2413,7 @@ actions:
     run: r:latest analysis/stata_data.R pe_primary_position main electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_pe_primary_position
+    - Analysis_cox_pe_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_primary_position_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2432,7 +2432,7 @@ actions:
     run: r:latest analysis/stata_data.R ate_primary_position main electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ate_primary_position
+    - Analysis_cox_ate_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_primary_position_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2451,7 +2451,7 @@ actions:
     run: r:latest analysis/stata_data.R vte_primary_position main electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_vte_primary_position
+    - Analysis_cox_vte_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_primary_position_main_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2470,7 +2470,7 @@ actions:
     run: r:latest analysis/stata_data.R ami covid_pheno_hospitalised vaccinated TRUE
       TRUE FALSE
     needs:
-    - Analysis_cox_ami
+    - Analysis_cox_ami_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2489,7 +2489,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch covid_pheno_hospitalised vaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch
+    - Analysis_cox_stroke_isch_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2508,7 +2508,7 @@ actions:
     run: r:latest analysis/stata_data.R dvt covid_pheno_hospitalised vaccinated TRUE
       TRUE FALSE
     needs:
-    - Analysis_cox_dvt
+    - Analysis_cox_dvt_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_dvt_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2527,7 +2527,7 @@ actions:
     run: r:latest analysis/stata_data.R pe covid_pheno_hospitalised vaccinated TRUE
       TRUE FALSE
     needs:
-    - Analysis_cox_pe
+    - Analysis_cox_pe_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2546,7 +2546,7 @@ actions:
     run: r:latest analysis/stata_data.R hf covid_pheno_hospitalised vaccinated TRUE
       TRUE FALSE
     needs:
-    - Analysis_cox_hf
+    - Analysis_cox_hf_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2565,7 +2565,7 @@ actions:
     run: r:latest analysis/stata_data.R angina covid_pheno_hospitalised vaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_angina
+    - Analysis_cox_angina_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2584,7 +2584,7 @@ actions:
     run: r:latest analysis/stata_data.R ate covid_pheno_hospitalised vaccinated TRUE
       TRUE FALSE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2603,7 +2603,7 @@ actions:
     run: r:latest analysis/stata_data.R vte covid_pheno_hospitalised vaccinated TRUE
       TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2622,7 +2622,7 @@ actions:
     run: r:latest analysis/stata_data.R ami_primary_position covid_pheno_hospitalised
       vaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ami_primary_position
+    - Analysis_cox_ami_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_primary_position_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2641,7 +2641,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch_primary_position covid_pheno_hospitalised
       vaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch_primary_position
+    - Analysis_cox_stroke_isch_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_primary_position_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2660,7 +2660,7 @@ actions:
     run: r:latest analysis/stata_data.R dvt_primary_position covid_pheno_hospitalised
       vaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_dvt_primary_position
+    - Analysis_cox_dvt_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_dvt_primary_position_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2679,7 +2679,7 @@ actions:
     run: r:latest analysis/stata_data.R pe_primary_position covid_pheno_hospitalised
       vaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_pe_primary_position
+    - Analysis_cox_pe_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_primary_position_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2698,7 +2698,7 @@ actions:
     run: r:latest analysis/stata_data.R hf_primary_position covid_pheno_hospitalised
       vaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_hf_primary_position
+    - Analysis_cox_hf_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_primary_position_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2717,7 +2717,7 @@ actions:
     run: r:latest analysis/stata_data.R angina_primary_position covid_pheno_hospitalised
       vaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_angina_primary_position
+    - Analysis_cox_angina_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_primary_position_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2736,7 +2736,7 @@ actions:
     run: r:latest analysis/stata_data.R ate_primary_position covid_pheno_hospitalised
       vaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ate_primary_position
+    - Analysis_cox_ate_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_primary_position_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2755,7 +2755,7 @@ actions:
     run: r:latest analysis/stata_data.R vte_primary_position covid_pheno_hospitalised
       vaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_vte_primary_position
+    - Analysis_cox_vte_primary_position_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_primary_position_covid_pheno_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2774,7 +2774,7 @@ actions:
     run: r:latest analysis/stata_data.R ami covid_pheno_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ami
+    - Analysis_cox_ami_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2793,7 +2793,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch covid_pheno_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch
+    - Analysis_cox_stroke_isch_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2812,7 +2812,7 @@ actions:
     run: r:latest analysis/stata_data.R dvt covid_pheno_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_dvt
+    - Analysis_cox_dvt_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_dvt_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2831,7 +2831,7 @@ actions:
     run: r:latest analysis/stata_data.R pe covid_pheno_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_pe
+    - Analysis_cox_pe_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2850,7 +2850,7 @@ actions:
     run: r:latest analysis/stata_data.R hf covid_pheno_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_hf
+    - Analysis_cox_hf_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2869,7 +2869,7 @@ actions:
     run: r:latest analysis/stata_data.R angina covid_pheno_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_angina
+    - Analysis_cox_angina_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2888,7 +2888,7 @@ actions:
     run: r:latest analysis/stata_data.R ate covid_pheno_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2907,7 +2907,7 @@ actions:
     run: r:latest analysis/stata_data.R vte covid_pheno_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2926,7 +2926,7 @@ actions:
     run: r:latest analysis/stata_data.R ate_primary_position covid_pheno_hospitalised
       electively_unvaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ate_primary_position
+    - Analysis_cox_ate_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_primary_position_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2945,7 +2945,7 @@ actions:
     run: r:latest analysis/stata_data.R vte_primary_position covid_pheno_hospitalised
       electively_unvaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_vte_primary_position
+    - Analysis_cox_vte_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_primary_position_covid_pheno_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2964,7 +2964,7 @@ actions:
     run: r:latest analysis/stata_data.R ami covid_pheno_non_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ami
+    - Analysis_cox_ami_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -2983,7 +2983,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch covid_pheno_non_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch
+    - Analysis_cox_stroke_isch_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3002,7 +3002,7 @@ actions:
     run: r:latest analysis/stata_data.R dvt covid_pheno_non_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_dvt
+    - Analysis_cox_dvt_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_dvt_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3021,7 +3021,7 @@ actions:
     run: r:latest analysis/stata_data.R pe covid_pheno_non_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_pe
+    - Analysis_cox_pe_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3040,7 +3040,7 @@ actions:
     run: r:latest analysis/stata_data.R hf covid_pheno_non_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_hf
+    - Analysis_cox_hf_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3059,7 +3059,7 @@ actions:
     run: r:latest analysis/stata_data.R angina covid_pheno_non_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_angina
+    - Analysis_cox_angina_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_angina_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3078,7 +3078,7 @@ actions:
     run: r:latest analysis/stata_data.R ate covid_pheno_non_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3097,7 +3097,7 @@ actions:
     run: r:latest analysis/stata_data.R vte covid_pheno_non_hospitalised electively_unvaccinated
       TRUE TRUE FALSE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3116,7 +3116,7 @@ actions:
     run: r:latest analysis/stata_data.R ami_primary_position covid_pheno_non_hospitalised
       electively_unvaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ami_primary_position
+    - Analysis_cox_ami_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ami_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3135,7 +3135,7 @@ actions:
     run: r:latest analysis/stata_data.R stroke_isch_primary_position covid_pheno_non_hospitalised
       electively_unvaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_stroke_isch_primary_position
+    - Analysis_cox_stroke_isch_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_stroke_isch_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3154,7 +3154,7 @@ actions:
     run: r:latest analysis/stata_data.R pe_primary_position covid_pheno_non_hospitalised
       electively_unvaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_pe_primary_position
+    - Analysis_cox_pe_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_pe_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3173,7 +3173,7 @@ actions:
     run: r:latest analysis/stata_data.R hf_primary_position covid_pheno_non_hospitalised
       electively_unvaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_hf_primary_position
+    - Analysis_cox_hf_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_hf_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3192,7 +3192,7 @@ actions:
     run: r:latest analysis/stata_data.R ate_primary_position covid_pheno_non_hospitalised
       electively_unvaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_ate_primary_position
+    - Analysis_cox_ate_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3211,7 +3211,7 @@ actions:
     run: r:latest analysis/stata_data.R vte_primary_position covid_pheno_non_hospitalised
       electively_unvaccinated TRUE TRUE FALSE
     needs:
-    - Analysis_cox_vte_primary_position
+    - Analysis_cox_vte_primary_position_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_primary_position_covid_pheno_non_hospitalised_electively_unvaccinated_day0TRUE_extfTRUE_m1splitFALSE.csv.gz
@@ -3230,7 +3230,7 @@ actions:
     run: r:latest analysis/stata_data.R ate main electively_unvaccinated FALSE TRUE
       TRUE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3249,7 +3249,7 @@ actions:
     run: r:latest analysis/stata_data.R vte main electively_unvaccinated FALSE TRUE
       TRUE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_main_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3268,7 +3268,7 @@ actions:
     run: r:latest analysis/stata_data.R ate covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE TRUE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3287,7 +3287,7 @@ actions:
     run: r:latest analysis/stata_data.R vte covid_pheno_hospitalised electively_unvaccinated
       FALSE TRUE TRUE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_covid_pheno_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3306,7 +3306,7 @@ actions:
     run: r:latest analysis/stata_data.R ate covid_pheno_non_hospitalised electively_unvaccinated
       FALSE TRUE TRUE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3325,7 +3325,7 @@ actions:
     run: r:latest analysis/stata_data.R vte covid_pheno_non_hospitalised electively_unvaccinated
       FALSE TRUE TRUE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_electively_unvaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_covid_pheno_non_hospitalised_electively_unvaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3343,7 +3343,7 @@ actions:
   d_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
     run: r:latest analysis/stata_data.R ate main vaccinated FALSE TRUE TRUE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3360,7 +3360,7 @@ actions:
   d_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE:
     run: r:latest analysis/stata_data.R vte main vaccinated FALSE TRUE TRUE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_main_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3378,7 +3378,7 @@ actions:
     run: r:latest analysis/stata_data.R ate covid_pheno_hospitalised vaccinated FALSE
       TRUE TRUE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3397,7 +3397,7 @@ actions:
     run: r:latest analysis/stata_data.R vte covid_pheno_hospitalised vaccinated FALSE
       TRUE TRUE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_covid_pheno_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3416,7 +3416,7 @@ actions:
     run: r:latest analysis/stata_data.R ate covid_pheno_non_hospitalised vaccinated
       FALSE TRUE TRUE
     needs:
-    - Analysis_cox_ate
+    - Analysis_cox_ate_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_ate_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
@@ -3435,7 +3435,7 @@ actions:
     run: r:latest analysis/stata_data.R vte covid_pheno_non_hospitalised vaccinated
       FALSE TRUE TRUE
     needs:
-    - Analysis_cox_vte
+    - Analysis_cox_vte_vaccinated
     outputs:
       highly_sensitive:
         stata_input: output/input_stata_vte_covid_pheno_non_hospitalised_vaccinated_day0FALSE_extfTRUE_m1splitTRUE.csv.gz
