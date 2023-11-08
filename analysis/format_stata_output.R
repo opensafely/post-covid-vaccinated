@@ -1,6 +1,6 @@
 # List files to be combined
 
-files <- list.files(path = "output/", pattern = "_cox_model.txt|_cox_model_day_zero.txt")
+files <- list.files(path = "output/", pattern = "_cox_model.txt|_cox_model_day_zero.txt|_cox_model_m1split.txt")
 
 # Create empty master data frame
 
@@ -71,7 +71,7 @@ for (f in files) {
                              values_from = c("min","AgeSexObesity", "max"),
                              names_glue = "{term}_{.value}")
     
-  ## Merge info and estinates
+  ## Merge info and estimates
   
   tmp <- merge(tmp, info, by = "source")
   
@@ -83,7 +83,7 @@ for (f in files) {
   fup <- readr::read_csv(file = paste0("output/",f))
   tmp <- merge(tmp, fup, by = "term", all.x = TRUE)
   
-  ## Apend to master dataframe
+  ## Append to master dataframe
     
   df <- rbind(df, tmp)
     

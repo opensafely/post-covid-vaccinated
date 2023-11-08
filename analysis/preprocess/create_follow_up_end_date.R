@@ -30,13 +30,20 @@ follow_up_end_dates <- function(cohort_name){
   # Load relevant data
   input <- read_rds(paste0("output/input_",cohort_name,"_stage1.rds"))
   
-  input <- input[,c("patient_id","death_date","index_date","sub_cat_covid19_hospital",active_analyses$outcome_variable,
+  # Define outcome variables
+  outcome_variables <- active_analyses$outcome_variable
+  
+  if (cohort_name=="vaccinated") {
+    outcome_variables <- outcome_variables[!grepl("_unvax_sens",outcome_variables)]
+  }
+  
+  input <- input[,c("patient_id","death_date","index_date","sub_cat_covid19_hospital",outcome_variables,
                     colnames(input)[grepl("exp_",colnames(input))], 
                     colnames(input)[grepl("vax_date_covid_",colnames(input))])] 
   
   input$cohort_end_date<- cohort_end_date
   
-  for(event in active_analyses$outcome_variable){
+  for(event in outcome_variables){
     print(paste0("Working on ",event))
     
     input <- input %>%rename(event_date = event)
