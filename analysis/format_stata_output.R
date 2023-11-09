@@ -18,7 +18,6 @@ files <- list.files(path = "output/", pattern = "_cox_model_")
 
 ## Load standard models
 analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv")
-analyses_to_run_stata <- analyses_to_run_stata %>% filter(time_periods == "reduced")
 analyses_to_run_stata$extf <- TRUE
 analyses_to_run_stata$day0 <- FALSE
 analyses_to_run_stata$m1split <- FALSE
@@ -41,6 +40,10 @@ analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_m1sp
 
 ## Remove unnecessary data frames
 rm(analyses_to_run_stata_day0,analyses_to_run_stata_m1split)
+
+if (name=="m1split") {
+  analyses_to_run_stata <- analyses_to_run_stata[analyses_to_run_stata$m1split==TRUE,]
+}
 
 ## Correct subgroup names
 analyses_to_run_stata$subgroup <-
