@@ -3566,7 +3566,7 @@ actions:
     - s_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        stata_output: output/stata_output_pre_vax.csv
+        stata_output: output/stata_output_all.csv
 
   format_stata_output_m1split:
     run: r:latest analysis/format_stata_output.R m1split
@@ -3585,7 +3585,7 @@ actions:
     - s_vte_covid_pheno_non_hospitalised_vaccinated_day0TRUE_extfTRUE_m1splitTRUE
     outputs:
       moderately_sensitive:
-        stata_output: output/stata_output_m1split_pre_vax.csv
+        stata_output: output/stata_output_m1split.csv
 
   format_R_output:
     run: r:latest analysis/model/07_combine_HRs_to_one_file.R

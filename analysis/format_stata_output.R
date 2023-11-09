@@ -190,4 +190,4 @@ df <- dplyr::rename(df,
 
 # Save output ------------------------------------------------------------------
 
-readr::write_csv(df, paste0("output/stata_output_",name,"_pre_vax.csv"))
+readr::write_csv(df, paste0("output/stata_output_",name,".csv"))

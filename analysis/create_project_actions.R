@@ -524,7 +524,7 @@ actions_list <- splice(
         analyses_to_run_stata$m1split
       )
     ),
-    moderately_sensitive = list(stata_output = "output/stata_output_pre_vax.csv")
+    moderately_sensitive = list(stata_output = "output/stata_output_all.csv")
   ),
   
   #comment("Format Stata output - m1split"),
@@ -547,7 +547,7 @@ actions_list <- splice(
         analyses_to_run_stata_m1split$m1split
       )
     ),
-    moderately_sensitive = list(stata_output = "output/stata_output_m1split_pre_vax.csv")
+    moderately_sensitive = list(stata_output = "output/stata_output_m1split.csv")
   ),
   
   action(
