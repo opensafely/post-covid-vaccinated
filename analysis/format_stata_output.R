@@ -12,12 +12,47 @@ if(length(args)==0){
 
 files <- list.files(path = "output/", pattern = "_cox_model_")
 
-analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv", header=TRUE,
-                                  col.names = c("outcome","cohort","subgroup","time_periods","day0","extf","m1split"),
-                                  colClasses = c("character","character","character","character","character","character","character"))
+# Analyses to run in Stata
 
-analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="hospitalised","covid_pheno_hospitalised",analyses_to_run_stata$subgroup)
-analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="non_hospitalised","covid_pheno_non_hospitalised",analyses_to_run_stata$subgroup)
+## Load standard models
+analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv")
+analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run & time_periods == "reduced")
+analyses_to_run_stata$extf <- TRUE
+analyses_to_run_stata$day0 <- FALSE
+analyses_to_run_stata$m1split <- FALSE
+
+## Load day0 models
+analyses_to_run_stata_day0 <- read.csv("lib/analyses_to_run_in_stata_day_zero.csv")
+analyses_to_run_stata_day0$time_periods <- gsub("day_zero_", "", analyses_to_run_stata_day0$time_periods)
+analyses_to_run_stata_day0$extf <- TRUE
+analyses_to_run_stata_day0$day0 <- TRUE
+analyses_to_run_stata_day0$m1split <- FALSE
+analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_day0)
+
+## Load first month split models
+analyses_to_run_stata_m1split <- read.csv("lib/analyses_to_run_in_stata_m1split.csv")
+analyses_to_run_stata_m1split$time_periods <- gsub("m1split_", "", analyses_to_run_stata_m1split$time_periods)
+analyses_to_run_stata_m1split$extf <- TRUE
+analyses_to_run_stata_m1split$day0 <- TRUE
+analyses_to_run_stata_m1split$m1split <- TRUE
+analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_m1split)
+
+## Remove unnecessary data frames
+rm(analyses_to_run_stata_day0,analyses_to_run_stata_m1split)
+
+## Correct subgroup names
+analyses_to_run_stata$subgroup <-
+  ifelse(
+    analyses_to_run_stata$subgroup == "hospitalised",
+    "covid_pheno_hospitalised",
+    analyses_to_run_stata$subgroup
+  )
+analyses_to_run_stata$subgroup <-
+  ifelse(
+    analyses_to_run_stata$subgroup == "non_hospitalised",
+    "covid_pheno_non_hospitalised",
+    analyses_to_run_stata$subgroup
+  )
 
 tmp_files <- paste0("stata_cox_model_",analyses_to_run_stata$outcome,
                     "_",analyses_to_run_stata$subgroup,
