@@ -1,6 +1,32 @@
+# Define arguments
+
+args = commandArgs(trailingOnly=TRUE)
+
+if(length(args)==0){
+  name="m1split"
+}else{
+  name  = args[[1]]
+}
+
 # List files to be combined
 
-files <- list.files(path = "output/", pattern = "_cox_model.txt|_cox_model_day_zero.txt|_cox_model_m1split.txt")
+files <- list.files(path = "output/", pattern = "_cox_model_")
+
+analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv", header=TRUE,
+                                  col.names = c("outcome","cohort","subgroup","time_periods","day0","extf","m1split"),
+                                  colClasses = c("character","character","character","character","character","character","character"))
+
+analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="hospitalised","covid_pheno_hospitalised",analyses_to_run_stata$subgroup)
+analyses_to_run_stata$subgroup <- ifelse(analyses_to_run_stata$subgroup=="non_hospitalised","covid_pheno_non_hospitalised",analyses_to_run_stata$subgroup)
+
+tmp_files <- paste0("stata_cox_model_",analyses_to_run_stata$outcome,
+                    "_",analyses_to_run_stata$subgroup,
+                    "_",analyses_to_run_stata$cohort,
+                    "_day0",analyses_to_run_stata$day0,
+                    "_extf",analyses_to_run_stata$extf,
+                    "_m1split",analyses_to_run_stata$m1split,".txt")
+
+files <- intersect(files, tmp_files)
 
 # Create empty master data frame
 
@@ -20,7 +46,7 @@ for (f in files) {
   
   colnames(tmp) <- gsub("age_sex_obesity","AgeSexObesity",colnames(tmp))
   
-    ## Make variables numeric
+  ## Make variables numeric
   
   tmp$b_min <- as.numeric(tmp$b_min)
   tmp$se_min <- as.numeric(tmp$se_min)
@@ -28,6 +54,7 @@ for (f in files) {
   tmp$lci_min <- as.numeric(tmp$lci_min)
   tmp$uci_min <- as.numeric(tmp$uci_min)
   tmp$p_min <- as.numeric(tmp$p_min)
+  tmp$b_max <- as.numeric(tmp$b_max)
   
   tmp$b_AgeSexObesity <- as.numeric(tmp$b_AgeSexObesity)
   tmp$se_AgeSexObesity <- as.numeric(tmp$se_AgeSexObesity)
@@ -36,7 +63,6 @@ for (f in files) {
   tmp$uci_AgeSexObesity <- as.numeric(tmp$uci_AgeSexObesity)
   tmp$p_AgeSexObesity <- as.numeric(tmp$p_AgeSexObesity)
   
-  tmp$b_max <- as.numeric(tmp$b_max)
   tmp$se_max <- as.numeric(tmp$se_max)
   tmp$t_max <- as.numeric(tmp$t_max)
   tmp$lci_max <- as.numeric(tmp$lci_max)
@@ -47,12 +73,11 @@ for (f in files) {
   
   tmp$source <- f
   
-  ## Seperate info from estimates
+  ## Separate info from estimates
   
   info_terms <- c("risk","N_fail","N_sub","N","N_clust")
   info <- tmp[tmp$term %in% info_terms,c("source","term","b_min","b_AgeSexObesity","b_max")]
   info <- dplyr::rename(info, "min" = "b_min","AgeSexObesity"="b_AgeSexObesity", "max" = "b_max")
-  
   tmp <- tmp[!(tmp$term %in% info_terms),]
   
   ## Rename info
@@ -70,20 +95,20 @@ for (f in files) {
                              names_from = "term", 
                              values_from = c("min","AgeSexObesity", "max"),
                              names_glue = "{term}_{.value}")
-    
-  ## Merge info and estimates
+  
+  ## Merge info and estinates
   
   tmp <- merge(tmp, info, by = "source")
   
   ## Add median follow up
 
-  f <- gsub("_cox_model","_stata_median_fup",f)
+  f <- gsub("cox_model_","median_fup_",f)
   f <- gsub(".txt",".csv",f)
   print(f)
   fup <- readr::read_csv(file = paste0("output/",f))
   tmp <- merge(tmp, fup, by = "term", all.x = TRUE)
   
-  ## Append to master dataframe
+  ## Apend to master dataframe
     
   df <- rbind(df, tmp)
     
@@ -104,6 +129,7 @@ df <- tidyr::pivot_longer(df,
                           names_sep = "_",
                           names_prefix = "name",
                           values_to = "value")
+
 
 df <- tidyr::pivot_wider(df, 
                          id_cols = c("source","term", "model","medianfup"),
@@ -129,4 +155,4 @@ df <- dplyr::rename(df,
 
 # Save output ------------------------------------------------------------------
 
-write.csv(df, "output/stata_output.csv")
+readr::write_csv(df, paste0("output/stata_output_",name,"_pre_vax.csv"))
