@@ -1,3 +1,5 @@
+library(magrittr)
+
 # Define arguments
 
 args = commandArgs(trailingOnly=TRUE)
