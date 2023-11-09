@@ -18,7 +18,7 @@ files <- list.files(path = "output/", pattern = "_cox_model_")
 
 ## Load standard models
 analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv")
-analyses_to_run_stata <- analyses_to_run_stata %>% filter(cohort %in% cohort_to_run & time_periods == "reduced")
+analyses_to_run_stata <- analyses_to_run_stata %>% filter(time_periods == "reduced")
 analyses_to_run_stata$extf <- TRUE
 analyses_to_run_stata$day0 <- FALSE
 analyses_to_run_stata$m1split <- FALSE
