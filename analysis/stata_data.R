@@ -4,9 +4,9 @@ print('Specify arguments')
 args <- commandArgs(trailingOnly=TRUE)
 
 if(length(args)==0){
-  outcome = "ate_extended_follow_up"
+  outcome = "ate"
   subgroup = "covid_pheno_non_hospitalised"
-  cohort = "pre_vaccination"
+  cohort = "vaccination"
   day0 = FALSE
   extf = TRUE
   m1split = TRUE
@@ -22,7 +22,7 @@ if(length(args)==0){
 # Load data --------------------------------------------------------------------
 print('Load data')
 
-df <- data.table::fread(paste0("output/input_sampled_data_",outcome,"_",subgroup,"_",cohort,"_m1split_reduced_time_periods.csv"))
+df <- data.table::fread(paste0("output/input_sampled_data_",outcome,"_",subgroup,"_",cohort,"_month1_split_reduced_time_periods.csv"))
 
 # Save data --------------------------------------------------------------------
 print('Save data')
