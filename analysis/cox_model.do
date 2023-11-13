@@ -335,7 +335,7 @@ if `prevax_cohort'==1 {
 		}
 		else {
 			if "`m1split'"=="TRUE" {
-				drop if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_365==0 & days365_714==0
+				drop if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_365==0 & days365_714==0
 				replace term = "days0_1" if days0_1==1 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_365==0 & days365_714==0
 				replace term = "days1_7" if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_365==0 & days365_714==0
 				replace term = "days7_14" if days0_1==0 & days1_7==0 & days7_14==1 & days14_21==0 & days21_28==0 & days28_197==0 & days197_365==0 & days365_714==0
@@ -364,7 +364,7 @@ if `prevax_cohort'==1 {
 		}
 		else {
 			if "`m1split'"=="TRUE" {
-				drop if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==0
+				drop if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==0
 				replace term = "days0_1" if days0_1==1 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==0
 				replace term = "days1_7" if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==0
 				replace term = "days7_14" if days0_1==0 & days1_7==0 & days7_14==1 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==0
@@ -391,7 +391,7 @@ else {
 	}
 	else {
 		if "`m1split'"=="TRUE" {
-			drop if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0
+			drop if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0
 			replace term = "days0_1" if days0_1==1 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0
 			replace term = "days1_7" if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0
 			replace term = "days7_14" if days0_1==0 & days1_7==0 & days7_14==1 & days14_21==0 & days21_28==0 & days28_197==0
