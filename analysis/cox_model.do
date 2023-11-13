@@ -7,7 +7,7 @@
 	   Datasets used:			csv outcome files
 	   Datasets created:		*_cox_model_* , *_stata_median_fup_*
 	   Other output:			logfiles
-   -----------------------------------------------------------------------------*/
+-----------------------------------------------------------------------------*/
 
 local outcome "`1'"
 local subgroup "`2'"
@@ -15,7 +15,7 @@ local cohort "`3'"
 local day0 "`4'"
 local extf "`5'"
 local m1split "`6'"
-  
+
 * Set file paths
 
 global projectdir `c(pwd)'
@@ -188,21 +188,20 @@ mkspline age_spline = age, cubic knots(`r(c_1)' `r(c_2)' `r(c_3)')
 
 * Apply stset including IPW here as unsampled datasets will be provided with cox_weights set to 1
 
+stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(01,01,2020))
+
 if `prevax_cohort'==1 {
 	if "`extf'"=="TRUE" {
-		if "`day0'"=="TRUE" {
-			stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(01,01,2020))
+		if "`day0'"=="TRUE" {	
 			stsplit time, after(exposure_date) at(0 1 28 197 365 714)
 			replace time = 714 if time==-1
 		}
 		else {
 			if "`m1split'"=="TRUE" {
-				stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(01,01,2020))
 				stsplit time, after(exposure_date) at(0 1 7 14 21 28 197 365 714)
 				replace time = 714 if time==-1
 			}
 			else {
-				stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(01,01,2020))
 				stsplit time, after(exposure_date) at(0 28 197 365 714)
 				replace time = 714 if time==-1
 			}
@@ -210,27 +209,35 @@ if `prevax_cohort'==1 {
 	} 
 	else {
 		if "`day0'"=="TRUE" {
-			stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(01,01,2020))
 			stsplit time, after(exposure_date) at(0 1 28 197 535)
 			replace time = 535 if time==-1
 		}
 		else {
-			stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(01,01,2020))
-			stsplit time, after(exposure_date) at(0 28 197 535)
-			replace time = 535 if time==-1
+			if "`m1split'"=="TRUE" {
+				stsplit time, after(exposure_date) at(0 1 7 14 21 28 197 535)
+				replace time = 535 if time==-1
+			}
+			else {
+				stsplit time, after(exposure_date) at(0 28 197 365 535)
+				replace time = 535 if time==-1
+			}
 		}
-	}
-} 
+	} 
+}
 else {
 	if "`day0'"=="TRUE" {
-		stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(01,06,2021))
 		stsplit time, after(exposure_date) at(0 1 28 197)
 		replace time = 197 if time==-1
-	} 
+	}
 	else {
-		stset follow_up_end [pweight=cox_weights], failure(outcome_status) id(patient_id) enter(follow_up_start) origin(time mdy(01,06,2021))
-		stsplit time, after(exposure_date) at(0 28 197)
-		replace time = 197 if time==-1
+		if "`m1split'"=="TRUE" {
+			stsplit time, after(exposure_date) at(0 1 7 14 21 28 197)
+			replace time = 197 if time==-1
+		}
+		else {
+			stsplit time, after(exposure_date) at(0 28 197)
+			replace time = 197 if time==-1
+		}
 	}
 }
 
@@ -350,16 +357,28 @@ if `prevax_cohort'==1 {
 	else {
 		if "`day0'"=="TRUE" {
 			drop if days0_1==0 & days1_28==0 & days28_197==0 & days197_535==0
-			replace term = "days0_1" if days0_1==1 & days1_28==0 & days28_197==0 & days197_535==0	
-			replace term = "days1_28" if days0_1==0 & days1_28==1 & days28_197==0 & days197_535==0	
-			replace term = "days28_197" if days0_1==0 & days1_28==0 & days28_197==1 & days197_535==0	
-			replace term = "days197_365" if days0_1==0 & days1_28==0 & days28_197==0 & days197_535==1	
+			replace term = "days0_1" if days0_1==1 & days1_28==0 & days28_197==0 & days197_535==0
+			replace term = "days1_28" if days0_1==0 & days1_28==1 & days28_197==0 & days197_535==0
+			replace term = "days28_197" if days0_1==0 & days1_28==0 & days28_197==1 & days197_535==0
+			replace term = "days197_535" if days0_1==0 & days1_28==0 & days28_197==0 & days197_535==1
 		}
 		else {
-			drop if days0_28==0 & days28_197==0 & days197_535==0	
-			replace term = "days0_28" if days0_28==1 & days28_197==0 & days197_535==0
-			replace term = "days28_197" if days0_28==0 & days28_197==1 & days197_535==0
-			replace term = "days197_535" if days0_28==0 & days28_197==0 & days197_535==1 
+			if "`m1split'"=="TRUE" {
+				drop if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==0
+				replace term = "days0_1" if days0_1==1 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==0
+				replace term = "days1_7" if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==0
+				replace term = "days7_14" if days0_1==0 & days1_7==0 & days7_14==1 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==0
+				replace term = "days14_21" if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==1 & days21_28==0 & days28_197==0 & days197_535==0
+				replace term = "days21_28" if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==1 & days28_197==0 & days197_535==0
+				replace term = "days28_197" if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==1 & days197_535==0
+				replace term = "days197_535" if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0 & days197_535==1
+			}
+			else{
+				drop if days0_28==0 & days28_197==0 & days197_535==0
+				replace term = "days0_28" if days0_28==1 & days28_197==0 & days197_535==0
+				replace term = "days28_197" if days0_28==0 & days28_197==1 & days197_535==0
+				replace term = "days197_535" if days0_28==0 & days28_197==0 & days197_535==1
+			}
 		}
 	}
 } 
@@ -367,15 +386,24 @@ else {
 	if "`day0'"=="TRUE" {
 		drop if days0_1==0 & days1_28==0 & days28_197==0
 		replace term = "days0_1" if days0_1==1 & days1_28==0 & days28_197==0
-		replace term = "days1_28" if days0_1==0 & days1_28==1 & days28_197==0	
+		replace term = "days1_28" if days0_1==0 & days1_28==1 & days28_197==0
 		replace term = "days28_197" if days0_1==0 & days1_28==0 & days28_197==1
 	}
 	else {
-		drop if days0_28==0 & days28_197==0
-		replace term = "days0_28" if days0_28==1 & days28_197==0
-		replace term = "days28_197" if days0_28==0 & days28_197==1
-		replace term = "days197_535" if days0_28==0 & days28_197==0
-		replace follow_up = follow_up + 197 if term == "days197_535" 
+		if "`m1split'"=="TRUE" {
+			drop if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0
+			replace term = "days0_1" if days0_1==1 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0
+			replace term = "days1_7" if days0_1==0 & days1_7==1 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==0
+			replace term = "days7_14" if days0_1==0 & days1_7==0 & days7_14==1 & days14_21==0 & days21_28==0 & days28_197==0
+			replace term = "days14_21" if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==1 & days21_28==0 & days28_197==0
+			replace term = "days21_28" if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==1 & days28_197==0
+			replace term = "days28_197" if days0_1==0 & days1_7==0 & days7_14==0 & days14_21==0 & days21_28==0 & days28_197==1
+		}
+		else{
+			drop if days0_28==0 & days28_197==0
+			replace term = "days0_28" if days0_28==1 & days28_197==0
+			replace term = "days28_197" if days0_28==0 & days28_197==1
+		}
 	}
 }
 
