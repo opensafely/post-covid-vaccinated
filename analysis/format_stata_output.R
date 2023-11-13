@@ -1,6 +1,7 @@
 library(magrittr)
 
 # Define arguments
+print("Define arguments")
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -11,18 +12,24 @@ if(length(args)==0){
 }
 
 # List files to be combined
+print("List files to be combined")
 
 files <- list.files(path = "output/", pattern = "_cox_model_")
 
 # Analyses to run in Stata
+print("Analyses to run in Stata")
 
 ## Load standard models
+print("Load standard models")
+
 analyses_to_run_stata <- read.csv("lib/analyses_to_run_in_stata.csv")
 analyses_to_run_stata$extf <- TRUE
 analyses_to_run_stata$day0 <- FALSE
 analyses_to_run_stata$m1split <- FALSE
 
 ## Load day0 models
+print("Load day0 models")
+
 analyses_to_run_stata_day0 <- read.csv("lib/analyses_to_run_in_stata_day_zero.csv")
 analyses_to_run_stata_day0$time_periods <- gsub("day_zero_", "", analyses_to_run_stata_day0$time_periods)
 analyses_to_run_stata_day0$extf <- TRUE
@@ -31,6 +38,8 @@ analyses_to_run_stata_day0$m1split <- FALSE
 analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_day0)
 
 ## Load first month split models
+print("Load first month split models")
+
 analyses_to_run_stata_m1split <- read.csv("lib/analyses_to_run_in_stata_m1split.csv")
 analyses_to_run_stata_m1split$time_periods <- gsub("m1split_", "", analyses_to_run_stata_m1split$time_periods)
 analyses_to_run_stata_m1split$extf <- TRUE
@@ -39,13 +48,19 @@ analyses_to_run_stata_m1split$m1split <- TRUE
 analyses_to_run_stata <- rbind(analyses_to_run_stata, analyses_to_run_stata_m1split)
 
 ## Remove unnecessary data frames
+print("Remove unnecessary data frames")
+
 rm(analyses_to_run_stata_day0,analyses_to_run_stata_m1split)
 
 if (name=="m1split") {
   analyses_to_run_stata <- analyses_to_run_stata[analyses_to_run_stata$m1split==TRUE,]
 }
 
+analyses_to_run_stata
+
 ## Correct subgroup names
+print("Correct subgroup names")
+
 analyses_to_run_stata$subgroup <-
   ifelse(
     analyses_to_run_stata$subgroup == "hospitalised",
@@ -68,25 +83,46 @@ tmp_files <- paste0("stata_cox_model_",analyses_to_run_stata$outcome,
 
 files <- intersect(files, tmp_files)
 
+files
+
 # Create empty master data frame
+print("Create empty master data frame")
 
 df <- NULL
 
 # Append each file to master data frame
+print("Append each file to master data frame")
 
 for (f in files) {
   
+  f
+  
   ## Load data
+  print("Load data")
   
-  tmp <- readr::read_tsv(file = paste0("output/",f), skip = 2,
-                         col_names = c("term",
-                                       "b_min","se_min","t_min","lci_min","uci_min","p_min",
-                                       "b_age_sex_obesity","se_age_sex_obesity","t_age_sex_obesity","lci_age_sex_obesity","uci_age_sex_obesity","p_age_sex_obesity",
-                                       "b_max","se_max","t_max","lci_max","uci_max","p_max"))
+  if (name=="m1split") {
+    tmp <- readr::read_tsv(file = paste0("output/",f), skip = 2,
+                           col_names = c("term",
+                                         "b_min","se_min","t_min","lci_min","uci_min","p_min",
+                                         "b_max","se_max","t_max","lci_max","uci_max","p_max"))
+    tmp$b_age_sex_obesity <- NA
+    tmp$se_age_sex_obesity <- NA
+    tmp$t_age_sex_obesity <- NA
+    tmp$lci_age_sex_obesity <- NA
+    tmp$uci_age_sex_obesity <- NA
+    tmp$p_age_sex_obesity <- NA
+  } else {
+    tmp <- readr::read_tsv(file = paste0("output/",f), skip = 2,
+                           col_names = c("term",
+                                         "b_min","se_min","t_min","lci_min","uci_min","p_min",
+                                         "b_age_sex_obesity","se_age_sex_obesity","t_age_sex_obesity","lci_age_sex_obesity","uci_age_sex_obesity","p_age_sex_obesity",
+                                         "b_max","se_max","t_max","lci_max","uci_max","p_max"))
+  }
   
-  colnames(tmp) <- gsub("age_sex_obesity","AgeSexObesity",colnames(tmp))
+  colnames(tmp) <- gsub("age_sex_obesity","AgeSexObesity",colnames(tmp)) 
   
   ## Make variables numeric
+  print("Make variables numeric")
   
   tmp$b_min <- as.numeric(tmp$b_min)
   tmp$se_min <- as.numeric(tmp$se_min)
@@ -110,10 +146,12 @@ for (f in files) {
   tmp$p_max <- as.numeric(tmp$p_max)
   
   ## Add source
+  print("Add source")
   
   tmp$source <- f
   
   ## Separate info from estimates
+  print("Separate info from estimates")
   
   info_terms <- c("risk","N_fail","N_sub","N","N_clust")
   info <- tmp[tmp$term %in% info_terms,c("source","term","b_min","b_AgeSexObesity","b_max")]
@@ -121,6 +159,7 @@ for (f in files) {
   tmp <- tmp[!(tmp$term %in% info_terms),]
   
   ## Rename info
+  print("Rename info")
   
   info$term <- ifelse(info$term=="risk", "persondays", info$term)
   info$term <- ifelse(info$term=="N_fail", "outcomes", info$term)
@@ -129,6 +168,7 @@ for (f in files) {
   info$term <- ifelse(info$term=="N_clust", "clusters", info$term)
   
   ## Transpose info 
+  print("Transpose info")
   
   info <- tidyr::pivot_wider(info, 
                              id_cols = "source", 
@@ -136,12 +176,14 @@ for (f in files) {
                              values_from = c("min","AgeSexObesity", "max"),
                              names_glue = "{term}_{.value}")
   
-  ## Merge info and estinates
+  ## Merge info and estimates
+  print("Merge info and estimates")
   
   tmp <- merge(tmp, info, by = "source")
   
   ## Add median follow up
-
+  print("Add median follow up")
+  
   f <- gsub("cox_model_","median_fup_",f)
   f <- gsub(".txt",".csv",f)
   print(f)
@@ -149,17 +191,21 @@ for (f in files) {
   tmp <- merge(tmp, fup, by = "term", all.x = TRUE)
   
   ## Apend to master dataframe
-    
+  print("Apend to master dataframe")
+  
   df <- rbind(df, tmp)
     
 }
 
 # Format master dataframe
+print("Format master dataframe")
 
 df <- df[,c("source","term","medianfup",
             paste0(c("b","se","t","lci","uci","p","persondays","outcomes","subjects","observations","clusters"),"_min"),
             paste0(c("b","se","t","lci","uci","p","persondays","outcomes","subjects","observations","clusters"),"_AgeSexObesity"),
             paste0(c("b","se","t","lci","uci","p","persondays","outcomes","subjects","observations","clusters"),"_max"))]
+
+df
 
 df <- tidyr::pivot_longer(df, 
                           cols = c(paste0(c("b","se","t","lci","uci","p","persondays","outcomes","subjects","observations","clusters"),"_min"),
@@ -177,6 +223,7 @@ df <- tidyr::pivot_wider(df,
                          values_from = "value")
 
 # Make names match R output ----------------------------------------------------
+print("Make names match R output")
 
 df <- df[df$model=="max" | (df$model=="min" & df$term %in% c(unique(df$term[grepl("days",df$term)]),"1.sex","2.sex","age_spline1","age_spline2")) |
            (df$model == "AgeSexObesity" & df$term %in% c(unique(df$term[grepl("days",df$term)]),"1.sex","2.sex","age_spline1","age_spline2","cov_bin_obesity")),]
@@ -194,5 +241,7 @@ df <- dplyr::rename(df,
                     "N_outcomes" = "outcomes")
 
 # Save output ------------------------------------------------------------------
+print("Save output")
 
+df <- df[!is.na(df$N_sample_size),]
 readr::write_csv(df, paste0("output/stata_output_",name,".csv"))
