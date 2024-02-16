@@ -152,7 +152,7 @@ ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = median_follow_up, y = esti
                  text=element_text(size=13)) +
   #ggplot2::facet_wrap(grouping_name~.,labeller=as_labeller(names), ncol=3)
   ggplot2::facet_wrap(outcome~., ncol = 2)
-ggplot2::ggsave(paste0(output_dir,"Figure_2_day0_reduced.png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+ggplot2::ggsave(paste0(output_dir,"Figure_CVD_outcomes_day0_reduced.png"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
 
 #--------------------------#
 # Same plot removing day 0 #
@@ -195,4 +195,4 @@ ggplot2::ggplot(data = df, mapping = ggplot2::aes(x = median_follow_up, y = esti
                  text=element_text(size=13)) +
   #ggplot2::facet_wrap(grouping_name~.,labeller=as_labeller(names), ncol=3)
   ggplot2::facet_wrap(outcome~., ncol = 2)
-ggplot2::ggsave(paste0(output_dir,"Figure_2_without_day0.pdf"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
+ggplot2::ggsave(paste0(output_dir,"Figure_3.pdf"), height = 297, width = 210, unit = "mm", dpi = 600, scale = 1)
