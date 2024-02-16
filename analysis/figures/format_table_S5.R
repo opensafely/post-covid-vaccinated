@@ -91,4 +91,4 @@ estimates$outcome <- factor(estimates$outcome, levels=c("All arterial thromboses
 
 estimates <- estimates[order(estimates$outcome),]
 
-write.csv(estimates, file = paste0(output_dir,"/supplementary_table7_unvaccinated_comparison.csv"),row.names = F)
+write.csv(estimates, file = paste0(output_dir,"/supplementary_table5_unvaccinated_comparison.csv"),row.names = F)
