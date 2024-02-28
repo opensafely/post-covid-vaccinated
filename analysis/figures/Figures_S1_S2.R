@@ -22,7 +22,7 @@ active_analyses <- read_rds("lib/active_analyses.rds") %>% filter(active == "TRU
 active_analyses <- active_analyses %>% 
   select(outcome, outcome_variable) %>% 
   mutate(outcome_name=active_analyses$outcome_variable %>% str_replace("out_date_", "")) %>%
-  filter(outcome_variable %in% c("out_date_ate","out_date_vte")) 
+  filter(outcome_variable %in% c("out_date_ate","out_date_vte","out_date_ate_primary_position","out_date_vte_primary_position")) 
 
 active_analyses_pre_vax <- read_rds("lib/active_analyses_pre_vax.rds") %>% filter(active == "TRUE")
 
@@ -30,7 +30,7 @@ active_analyses_pre_vax <- active_analyses_pre_vax %>%
   select(outcome, outcome_variable) %>% 
   mutate(outcome_name=active_analyses_pre_vax$outcome_variable %>% str_replace("out_date_", ""))%>%
   filter(grepl("extended_follow_up",outcome_variable) 
-         & outcome_variable %in% c("out_date_ate_extended_follow_up","out_date_vte_extended_follow_up"))
+         & outcome_variable %in% c("out_date_ate_extended_follow_up","out_date_vte_extended_follow_up","out_date_ate_primary_position_extended_follow_up","out_date_vte_primary_position_extended_follow_up"))
 
 #----------------------------Focus on ATE & VTE---------------------------------
 outcomes_to_plot <- active_analyses$outcome_name
@@ -45,13 +45,16 @@ estimates <- estimates %>% filter(subgroup %in% c("covid_pheno_non_hospitalised"
                                   & ((event %in% outcomes_to_plot & cohort %in% c("vaccinated","electively_unvaccinated")) | (event %in% outcomes_to_plot_pre_vax & cohort %in% c("pre_vaccination"))) 
                                   & term %in% term[grepl("^days",term)]
                                   & model == "mdl_max_adj"
-                                  & time_points == "day_zero_reduced") %>%
+                                  & time_points == "reduced") %>%
   select(term,estimate,conf_low,conf_high,event,subgroup,cohort,time_points,median_follow_up)
 
 estimates <- estimates %>% dplyr::mutate(across(c(estimate,conf_low,conf_high,median_follow_up),as.numeric))
 
 #------------------------------Tidy event names---------------------------------
 estimates$event <- gsub("_extended_follow_up","",estimates$event)
+
+estimates$position <- ifelse(estimates$event %in% c("ate_primary_position","vte_primary_position"), "Primary position", "Any position")
+estimates$event <- gsub("_primary_position","",estimates$event)
 
 #---------------------------------------#
 # Specify groups and their line colours #
@@ -73,41 +76,42 @@ levels(estimates$cohort) <- list("Pre-vaccination (Jan 1 2020 - Jun 18 2021)"="p
 levels(estimates$subgroup) <- list("All COVID-19"="main", "Hospitalised COVID-19"="covid_pheno_hospitalised","Non-hospitalised COVID-19"="covid_pheno_non_hospitalised")
 
 estimates$grouping_name=""
-estimates$grouping_name <- paste0(estimates$subgroup," - ", estimates$event)
+estimates$grouping_name <- paste0(estimates$subgroup," - ", estimates$position)
 
 unique(estimates$grouping_name)
 
 #Set factor levels
-estimates$grouping_name <- factor(estimates$grouping_name, levels = c("All COVID-19 - ate",
-                                                                      "Hospitalised COVID-19 - ate",
-                                                                      "Non-hospitalised COVID-19 - ate",
-                                                                      "All COVID-19 - vte",
-                                                                      "Hospitalised COVID-19 - vte",
-                                                                      "Non-hospitalised COVID-19 - vte"))
+estimates$grouping_name <- factor(estimates$grouping_name, levels = c("All COVID-19 - Any position",
+                                                                      "Hospitalised COVID-19 - Any position",
+                                                                      "Non-hospitalised COVID-19 - Any position",
+                                                                      "All COVID-19 - Primary position",
+                                                                      "Hospitalised COVID-19 - Primary position",
+                                                                      "Non-hospitalised COVID-19 - Primary position"))
 
 names <- c(
-  `All COVID-19 - ate` = "All COVID-19
+  `All COVID-19 - Any position` = "All COVID-19
   ",
-  `Hospitalised COVID-19 - ate` = "Hospitalised COVID-19
-  Arterial thrombotic events",
-  `Non-hospitalised COVID-19 - ate` = "Non-hospitalised COVID-19
+  `Hospitalised COVID-19 - Any position` = "Hospitalised COVID-19
+  Any position",
+  `Non-hospitalised COVID-19 - Any position` = "Non-hospitalised COVID-19
   ",
-  `All COVID-19 - vte` = "",
-  `Hospitalised COVID-19 - vte` = "Venous thrombotic events",
-  `Non-hospitalised COVID-19 - vte` = ""
+  `All COVID-19 - Primary position` = "",
+  `Hospitalised COVID-19 - Primary position` = "Primary position",
+  `Non-hospitalised COVID-19 - Primary position` = ""
 )
 
-df <- estimates
+
+#------------------------#
+# Plot figure S1 for ate #
+#------------------------# 
+df_ate <- estimates %>% filter(event == "ate")
 
 min_plot <- 0.5
-max_plot <- 3000
-y_lim <- c(0.5,3000)
-y_lim_breaks <- c(0.5,1,2,4,8,16,32,64,128,256,512,1024,2048)
-
-#-------------#
-# Plot figure #
-#-------------# 
-ggplot2::ggplot(data = df, 
+max_plot <- 64
+y_lim <- c(0.5,64)
+y_lim_breaks <- c(0.5,1,2,4,8,16,32,64)
+  
+ggplot2::ggplot(data = df_ate, 
                 mapping = ggplot2::aes(x = median_follow_up, y = estimate, color = cohort, shape = cohort, fill = cohort)) +
   ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
   #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1.5))+
@@ -138,21 +142,19 @@ ggplot2::ggplot(data = df,
                  text=element_text(size=13)) +
   ggplot2::facet_wrap(grouping_name~.,labeller=as_labeller(names), ncol=3)
 
-ggplot2::ggsave(paste0(output_dir,"Figure_ate_vte_day0_reduced.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+ggplot2::ggsave(paste0(output_dir,"Figure_S1_ate.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
 
-#--------------------------#
-# Same plot removing day 0 #
-#--------------------------#
-# Remove day 0 time period from plot --------------------------------------------------
-df <- df %>% filter(term!="days0_1")
+#------------------------#
+# Plot figure S1 for vte #
+#------------------------# 
+df_vte <- estimates %>% filter(event == "vte")
 
-#Adjust y-scale
 min_plot <- 0.5
-max_plot <- 256
-y_lim <- c(0.5,256)
-y_lim_breaks <- c(0.5,1,2,4,8,16,32,64,128,256)
+max_plot <- 512
+y_lim <- c(0.5,512)
+y_lim_breaks <- c(0.5,1,2,4,8,16,32,64,128,256,512)
 
-ggplot2::ggplot(data = df, 
+ggplot2::ggplot(data = df_vte, 
                 mapping = ggplot2::aes(x = median_follow_up, y = estimate, color = cohort, shape = cohort, fill = cohort)) +
   ggplot2::geom_hline(mapping = ggplot2::aes(yintercept = 1), colour = "#A9A9A9") +
   #ggplot2::geom_point(position = ggplot2::position_dodge(width = 1.5))+
@@ -183,4 +185,4 @@ ggplot2::ggplot(data = df,
                  text=element_text(size=13)) +
   ggplot2::facet_wrap(grouping_name~.,labeller=as_labeller(names), ncol=3)
 
-ggplot2::ggsave(paste0(output_dir,"Figure_2.pdf"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)
+ggplot2::ggsave(paste0(output_dir,"Figure_S2_vte.png"), height = 210, width = 297, unit = "mm", dpi = 600, scale = 1)

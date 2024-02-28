@@ -83,5 +83,5 @@ table1_merged <- table1_merged %>% select(Covariate, `Covariate Level`, `Whole P
 
 # SAVE TABLE 1
   
-write.csv(table1_merged, paste0(output_dir,"Table1_formatted.csv"), row.names = FALSE)
+write.csv(table1_merged, paste0(output_dir,"Table1_formatted.csv"), row.names = FALSE) # Table 1 and S2
 
